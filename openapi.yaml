@@ -1,0 +1,58 @@
+# Generated with protoc-gen-openapi
+# https://github.com/google/gnostic/tree/master/cmd/protoc-gen-openapi
+
+openapi: 3.0.3
+info:
+    title: Upload API
+    version: 0.0.1
+paths:
+    /v1/media/avatar:
+        post:
+            tags:
+                - Upload
+            operationId: Upload_UploadAvatar
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.upload.v1.UploadMediaRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.upload.v1.UploadMediaReply'
+    /v1/media/upload:
+        post:
+            tags:
+                - Upload
+            operationId: Upload_UploadMedia
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.upload.v1.UploadMediaRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.upload.v1.UploadMediaReply'
+components:
+    schemas:
+        api.upload.v1.UploadMediaReply:
+            type: object
+            properties:
+                url:
+                    type: string
+        api.upload.v1.UploadMediaRequest:
+            type: object
+            properties:
+                content:
+                    type: string
+tags:
+    - name: Upload
