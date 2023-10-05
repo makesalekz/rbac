@@ -234,7 +234,7 @@ func (c *DummyClient) UpdateOne(d *Dummy) *DummyUpdateOne {
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *DummyClient) UpdateOneID(id int) *DummyUpdateOne {
+func (c *DummyClient) UpdateOneID(id int64) *DummyUpdateOne {
 	mutation := newDummyMutation(c.config, OpUpdateOne, withDummyID(id))
 	return &DummyUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -251,7 +251,7 @@ func (c *DummyClient) DeleteOne(d *Dummy) *DummyDeleteOne {
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *DummyClient) DeleteOneID(id int) *DummyDeleteOne {
+func (c *DummyClient) DeleteOneID(id int64) *DummyDeleteOne {
 	builder := c.Delete().Where(dummy.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -268,12 +268,12 @@ func (c *DummyClient) Query() *DummyQuery {
 }
 
 // Get returns a Dummy entity by its id.
-func (c *DummyClient) Get(ctx context.Context, id int) (*Dummy, error) {
+func (c *DummyClient) Get(ctx context.Context, id int64) (*Dummy, error) {
 	return c.Query().Where(dummy.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *DummyClient) GetX(ctx context.Context, id int) *Dummy {
+func (c *DummyClient) GetX(ctx context.Context, id int64) *Dummy {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
