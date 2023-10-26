@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package utils;
+
+option go_package = "rbac/api/utils";
+option java_package = "utils";
+
+message PaginateRequest {
+  int32 page = 1;
+  int64 pageSize = 2;
+}
+
+message PaginateReply {
+  optional int32 totalPage = 1;
+  optional int64 totalSize = 2;
+  optional int32 page = 3;
+  optional int32 pageSize = 4;
+
+}

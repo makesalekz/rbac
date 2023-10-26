@@ -1,0 +1,151 @@
+//kratos:client
+syntax = "proto3";
+
+import "google/api/annotations.proto";
+import "errors/errors.proto";
+import "api/utils/utils.proto";
+import "api/permissions/v1/permissions.proto";
+
+package api.roles.v1;
+
+option go_package = "rbac/api/roles/v1;roles_v1";
+option java_multiple_files = true;
+option java_package = "api.roles.v1";
+
+service Roles {
+  rpc CreateRole (CreateRoleRequest) returns (RoleReply) {
+    option (google.api.http) = {
+      post: "/v1/roles"
+      body: "*"
+    };
+  };
+  rpc UpdateRole (UpdateRoleRequest) returns (RoleReply) {
+    option (google.api.http) = {
+      put: "/v1/roles/{roleId}"
+      body: "*"
+    };
+  };
+  rpc DeleteRole (DeleteRoleRequest) returns (EmptyReply) {
+    option (google.api.http) = {
+      delete: "/v1/roles/{roleId}"
+    };
+  };
+  rpc GetRole (GetRoleRequest) returns (RoleReply) {
+    option (google.api.http) = {
+      get: "/v1/roles/{roleId}"
+    };
+  };
+  rpc ListRoles (ListRolesRequest) returns (ListRolesReply){
+    option (google.api.http) = {
+      get: "/v1/roles"
+    };
+  };
+  rpc AddPermissionToRole (AddPermissionToRoleRequest) returns (AddPermissionToRoleReply){
+    option (google.api.http) = {
+      post: "/v1/roles/{roleId}/permissions"
+      body: "*"
+    };
+  };
+  rpc RemovePermissionFromRole (RemovePermissionFromRoleRequest) returns (EmptyReply){
+    option (google.api.http) = {
+      delete: "/v1/roles/{roleId}/permissions/{permissionId}"
+    };
+  };
+  rpc ListRolePermissions (RolesPermissionsRequest) returns (RolesPermissionsReply){
+    option (google.api.http) = {
+      get: "/v1/roles/{roleId}/permissions"
+    };
+  };
+}
+
+message EmptyRequest {}
+
+message EmptyReply {}
+
+message RoleReply {
+  int64 id = 1;
+  string name = 2;
+  int64 organizationId = 3;
+  int64 appId = 4;
+}
+
+message CreateRoleRequest {
+  string name = 1;
+  int64 organizationId = 2;
+  int64 appId = 3;
+}
+
+message UpdateRoleRequest {
+  int64 roleId = 1;
+  string name = 2;
+  int64 organizationId = 3;
+  int64 appId = 4;
+}
+
+message DeleteRoleRequest {
+  int64 roleId = 1;
+}
+
+message GetRoleRequest {
+  int64 roleId = 1;
+  int64 organizationId = 2;
+  int64 appId = 3;
+  string name = 4;
+}
+
+message ListRolesRequest {
+  int64 organizationId = 1;
+  optional string name = 2;
+  utils.PaginateRequest paginate = 3;
+}
+
+message ListRolesReply {
+  repeated RoleReply roles = 1;
+  utils.PaginateReply paginate = 2;
+}
+
+message AddPermissionToRoleRequest {
+  int64 organizationId = 1;
+  int64 appId = 2;
+  int64 roleId = 3;
+  int64 permissionId = 4;
+}
+
+message AddPermissionToRoleReply {
+  api.permissions.v1.PermissionReply permissions = 1;
+}
+
+message RemovePermissionFromRoleRequest {
+  int64 organizationId = 1;
+  int64 appId = 2;
+  int64 roleId = 3;
+  int64 permissionId = 4;
+}
+
+message RolesPermissionsRequest {
+  int64 organizationId = 1;
+  int64 appId = 2;
+  int64 roleId = 3;
+  utils.PaginateRequest paginate = 4;
+}
+
+message RolesPermissionsReply {
+  repeated api.permissions.v1.PermissionReply permissions = 1;
+  utils.PaginateReply paginate = 2;
+}
+
+
+enum ErrorReason {
+  // Set default error code.
+  option (errors.default_code) = 500;
+
+  // Set the error code separately for an enumeration.
+  INTERNAL = 0;
+  GRPC_CONNECTION = 1;
+  SERVICE_FAILED = 2;
+  DATABASE_QUERY = 3;
+
+  UNAUTHORIZED = 10 [(errors.code) = 401];
+
+  USER_NOT_FOUND = 20 [(errors.code) = 404];
+}

@@ -1,0 +1,108 @@
+syntax = "proto3";
+
+import "google/api/annotations.proto";
+import "errors/errors.proto";
+import "api/utils/utils.proto";
+
+package api.permissions.v1;
+
+option go_package = "rbac/api/permissions/v1;permissions_v1";
+option java_multiple_files = true;
+option java_package = "api.permissions.v1";
+
+service Permissions {
+	rpc CreatePermission (CreatePermissionRequest) returns (PermissionReply) {
+		option (google.api.http) = {
+			post: "/v1/permissions"
+			body: "*"
+		};
+	};
+	rpc UpdatePermission (UpdatePermissionRequest) returns (PermissionReply) {
+		option (google.api.http) = {
+			put: "/v1/permissions/{permissionId}"
+			body: "*"
+		};
+	};
+	rpc DeletePermission (DeletePermissionRequest) returns (EmptyReply) {
+		option (google.api.http) = {
+			delete: "/v1/permissions/{permissionId}"
+		};
+	};
+	rpc GetPermission (GetPermissionRequest) returns (PermissionReply) {
+		option (google.api.http) = {
+			get: "/v1/permissions/{permissionId}"
+		};
+	};
+	rpc ListPermissions (ListPermissionsRequest) returns (ListPermissionsReply){
+		option (google.api.http) = {
+			get: "/v1/permissions"
+		};
+	};
+}
+
+
+message EmptyRequest {}
+message EmptyReply {}
+
+message PermissionReply {
+	int64 id = 1;
+	string name = 2;
+	int64 organizationId = 3;
+	int64 appId = 4;
+	repeated string fields = 5;
+}
+
+message CreatePermissionRequest {
+	string name = 1;
+	int64 organizationId = 2;
+	int64 appId = 3;
+	repeated string fields = 5;
+}
+
+message UpdatePermissionRequest {
+	int64 permissionId = 1;
+	string name = 2;
+	int64 organizationId = 3;
+	int64 appId = 4;
+	repeated string fields = 5;
+}
+
+message DeletePermissionRequest {
+	int64 permissionId = 1;
+}
+
+message GetPermissionRequest {
+	int64 permissionId = 1;
+	string organizationId = 2;
+	string appId = 3;
+	string name = 4;
+	repeated string fields = 5;
+}
+
+message ListPermissionsRequest {
+	int64 organizationId = 1;
+	int64 appId = 2;
+	repeated int64 ids = 3;
+	utils.PaginateRequest paginate = 4;
+}
+
+message ListPermissionsReply {
+	repeated PermissionReply permissions = 1;
+	utils.PaginateReply paginate = 2;
+}
+
+
+enum ErrorReason {
+	// Set default error code.
+	option (errors.default_code) = 500;
+
+	// Set the error code separately for an enumeration.
+	INTERNAL = 0;
+	GRPC_CONNECTION = 1;
+	SERVICE_FAILED = 2;
+	DATABASE_QUERY = 3;
+
+	UNAUTHORIZED = 10 [(errors.code) = 401];
+
+	USER_NOT_FOUND = 20 [(errors.code) = 404];
+}
