@@ -45,45 +45,40 @@ message EmptyRequest {}
 message EmptyReply {}
 
 message PermissionReply {
-	int64 id = 1;
+	string id = 1;
 	string name = 2;
-	int64 organizationId = 3;
-	int64 appId = 4;
+	string description = 3;
+	int32 appId = 4;
 	repeated string fields = 5;
 }
 
 message CreatePermissionRequest {
-	string name = 1;
-	int64 organizationId = 2;
-	int64 appId = 3;
+	string id = 1;
+	int32 appId = 2;
+	string name = 3;
+	string description = 4;
 	repeated string fields = 5;
 }
 
 message UpdatePermissionRequest {
-	int64 permissionId = 1;
+	string permissionId = 1;
 	string name = 2;
-	int64 organizationId = 3;
-	int64 appId = 4;
-	repeated string fields = 5;
+	string description = 3;
+	repeated string fields = 4;
 }
 
 message DeletePermissionRequest {
-	int64 permissionId = 1;
+	string permissionId = 1;
 }
 
 message GetPermissionRequest {
-	int64 permissionId = 1;
-	string organizationId = 2;
-	string appId = 3;
-	string name = 4;
-	repeated string fields = 5;
+	string permissionId = 1;
 }
 
 message ListPermissionsRequest {
-	int64 organizationId = 1;
-	int64 appId = 2;
-	repeated int64 ids = 3;
-	utils.PaginateRequest paginate = 4;
+	int32 appId = 1;
+	repeated string ids = 2;
+	utils.PaginateRequest paginate = 3;
 }
 
 message ListPermissionsReply {

@@ -1,0 +1,52 @@
+syntax = "proto3";
+
+package api.check_permissions.v1;
+
+
+import "google/api/annotations.proto";
+import "errors/errors.proto";
+
+option go_package = "rbac/api/check_permissions/v1;check_permissions_v1";
+option java_multiple_files = true;
+option java_package = "api.check_permissions.v1";
+
+service CheckPermissions {
+	rpc CheckPermissions (CheckPermissionsRequest) returns (CheckPermissionsReply) {
+		option (google.api.http) = {
+			post: "/v1/check-permission"
+			body: "*"
+		};
+	}
+}
+
+message CheckPermissionsRequest {
+	int64 userId = 1;
+	int64 teamId = 2;
+	repeated string permissions = 3;
+}
+
+message HasPermission {
+	string permission = 1;
+	bool hasPermission = 2;
+}
+
+message CheckPermissionsReply {
+	bool hasSomePermissions = 1;
+	bool hasEveryPermissions = 2;
+	repeated HasPermission hasPermissions = 3;
+}
+
+enum ErrorReason {
+	// Set default error code.
+	option (errors.default_code) = 500;
+
+	// Set the error code separately for an enumeration.
+	INTERNAL = 0;
+	GRPC_CONNECTION = 1;
+	SERVICE_FAILED = 2;
+	DATABASE_QUERY = 3;
+
+	UNAUTHORIZED = 10 [(errors.code) = 401];
+
+	USER_NOT_FOUND = 20 [(errors.code) = 404];
+}

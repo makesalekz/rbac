@@ -65,21 +65,20 @@ message EmptyReply {}
 message RoleReply {
   int64 id = 1;
   string name = 2;
-  int64 organizationId = 3;
-  int64 appId = 4;
+  string description = 3;
+  int64 teamId = 4;
 }
 
 message CreateRoleRequest {
   string name = 1;
-  int64 organizationId = 2;
-  int64 appId = 3;
+  string description = 2;
+  int64 teamId = 3;
 }
 
 message UpdateRoleRequest {
   int64 roleId = 1;
   string name = 2;
-  int64 organizationId = 3;
-  int64 appId = 4;
+  string description = 3;
 }
 
 message DeleteRoleRequest {
@@ -88,13 +87,10 @@ message DeleteRoleRequest {
 
 message GetRoleRequest {
   int64 roleId = 1;
-  int64 organizationId = 2;
-  int64 appId = 3;
-  string name = 4;
 }
 
 message ListRolesRequest {
-  int64 organizationId = 1;
+  string teamId = 1;
   optional string name = 2;
   utils.PaginateRequest paginate = 3;
 }
@@ -105,28 +101,23 @@ message ListRolesReply {
 }
 
 message AddPermissionToRoleRequest {
-  int64 organizationId = 1;
-  int64 appId = 2;
-  int64 roleId = 3;
-  int64 permissionId = 4;
+  int64 roleId = 1;
+  string permissionId = 2;
 }
 
 message AddPermissionToRoleReply {
-  api.permissions.v1.PermissionReply permissions = 1;
+  int64 roleId = 1;
+  api.permissions.v1.PermissionReply permissions = 2;
 }
 
 message RemovePermissionFromRoleRequest {
-  int64 organizationId = 1;
-  int64 appId = 2;
-  int64 roleId = 3;
-  int64 permissionId = 4;
+  int64 roleId = 1;
+  string permissionId = 2;
 }
 
 message RolesPermissionsRequest {
-  int64 organizationId = 1;
-  int64 appId = 2;
-  int64 roleId = 3;
-  utils.PaginateRequest paginate = 4;
+  int64 roleId = 1;
+  utils.PaginateRequest paginate = 2;
 }
 
 message RolesPermissionsReply {
