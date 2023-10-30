@@ -16,7 +16,7 @@ type RolePermission struct {
 func (RolePermission) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int64("role_id"),
-		field.Int32("permission_id"),
+		field.String("permission_id"),
 		field.JSON("fields", []string{}),
 	}
 }

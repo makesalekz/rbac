@@ -15,7 +15,7 @@ type Permission struct {
 // Fields of the Permission.
 func (Permission) Fields() []ent.Field {
 	return []ent.Field{
-		field.Int32("id").Immutable(),
+		field.String("id").Immutable(),
 		field.String("name").NotEmpty(),
 		field.String("description").Optional(),
 		field.Int32("app_id"),
