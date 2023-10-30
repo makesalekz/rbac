@@ -4,9 +4,12 @@ package ent
 
 import (
 	"context"
-	"dummy/ent/dummy"
 	"errors"
 	"fmt"
+	"rbac/ent/permission"
+	"rbac/ent/role"
+	"rbac/ent/rolepermission"
+	"rbac/ent/usersroles"
 	"reflect"
 	"sync"
 
@@ -73,7 +76,10 @@ var (
 func checkColumn(table, column string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
-			dummy.Table: dummy.ValidColumn,
+			permission.Table:     permission.ValidColumn,
+			role.Table:           role.ValidColumn,
+			rolepermission.Table: rolepermission.ValidColumn,
+			usersroles.Table:     usersroles.ValidColumn,
 		})
 	})
 	return columnCheck(table, column)

@@ -3,8 +3,9 @@
 package ent
 
 import (
-	"dummy/ent/dummy"
-	"dummy/ent/schema"
+	"rbac/ent/permission"
+	"rbac/ent/role"
+	"rbac/ent/schema"
 	"time"
 )
 
@@ -12,18 +13,20 @@ import (
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
-	dummyFields := schema.Dummy{}.Fields()
-	_ = dummyFields
-	// dummyDescName is the schema descriptor for name field.
-	dummyDescName := dummyFields[1].Descriptor()
-	// dummy.DefaultName holds the default value on creation for the name field.
-	dummy.DefaultName = dummyDescName.Default.(string)
-	// dummyDescCreatedAt is the schema descriptor for created_at field.
-	dummyDescCreatedAt := dummyFields[2].Descriptor()
-	// dummy.DefaultCreatedAt holds the default value on creation for the created_at field.
-	dummy.DefaultCreatedAt = dummyDescCreatedAt.Default.(func() time.Time)
-	// dummyDescUpdatedAt is the schema descriptor for updated_at field.
-	dummyDescUpdatedAt := dummyFields[3].Descriptor()
-	// dummy.DefaultUpdatedAt holds the default value on creation for the updated_at field.
-	dummy.DefaultUpdatedAt = dummyDescUpdatedAt.Default.(func() time.Time)
+	permissionFields := schema.Permission{}.Fields()
+	_ = permissionFields
+	// permissionDescName is the schema descriptor for name field.
+	permissionDescName := permissionFields[1].Descriptor()
+	// permission.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	permission.NameValidator = permissionDescName.Validators[0].(func(string) error)
+	// permissionDescCreatedAt is the schema descriptor for created_at field.
+	permissionDescCreatedAt := permissionFields[5].Descriptor()
+	// permission.DefaultCreatedAt holds the default value on creation for the created_at field.
+	permission.DefaultCreatedAt = permissionDescCreatedAt.Default.(func() time.Time)
+	roleFields := schema.Role{}.Fields()
+	_ = roleFields
+	// roleDescCreatedAt is the schema descriptor for created_at field.
+	roleDescCreatedAt := roleFields[4].Descriptor()
+	// role.DefaultCreatedAt holds the default value on creation for the created_at field.
+	role.DefaultCreatedAt = roleDescCreatedAt.Default.(func() time.Time)
 }
