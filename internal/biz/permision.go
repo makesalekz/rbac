@@ -31,6 +31,10 @@ func (uc *PermissionsUsecase) GetPermissionById(ctx context.Context, permissionI
 	return uc.permissionRepo.GetPermissionById(ctx, permissionId)
 }
 
+func (uc *PermissionsUsecase) CreatePermission(ctx context.Context, data data.CreatePermissionDto) (*ent.Permission, error) {
+	return uc.permissionRepo.CreatePermission(ctx, data)
+}
+
 func (uc *PermissionsUsecase) UpdatePermission(ctx context.Context, permissionId string, data data.UpdatePermissionDto) (*ent.Permission, error) {
 	return uc.permissionRepo.UpdatePermission(ctx, permissionId, data)
 }
@@ -39,6 +43,6 @@ func (uc *PermissionsUsecase) DeletePermission(ctx context.Context, permissionId
 	return uc.permissionRepo.DeletePermission(ctx, permissionId)
 }
 
-func (uc *PermissionsUsecase) GetPermissions(ctx context.Context, permissionIds []string) ([]*ent.Permission, error) {
-	return uc.permissionRepo.GetPermissionsByIds(ctx, permissionIds)
+func (uc *PermissionsUsecase) GetPermissions(ctx context.Context, appId int32, permissionIds []string) ([]*ent.Permission, error) {
+	return uc.permissionRepo.GetPermissions(ctx, appId, permissionIds)
 }
