@@ -4,8 +4,8 @@ import (
 	"context"
 	"os"
 
-	"dummy/ent"
-	"dummy/internal/conf"
+	"rbac/ent"
+	"rbac/internal/conf"
 
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/google/wire"
@@ -13,7 +13,7 @@ import (
 )
 
 // ProviderSet is data providers.
-var ProviderSet = wire.NewSet(NewData, NewConfig, NewJwtProcessor, NewNatsClient, NewDummyRepo)
+var ProviderSet = wire.NewSet(NewData, NewConfig, NewJwtProcessor, NewNatsClient, NewRoleRepo, NewPermissionRepo)
 
 // Data .
 type Data struct {

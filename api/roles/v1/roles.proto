@@ -90,7 +90,7 @@ message GetRoleRequest {
 }
 
 message ListRolesRequest {
-  string teamId = 1;
+  int64 teamId = 1;
   optional string name = 2;
   utils.PaginateRequest paginate = 3;
 }
@@ -103,6 +103,7 @@ message ListRolesReply {
 message AddPermissionToRoleRequest {
   int64 roleId = 1;
   string permissionId = 2;
+  repeated string fields = 3;
 }
 
 message AddPermissionToRoleReply {
