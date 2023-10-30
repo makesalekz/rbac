@@ -15,12 +15,11 @@ type Permission struct {
 // Fields of the Permission.
 func (Permission) Fields() []ent.Field {
 	return []ent.Field{
-		field.Int64("id").Immutable(),
-		field.String("key").MaxLen(32).NotEmpty().Unique(),
-		field.String("name"),
-		field.Int64("organization_id"),
-		field.Int64("app_id"),
-		field.JSON("fields", []string{}),
+		field.Int32("id").Immutable(),
+		field.String("name").NotEmpty(),
+		field.String("description").Optional(),
+		field.Int32("app_id"),
+		field.JSON("fields", []string{}).Optional(),
 		field.Time("created_at").Default(time.Now),
 	}
 }

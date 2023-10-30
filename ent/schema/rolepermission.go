@@ -2,6 +2,7 @@ package schema
 
 import (
 	"entgo.io/ent"
+	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 	"entgo.io/ent/schema/index"
 )
@@ -14,15 +15,24 @@ type RolePermission struct {
 // Fields of the RolePermission.
 func (RolePermission) Fields() []ent.Field {
 	return []ent.Field{
-		field.Int64("role_id").Immutable(),
-		field.Int64("permission_id").Immutable(),
+		field.Int64("role_id"),
+		field.Int32("permission_id"),
 		field.JSON("fields", []string{}),
 	}
 }
 
 // Edges of the RolePermission.
 func (RolePermission) Edges() []ent.Edge {
-	return nil
+	return []ent.Edge{
+		edge.To("role", Role.Type).
+			Required().
+			Unique().
+			Field("role_id"),
+		edge.To("permission", Permission.Type).
+			Required().
+			Unique().
+			Field("permission_id"),
+	}
 }
 
 // Indexes of the RolePermission.
