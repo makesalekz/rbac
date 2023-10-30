@@ -3,8 +3,8 @@ package data
 import (
 	"context"
 
-	"dummy/internal/conf"
-	users_v1 "dummy/third_party/api/users/v1"
+	"rbac/internal/conf"
+	users_v1 "rbac/third_party/api/users/v1"
 
 	consul "github.com/go-kratos/consul/registry"
 	"github.com/go-kratos/kratos/v2/middleware/auth/jwt"

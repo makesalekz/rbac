@@ -3,7 +3,7 @@ package biz
 import (
 	"context"
 
-	"dummy/internal/data"
+	"rbac/internal/data"
 
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/nats-io/nats.go"
