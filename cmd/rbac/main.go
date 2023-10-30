@@ -4,8 +4,8 @@ import (
 	"flag"
 	"os"
 
-	"dummy/internal/conf"
-	"dummy/internal/data"
+	"rbac/internal/conf"
+	"rbac/internal/data"
 
 	"github.com/go-kratos/kratos/v2"
 	"github.com/go-kratos/kratos/v2/config"
@@ -21,9 +21,9 @@ import (
 // go build -ldflags "-X main.Version=x.y.z"
 var (
 	// Name is the name of the compiled software.
-	Name string = "dummy"
+	Name string = "rbac"
 	// Version is the version of the compiled software.
-	Version string = "1.0.0"
+	Version string = "0.1.0"
 	// flagconf is the config flag.
 	flagconf string
 

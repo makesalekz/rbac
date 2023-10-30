@@ -1,4 +1,4 @@
-module dummy
+module rbac
 
 go 1.19
 

@@ -7,13 +7,13 @@
 package main
 
 import (
-	"dummy/internal/biz"
-	"dummy/internal/conf"
-	"dummy/internal/data"
-	"dummy/internal/server"
-	"dummy/internal/service"
 	"github.com/go-kratos/kratos/v2"
 	"github.com/go-kratos/kratos/v2/log"
+	"rbac/internal/biz"
+	"rbac/internal/conf"
+	"rbac/internal/data"
+	"rbac/internal/server"
+	"rbac/internal/service"
 )
 
 import (
@@ -36,15 +36,16 @@ func wireApp(bootstrap *conf.Bootstrap, logger log.Logger) (*kratos.App, func(),
 	if err != nil {
 		return nil, nil, err
 	}
-	dummyRepo := data.NewDummyRepo(dataData)
-	dummyUsecase, err := biz.NewDummyUsecase(logger, config, jwtProcessor, dummyRepo)
+	roleRepo := data.NewRoleRepo(dataData)
+	rolesUsecase, err := biz.NewRolesUsecase(logger, config, roleRepo)
 	if err != nil {
 		cleanup()
 		return nil, nil, err
 	}
-	dummyService := service.NewDummyService(logger, dummyUsecase)
-	grpcServer := server.NewGRPCServer(bootstrap, logger, jwtProcessor, dummyService)
-	httpServer := server.NewHTTPServer(bootstrap, logger, jwtProcessor, dummyService)
+	rolesService := service.NewRolesService(logger, jwtProcessor, rolesUsecase)
+	permissionsService := service.NewPermissionsService(logger, jwtProcessor)
+	grpcServer := server.NewGRPCServer(bootstrap, logger, jwtProcessor, rolesService, permissionsService)
+	httpServer := server.NewHTTPServer(bootstrap, logger, jwtProcessor, rolesService, permissionsService)
 	app := newApp(logger, config, grpcServer, httpServer)
 	return app, func() {
 		cleanup()
