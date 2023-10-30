@@ -477,8 +477,8 @@ func (rpq *RolePermissionQuery) loadRole(ctx context.Context, query *RoleQuery, 
 	return nil
 }
 func (rpq *RolePermissionQuery) loadPermission(ctx context.Context, query *PermissionQuery, nodes []*RolePermission, init func(*RolePermission), assign func(*RolePermission, *Permission)) error {
-	ids := make([]int32, 0, len(nodes))
-	nodeids := make(map[int32][]*RolePermission)
+	ids := make([]string, 0, len(nodes))
+	nodeids := make(map[string][]*RolePermission)
 	for i := range nodes {
 		fk := nodes[i].PermissionID
 		if _, ok := nodeids[fk]; !ok {

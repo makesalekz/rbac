@@ -10,7 +10,7 @@ import (
 var (
 	// PermissionsColumns holds the columns for the "permissions" table.
 	PermissionsColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeInt32, Increment: true},
+		{Name: "id", Type: field.TypeString},
 		{Name: "name", Type: field.TypeString},
 		{Name: "description", Type: field.TypeString, Nullable: true},
 		{Name: "app_id", Type: field.TypeInt32},
@@ -39,7 +39,7 @@ var (
 		{Name: "description", Type: field.TypeString},
 		{Name: "team_id", Type: field.TypeInt64},
 		{Name: "created_at", Type: field.TypeTime},
-		{Name: "permission_roles", Type: field.TypeInt32, Nullable: true},
+		{Name: "permission_roles", Type: field.TypeString, Nullable: true},
 	}
 	// RolesTable holds the schema information for the "roles" table.
 	RolesTable = &schema.Table{
@@ -60,7 +60,7 @@ var (
 		{Name: "id", Type: field.TypeInt64, Increment: true},
 		{Name: "fields", Type: field.TypeJSON},
 		{Name: "role_id", Type: field.TypeInt64},
-		{Name: "permission_id", Type: field.TypeInt32},
+		{Name: "permission_id", Type: field.TypeString},
 	}
 	// RolePermissionsTable holds the schema information for the "role_permissions" table.
 	RolePermissionsTable = &schema.Table{

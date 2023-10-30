@@ -30,8 +30,8 @@ func (rpc *RolePermissionCreate) SetRoleID(i int64) *RolePermissionCreate {
 }
 
 // SetPermissionID sets the "permission_id" field.
-func (rpc *RolePermissionCreate) SetPermissionID(i int32) *RolePermissionCreate {
-	rpc.mutation.SetPermissionID(i)
+func (rpc *RolePermissionCreate) SetPermissionID(s string) *RolePermissionCreate {
+	rpc.mutation.SetPermissionID(s)
 	return rpc
 }
 
@@ -156,7 +156,7 @@ func (rpc *RolePermissionCreate) createSpec() (*RolePermission, *sqlgraph.Create
 			Columns: []string{rolepermission.PermissionColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(permission.FieldID, field.TypeInt32),
+				IDSpec: sqlgraph.NewFieldSpec(permission.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -230,7 +230,7 @@ func (u *RolePermissionUpsert) UpdateRoleID() *RolePermissionUpsert {
 }
 
 // SetPermissionID sets the "permission_id" field.
-func (u *RolePermissionUpsert) SetPermissionID(v int32) *RolePermissionUpsert {
+func (u *RolePermissionUpsert) SetPermissionID(v string) *RolePermissionUpsert {
 	u.Set(rolepermission.FieldPermissionID, v)
 	return u
 }
@@ -308,7 +308,7 @@ func (u *RolePermissionUpsertOne) UpdateRoleID() *RolePermissionUpsertOne {
 }
 
 // SetPermissionID sets the "permission_id" field.
-func (u *RolePermissionUpsertOne) SetPermissionID(v int32) *RolePermissionUpsertOne {
+func (u *RolePermissionUpsertOne) SetPermissionID(v string) *RolePermissionUpsertOne {
 	return u.Update(func(s *RolePermissionUpsert) {
 		s.SetPermissionID(v)
 	})
@@ -549,7 +549,7 @@ func (u *RolePermissionUpsertBulk) UpdateRoleID() *RolePermissionUpsertBulk {
 }
 
 // SetPermissionID sets the "permission_id" field.
-func (u *RolePermissionUpsertBulk) SetPermissionID(v int32) *RolePermissionUpsertBulk {
+func (u *RolePermissionUpsertBulk) SetPermissionID(v string) *RolePermissionUpsertBulk {
 	return u.Update(func(s *RolePermissionUpsert) {
 		s.SetPermissionID(v)
 	})

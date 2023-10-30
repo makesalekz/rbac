@@ -38,7 +38,7 @@ type PermissionMutation struct {
 	config
 	op            Op
 	typ           string
-	id            *int32
+	id            *string
 	name          *string
 	description   *string
 	app_id        *int32
@@ -75,7 +75,7 @@ func newPermissionMutation(c config, op Op, opts ...permissionOption) *Permissio
 }
 
 // withPermissionID sets the ID field of the mutation.
-func withPermissionID(id int32) permissionOption {
+func withPermissionID(id string) permissionOption {
 	return func(m *PermissionMutation) {
 		var (
 			err   error
@@ -127,13 +127,13 @@ func (m PermissionMutation) Tx() (*Tx, error) {
 
 // SetID sets the value of the id field. Note that this
 // operation is only accepted on creation of Permission entities.
-func (m *PermissionMutation) SetID(id int32) {
+func (m *PermissionMutation) SetID(id string) {
 	m.id = &id
 }
 
 // ID returns the ID value in the mutation. Note that the ID is only available
 // if it was provided to the builder or after it was returned from the database.
-func (m *PermissionMutation) ID() (id int32, exists bool) {
+func (m *PermissionMutation) ID() (id string, exists bool) {
 	if m.id == nil {
 		return
 	}
@@ -144,12 +144,12 @@ func (m *PermissionMutation) ID() (id int32, exists bool) {
 // That means, if the mutation is applied within a transaction with an isolation level such
 // as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
 // or updated by the mutation.
-func (m *PermissionMutation) IDs(ctx context.Context) ([]int32, error) {
+func (m *PermissionMutation) IDs(ctx context.Context) ([]string, error) {
 	switch {
 	case m.op.Is(OpUpdateOne | OpDeleteOne):
 		id, exists := m.ID()
 		if exists {
-			return []int32{id}, nil
+			return []string{id}, nil
 		}
 		fallthrough
 	case m.op.Is(OpUpdate | OpDelete):
@@ -780,8 +780,8 @@ type RoleMutation struct {
 	addteam_id         *int64
 	created_at         *time.Time
 	clearedFields      map[string]struct{}
-	permissions        map[int32]struct{}
-	removedpermissions map[int32]struct{}
+	permissions        map[string]struct{}
+	removedpermissions map[string]struct{}
 	clearedpermissions bool
 	done               bool
 	oldValue           func(context.Context) (*Role, error)
@@ -1057,9 +1057,9 @@ func (m *RoleMutation) ResetCreatedAt() {
 }
 
 // AddPermissionIDs adds the "permissions" edge to the Permission entity by ids.
-func (m *RoleMutation) AddPermissionIDs(ids ...int32) {
+func (m *RoleMutation) AddPermissionIDs(ids ...string) {
 	if m.permissions == nil {
-		m.permissions = make(map[int32]struct{})
+		m.permissions = make(map[string]struct{})
 	}
 	for i := range ids {
 		m.permissions[ids[i]] = struct{}{}
@@ -1077,9 +1077,9 @@ func (m *RoleMutation) PermissionsCleared() bool {
 }
 
 // RemovePermissionIDs removes the "permissions" edge to the Permission entity by IDs.
-func (m *RoleMutation) RemovePermissionIDs(ids ...int32) {
+func (m *RoleMutation) RemovePermissionIDs(ids ...string) {
 	if m.removedpermissions == nil {
-		m.removedpermissions = make(map[int32]struct{})
+		m.removedpermissions = make(map[string]struct{})
 	}
 	for i := range ids {
 		delete(m.permissions, ids[i])
@@ -1088,7 +1088,7 @@ func (m *RoleMutation) RemovePermissionIDs(ids ...int32) {
 }
 
 // RemovedPermissions returns the removed IDs of the "permissions" edge to the Permission entity.
-func (m *RoleMutation) RemovedPermissionsIDs() (ids []int32) {
+func (m *RoleMutation) RemovedPermissionsIDs() (ids []string) {
 	for id := range m.removedpermissions {
 		ids = append(ids, id)
 	}
@@ -1096,7 +1096,7 @@ func (m *RoleMutation) RemovedPermissionsIDs() (ids []int32) {
 }
 
 // PermissionsIDs returns the "permissions" edge IDs in the mutation.
-func (m *RoleMutation) PermissionsIDs() (ids []int32) {
+func (m *RoleMutation) PermissionsIDs() (ids []string) {
 	for id := range m.permissions {
 		ids = append(ids, id)
 	}
@@ -1402,7 +1402,7 @@ type RolePermissionMutation struct {
 	clearedFields     map[string]struct{}
 	role              *int64
 	clearedrole       bool
-	permission        *int32
+	permission        *string
 	clearedpermission bool
 	done              bool
 	oldValue          func(context.Context) (*RolePermission, error)
@@ -1544,12 +1544,12 @@ func (m *RolePermissionMutation) ResetRoleID() {
 }
 
 // SetPermissionID sets the "permission_id" field.
-func (m *RolePermissionMutation) SetPermissionID(i int32) {
-	m.permission = &i
+func (m *RolePermissionMutation) SetPermissionID(s string) {
+	m.permission = &s
 }
 
 // PermissionID returns the value of the "permission_id" field in the mutation.
-func (m *RolePermissionMutation) PermissionID() (r int32, exists bool) {
+func (m *RolePermissionMutation) PermissionID() (r string, exists bool) {
 	v := m.permission
 	if v == nil {
 		return
@@ -1560,7 +1560,7 @@ func (m *RolePermissionMutation) PermissionID() (r int32, exists bool) {
 // OldPermissionID returns the old "permission_id" field's value of the RolePermission entity.
 // If the RolePermission object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *RolePermissionMutation) OldPermissionID(ctx context.Context) (v int32, err error) {
+func (m *RolePermissionMutation) OldPermissionID(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldPermissionID is only allowed on UpdateOne operations")
 	}
@@ -1669,7 +1669,7 @@ func (m *RolePermissionMutation) PermissionCleared() bool {
 // PermissionIDs returns the "permission" edge IDs in the mutation.
 // Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
 // PermissionID instead. It exists only for internal usage by the builders.
-func (m *RolePermissionMutation) PermissionIDs() (ids []int32) {
+func (m *RolePermissionMutation) PermissionIDs() (ids []string) {
 	if id := m.permission; id != nil {
 		ids = append(ids, *id)
 	}
@@ -1772,7 +1772,7 @@ func (m *RolePermissionMutation) SetField(name string, value ent.Value) error {
 		m.SetRoleID(v)
 		return nil
 	case rolepermission.FieldPermissionID:
-		v, ok := value.(int32)
+		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}

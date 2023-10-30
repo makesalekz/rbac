@@ -22,7 +22,7 @@ type RolePermission struct {
 	// RoleID holds the value of the "role_id" field.
 	RoleID int64 `json:"role_id,omitempty"`
 	// PermissionID holds the value of the "permission_id" field.
-	PermissionID int32 `json:"permission_id,omitempty"`
+	PermissionID string `json:"permission_id,omitempty"`
 	// Fields holds the value of the "fields" field.
 	Fields []string `json:"fields,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -75,8 +75,10 @@ func (*RolePermission) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case rolepermission.FieldFields:
 			values[i] = new([]byte)
-		case rolepermission.FieldID, rolepermission.FieldRoleID, rolepermission.FieldPermissionID:
+		case rolepermission.FieldID, rolepermission.FieldRoleID:
 			values[i] = new(sql.NullInt64)
+		case rolepermission.FieldPermissionID:
+			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -105,10 +107,10 @@ func (rp *RolePermission) assignValues(columns []string, values []any) error {
 				rp.RoleID = value.Int64
 			}
 		case rolepermission.FieldPermissionID:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
+			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field permission_id", values[i])
 			} else if value.Valid {
-				rp.PermissionID = int32(value.Int64)
+				rp.PermissionID = value.String
 			}
 		case rolepermission.FieldFields:
 			if value, ok := values[i].(*[]byte); !ok {
@@ -168,7 +170,7 @@ func (rp *RolePermission) String() string {
 	builder.WriteString(fmt.Sprintf("%v", rp.RoleID))
 	builder.WriteString(", ")
 	builder.WriteString("permission_id=")
-	builder.WriteString(fmt.Sprintf("%v", rp.PermissionID))
+	builder.WriteString(rp.PermissionID)
 	builder.WriteString(", ")
 	builder.WriteString("fields=")
 	builder.WriteString(fmt.Sprintf("%v", rp.Fields))

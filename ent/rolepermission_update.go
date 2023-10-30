@@ -38,8 +38,8 @@ func (rpu *RolePermissionUpdate) SetRoleID(i int64) *RolePermissionUpdate {
 }
 
 // SetPermissionID sets the "permission_id" field.
-func (rpu *RolePermissionUpdate) SetPermissionID(i int32) *RolePermissionUpdate {
-	rpu.mutation.SetPermissionID(i)
+func (rpu *RolePermissionUpdate) SetPermissionID(s string) *RolePermissionUpdate {
+	rpu.mutation.SetPermissionID(s)
 	return rpu
 }
 
@@ -183,7 +183,7 @@ func (rpu *RolePermissionUpdate) sqlSave(ctx context.Context) (n int, err error)
 			Columns: []string{rolepermission.PermissionColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(permission.FieldID, field.TypeInt32),
+				IDSpec: sqlgraph.NewFieldSpec(permission.FieldID, field.TypeString),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -196,7 +196,7 @@ func (rpu *RolePermissionUpdate) sqlSave(ctx context.Context) (n int, err error)
 			Columns: []string{rolepermission.PermissionColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(permission.FieldID, field.TypeInt32),
+				IDSpec: sqlgraph.NewFieldSpec(permission.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -233,8 +233,8 @@ func (rpuo *RolePermissionUpdateOne) SetRoleID(i int64) *RolePermissionUpdateOne
 }
 
 // SetPermissionID sets the "permission_id" field.
-func (rpuo *RolePermissionUpdateOne) SetPermissionID(i int32) *RolePermissionUpdateOne {
-	rpuo.mutation.SetPermissionID(i)
+func (rpuo *RolePermissionUpdateOne) SetPermissionID(s string) *RolePermissionUpdateOne {
+	rpuo.mutation.SetPermissionID(s)
 	return rpuo
 }
 
@@ -408,7 +408,7 @@ func (rpuo *RolePermissionUpdateOne) sqlSave(ctx context.Context) (_node *RolePe
 			Columns: []string{rolepermission.PermissionColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(permission.FieldID, field.TypeInt32),
+				IDSpec: sqlgraph.NewFieldSpec(permission.FieldID, field.TypeString),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -421,7 +421,7 @@ func (rpuo *RolePermissionUpdateOne) sqlSave(ctx context.Context) (_node *RolePe
 			Columns: []string{rolepermission.PermissionColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(permission.FieldID, field.TypeInt32),
+				IDSpec: sqlgraph.NewFieldSpec(permission.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

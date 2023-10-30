@@ -108,8 +108,8 @@ func (pq *PermissionQuery) FirstX(ctx context.Context) *Permission {
 
 // FirstID returns the first Permission ID from the query.
 // Returns a *NotFoundError when no Permission ID was found.
-func (pq *PermissionQuery) FirstID(ctx context.Context) (id int32, err error) {
-	var ids []int32
+func (pq *PermissionQuery) FirstID(ctx context.Context) (id string, err error) {
+	var ids []string
 	if ids, err = pq.Limit(1).IDs(setContextOp(ctx, pq.ctx, "FirstID")); err != nil {
 		return
 	}
@@ -121,7 +121,7 @@ func (pq *PermissionQuery) FirstID(ctx context.Context) (id int32, err error) {
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (pq *PermissionQuery) FirstIDX(ctx context.Context) int32 {
+func (pq *PermissionQuery) FirstIDX(ctx context.Context) string {
 	id, err := pq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -159,8 +159,8 @@ func (pq *PermissionQuery) OnlyX(ctx context.Context) *Permission {
 // OnlyID is like Only, but returns the only Permission ID in the query.
 // Returns a *NotSingularError when more than one Permission ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (pq *PermissionQuery) OnlyID(ctx context.Context) (id int32, err error) {
-	var ids []int32
+func (pq *PermissionQuery) OnlyID(ctx context.Context) (id string, err error) {
+	var ids []string
 	if ids, err = pq.Limit(2).IDs(setContextOp(ctx, pq.ctx, "OnlyID")); err != nil {
 		return
 	}
@@ -176,7 +176,7 @@ func (pq *PermissionQuery) OnlyID(ctx context.Context) (id int32, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (pq *PermissionQuery) OnlyIDX(ctx context.Context) int32 {
+func (pq *PermissionQuery) OnlyIDX(ctx context.Context) string {
 	id, err := pq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -204,7 +204,7 @@ func (pq *PermissionQuery) AllX(ctx context.Context) []*Permission {
 }
 
 // IDs executes the query and returns a list of Permission IDs.
-func (pq *PermissionQuery) IDs(ctx context.Context) (ids []int32, err error) {
+func (pq *PermissionQuery) IDs(ctx context.Context) (ids []string, err error) {
 	if pq.ctx.Unique == nil && pq.path != nil {
 		pq.Unique(true)
 	}
@@ -216,7 +216,7 @@ func (pq *PermissionQuery) IDs(ctx context.Context) (ids []int32, err error) {
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (pq *PermissionQuery) IDsX(ctx context.Context) []int32 {
+func (pq *PermissionQuery) IDsX(ctx context.Context) []string {
 	ids, err := pq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -413,7 +413,7 @@ func (pq *PermissionQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*P
 
 func (pq *PermissionQuery) loadRoles(ctx context.Context, query *RoleQuery, nodes []*Permission, init func(*Permission), assign func(*Permission, *Role)) error {
 	fks := make([]driver.Value, 0, len(nodes))
-	nodeids := make(map[int32]*Permission)
+	nodeids := make(map[string]*Permission)
 	for i := range nodes {
 		fks = append(fks, nodes[i].ID)
 		nodeids[nodes[i].ID] = nodes[i]
@@ -456,7 +456,7 @@ func (pq *PermissionQuery) sqlCount(ctx context.Context) (int, error) {
 }
 
 func (pq *PermissionQuery) querySpec() *sqlgraph.QuerySpec {
-	_spec := sqlgraph.NewQuerySpec(permission.Table, permission.Columns, sqlgraph.NewFieldSpec(permission.FieldID, field.TypeInt32))
+	_spec := sqlgraph.NewQuerySpec(permission.Table, permission.Columns, sqlgraph.NewFieldSpec(permission.FieldID, field.TypeString))
 	_spec.From = pq.sql
 	if unique := pq.ctx.Unique; unique != nil {
 		_spec.Unique = *unique

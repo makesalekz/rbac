@@ -23,7 +23,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			Table:   permission.Table,
 			Columns: permission.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt32,
+				Type:   field.TypeString,
 				Column: permission.FieldID,
 			},
 		},
@@ -65,7 +65,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 		Type: "RolePermission",
 		Fields: map[string]*sqlgraph.FieldSpec{
 			rolepermission.FieldRoleID:       {Type: field.TypeInt64, Column: rolepermission.FieldRoleID},
-			rolepermission.FieldPermissionID: {Type: field.TypeInt32, Column: rolepermission.FieldPermissionID},
+			rolepermission.FieldPermissionID: {Type: field.TypeString, Column: rolepermission.FieldPermissionID},
 			rolepermission.FieldFields:       {Type: field.TypeJSON, Column: rolepermission.FieldFields},
 		},
 	}
@@ -201,8 +201,8 @@ func (f *PermissionFilter) Where(p entql.P) {
 	})
 }
 
-// WhereID applies the entql int32 predicate on the id field.
-func (f *PermissionFilter) WhereID(p entql.Int32P) {
+// WhereID applies the entql string predicate on the id field.
+func (f *PermissionFilter) WhereID(p entql.StringP) {
 	f.Where(p.Field(permission.FieldID))
 }
 
@@ -364,8 +364,8 @@ func (f *RolePermissionFilter) WhereRoleID(p entql.Int64P) {
 	f.Where(p.Field(rolepermission.FieldRoleID))
 }
 
-// WherePermissionID applies the entql int32 predicate on the permission_id field.
-func (f *RolePermissionFilter) WherePermissionID(p entql.Int32P) {
+// WherePermissionID applies the entql string predicate on the permission_id field.
+func (f *RolePermissionFilter) WherePermissionID(p entql.StringP) {
 	f.Where(p.Field(rolepermission.FieldPermissionID))
 }
 

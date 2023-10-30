@@ -265,7 +265,7 @@ func (c *PermissionClient) UpdateOne(pe *Permission) *PermissionUpdateOne {
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *PermissionClient) UpdateOneID(id int32) *PermissionUpdateOne {
+func (c *PermissionClient) UpdateOneID(id string) *PermissionUpdateOne {
 	mutation := newPermissionMutation(c.config, OpUpdateOne, withPermissionID(id))
 	return &PermissionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -282,7 +282,7 @@ func (c *PermissionClient) DeleteOne(pe *Permission) *PermissionDeleteOne {
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *PermissionClient) DeleteOneID(id int32) *PermissionDeleteOne {
+func (c *PermissionClient) DeleteOneID(id string) *PermissionDeleteOne {
 	builder := c.Delete().Where(permission.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -299,12 +299,12 @@ func (c *PermissionClient) Query() *PermissionQuery {
 }
 
 // Get returns a Permission entity by its id.
-func (c *PermissionClient) Get(ctx context.Context, id int32) (*Permission, error) {
+func (c *PermissionClient) Get(ctx context.Context, id string) (*Permission, error) {
 	return c.Query().Where(permission.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *PermissionClient) GetX(ctx context.Context, id int32) *Permission {
+func (c *PermissionClient) GetX(ctx context.Context, id string) *Permission {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -545,7 +545,7 @@ func (c *RolePermissionClient) Delete() *RolePermissionDelete {
 }
 
 // DeleteOne returns a builder for deleting the given entity.
-func (c *RolePermissionClient) DeleteOne(rp *RolePermission) *RolePermissionDeleteOne {
+func (c *RolePermissionClient) DeleteOne(rp RolePermission) *RolePermissionDeleteOne {
 	return c.DeleteOneID(rp.ID)
 }
 

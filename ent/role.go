@@ -28,7 +28,7 @@ type Role struct {
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the RoleQuery when eager-loading is set.
 	Edges            RoleEdges `json:"edges"`
-	permission_roles *int32
+	permission_roles *string
 	selectValues     sql.SelectValues
 }
 
@@ -62,7 +62,7 @@ func (*Role) scanValues(columns []string) ([]any, error) {
 		case role.FieldCreatedAt:
 			values[i] = new(sql.NullTime)
 		case role.ForeignKeys[0]: // permission_roles
-			values[i] = new(sql.NullInt64)
+			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -109,11 +109,11 @@ func (r *Role) assignValues(columns []string, values []any) error {
 				r.CreatedAt = value.Time
 			}
 		case role.ForeignKeys[0]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field permission_roles", value)
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field permission_roles", values[i])
 			} else if value.Valid {
-				r.permission_roles = new(int32)
-				*r.permission_roles = int32(value.Int64)
+				r.permission_roles = new(string)
+				*r.permission_roles = value.String
 			}
 		default:
 			r.selectValues.Set(columns[i], values[i])

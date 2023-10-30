@@ -17,7 +17,7 @@ import (
 type Permission struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID int32 `json:"id,omitempty"`
+	ID string `json:"id,omitempty"`
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
 	// Description holds the value of the "description" field.
@@ -60,9 +60,9 @@ func (*Permission) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case permission.FieldFields:
 			values[i] = new([]byte)
-		case permission.FieldID, permission.FieldAppID:
+		case permission.FieldAppID:
 			values[i] = new(sql.NullInt64)
-		case permission.FieldName, permission.FieldDescription:
+		case permission.FieldID, permission.FieldName, permission.FieldDescription:
 			values[i] = new(sql.NullString)
 		case permission.FieldCreatedAt:
 			values[i] = new(sql.NullTime)
@@ -84,11 +84,11 @@ func (pe *Permission) assignValues(columns []string, values []any) error {
 	for i := range columns {
 		switch columns[i] {
 		case permission.FieldID:
-			value, ok := values[i].(*sql.NullInt64)
-			if !ok {
-				return fmt.Errorf("unexpected type %T for field id", value)
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field id", values[i])
+			} else if value.Valid {
+				pe.ID = value.String
 			}
-			pe.ID = int32(value.Int64)
 		case permission.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field name", values[i])
