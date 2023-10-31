@@ -85,6 +85,11 @@ func DeletedAt(v time.Time) predicate.Role {
 	return predicate.Role(sql.FieldEQ(FieldDeletedAt, v))
 }
 
+// DeletedAt applies equality check predicate on the "deleted_at" field. It's identical to DeletedAtEQ.
+func DeletedAtIsNil() predicate.Role {
+	return predicate.Role(sql.FieldEQ(FieldDeletedAt, nil))
+}
+
 // NameEQ applies the EQ predicate on the "name" field.
 func NameEQ(v string) predicate.Role {
 	return predicate.Role(sql.FieldEQ(FieldName, v))

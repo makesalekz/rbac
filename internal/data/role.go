@@ -4,6 +4,7 @@ import (
 	"context"
 	"rbac/ent"
 	"rbac/ent/role"
+	"time"
 )
 
 type UpdateRoleDto struct {
@@ -24,10 +25,10 @@ type RoleRepo interface {
 	DeleteRole(ctx context.Context, roleId int64) error
 	GetRoleById(ctx context.Context, roleId int64) (*ent.Role, error)
 	GetRoleByIds(ctx context.Context, ids []int64) ([]*ent.Role, error)
-	GetRolesList(ctx context.Context, teamId int64, name string, page int64, pageSize int64) ([]*ent.Role, error)
+	GetRolesList(ctx context.Context, teamId int64, name string) ([]*ent.Role, error)
 	AddPermissionToRole(ctx context.Context, roleId int64, permissionId string, fields []string) (*ent.Permission, error)
 	RemovePermissionFromRole(ctx context.Context, roleId int64, permissionId string) error
-	ListRolePermissions(ctx context.Context, roleId int64, page int64, pageSize int64) ([]*ent.Permission, error)
+	ListRolePermissions(ctx context.Context, roleId int64) ([]*ent.Permission, error)
 }
 
 type roleRepo struct {
@@ -81,7 +82,15 @@ func (r *roleRepo) UpdateRole(ctx context.Context, roleId int64, roleDto UpdateR
 }
 
 func (r *roleRepo) DeleteRole(ctx context.Context, roleId int64) error {
-	return r.db.Role.DeleteOneID(roleId).Exec(ctx)
+	role, err := r.db.Role.Get(ctx, roleId)
+	if err != nil {
+		return err
+	}
+	_, err = role.Update().SetDeletedAt(time.Now()).Save(ctx)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (r *roleRepo) GetRoleById(ctx context.Context, roleId int64) (*ent.Role, error) {
@@ -92,7 +101,7 @@ func (r *roleRepo) GetRoleByIds(ctx context.Context, ids []int64) ([]*ent.Role, 
 	return r.db.Role.Query().Where(role.IDIn(ids...)).All(ctx)
 }
 
-func (r *roleRepo) GetRolesList(ctx context.Context, teamId int64, name string, page int64, pageSize int64) ([]*ent.Role, error) {
+func (r *roleRepo) GetRolesList(ctx context.Context, teamId int64, name string) ([]*ent.Role, error) {
 	query := r.db.Role.Query()
 	if name != "" {
 		query = query.Where(role.NameContains(name))
@@ -100,12 +109,7 @@ func (r *roleRepo) GetRolesList(ctx context.Context, teamId int64, name string, 
 	if teamId != 0 {
 		query = query.Where(role.TeamID(teamId))
 	}
-
-	if pageSize != 0 {
-		query = query.
-			Offset(int(pageSize * page)).
-			Limit(int(pageSize))
-	}
+	query = query.Where(role.DeletedAtIsNil())
 	return query.All(ctx)
 }
 
@@ -139,16 +143,14 @@ func (r *roleRepo) AddPermissionToRole(ctx context.Context, roleId int64, permis
 
 func (r *roleRepo) RemovePermissionFromRole(ctx context.Context, roleId int64, permissionId string) error {
 	return r.db.RolePermission.DeleteOne(ent.RolePermission{
+		ID:           0,
 		RoleID:       roleId,
 		PermissionID: permissionId,
 	}).Exec(ctx)
 }
 
-func (r *roleRepo) ListRolePermissions(ctx context.Context, roleId, page, pageSize int64) ([]*ent.Permission, error) {
+func (r *roleRepo) ListRolePermissions(ctx context.Context, roleId int64) ([]*ent.Permission, error) {
 	query := r.db.Role.Query().Where(role.ID(roleId)).QueryPermissions()
-	if pageSize != 0 {
-		query = query.Limit(int(pageSize)).Offset(int(pageSize * page))
-	}
 	return query.All(ctx)
 }
 

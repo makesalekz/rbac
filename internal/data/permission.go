@@ -16,7 +16,7 @@ type CreatePermissionDto struct {
 	Id          string
 	Name        string
 	Description string
-	AppId       int32
+	AppId       string
 	Fields      []string
 }
 
@@ -27,7 +27,7 @@ type PermissionRepo interface {
 	DeletePermission(ctx context.Context, id string) error
 	GetPermissionById(ctx context.Context, id string) (*ent.Permission, error)
 	GetPermissionsByIds(ctx context.Context, ids []string) ([]*ent.Permission, error)
-	GetPermissions(ctx context.Context, appId int32, ids []string) ([]*ent.Permission, error)
+	GetPermissions(ctx context.Context, appId string, ids []string) ([]*ent.Permission, error)
 }
 
 type permissionRepo struct {
@@ -75,10 +75,10 @@ func (p *permissionRepo) GetPermissionsByIds(ctx context.Context, ids []string) 
 	return p.db.Permission.Query().Where(permission.IDIn(ids...)).All(ctx)
 }
 
-func (p *permissionRepo) GetPermissions(ctx context.Context, appId int32, ids []string) ([]*ent.Permission, error) {
+func (p *permissionRepo) GetPermissions(ctx context.Context, appId string, ids []string) ([]*ent.Permission, error) {
 	query := p.db.Permission.Query()
 	// check if app exists
-	if appId != 0 {
+	if appId != "" {
 		query.Where(permission.AppID(appId))
 	}
 	if ids != nil {

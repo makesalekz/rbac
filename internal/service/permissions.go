@@ -3,14 +3,13 @@ package service
 import (
 	"context"
 	"github.com/go-kratos/kratos/v2/log"
+	"rbac/api/rbac/permissions/v1"
 	"rbac/internal/biz"
 	"rbac/internal/data"
-
-	pb "rbac/api/permissions/v1"
 )
 
 type PermissionsService struct {
-	pb.PermissionsServer
+	permissions_v1.PermissionsServer
 	log *log.Helper
 	jwt *data.JwtProcessor
 	uc  *biz.PermissionsUsecase
@@ -24,7 +23,7 @@ func NewPermissionsService(logger log.Logger, jwt *data.JwtProcessor, uc *biz.Pe
 	}
 }
 
-func (s *PermissionsService) CreatePermission(ctx context.Context, req *pb.CreatePermissionRequest) (*pb.PermissionReply, error) {
+func (s *PermissionsService) CreatePermission(ctx context.Context, req *permissions_v1.CreatePermissionRequest) (*permissions_v1.PermissionReply, error) {
 	s.log.Debug("Received PermissionsService.CreatePermission request")
 	permission, err := s.uc.CreatePermission(ctx, data.CreatePermissionDto{
 		Id:          req.Id,
@@ -34,9 +33,9 @@ func (s *PermissionsService) CreatePermission(ctx context.Context, req *pb.Creat
 		Fields:      req.Fields,
 	})
 	if err != nil {
-		return nil, pb.ErrorDatabaseQuery("Internal error")
+		return nil, permissions_v1.ErrorDatabaseQuery("Internal error")
 	}
-	return &pb.PermissionReply{
+	return &permissions_v1.PermissionReply{
 		Id:          permission.ID,
 		Name:        permission.Name,
 		Description: permission.Description,
@@ -44,7 +43,7 @@ func (s *PermissionsService) CreatePermission(ctx context.Context, req *pb.Creat
 		Fields:      permission.Fields,
 	}, nil
 }
-func (s *PermissionsService) UpdatePermission(ctx context.Context, req *pb.UpdatePermissionRequest) (*pb.PermissionReply, error) {
+func (s *PermissionsService) UpdatePermission(ctx context.Context, req *permissions_v1.UpdatePermissionRequest) (*permissions_v1.PermissionReply, error) {
 	s.log.Debug("Received PermissionsService.UpdatePermission request")
 	permission, err := s.uc.UpdatePermission(ctx, req.PermissionId, data.UpdatePermissionDto{
 		Name:        req.Name,
@@ -52,9 +51,9 @@ func (s *PermissionsService) UpdatePermission(ctx context.Context, req *pb.Updat
 		Fields:      req.Fields,
 	})
 	if err != nil {
-		return nil, pb.ErrorDatabaseQuery("Internal error")
+		return nil, permissions_v1.ErrorDatabaseQuery("Internal error")
 	}
-	return &pb.PermissionReply{
+	return &permissions_v1.PermissionReply{
 		Id:          permission.ID,
 		Name:        permission.Name,
 		Description: permission.Description,
@@ -62,21 +61,21 @@ func (s *PermissionsService) UpdatePermission(ctx context.Context, req *pb.Updat
 		Fields:      permission.Fields,
 	}, nil
 }
-func (s *PermissionsService) DeletePermission(ctx context.Context, req *pb.DeletePermissionRequest) (*pb.EmptyReply, error) {
+func (s *PermissionsService) DeletePermission(ctx context.Context, req *permissions_v1.DeletePermissionRequest) (*permissions_v1.EmptyReply, error) {
 	s.log.Debug("Received PermissionsService.DeletePermission request")
 	err := s.uc.DeletePermission(ctx, req.PermissionId)
 	if err != nil {
-		return nil, pb.ErrorDatabaseQuery("Internal error")
+		return nil, permissions_v1.ErrorDatabaseQuery("Internal error")
 	}
-	return &pb.EmptyReply{}, nil
+	return &permissions_v1.EmptyReply{}, nil
 }
-func (s *PermissionsService) GetPermission(ctx context.Context, req *pb.GetPermissionRequest) (*pb.PermissionReply, error) {
+func (s *PermissionsService) GetPermission(ctx context.Context, req *permissions_v1.GetPermissionRequest) (*permissions_v1.PermissionReply, error) {
 	s.log.Debug("Received PermissionsService.GetPermission request")
 	permission, err := s.uc.GetPermissionById(ctx, req.PermissionId)
 	if err != nil {
-		return nil, pb.ErrorDatabaseQuery("Internal error")
+		return nil, permissions_v1.ErrorDatabaseQuery("Internal error")
 	}
-	return &pb.PermissionReply{
+	return &permissions_v1.PermissionReply{
 		Id:          permission.ID,
 		Name:        permission.Name,
 		Description: permission.Description,
@@ -84,15 +83,15 @@ func (s *PermissionsService) GetPermission(ctx context.Context, req *pb.GetPermi
 		Fields:      permission.Fields,
 	}, nil
 }
-func (s *PermissionsService) ListPermissions(ctx context.Context, req *pb.ListPermissionsRequest) (*pb.ListPermissionsReply, error) {
+func (s *PermissionsService) ListPermissions(ctx context.Context, req *permissions_v1.ListPermissionsRequest) (*permissions_v1.ListPermissionsReply, error) {
 	s.log.Debug("Received PermissionsService.ListPermissions request")
 	permissions, err := s.uc.GetPermissions(ctx, req.AppId, req.Ids)
 	if err != nil {
-		return nil, pb.ErrorDatabaseQuery("Internal error")
+		return nil, permissions_v1.ErrorDatabaseQuery("Internal error")
 	}
-	var replyPermissions []*pb.PermissionReply
+	var replyPermissions []*permissions_v1.PermissionReply
 	for _, permission := range permissions {
-		replyPermissions = append(replyPermissions, &pb.PermissionReply{
+		replyPermissions = append(replyPermissions, &permissions_v1.PermissionReply{
 			Id:          permission.ID,
 			Name:        permission.Name,
 			Description: permission.Description,
@@ -100,5 +99,5 @@ func (s *PermissionsService) ListPermissions(ctx context.Context, req *pb.ListPe
 			Fields:      permission.Fields,
 		})
 	}
-	return &pb.ListPermissionsReply{Permissions: replyPermissions}, nil
+	return &permissions_v1.ListPermissionsReply{Permissions: replyPermissions}, nil
 }

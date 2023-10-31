@@ -43,6 +43,6 @@ func (uc *PermissionsUsecase) DeletePermission(ctx context.Context, permissionId
 	return uc.permissionRepo.DeletePermission(ctx, permissionId)
 }
 
-func (uc *PermissionsUsecase) GetPermissions(ctx context.Context, appId int32, permissionIds []string) ([]*ent.Permission, error) {
+func (uc *PermissionsUsecase) GetPermissions(ctx context.Context, appId string, permissionIds []string) ([]*ent.Permission, error) {
 	return uc.permissionRepo.GetPermissions(ctx, appId, permissionIds)
 }

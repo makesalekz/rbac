@@ -39,8 +39,8 @@ func (uc *RolesUsecase) DeleteRole(ctx context.Context, roleId int64) error {
 	return uc.roleRepo.DeleteRole(ctx, roleId)
 }
 
-func (uc *RolesUsecase) GetRoles(ctx context.Context, teamId int64, name string, page int64, pageSize int64) ([]*ent.Role, error) {
-	return uc.roleRepo.GetRolesList(ctx, teamId, name, page, pageSize)
+func (uc *RolesUsecase) GetRoles(ctx context.Context, teamId int64, name string) ([]*ent.Role, error) {
+	return uc.roleRepo.GetRolesList(ctx, teamId, name)
 }
 
 func (uc *RolesUsecase) CreateRole(ctx context.Context, createRoleDto data.CreateRoleDto) (*ent.Role, error) {
@@ -55,6 +55,6 @@ func (uc *RolesUsecase) RemovePermissionFromRole(ctx context.Context, roleId int
 	return uc.roleRepo.RemovePermissionFromRole(ctx, roleId, permissionId)
 }
 
-func (uc *RolesUsecase) ListRolePermissions(ctx context.Context, roleId int64, page int64, pageSize int64) ([]*ent.Permission, error) {
-	return uc.roleRepo.ListRolePermissions(ctx, roleId, page, pageSize)
+func (uc *RolesUsecase) ListRolePermissions(ctx context.Context, roleId int64) ([]*ent.Permission, error) {
+	return uc.roleRepo.ListRolePermissions(ctx, roleId)
 }
