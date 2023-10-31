@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-http v2.7.1
 // - protoc             v4.24.4
-// source: api/check-permissions/v1/rbac/check-permissions.proto
+// source: api/rbac/check-permissions/v1/check-permissions.proto
 
 package check_permissions_v1
 
@@ -19,7 +19,7 @@ var _ = binding.EncodeURL
 
 const _ = http.SupportPackageIsVersion1
 
-const OperationCheckPermissionsCheckPermissions = "/api.check_permissions.v1.CheckPermissions/CheckPermissions"
+const OperationCheckPermissionsCheckPermissions = "/api.rbac.check_permissions.v1.CheckPermissions/CheckPermissions"
 
 type CheckPermissionsHTTPServer interface {
 	CheckPermissions(context.Context, *CheckPermissionsRequest) (*CheckPermissionsReply, error)

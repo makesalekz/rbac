@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.3.0
 // - protoc             v4.24.4
-// source: api/users-roles/v1/rbac/users-roles.proto
+// source: api/rbac/users-roles/v1/users-roles.proto
 
 package users_roles_v1
 
@@ -19,9 +19,10 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	UsersRoles_AssignRoleToUser_FullMethodName   = "/api.users_roles.v1.UsersRoles/AssignRoleToUser"
-	UsersRoles_DeleteRoleFromUser_FullMethodName = "/api.users_roles.v1.UsersRoles/DeleteRoleFromUser"
-	UsersRoles_ListUserRoles_FullMethodName      = "/api.users_roles.v1.UsersRoles/ListUserRoles"
+	UsersRoles_AssignRoleToUser_FullMethodName    = "/api.rbac.users_roles.v1.UsersRoles/AssignRoleToUser"
+	UsersRoles_DeleteRoleFromUser_FullMethodName  = "/api.rbac.users_roles.v1.UsersRoles/DeleteRoleFromUser"
+	UsersRoles_ListUserRoles_FullMethodName       = "/api.rbac.users_roles.v1.UsersRoles/ListUserRoles"
+	UsersRoles_ListUserRolesByTeam_FullMethodName = "/api.rbac.users_roles.v1.UsersRoles/ListUserRolesByTeam"
 )
 
 // UsersRolesClient is the client API for UsersRoles service.
@@ -31,6 +32,7 @@ type UsersRolesClient interface {
 	AssignRoleToUser(ctx context.Context, in *CreateUsersRolesRequest, opts ...grpc.CallOption) (*CreateUsersRolesReply, error)
 	DeleteRoleFromUser(ctx context.Context, in *DeleteUsersRolesRequest, opts ...grpc.CallOption) (*EmptyReply, error)
 	ListUserRoles(ctx context.Context, in *ListUserRolesRequest, opts ...grpc.CallOption) (*ListUsersRolesReply, error)
+	ListUserRolesByTeam(ctx context.Context, in *ListUserRolesByTeamRequest, opts ...grpc.CallOption) (*ListUsersRolesReply, error)
 }
 
 type usersRolesClient struct {
@@ -68,6 +70,15 @@ func (c *usersRolesClient) ListUserRoles(ctx context.Context, in *ListUserRolesR
 	return out, nil
 }
 
+func (c *usersRolesClient) ListUserRolesByTeam(ctx context.Context, in *ListUserRolesByTeamRequest, opts ...grpc.CallOption) (*ListUsersRolesReply, error) {
+	out := new(ListUsersRolesReply)
+	err := c.cc.Invoke(ctx, UsersRoles_ListUserRolesByTeam_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UsersRolesServer is the server API for UsersRoles service.
 // All implementations must embed UnimplementedUsersRolesServer
 // for forward compatibility
@@ -75,6 +86,7 @@ type UsersRolesServer interface {
 	AssignRoleToUser(context.Context, *CreateUsersRolesRequest) (*CreateUsersRolesReply, error)
 	DeleteRoleFromUser(context.Context, *DeleteUsersRolesRequest) (*EmptyReply, error)
 	ListUserRoles(context.Context, *ListUserRolesRequest) (*ListUsersRolesReply, error)
+	ListUserRolesByTeam(context.Context, *ListUserRolesByTeamRequest) (*ListUsersRolesReply, error)
 	mustEmbedUnimplementedUsersRolesServer()
 }
 
@@ -90,6 +102,9 @@ func (UnimplementedUsersRolesServer) DeleteRoleFromUser(context.Context, *Delete
 }
 func (UnimplementedUsersRolesServer) ListUserRoles(context.Context, *ListUserRolesRequest) (*ListUsersRolesReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListUserRoles not implemented")
+}
+func (UnimplementedUsersRolesServer) ListUserRolesByTeam(context.Context, *ListUserRolesByTeamRequest) (*ListUsersRolesReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListUserRolesByTeam not implemented")
 }
 func (UnimplementedUsersRolesServer) mustEmbedUnimplementedUsersRolesServer() {}
 
@@ -158,11 +173,29 @@ func _UsersRoles_ListUserRoles_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
+func _UsersRoles_ListUserRolesByTeam_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListUserRolesByTeamRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UsersRolesServer).ListUserRolesByTeam(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UsersRoles_ListUserRolesByTeam_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UsersRolesServer).ListUserRolesByTeam(ctx, req.(*ListUserRolesByTeamRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // UsersRoles_ServiceDesc is the grpc.ServiceDesc for UsersRoles service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var UsersRoles_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "api.users_roles.v1.UsersRoles",
+	ServiceName: "api.rbac.users_roles.v1.UsersRoles",
 	HandlerType: (*UsersRolesServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
@@ -177,7 +210,11 @@ var UsersRoles_ServiceDesc = grpc.ServiceDesc{
 			MethodName: "ListUserRoles",
 			Handler:    _UsersRoles_ListUserRoles_Handler,
 		},
+		{
+			MethodName: "ListUserRolesByTeam",
+			Handler:    _UsersRoles_ListUserRolesByTeam_Handler,
+		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "api/users-roles/v1/rbac/users-roles.proto",
+	Metadata: "api/rbac/users-roles/v1/users-roles.proto",
 }

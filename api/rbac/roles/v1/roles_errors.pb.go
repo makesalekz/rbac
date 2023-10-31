@@ -61,16 +61,52 @@ func ErrorDatabaseQuery(format string, args ...interface{}) *errors.Error {
 	return errors.New(500, ErrorReason_DATABASE_QUERY.String(), fmt.Sprintf(format, args...))
 }
 
-func IsUnauthorized(err error) bool {
+func IsInvalidRequest(err error) bool {
 	if err == nil {
 		return false
 	}
 	e := errors.FromError(err)
-	return e.Reason == ErrorReason_UNAUTHORIZED.String() && e.Code == 401
+	return e.Reason == ErrorReason_INVALID_REQUEST.String() && e.Code == 400
 }
 
-func ErrorUnauthorized(format string, args ...interface{}) *errors.Error {
-	return errors.New(401, ErrorReason_UNAUTHORIZED.String(), fmt.Sprintf(format, args...))
+func ErrorInvalidRequest(format string, args ...interface{}) *errors.Error {
+	return errors.New(400, ErrorReason_INVALID_REQUEST.String(), fmt.Sprintf(format, args...))
+}
+
+func IsInvalidPhoneNumber(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == ErrorReason_INVALID_PHONE_NUMBER.String() && e.Code == 400
+}
+
+func ErrorInvalidPhoneNumber(format string, args ...interface{}) *errors.Error {
+	return errors.New(400, ErrorReason_INVALID_PHONE_NUMBER.String(), fmt.Sprintf(format, args...))
+}
+
+func IsInvalidToken(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == ErrorReason_INVALID_TOKEN.String() && e.Code == 401
+}
+
+func ErrorInvalidToken(format string, args ...interface{}) *errors.Error {
+	return errors.New(401, ErrorReason_INVALID_TOKEN.String(), fmt.Sprintf(format, args...))
+}
+
+func IsInvalidCode(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == ErrorReason_INVALID_CODE.String() && e.Code == 401
+}
+
+func ErrorInvalidCode(format string, args ...interface{}) *errors.Error {
+	return errors.New(401, ErrorReason_INVALID_CODE.String(), fmt.Sprintf(format, args...))
 }
 
 func IsUserNotFound(err error) bool {

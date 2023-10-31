@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.3.0
 // - protoc             v4.24.4
-// source: api/permissions/v1/rbac/permissions.proto
+// source: api/rbac/permissions/v1/permissions.proto
 
 package permissions_v1
 
@@ -19,11 +19,11 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	Permissions_CreatePermission_FullMethodName = "/api.permissions.v1.Permissions/CreatePermission"
-	Permissions_UpdatePermission_FullMethodName = "/api.permissions.v1.Permissions/UpdatePermission"
-	Permissions_DeletePermission_FullMethodName = "/api.permissions.v1.Permissions/DeletePermission"
-	Permissions_GetPermission_FullMethodName    = "/api.permissions.v1.Permissions/GetPermission"
-	Permissions_ListPermissions_FullMethodName  = "/api.permissions.v1.Permissions/ListPermissions"
+	Permissions_CreatePermission_FullMethodName = "/api.rbac.permissions.v1.Permissions/CreatePermission"
+	Permissions_UpdatePermission_FullMethodName = "/api.rbac.permissions.v1.Permissions/UpdatePermission"
+	Permissions_DeletePermission_FullMethodName = "/api.rbac.permissions.v1.Permissions/DeletePermission"
+	Permissions_GetPermission_FullMethodName    = "/api.rbac.permissions.v1.Permissions/GetPermission"
+	Permissions_ListPermissions_FullMethodName  = "/api.rbac.permissions.v1.Permissions/ListPermissions"
 )
 
 // PermissionsClient is the client API for Permissions service.
@@ -228,7 +228,7 @@ func _Permissions_ListPermissions_Handler(srv interface{}, ctx context.Context, 
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var Permissions_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "api.permissions.v1.Permissions",
+	ServiceName: "api.rbac.permissions.v1.Permissions",
 	HandlerType: (*PermissionsServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
@@ -253,5 +253,5 @@ var Permissions_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "api/permissions/v1/rbac/permissions.proto",
+	Metadata: "api/rbac/permissions/v1/permissions.proto",
 }

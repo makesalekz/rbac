@@ -47,14 +47,14 @@ message PermissionReply {
 	string id = 1;
 	string name = 2;
 	string description = 3;
-	int32 appId = 4;
+	string appId = 4;
 	int32 level = 5;
 	repeated string fields = 6;
 }
 
 message CreatePermissionRequest {
 	string id = 1;
-	int32 appId = 2;
+	string appId = 2;
 	string name = 3;
 	string description = 4;
 	int32 level = 5;
@@ -78,10 +78,28 @@ message GetPermissionRequest {
 }
 
 message ListPermissionsRequest {
-	int32 appId = 1;
+	string appId = 1;
 	repeated string ids = 2;
 }
 
 message ListPermissionsReply {
 	repeated PermissionReply permissions = 1;
+}
+
+enum ErrorReason {
+	// Set default error code.
+	option (errors.default_code) = 500;
+
+	// Set the error code separately for an enumeration.
+	INTERNAL = 0;
+	GRPC_CONNECTION = 1;
+	SERVICE_FAILED = 2;
+	DATABASE_QUERY = 3;
+
+	INVALID_REQUEST = 10 [(errors.code) = 400];
+	INVALID_PHONE_NUMBER = 11 [(errors.code) = 400];
+	INVALID_TOKEN = 12 [(errors.code) = 401];
+	INVALID_CODE = 13 [(errors.code) = 401];
+
+	USER_NOT_FOUND = 20 [(errors.code) = 404];
 }

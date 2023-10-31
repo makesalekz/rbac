@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-http v2.7.1
 // - protoc             v4.24.4
-// source: api/permissions/v1/rbac/permissions.proto
+// source: api/rbac/permissions/v1/permissions.proto
 
 package permissions_v1
 
@@ -19,11 +19,11 @@ var _ = binding.EncodeURL
 
 const _ = http.SupportPackageIsVersion1
 
-const OperationPermissionsCreatePermission = "/api.permissions.v1.Permissions/CreatePermission"
-const OperationPermissionsDeletePermission = "/api.permissions.v1.Permissions/DeletePermission"
-const OperationPermissionsGetPermission = "/api.permissions.v1.Permissions/GetPermission"
-const OperationPermissionsListPermissions = "/api.permissions.v1.Permissions/ListPermissions"
-const OperationPermissionsUpdatePermission = "/api.permissions.v1.Permissions/UpdatePermission"
+const OperationPermissionsCreatePermission = "/api.rbac.permissions.v1.Permissions/CreatePermission"
+const OperationPermissionsDeletePermission = "/api.rbac.permissions.v1.Permissions/DeletePermission"
+const OperationPermissionsGetPermission = "/api.rbac.permissions.v1.Permissions/GetPermission"
+const OperationPermissionsListPermissions = "/api.rbac.permissions.v1.Permissions/ListPermissions"
+const OperationPermissionsUpdatePermission = "/api.rbac.permissions.v1.Permissions/UpdatePermission"
 
 type PermissionsHTTPServer interface {
 	CreatePermission(context.Context, *CreatePermissionRequest) (*PermissionReply, error)

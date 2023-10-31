@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-http v2.7.1
 // - protoc             v4.24.4
-// source: api/users-roles/v1/rbac/users-roles.proto
+// source: api/rbac/users-roles/v1/users-roles.proto
 
 package users_roles_v1
 
@@ -19,21 +19,24 @@ var _ = binding.EncodeURL
 
 const _ = http.SupportPackageIsVersion1
 
-const OperationUsersRolesAssignRoleToUser = "/api.users_roles.v1.UsersRoles/AssignRoleToUser"
-const OperationUsersRolesDeleteRoleFromUser = "/api.users_roles.v1.UsersRoles/DeleteRoleFromUser"
-const OperationUsersRolesListUserRoles = "/api.users_roles.v1.UsersRoles/ListUserRoles"
+const OperationUsersRolesAssignRoleToUser = "/api.rbac.users_roles.v1.UsersRoles/AssignRoleToUser"
+const OperationUsersRolesDeleteRoleFromUser = "/api.rbac.users_roles.v1.UsersRoles/DeleteRoleFromUser"
+const OperationUsersRolesListUserRoles = "/api.rbac.users_roles.v1.UsersRoles/ListUserRoles"
+const OperationUsersRolesListUserRolesByTeam = "/api.rbac.users_roles.v1.UsersRoles/ListUserRolesByTeam"
 
 type UsersRolesHTTPServer interface {
 	AssignRoleToUser(context.Context, *CreateUsersRolesRequest) (*CreateUsersRolesReply, error)
 	DeleteRoleFromUser(context.Context, *DeleteUsersRolesRequest) (*EmptyReply, error)
 	ListUserRoles(context.Context, *ListUserRolesRequest) (*ListUsersRolesReply, error)
+	ListUserRolesByTeam(context.Context, *ListUserRolesByTeamRequest) (*ListUsersRolesReply, error)
 }
 
 func RegisterUsersRolesHTTPServer(s *http.Server, srv UsersRolesHTTPServer) {
 	r := s.Route("/")
-	r.POST("/v1/rbac/users/{userId}/roles/{roleId}", _UsersRoles_AssignRoleToUser0_HTTP_Handler(srv))
-	r.DELETE("/v1/rbac/users/{userId}/roles/{roleId}", _UsersRoles_DeleteRoleFromUser0_HTTP_Handler(srv))
-	r.GET("/v1/rbac/users/{userId}/roles", _UsersRoles_ListUserRoles0_HTTP_Handler(srv))
+	r.POST("/v1/rbac/assigns", _UsersRoles_AssignRoleToUser0_HTTP_Handler(srv))
+	r.DELETE("/v1/rbac/assigns/{assignId}", _UsersRoles_DeleteRoleFromUser0_HTTP_Handler(srv))
+	r.GET("/v1/rbac/users/{userId}", _UsersRoles_ListUserRoles0_HTTP_Handler(srv))
+	r.GET("/v1/rbac/teams/{teamId}", _UsersRoles_ListUserRolesByTeam0_HTTP_Handler(srv))
 }
 
 func _UsersRoles_AssignRoleToUser0_HTTP_Handler(srv UsersRolesHTTPServer) func(ctx http.Context) error {
@@ -43,9 +46,6 @@ func _UsersRoles_AssignRoleToUser0_HTTP_Handler(srv UsersRolesHTTPServer) func(c
 			return err
 		}
 		if err := ctx.BindQuery(&in); err != nil {
-			return err
-		}
-		if err := ctx.BindVars(&in); err != nil {
 			return err
 		}
 		http.SetOperation(ctx, OperationUsersRolesAssignRoleToUser)
@@ -105,10 +105,33 @@ func _UsersRoles_ListUserRoles0_HTTP_Handler(srv UsersRolesHTTPServer) func(ctx 
 	}
 }
 
+func _UsersRoles_ListUserRolesByTeam0_HTTP_Handler(srv UsersRolesHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in ListUserRolesByTeamRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationUsersRolesListUserRolesByTeam)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.ListUserRolesByTeam(ctx, req.(*ListUserRolesByTeamRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*ListUsersRolesReply)
+		return ctx.Result(200, reply)
+	}
+}
+
 type UsersRolesHTTPClient interface {
 	AssignRoleToUser(ctx context.Context, req *CreateUsersRolesRequest, opts ...http.CallOption) (rsp *CreateUsersRolesReply, err error)
 	DeleteRoleFromUser(ctx context.Context, req *DeleteUsersRolesRequest, opts ...http.CallOption) (rsp *EmptyReply, err error)
 	ListUserRoles(ctx context.Context, req *ListUserRolesRequest, opts ...http.CallOption) (rsp *ListUsersRolesReply, err error)
+	ListUserRolesByTeam(ctx context.Context, req *ListUserRolesByTeamRequest, opts ...http.CallOption) (rsp *ListUsersRolesReply, err error)
 }
 
 type UsersRolesHTTPClientImpl struct {
@@ -121,7 +144,7 @@ func NewUsersRolesHTTPClient(client *http.Client) UsersRolesHTTPClient {
 
 func (c *UsersRolesHTTPClientImpl) AssignRoleToUser(ctx context.Context, in *CreateUsersRolesRequest, opts ...http.CallOption) (*CreateUsersRolesReply, error) {
 	var out CreateUsersRolesReply
-	pattern := "/v1/rbac/users/{userId}/roles/{roleId}"
+	pattern := "/v1/rbac/assigns"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationUsersRolesAssignRoleToUser))
 	opts = append(opts, http.PathTemplate(pattern))
@@ -134,7 +157,7 @@ func (c *UsersRolesHTTPClientImpl) AssignRoleToUser(ctx context.Context, in *Cre
 
 func (c *UsersRolesHTTPClientImpl) DeleteRoleFromUser(ctx context.Context, in *DeleteUsersRolesRequest, opts ...http.CallOption) (*EmptyReply, error) {
 	var out EmptyReply
-	pattern := "/v1/rbac/users/{userId}/roles/{roleId}"
+	pattern := "/v1/rbac/assigns/{assignId}"
 	path := binding.EncodeURL(pattern, in, true)
 	opts = append(opts, http.Operation(OperationUsersRolesDeleteRoleFromUser))
 	opts = append(opts, http.PathTemplate(pattern))
@@ -147,9 +170,22 @@ func (c *UsersRolesHTTPClientImpl) DeleteRoleFromUser(ctx context.Context, in *D
 
 func (c *UsersRolesHTTPClientImpl) ListUserRoles(ctx context.Context, in *ListUserRolesRequest, opts ...http.CallOption) (*ListUsersRolesReply, error) {
 	var out ListUsersRolesReply
-	pattern := "/v1/rbac/users/{userId}/roles"
+	pattern := "/v1/rbac/users/{userId}"
 	path := binding.EncodeURL(pattern, in, true)
 	opts = append(opts, http.Operation(OperationUsersRolesListUserRoles))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, err
+}
+
+func (c *UsersRolesHTTPClientImpl) ListUserRolesByTeam(ctx context.Context, in *ListUserRolesByTeamRequest, opts ...http.CallOption) (*ListUsersRolesReply, error) {
+	var out ListUsersRolesReply
+	pattern := "/v1/rbac/teams/{teamId}"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationUsersRolesListUserRolesByTeam))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
 	if err != nil {

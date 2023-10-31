@@ -4,7 +4,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.3.0
 // - protoc             v4.24.4
-// source: api/roles/v1/rbac/roles.proto
+// source: api/rbac/roles/v1/roles.proto
 
 package roles_v1
 
@@ -21,14 +21,14 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	Roles_CreateRole_FullMethodName               = "/api.roles.v1.Roles/CreateRole"
-	Roles_UpdateRole_FullMethodName               = "/api.roles.v1.Roles/UpdateRole"
-	Roles_DeleteRole_FullMethodName               = "/api.roles.v1.Roles/DeleteRole"
-	Roles_GetRole_FullMethodName                  = "/api.roles.v1.Roles/GetRole"
-	Roles_ListRoles_FullMethodName                = "/api.roles.v1.Roles/ListRoles"
-	Roles_AddPermissionToRole_FullMethodName      = "/api.roles.v1.Roles/AddPermissionToRole"
-	Roles_RemovePermissionFromRole_FullMethodName = "/api.roles.v1.Roles/RemovePermissionFromRole"
-	Roles_ListRolePermissions_FullMethodName      = "/api.roles.v1.Roles/ListRolePermissions"
+	Roles_CreateRole_FullMethodName               = "/api.rbac.roles.v1.Roles/CreateRole"
+	Roles_UpdateRole_FullMethodName               = "/api.rbac.roles.v1.Roles/UpdateRole"
+	Roles_DeleteRole_FullMethodName               = "/api.rbac.roles.v1.Roles/DeleteRole"
+	Roles_GetRole_FullMethodName                  = "/api.rbac.roles.v1.Roles/GetRole"
+	Roles_ListRoles_FullMethodName                = "/api.rbac.roles.v1.Roles/ListRoles"
+	Roles_AddPermissionToRole_FullMethodName      = "/api.rbac.roles.v1.Roles/AddPermissionToRole"
+	Roles_RemovePermissionFromRole_FullMethodName = "/api.rbac.roles.v1.Roles/RemovePermissionFromRole"
+	Roles_ListRolePermissions_FullMethodName      = "/api.rbac.roles.v1.Roles/ListRolePermissions"
 )
 
 // RolesClient is the client API for Roles service.
@@ -329,7 +329,7 @@ func _Roles_ListRolePermissions_Handler(srv interface{}, ctx context.Context, de
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var Roles_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "api.roles.v1.Roles",
+	ServiceName: "api.rbac.roles.v1.Roles",
 	HandlerType: (*RolesServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
@@ -366,5 +366,5 @@ var Roles_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "api/roles/v1/rbac/roles.proto",
+	Metadata: "api/rbac/roles/v1/roles.proto",
 }

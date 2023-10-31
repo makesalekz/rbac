@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-http v2.7.1
 // - protoc             v4.24.4
-// source: api/roles/v1/rbac/roles.proto
+// source: api/rbac/roles/v1/roles.proto
 
 package roles_v1
 
@@ -19,14 +19,14 @@ var _ = binding.EncodeURL
 
 const _ = http.SupportPackageIsVersion1
 
-const OperationRolesAddPermissionToRole = "/api.roles.v1.Roles/AddPermissionToRole"
-const OperationRolesCreateRole = "/api.roles.v1.Roles/CreateRole"
-const OperationRolesDeleteRole = "/api.roles.v1.Roles/DeleteRole"
-const OperationRolesGetRole = "/api.roles.v1.Roles/GetRole"
-const OperationRolesListRolePermissions = "/api.roles.v1.Roles/ListRolePermissions"
-const OperationRolesListRoles = "/api.roles.v1.Roles/ListRoles"
-const OperationRolesRemovePermissionFromRole = "/api.roles.v1.Roles/RemovePermissionFromRole"
-const OperationRolesUpdateRole = "/api.roles.v1.Roles/UpdateRole"
+const OperationRolesAddPermissionToRole = "/api.rbac.roles.v1.Roles/AddPermissionToRole"
+const OperationRolesCreateRole = "/api.rbac.roles.v1.Roles/CreateRole"
+const OperationRolesDeleteRole = "/api.rbac.roles.v1.Roles/DeleteRole"
+const OperationRolesGetRole = "/api.rbac.roles.v1.Roles/GetRole"
+const OperationRolesListRolePermissions = "/api.rbac.roles.v1.Roles/ListRolePermissions"
+const OperationRolesListRoles = "/api.rbac.roles.v1.Roles/ListRoles"
+const OperationRolesRemovePermissionFromRole = "/api.rbac.roles.v1.Roles/RemovePermissionFromRole"
+const OperationRolesUpdateRole = "/api.rbac.roles.v1.Roles/UpdateRole"
 
 type RolesHTTPServer interface {
 	AddPermissionToRole(context.Context, *AddPermissionToRoleRequest) (*AddPermissionToRoleReply, error)
