@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"rbac/ent/permission"
 	"rbac/ent/role"
-	"time"
 
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
@@ -45,28 +44,14 @@ func (pc *PermissionCreate) SetNillableDescription(s *string) *PermissionCreate 
 }
 
 // SetAppID sets the "app_id" field.
-func (pc *PermissionCreate) SetAppID(i int32) *PermissionCreate {
-	pc.mutation.SetAppID(i)
+func (pc *PermissionCreate) SetAppID(s string) *PermissionCreate {
+	pc.mutation.SetAppID(s)
 	return pc
 }
 
 // SetFields sets the "fields" field.
 func (pc *PermissionCreate) SetFields(s []string) *PermissionCreate {
 	pc.mutation.SetFields(s)
-	return pc
-}
-
-// SetCreatedAt sets the "created_at" field.
-func (pc *PermissionCreate) SetCreatedAt(t time.Time) *PermissionCreate {
-	pc.mutation.SetCreatedAt(t)
-	return pc
-}
-
-// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
-func (pc *PermissionCreate) SetNillableCreatedAt(t *time.Time) *PermissionCreate {
-	if t != nil {
-		pc.SetCreatedAt(*t)
-	}
 	return pc
 }
 
@@ -126,9 +111,13 @@ func (pc *PermissionCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (pc *PermissionCreate) defaults() {
-	if _, ok := pc.mutation.CreatedAt(); !ok {
-		v := permission.DefaultCreatedAt()
-		pc.mutation.SetCreatedAt(v)
+	if _, ok := pc.mutation.Description(); !ok {
+		v := permission.DefaultDescription
+		pc.mutation.SetDescription(v)
+	}
+	if _, ok := pc.mutation.GetFields(); !ok {
+		v := permission.DefaultFields
+		pc.mutation.SetFields(v)
 	}
 }
 
@@ -145,8 +134,10 @@ func (pc *PermissionCreate) check() error {
 	if _, ok := pc.mutation.AppID(); !ok {
 		return &ValidationError{Name: "app_id", err: errors.New(`ent: missing required field "Permission.app_id"`)}
 	}
-	if _, ok := pc.mutation.CreatedAt(); !ok {
-		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "Permission.created_at"`)}
+	if v, ok := pc.mutation.AppID(); ok {
+		if err := permission.AppIDValidator(v); err != nil {
+			return &ValidationError{Name: "app_id", err: fmt.Errorf(`ent: validator failed for field "Permission.app_id": %w`, err)}
+		}
 	}
 	return nil
 }
@@ -193,16 +184,12 @@ func (pc *PermissionCreate) createSpec() (*Permission, *sqlgraph.CreateSpec) {
 		_node.Description = value
 	}
 	if value, ok := pc.mutation.AppID(); ok {
-		_spec.SetField(permission.FieldAppID, field.TypeInt32, value)
+		_spec.SetField(permission.FieldAppID, field.TypeString, value)
 		_node.AppID = value
 	}
 	if value, ok := pc.mutation.GetFields(); ok {
 		_spec.SetField(permission.FieldFields, field.TypeJSON, value)
 		_node.Fields = value
-	}
-	if value, ok := pc.mutation.CreatedAt(); ok {
-		_spec.SetField(permission.FieldCreatedAt, field.TypeTime, value)
-		_node.CreatedAt = value
 	}
 	if nodes := pc.mutation.RolesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -302,24 +289,6 @@ func (u *PermissionUpsert) ClearDescription() *PermissionUpsert {
 	return u
 }
 
-// SetAppID sets the "app_id" field.
-func (u *PermissionUpsert) SetAppID(v int32) *PermissionUpsert {
-	u.Set(permission.FieldAppID, v)
-	return u
-}
-
-// UpdateAppID sets the "app_id" field to the value that was provided on create.
-func (u *PermissionUpsert) UpdateAppID() *PermissionUpsert {
-	u.SetExcluded(permission.FieldAppID)
-	return u
-}
-
-// AddAppID adds v to the "app_id" field.
-func (u *PermissionUpsert) AddAppID(v int32) *PermissionUpsert {
-	u.Add(permission.FieldAppID, v)
-	return u
-}
-
 // SetFields sets the "fields" field.
 func (u *PermissionUpsert) SetFields(v []string) *PermissionUpsert {
 	u.Set(permission.FieldFields, v)
@@ -335,18 +304,6 @@ func (u *PermissionUpsert) UpdateFields() *PermissionUpsert {
 // ClearFields clears the value of the "fields" field.
 func (u *PermissionUpsert) ClearFields() *PermissionUpsert {
 	u.SetNull(permission.FieldFields)
-	return u
-}
-
-// SetCreatedAt sets the "created_at" field.
-func (u *PermissionUpsert) SetCreatedAt(v time.Time) *PermissionUpsert {
-	u.Set(permission.FieldCreatedAt, v)
-	return u
-}
-
-// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
-func (u *PermissionUpsert) UpdateCreatedAt() *PermissionUpsert {
-	u.SetExcluded(permission.FieldCreatedAt)
 	return u
 }
 
@@ -366,6 +323,9 @@ func (u *PermissionUpsertOne) UpdateNewValues() *PermissionUpsertOne {
 	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
 		if _, exists := u.create.mutation.ID(); exists {
 			s.SetIgnore(permission.FieldID)
+		}
+		if _, exists := u.create.mutation.AppID(); exists {
+			s.SetIgnore(permission.FieldAppID)
 		}
 	}))
 	return u
@@ -433,27 +393,6 @@ func (u *PermissionUpsertOne) ClearDescription() *PermissionUpsertOne {
 	})
 }
 
-// SetAppID sets the "app_id" field.
-func (u *PermissionUpsertOne) SetAppID(v int32) *PermissionUpsertOne {
-	return u.Update(func(s *PermissionUpsert) {
-		s.SetAppID(v)
-	})
-}
-
-// AddAppID adds v to the "app_id" field.
-func (u *PermissionUpsertOne) AddAppID(v int32) *PermissionUpsertOne {
-	return u.Update(func(s *PermissionUpsert) {
-		s.AddAppID(v)
-	})
-}
-
-// UpdateAppID sets the "app_id" field to the value that was provided on create.
-func (u *PermissionUpsertOne) UpdateAppID() *PermissionUpsertOne {
-	return u.Update(func(s *PermissionUpsert) {
-		s.UpdateAppID()
-	})
-}
-
 // SetFields sets the "fields" field.
 func (u *PermissionUpsertOne) SetFields(v []string) *PermissionUpsertOne {
 	return u.Update(func(s *PermissionUpsert) {
@@ -472,20 +411,6 @@ func (u *PermissionUpsertOne) UpdateFields() *PermissionUpsertOne {
 func (u *PermissionUpsertOne) ClearFields() *PermissionUpsertOne {
 	return u.Update(func(s *PermissionUpsert) {
 		s.ClearFields()
-	})
-}
-
-// SetCreatedAt sets the "created_at" field.
-func (u *PermissionUpsertOne) SetCreatedAt(v time.Time) *PermissionUpsertOne {
-	return u.Update(func(s *PermissionUpsert) {
-		s.SetCreatedAt(v)
-	})
-}
-
-// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
-func (u *PermissionUpsertOne) UpdateCreatedAt() *PermissionUpsertOne {
-	return u.Update(func(s *PermissionUpsert) {
-		s.UpdateCreatedAt()
 	})
 }
 
@@ -668,6 +593,9 @@ func (u *PermissionUpsertBulk) UpdateNewValues() *PermissionUpsertBulk {
 			if _, exists := b.mutation.ID(); exists {
 				s.SetIgnore(permission.FieldID)
 			}
+			if _, exists := b.mutation.AppID(); exists {
+				s.SetIgnore(permission.FieldAppID)
+			}
 		}
 	}))
 	return u
@@ -735,27 +663,6 @@ func (u *PermissionUpsertBulk) ClearDescription() *PermissionUpsertBulk {
 	})
 }
 
-// SetAppID sets the "app_id" field.
-func (u *PermissionUpsertBulk) SetAppID(v int32) *PermissionUpsertBulk {
-	return u.Update(func(s *PermissionUpsert) {
-		s.SetAppID(v)
-	})
-}
-
-// AddAppID adds v to the "app_id" field.
-func (u *PermissionUpsertBulk) AddAppID(v int32) *PermissionUpsertBulk {
-	return u.Update(func(s *PermissionUpsert) {
-		s.AddAppID(v)
-	})
-}
-
-// UpdateAppID sets the "app_id" field to the value that was provided on create.
-func (u *PermissionUpsertBulk) UpdateAppID() *PermissionUpsertBulk {
-	return u.Update(func(s *PermissionUpsert) {
-		s.UpdateAppID()
-	})
-}
-
 // SetFields sets the "fields" field.
 func (u *PermissionUpsertBulk) SetFields(v []string) *PermissionUpsertBulk {
 	return u.Update(func(s *PermissionUpsert) {
@@ -774,20 +681,6 @@ func (u *PermissionUpsertBulk) UpdateFields() *PermissionUpsertBulk {
 func (u *PermissionUpsertBulk) ClearFields() *PermissionUpsertBulk {
 	return u.Update(func(s *PermissionUpsert) {
 		s.ClearFields()
-	})
-}
-
-// SetCreatedAt sets the "created_at" field.
-func (u *PermissionUpsertBulk) SetCreatedAt(v time.Time) *PermissionUpsertBulk {
-	return u.Update(func(s *PermissionUpsert) {
-		s.SetCreatedAt(v)
-	})
-}
-
-// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
-func (u *PermissionUpsertBulk) UpdateCreatedAt() *PermissionUpsertBulk {
-	return u.Update(func(s *PermissionUpsert) {
-		s.UpdateCreatedAt()
 	})
 }
 

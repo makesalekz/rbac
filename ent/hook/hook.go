@@ -8,6 +8,18 @@ import (
 	"rbac/ent"
 )
 
+// The MemberRoleFunc type is an adapter to allow the use of ordinary
+// function as MemberRole mutator.
+type MemberRoleFunc func(context.Context, *ent.MemberRoleMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f MemberRoleFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.MemberRoleMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.MemberRoleMutation", m)
+}
+
 // The PermissionFunc type is an adapter to allow the use of ordinary
 // function as Permission mutator.
 type PermissionFunc func(context.Context, *ent.PermissionMutation) (ent.Value, error)
@@ -42,18 +54,6 @@ func (f RolePermissionFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Val
 		return f(ctx, mv)
 	}
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.RolePermissionMutation", m)
-}
-
-// The UsersRolesFunc type is an adapter to allow the use of ordinary
-// function as UsersRoles mutator.
-type UsersRolesFunc func(context.Context, *ent.UsersRolesMutation) (ent.Value, error)
-
-// Mutate calls f(ctx, m).
-func (f UsersRolesFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	if mv, ok := m.(*ent.UsersRolesMutation); ok {
-		return f(ctx, mv)
-	}
-	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.UsersRolesMutation", m)
 }
 
 // Condition is a hook condition function.

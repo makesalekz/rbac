@@ -15,8 +15,8 @@ type RolePermission struct {
 // Fields of the RolePermission.
 func (RolePermission) Fields() []ent.Field {
 	return []ent.Field{
-		field.Int64("role_id"),
-		field.String("permission_id"),
+		field.Int64("role_id").Immutable(),
+		field.String("permission_id").Immutable(),
 		field.JSON("fields", []string{}),
 	}
 }
@@ -27,11 +27,11 @@ func (RolePermission) Edges() []ent.Edge {
 		edge.To("role", Role.Type).
 			Required().
 			Unique().
-			Field("role_id"),
+			Field("role_id").Immutable(),
 		edge.To("permission", Permission.Type).
 			Required().
 			Unique().
-			Field("permission_id"),
+			Field("permission_id").Immutable(),
 	}
 }
 

@@ -6,10 +6,10 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"rbac/ent/memberrole"
 	"rbac/ent/permission"
 	"rbac/ent/role"
 	"rbac/ent/rolepermission"
-	"rbac/ent/usersroles"
 	"reflect"
 	"sync"
 
@@ -76,10 +76,10 @@ var (
 func checkColumn(table, column string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
+			memberrole.Table:     memberrole.ValidColumn,
 			permission.Table:     permission.ValidColumn,
 			role.Table:           role.ValidColumn,
 			rolepermission.Table: rolepermission.ValidColumn,
-			usersroles.Table:     usersroles.ValidColumn,
 		})
 	})
 	return columnCheck(table, column)

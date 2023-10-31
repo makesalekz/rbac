@@ -3,8 +3,6 @@
 package permission
 
 import (
-	"time"
-
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 )
@@ -22,8 +20,6 @@ const (
 	FieldAppID = "app_id"
 	// FieldFields holds the string denoting the fields field in the database.
 	FieldFields = "fields"
-	// FieldCreatedAt holds the string denoting the created_at field in the database.
-	FieldCreatedAt = "created_at"
 	// EdgeRoles holds the string denoting the roles edge name in mutations.
 	EdgeRoles = "roles"
 	// Table holds the table name of the permission in the database.
@@ -44,7 +40,6 @@ var Columns = []string{
 	FieldDescription,
 	FieldAppID,
 	FieldFields,
-	FieldCreatedAt,
 }
 
 // ForeignKeys holds the SQL foreign-keys that are owned by the "permissions"
@@ -71,8 +66,12 @@ func ValidColumn(column string) bool {
 var (
 	// NameValidator is a validator for the "name" field. It is called by the builders before save.
 	NameValidator func(string) error
-	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
-	DefaultCreatedAt func() time.Time
+	// DefaultDescription holds the default value on creation for the "description" field.
+	DefaultDescription string
+	// AppIDValidator is a validator for the "app_id" field. It is called by the builders before save.
+	AppIDValidator func(string) error
+	// DefaultFields holds the default value on creation for the "fields" field.
+	DefaultFields []string
 )
 
 // OrderOption defines the ordering options for the Permission queries.
@@ -96,11 +95,6 @@ func ByDescription(opts ...sql.OrderTermOption) OrderOption {
 // ByAppID orders the results by the app_id field.
 func ByAppID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldAppID, opts...).ToFunc()
-}
-
-// ByCreatedAt orders the results by the created_at field.
-func ByCreatedAt(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldCreatedAt, opts...).ToFunc()
 }
 
 // ByRolesCount orders the results by roles count.

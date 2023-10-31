@@ -4,33 +4,33 @@ package ent
 
 import (
 	"fmt"
+	"rbac/ent/memberrole"
 	"rbac/ent/role"
-	"rbac/ent/usersroles"
 	"strings"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 )
 
-// UsersRoles is the model entity for the UsersRoles schema.
-type UsersRoles struct {
+// MemberRole is the model entity for the MemberRole schema.
+type MemberRole struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID int64 `json:"id,omitempty"`
-	// UserID holds the value of the "user_id" field.
-	UserID int64 `json:"user_id,omitempty"`
+	// MemberID holds the value of the "member_id" field.
+	MemberID int64 `json:"member_id,omitempty"`
 	// RoleID holds the value of the "role_id" field.
 	RoleID int64 `json:"role_id,omitempty"`
 	// TeamID holds the value of the "team_id" field.
 	TeamID int64 `json:"team_id,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
-	// The values are being populated by the UsersRolesQuery when eager-loading is set.
-	Edges        UsersRolesEdges `json:"edges"`
+	// The values are being populated by the MemberRoleQuery when eager-loading is set.
+	Edges        MemberRoleEdges `json:"edges"`
 	selectValues sql.SelectValues
 }
 
-// UsersRolesEdges holds the relations/edges for other nodes in the graph.
-type UsersRolesEdges struct {
+// MemberRoleEdges holds the relations/edges for other nodes in the graph.
+type MemberRoleEdges struct {
 	// Role holds the value of the role edge.
 	Role *Role `json:"role,omitempty"`
 	// Teams holds the value of the teams edge.
@@ -42,7 +42,7 @@ type UsersRolesEdges struct {
 
 // RoleOrErr returns the Role value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e UsersRolesEdges) RoleOrErr() (*Role, error) {
+func (e MemberRoleEdges) RoleOrErr() (*Role, error) {
 	if e.loadedTypes[0] {
 		if e.Role == nil {
 			// Edge was loaded but was not found.
@@ -55,7 +55,7 @@ func (e UsersRolesEdges) RoleOrErr() (*Role, error) {
 
 // TeamsOrErr returns the Teams value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e UsersRolesEdges) TeamsOrErr() (*Role, error) {
+func (e MemberRoleEdges) TeamsOrErr() (*Role, error) {
 	if e.loadedTypes[1] {
 		if e.Teams == nil {
 			// Edge was loaded but was not found.
@@ -67,11 +67,11 @@ func (e UsersRolesEdges) TeamsOrErr() (*Role, error) {
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
-func (*UsersRoles) scanValues(columns []string) ([]any, error) {
+func (*MemberRole) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case usersroles.FieldID, usersroles.FieldUserID, usersroles.FieldRoleID, usersroles.FieldTeamID:
+		case memberrole.FieldID, memberrole.FieldMemberID, memberrole.FieldRoleID, memberrole.FieldTeamID:
 			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -81,94 +81,94 @@ func (*UsersRoles) scanValues(columns []string) ([]any, error) {
 }
 
 // assignValues assigns the values that were returned from sql.Rows (after scanning)
-// to the UsersRoles fields.
-func (ur *UsersRoles) assignValues(columns []string, values []any) error {
+// to the MemberRole fields.
+func (mr *MemberRole) assignValues(columns []string, values []any) error {
 	if m, n := len(values), len(columns); m < n {
 		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
 	for i := range columns {
 		switch columns[i] {
-		case usersroles.FieldID:
+		case memberrole.FieldID:
 			value, ok := values[i].(*sql.NullInt64)
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			ur.ID = int64(value.Int64)
-		case usersroles.FieldUserID:
+			mr.ID = int64(value.Int64)
+		case memberrole.FieldMemberID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field user_id", values[i])
+				return fmt.Errorf("unexpected type %T for field member_id", values[i])
 			} else if value.Valid {
-				ur.UserID = value.Int64
+				mr.MemberID = value.Int64
 			}
-		case usersroles.FieldRoleID:
+		case memberrole.FieldRoleID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field role_id", values[i])
 			} else if value.Valid {
-				ur.RoleID = value.Int64
+				mr.RoleID = value.Int64
 			}
-		case usersroles.FieldTeamID:
+		case memberrole.FieldTeamID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field team_id", values[i])
 			} else if value.Valid {
-				ur.TeamID = value.Int64
+				mr.TeamID = value.Int64
 			}
 		default:
-			ur.selectValues.Set(columns[i], values[i])
+			mr.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
 }
 
-// Value returns the ent.Value that was dynamically selected and assigned to the UsersRoles.
+// Value returns the ent.Value that was dynamically selected and assigned to the MemberRole.
 // This includes values selected through modifiers, order, etc.
-func (ur *UsersRoles) Value(name string) (ent.Value, error) {
-	return ur.selectValues.Get(name)
+func (mr *MemberRole) Value(name string) (ent.Value, error) {
+	return mr.selectValues.Get(name)
 }
 
-// QueryRole queries the "role" edge of the UsersRoles entity.
-func (ur *UsersRoles) QueryRole() *RoleQuery {
-	return NewUsersRolesClient(ur.config).QueryRole(ur)
+// QueryRole queries the "role" edge of the MemberRole entity.
+func (mr *MemberRole) QueryRole() *RoleQuery {
+	return NewMemberRoleClient(mr.config).QueryRole(mr)
 }
 
-// QueryTeams queries the "teams" edge of the UsersRoles entity.
-func (ur *UsersRoles) QueryTeams() *RoleQuery {
-	return NewUsersRolesClient(ur.config).QueryTeams(ur)
+// QueryTeams queries the "teams" edge of the MemberRole entity.
+func (mr *MemberRole) QueryTeams() *RoleQuery {
+	return NewMemberRoleClient(mr.config).QueryTeams(mr)
 }
 
-// Update returns a builder for updating this UsersRoles.
-// Note that you need to call UsersRoles.Unwrap() before calling this method if this UsersRoles
+// Update returns a builder for updating this MemberRole.
+// Note that you need to call MemberRole.Unwrap() before calling this method if this MemberRole
 // was returned from a transaction, and the transaction was committed or rolled back.
-func (ur *UsersRoles) Update() *UsersRolesUpdateOne {
-	return NewUsersRolesClient(ur.config).UpdateOne(ur)
+func (mr *MemberRole) Update() *MemberRoleUpdateOne {
+	return NewMemberRoleClient(mr.config).UpdateOne(mr)
 }
 
-// Unwrap unwraps the UsersRoles entity that was returned from a transaction after it was closed,
+// Unwrap unwraps the MemberRole entity that was returned from a transaction after it was closed,
 // so that all future queries will be executed through the driver which created the transaction.
-func (ur *UsersRoles) Unwrap() *UsersRoles {
-	_tx, ok := ur.config.driver.(*txDriver)
+func (mr *MemberRole) Unwrap() *MemberRole {
+	_tx, ok := mr.config.driver.(*txDriver)
 	if !ok {
-		panic("ent: UsersRoles is not a transactional entity")
+		panic("ent: MemberRole is not a transactional entity")
 	}
-	ur.config.driver = _tx.drv
-	return ur
+	mr.config.driver = _tx.drv
+	return mr
 }
 
 // String implements the fmt.Stringer.
-func (ur *UsersRoles) String() string {
+func (mr *MemberRole) String() string {
 	var builder strings.Builder
-	builder.WriteString("UsersRoles(")
-	builder.WriteString(fmt.Sprintf("id=%v, ", ur.ID))
-	builder.WriteString("user_id=")
-	builder.WriteString(fmt.Sprintf("%v", ur.UserID))
+	builder.WriteString("MemberRole(")
+	builder.WriteString(fmt.Sprintf("id=%v, ", mr.ID))
+	builder.WriteString("member_id=")
+	builder.WriteString(fmt.Sprintf("%v", mr.MemberID))
 	builder.WriteString(", ")
 	builder.WriteString("role_id=")
-	builder.WriteString(fmt.Sprintf("%v", ur.RoleID))
+	builder.WriteString(fmt.Sprintf("%v", mr.RoleID))
 	builder.WriteString(", ")
 	builder.WriteString("team_id=")
-	builder.WriteString(fmt.Sprintf("%v", ur.TeamID))
+	builder.WriteString(fmt.Sprintf("%v", mr.TeamID))
 	builder.WriteByte(')')
 	return builder.String()
 }
 
-// UsersRolesSlice is a parsable slice of UsersRoles.
-type UsersRolesSlice []*UsersRoles
+// MemberRoles is a parsable slice of MemberRole.
+type MemberRoles []*MemberRole

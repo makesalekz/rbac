@@ -22,9 +22,13 @@ type Role struct {
 	// Description holds the value of the "description" field.
 	Description string `json:"description,omitempty"`
 	// TeamID holds the value of the "team_id" field.
-	TeamID int64 `json:"team_id,omitempty"`
+	TeamID *int64 `json:"team_id,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
+	// UpdatedAt holds the value of the "updated_at" field.
+	UpdatedAt *time.Time `json:"updated_at,omitempty"`
+	// DeletedAt holds the value of the "deleted_at" field.
+	DeletedAt *time.Time `json:"deleted_at,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the RoleQuery when eager-loading is set.
 	Edges            RoleEdges `json:"edges"`
@@ -59,7 +63,7 @@ func (*Role) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullInt64)
 		case role.FieldName, role.FieldDescription:
 			values[i] = new(sql.NullString)
-		case role.FieldCreatedAt:
+		case role.FieldCreatedAt, role.FieldUpdatedAt, role.FieldDeletedAt:
 			values[i] = new(sql.NullTime)
 		case role.ForeignKeys[0]: // permission_roles
 			values[i] = new(sql.NullString)
@@ -100,13 +104,28 @@ func (r *Role) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field team_id", values[i])
 			} else if value.Valid {
-				r.TeamID = value.Int64
+				r.TeamID = new(int64)
+				*r.TeamID = value.Int64
 			}
 		case role.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
 				r.CreatedAt = value.Time
+			}
+		case role.FieldUpdatedAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
+			} else if value.Valid {
+				r.UpdatedAt = new(time.Time)
+				*r.UpdatedAt = value.Time
+			}
+		case role.FieldDeletedAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field deleted_at", values[i])
+			} else if value.Valid {
+				r.DeletedAt = new(time.Time)
+				*r.DeletedAt = value.Time
 			}
 		case role.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -162,11 +181,23 @@ func (r *Role) String() string {
 	builder.WriteString("description=")
 	builder.WriteString(r.Description)
 	builder.WriteString(", ")
-	builder.WriteString("team_id=")
-	builder.WriteString(fmt.Sprintf("%v", r.TeamID))
+	if v := r.TeamID; v != nil {
+		builder.WriteString("team_id=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
 	builder.WriteString(", ")
 	builder.WriteString("created_at=")
 	builder.WriteString(r.CreatedAt.Format(time.ANSIC))
+	builder.WriteString(", ")
+	if v := r.UpdatedAt; v != nil {
+		builder.WriteString("updated_at=")
+		builder.WriteString(v.Format(time.ANSIC))
+	}
+	builder.WriteString(", ")
+	if v := r.DeletedAt; v != nil {
+		builder.WriteString("deleted_at=")
+		builder.WriteString(v.Format(time.ANSIC))
+	}
 	builder.WriteByte(')')
 	return builder.String()
 }

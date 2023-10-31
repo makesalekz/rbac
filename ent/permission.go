@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"rbac/ent/permission"
 	"strings"
-	"time"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
@@ -23,11 +22,9 @@ type Permission struct {
 	// Description holds the value of the "description" field.
 	Description string `json:"description,omitempty"`
 	// AppID holds the value of the "app_id" field.
-	AppID int32 `json:"app_id,omitempty"`
+	AppID string `json:"app_id,omitempty"`
 	// Fields holds the value of the "fields" field.
 	Fields []string `json:"fields,omitempty"`
-	// CreatedAt holds the value of the "created_at" field.
-	CreatedAt time.Time `json:"created_at,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the PermissionQuery when eager-loading is set.
 	Edges            PermissionEdges `json:"edges"`
@@ -60,12 +57,8 @@ func (*Permission) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case permission.FieldFields:
 			values[i] = new([]byte)
-		case permission.FieldAppID:
-			values[i] = new(sql.NullInt64)
-		case permission.FieldID, permission.FieldName, permission.FieldDescription:
+		case permission.FieldID, permission.FieldName, permission.FieldDescription, permission.FieldAppID:
 			values[i] = new(sql.NullString)
-		case permission.FieldCreatedAt:
-			values[i] = new(sql.NullTime)
 		case permission.ForeignKeys[0]: // role_permissions
 			values[i] = new(sql.NullInt64)
 		default:
@@ -102,10 +95,10 @@ func (pe *Permission) assignValues(columns []string, values []any) error {
 				pe.Description = value.String
 			}
 		case permission.FieldAppID:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
+			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field app_id", values[i])
 			} else if value.Valid {
-				pe.AppID = int32(value.Int64)
+				pe.AppID = value.String
 			}
 		case permission.FieldFields:
 			if value, ok := values[i].(*[]byte); !ok {
@@ -114,12 +107,6 @@ func (pe *Permission) assignValues(columns []string, values []any) error {
 				if err := json.Unmarshal(*value, &pe.Fields); err != nil {
 					return fmt.Errorf("unmarshal field fields: %w", err)
 				}
-			}
-		case permission.FieldCreatedAt:
-			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field created_at", values[i])
-			} else if value.Valid {
-				pe.CreatedAt = value.Time
 			}
 		case permission.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -176,13 +163,10 @@ func (pe *Permission) String() string {
 	builder.WriteString(pe.Description)
 	builder.WriteString(", ")
 	builder.WriteString("app_id=")
-	builder.WriteString(fmt.Sprintf("%v", pe.AppID))
+	builder.WriteString(pe.AppID)
 	builder.WriteString(", ")
 	builder.WriteString("fields=")
 	builder.WriteString(fmt.Sprintf("%v", pe.Fields))
-	builder.WriteString(", ")
-	builder.WriteString("created_at=")
-	builder.WriteString(pe.CreatedAt.Format(time.ANSIC))
 	builder.WriteByte(')')
 	return builder.String()
 }

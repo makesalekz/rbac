@@ -42,6 +42,20 @@ func (ru *RoleUpdate) SetDescription(s string) *RoleUpdate {
 	return ru
 }
 
+// SetNillableDescription sets the "description" field if the given value is not nil.
+func (ru *RoleUpdate) SetNillableDescription(s *string) *RoleUpdate {
+	if s != nil {
+		ru.SetDescription(*s)
+	}
+	return ru
+}
+
+// ClearDescription clears the value of the "description" field.
+func (ru *RoleUpdate) ClearDescription() *RoleUpdate {
+	ru.mutation.ClearDescription()
+	return ru
+}
+
 // SetTeamID sets the "team_id" field.
 func (ru *RoleUpdate) SetTeamID(i int64) *RoleUpdate {
 	ru.mutation.ResetTeamID()
@@ -66,6 +80,18 @@ func (ru *RoleUpdate) SetNillableCreatedAt(t *time.Time) *RoleUpdate {
 	if t != nil {
 		ru.SetCreatedAt(*t)
 	}
+	return ru
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (ru *RoleUpdate) SetUpdatedAt(t time.Time) *RoleUpdate {
+	ru.mutation.SetUpdatedAt(t)
+	return ru
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (ru *RoleUpdate) SetDeletedAt(t time.Time) *RoleUpdate {
+	ru.mutation.SetDeletedAt(t)
 	return ru
 }
 
@@ -137,6 +163,16 @@ func (ru *RoleUpdate) ExecX(ctx context.Context) {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (ru *RoleUpdate) check() error {
+	if v, ok := ru.mutation.Name(); ok {
+		if err := role.NameValidator(v); err != nil {
+			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Role.name": %w`, err)}
+		}
+	}
+	return nil
+}
+
 // Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
 func (ru *RoleUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)) *RoleUpdate {
 	ru.modifiers = append(ru.modifiers, modifiers...)
@@ -144,6 +180,9 @@ func (ru *RoleUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)) *RoleUpdat
 }
 
 func (ru *RoleUpdate) sqlSave(ctx context.Context) (n int, err error) {
+	if err := ru.check(); err != nil {
+		return n, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(role.Table, role.Columns, sqlgraph.NewFieldSpec(role.FieldID, field.TypeInt64))
 	if ps := ru.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
@@ -158,6 +197,9 @@ func (ru *RoleUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := ru.mutation.Description(); ok {
 		_spec.SetField(role.FieldDescription, field.TypeString, value)
 	}
+	if ru.mutation.DescriptionCleared() {
+		_spec.ClearField(role.FieldDescription, field.TypeString)
+	}
 	if value, ok := ru.mutation.TeamID(); ok {
 		_spec.SetField(role.FieldTeamID, field.TypeInt64, value)
 	}
@@ -166,6 +208,12 @@ func (ru *RoleUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := ru.mutation.CreatedAt(); ok {
 		_spec.SetField(role.FieldCreatedAt, field.TypeTime, value)
+	}
+	if value, ok := ru.mutation.UpdatedAt(); ok {
+		_spec.SetField(role.FieldUpdatedAt, field.TypeTime, value)
+	}
+	if value, ok := ru.mutation.DeletedAt(); ok {
+		_spec.SetField(role.FieldDeletedAt, field.TypeTime, value)
 	}
 	if ru.mutation.PermissionsCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -246,6 +294,20 @@ func (ruo *RoleUpdateOne) SetDescription(s string) *RoleUpdateOne {
 	return ruo
 }
 
+// SetNillableDescription sets the "description" field if the given value is not nil.
+func (ruo *RoleUpdateOne) SetNillableDescription(s *string) *RoleUpdateOne {
+	if s != nil {
+		ruo.SetDescription(*s)
+	}
+	return ruo
+}
+
+// ClearDescription clears the value of the "description" field.
+func (ruo *RoleUpdateOne) ClearDescription() *RoleUpdateOne {
+	ruo.mutation.ClearDescription()
+	return ruo
+}
+
 // SetTeamID sets the "team_id" field.
 func (ruo *RoleUpdateOne) SetTeamID(i int64) *RoleUpdateOne {
 	ruo.mutation.ResetTeamID()
@@ -270,6 +332,18 @@ func (ruo *RoleUpdateOne) SetNillableCreatedAt(t *time.Time) *RoleUpdateOne {
 	if t != nil {
 		ruo.SetCreatedAt(*t)
 	}
+	return ruo
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (ruo *RoleUpdateOne) SetUpdatedAt(t time.Time) *RoleUpdateOne {
+	ruo.mutation.SetUpdatedAt(t)
+	return ruo
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (ruo *RoleUpdateOne) SetDeletedAt(t time.Time) *RoleUpdateOne {
+	ruo.mutation.SetDeletedAt(t)
 	return ruo
 }
 
@@ -354,6 +428,16 @@ func (ruo *RoleUpdateOne) ExecX(ctx context.Context) {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (ruo *RoleUpdateOne) check() error {
+	if v, ok := ruo.mutation.Name(); ok {
+		if err := role.NameValidator(v); err != nil {
+			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Role.name": %w`, err)}
+		}
+	}
+	return nil
+}
+
 // Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
 func (ruo *RoleUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuilder)) *RoleUpdateOne {
 	ruo.modifiers = append(ruo.modifiers, modifiers...)
@@ -361,6 +445,9 @@ func (ruo *RoleUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuilder)) *RoleU
 }
 
 func (ruo *RoleUpdateOne) sqlSave(ctx context.Context) (_node *Role, err error) {
+	if err := ruo.check(); err != nil {
+		return _node, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(role.Table, role.Columns, sqlgraph.NewFieldSpec(role.FieldID, field.TypeInt64))
 	id, ok := ruo.mutation.ID()
 	if !ok {
@@ -392,6 +479,9 @@ func (ruo *RoleUpdateOne) sqlSave(ctx context.Context) (_node *Role, err error) 
 	if value, ok := ruo.mutation.Description(); ok {
 		_spec.SetField(role.FieldDescription, field.TypeString, value)
 	}
+	if ruo.mutation.DescriptionCleared() {
+		_spec.ClearField(role.FieldDescription, field.TypeString)
+	}
 	if value, ok := ruo.mutation.TeamID(); ok {
 		_spec.SetField(role.FieldTeamID, field.TypeInt64, value)
 	}
@@ -400,6 +490,12 @@ func (ruo *RoleUpdateOne) sqlSave(ctx context.Context) (_node *Role, err error) 
 	}
 	if value, ok := ruo.mutation.CreatedAt(); ok {
 		_spec.SetField(role.FieldCreatedAt, field.TypeTime, value)
+	}
+	if value, ok := ruo.mutation.UpdatedAt(); ok {
+		_spec.SetField(role.FieldUpdatedAt, field.TypeTime, value)
+	}
+	if value, ok := ruo.mutation.DeletedAt(); ok {
+		_spec.SetField(role.FieldDeletedAt, field.TypeTime, value)
 	}
 	if ruo.mutation.PermissionsCleared() {
 		edge := &sqlgraph.EdgeSpec{

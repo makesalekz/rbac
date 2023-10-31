@@ -10,10 +10,10 @@ import (
 
 	"rbac/ent/migrate"
 
+	"rbac/ent/memberrole"
 	"rbac/ent/permission"
 	"rbac/ent/role"
 	"rbac/ent/rolepermission"
-	"rbac/ent/usersroles"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect"
@@ -26,14 +26,14 @@ type Client struct {
 	config
 	// Schema is the client for creating, migrating and dropping schema.
 	Schema *migrate.Schema
+	// MemberRole is the client for interacting with the MemberRole builders.
+	MemberRole *MemberRoleClient
 	// Permission is the client for interacting with the Permission builders.
 	Permission *PermissionClient
 	// Role is the client for interacting with the Role builders.
 	Role *RoleClient
 	// RolePermission is the client for interacting with the RolePermission builders.
 	RolePermission *RolePermissionClient
-	// UsersRoles is the client for interacting with the UsersRoles builders.
-	UsersRoles *UsersRolesClient
 }
 
 // NewClient creates a new client configured with the given options.
@@ -47,10 +47,10 @@ func NewClient(opts ...Option) *Client {
 
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
+	c.MemberRole = NewMemberRoleClient(c.config)
 	c.Permission = NewPermissionClient(c.config)
 	c.Role = NewRoleClient(c.config)
 	c.RolePermission = NewRolePermissionClient(c.config)
-	c.UsersRoles = NewUsersRolesClient(c.config)
 }
 
 type (
@@ -133,10 +133,10 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	return &Tx{
 		ctx:            ctx,
 		config:         cfg,
+		MemberRole:     NewMemberRoleClient(cfg),
 		Permission:     NewPermissionClient(cfg),
 		Role:           NewRoleClient(cfg),
 		RolePermission: NewRolePermissionClient(cfg),
-		UsersRoles:     NewUsersRolesClient(cfg),
 	}, nil
 }
 
@@ -156,17 +156,17 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	return &Tx{
 		ctx:            ctx,
 		config:         cfg,
+		MemberRole:     NewMemberRoleClient(cfg),
 		Permission:     NewPermissionClient(cfg),
 		Role:           NewRoleClient(cfg),
 		RolePermission: NewRolePermissionClient(cfg),
-		UsersRoles:     NewUsersRolesClient(cfg),
 	}, nil
 }
 
 // Debug returns a new debug-client. It's used to get verbose logging on specific operations.
 //
 //	client.Debug().
-//		Permission.
+//		MemberRole.
 //		Query().
 //		Count(ctx)
 func (c *Client) Debug() *Client {
@@ -188,34 +188,184 @@ func (c *Client) Close() error {
 // Use adds the mutation hooks to all the entity clients.
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
+	c.MemberRole.Use(hooks...)
 	c.Permission.Use(hooks...)
 	c.Role.Use(hooks...)
 	c.RolePermission.Use(hooks...)
-	c.UsersRoles.Use(hooks...)
 }
 
 // Intercept adds the query interceptors to all the entity clients.
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
+	c.MemberRole.Intercept(interceptors...)
 	c.Permission.Intercept(interceptors...)
 	c.Role.Intercept(interceptors...)
 	c.RolePermission.Intercept(interceptors...)
-	c.UsersRoles.Intercept(interceptors...)
 }
 
 // Mutate implements the ent.Mutator interface.
 func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 	switch m := m.(type) {
+	case *MemberRoleMutation:
+		return c.MemberRole.mutate(ctx, m)
 	case *PermissionMutation:
 		return c.Permission.mutate(ctx, m)
 	case *RoleMutation:
 		return c.Role.mutate(ctx, m)
 	case *RolePermissionMutation:
 		return c.RolePermission.mutate(ctx, m)
-	case *UsersRolesMutation:
-		return c.UsersRoles.mutate(ctx, m)
 	default:
 		return nil, fmt.Errorf("ent: unknown mutation type %T", m)
+	}
+}
+
+// MemberRoleClient is a client for the MemberRole schema.
+type MemberRoleClient struct {
+	config
+}
+
+// NewMemberRoleClient returns a client for the MemberRole from the given config.
+func NewMemberRoleClient(c config) *MemberRoleClient {
+	return &MemberRoleClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `memberrole.Hooks(f(g(h())))`.
+func (c *MemberRoleClient) Use(hooks ...Hook) {
+	c.hooks.MemberRole = append(c.hooks.MemberRole, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `memberrole.Intercept(f(g(h())))`.
+func (c *MemberRoleClient) Intercept(interceptors ...Interceptor) {
+	c.inters.MemberRole = append(c.inters.MemberRole, interceptors...)
+}
+
+// Create returns a builder for creating a MemberRole entity.
+func (c *MemberRoleClient) Create() *MemberRoleCreate {
+	mutation := newMemberRoleMutation(c.config, OpCreate)
+	return &MemberRoleCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of MemberRole entities.
+func (c *MemberRoleClient) CreateBulk(builders ...*MemberRoleCreate) *MemberRoleCreateBulk {
+	return &MemberRoleCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for MemberRole.
+func (c *MemberRoleClient) Update() *MemberRoleUpdate {
+	mutation := newMemberRoleMutation(c.config, OpUpdate)
+	return &MemberRoleUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *MemberRoleClient) UpdateOne(mr *MemberRole) *MemberRoleUpdateOne {
+	mutation := newMemberRoleMutation(c.config, OpUpdateOne, withMemberRole(mr))
+	return &MemberRoleUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *MemberRoleClient) UpdateOneID(id int64) *MemberRoleUpdateOne {
+	mutation := newMemberRoleMutation(c.config, OpUpdateOne, withMemberRoleID(id))
+	return &MemberRoleUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for MemberRole.
+func (c *MemberRoleClient) Delete() *MemberRoleDelete {
+	mutation := newMemberRoleMutation(c.config, OpDelete)
+	return &MemberRoleDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *MemberRoleClient) DeleteOne(mr *MemberRole) *MemberRoleDeleteOne {
+	return c.DeleteOneID(mr.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *MemberRoleClient) DeleteOneID(id int64) *MemberRoleDeleteOne {
+	builder := c.Delete().Where(memberrole.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &MemberRoleDeleteOne{builder}
+}
+
+// Query returns a query builder for MemberRole.
+func (c *MemberRoleClient) Query() *MemberRoleQuery {
+	return &MemberRoleQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeMemberRole},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a MemberRole entity by its id.
+func (c *MemberRoleClient) Get(ctx context.Context, id int64) (*MemberRole, error) {
+	return c.Query().Where(memberrole.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *MemberRoleClient) GetX(ctx context.Context, id int64) *MemberRole {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryRole queries the role edge of a MemberRole.
+func (c *MemberRoleClient) QueryRole(mr *MemberRole) *RoleQuery {
+	query := (&RoleClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := mr.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(memberrole.Table, memberrole.FieldID, id),
+			sqlgraph.To(role.Table, role.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, memberrole.RoleTable, memberrole.RoleColumn),
+		)
+		fromV = sqlgraph.Neighbors(mr.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryTeams queries the teams edge of a MemberRole.
+func (c *MemberRoleClient) QueryTeams(mr *MemberRole) *RoleQuery {
+	query := (&RoleClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := mr.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(memberrole.Table, memberrole.FieldID, id),
+			sqlgraph.To(role.Table, role.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, memberrole.TeamsTable, memberrole.TeamsColumn),
+		)
+		fromV = sqlgraph.Neighbors(mr.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *MemberRoleClient) Hooks() []Hook {
+	return c.hooks.MemberRole
+}
+
+// Interceptors returns the client interceptors.
+func (c *MemberRoleClient) Interceptors() []Interceptor {
+	return c.inters.MemberRole
+}
+
+func (c *MemberRoleClient) mutate(ctx context.Context, m *MemberRoleMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&MemberRoleCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&MemberRoleUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&MemberRoleUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&MemberRoleDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown MemberRole mutation op: %q", m.Op())
 	}
 }
 
@@ -545,7 +695,7 @@ func (c *RolePermissionClient) Delete() *RolePermissionDelete {
 }
 
 // DeleteOne returns a builder for deleting the given entity.
-func (c *RolePermissionClient) DeleteOne(rp RolePermission) *RolePermissionDeleteOne {
+func (c *RolePermissionClient) DeleteOne(rp *RolePermission) *RolePermissionDeleteOne {
 	return c.DeleteOneID(rp.ID)
 }
 
@@ -637,162 +787,12 @@ func (c *RolePermissionClient) mutate(ctx context.Context, m *RolePermissionMuta
 	}
 }
 
-// UsersRolesClient is a client for the UsersRoles schema.
-type UsersRolesClient struct {
-	config
-}
-
-// NewUsersRolesClient returns a client for the UsersRoles from the given config.
-func NewUsersRolesClient(c config) *UsersRolesClient {
-	return &UsersRolesClient{config: c}
-}
-
-// Use adds a list of mutation hooks to the hooks stack.
-// A call to `Use(f, g, h)` equals to `usersroles.Hooks(f(g(h())))`.
-func (c *UsersRolesClient) Use(hooks ...Hook) {
-	c.hooks.UsersRoles = append(c.hooks.UsersRoles, hooks...)
-}
-
-// Intercept adds a list of query interceptors to the interceptors stack.
-// A call to `Intercept(f, g, h)` equals to `usersroles.Intercept(f(g(h())))`.
-func (c *UsersRolesClient) Intercept(interceptors ...Interceptor) {
-	c.inters.UsersRoles = append(c.inters.UsersRoles, interceptors...)
-}
-
-// Create returns a builder for creating a UsersRoles entity.
-func (c *UsersRolesClient) Create() *UsersRolesCreate {
-	mutation := newUsersRolesMutation(c.config, OpCreate)
-	return &UsersRolesCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// CreateBulk returns a builder for creating a bulk of UsersRoles entities.
-func (c *UsersRolesClient) CreateBulk(builders ...*UsersRolesCreate) *UsersRolesCreateBulk {
-	return &UsersRolesCreateBulk{config: c.config, builders: builders}
-}
-
-// Update returns an update builder for UsersRoles.
-func (c *UsersRolesClient) Update() *UsersRolesUpdate {
-	mutation := newUsersRolesMutation(c.config, OpUpdate)
-	return &UsersRolesUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOne returns an update builder for the given entity.
-func (c *UsersRolesClient) UpdateOne(ur *UsersRoles) *UsersRolesUpdateOne {
-	mutation := newUsersRolesMutation(c.config, OpUpdateOne, withUsersRoles(ur))
-	return &UsersRolesUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOneID returns an update builder for the given id.
-func (c *UsersRolesClient) UpdateOneID(id int64) *UsersRolesUpdateOne {
-	mutation := newUsersRolesMutation(c.config, OpUpdateOne, withUsersRolesID(id))
-	return &UsersRolesUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// Delete returns a delete builder for UsersRoles.
-func (c *UsersRolesClient) Delete() *UsersRolesDelete {
-	mutation := newUsersRolesMutation(c.config, OpDelete)
-	return &UsersRolesDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// DeleteOne returns a builder for deleting the given entity.
-func (c *UsersRolesClient) DeleteOne(ur *UsersRoles) *UsersRolesDeleteOne {
-	return c.DeleteOneID(ur.ID)
-}
-
-// DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *UsersRolesClient) DeleteOneID(id int64) *UsersRolesDeleteOne {
-	builder := c.Delete().Where(usersroles.ID(id))
-	builder.mutation.id = &id
-	builder.mutation.op = OpDeleteOne
-	return &UsersRolesDeleteOne{builder}
-}
-
-// Query returns a query builder for UsersRoles.
-func (c *UsersRolesClient) Query() *UsersRolesQuery {
-	return &UsersRolesQuery{
-		config: c.config,
-		ctx:    &QueryContext{Type: TypeUsersRoles},
-		inters: c.Interceptors(),
-	}
-}
-
-// Get returns a UsersRoles entity by its id.
-func (c *UsersRolesClient) Get(ctx context.Context, id int64) (*UsersRoles, error) {
-	return c.Query().Where(usersroles.ID(id)).Only(ctx)
-}
-
-// GetX is like Get, but panics if an error occurs.
-func (c *UsersRolesClient) GetX(ctx context.Context, id int64) *UsersRoles {
-	obj, err := c.Get(ctx, id)
-	if err != nil {
-		panic(err)
-	}
-	return obj
-}
-
-// QueryRole queries the role edge of a UsersRoles.
-func (c *UsersRolesClient) QueryRole(ur *UsersRoles) *RoleQuery {
-	query := (&RoleClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := ur.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(usersroles.Table, usersroles.FieldID, id),
-			sqlgraph.To(role.Table, role.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, usersroles.RoleTable, usersroles.RoleColumn),
-		)
-		fromV = sqlgraph.Neighbors(ur.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryTeams queries the teams edge of a UsersRoles.
-func (c *UsersRolesClient) QueryTeams(ur *UsersRoles) *RoleQuery {
-	query := (&RoleClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := ur.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(usersroles.Table, usersroles.FieldID, id),
-			sqlgraph.To(role.Table, role.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, usersroles.TeamsTable, usersroles.TeamsColumn),
-		)
-		fromV = sqlgraph.Neighbors(ur.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// Hooks returns the client hooks.
-func (c *UsersRolesClient) Hooks() []Hook {
-	return c.hooks.UsersRoles
-}
-
-// Interceptors returns the client interceptors.
-func (c *UsersRolesClient) Interceptors() []Interceptor {
-	return c.inters.UsersRoles
-}
-
-func (c *UsersRolesClient) mutate(ctx context.Context, m *UsersRolesMutation) (Value, error) {
-	switch m.Op() {
-	case OpCreate:
-		return (&UsersRolesCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpUpdate:
-		return (&UsersRolesUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpUpdateOne:
-		return (&UsersRolesUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpDelete, OpDeleteOne:
-		return (&UsersRolesDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
-	default:
-		return nil, fmt.Errorf("ent: unknown UsersRoles mutation op: %q", m.Op())
-	}
-}
-
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		Permission, Role, RolePermission, UsersRoles []ent.Hook
+		MemberRole, Permission, Role, RolePermission []ent.Hook
 	}
 	inters struct {
-		Permission, Role, RolePermission, UsersRoles []ent.Interceptor
+		MemberRole, Permission, Role, RolePermission []ent.Interceptor
 	}
 )

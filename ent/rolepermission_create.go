@@ -217,30 +217,6 @@ type (
 	}
 )
 
-// SetRoleID sets the "role_id" field.
-func (u *RolePermissionUpsert) SetRoleID(v int64) *RolePermissionUpsert {
-	u.Set(rolepermission.FieldRoleID, v)
-	return u
-}
-
-// UpdateRoleID sets the "role_id" field to the value that was provided on create.
-func (u *RolePermissionUpsert) UpdateRoleID() *RolePermissionUpsert {
-	u.SetExcluded(rolepermission.FieldRoleID)
-	return u
-}
-
-// SetPermissionID sets the "permission_id" field.
-func (u *RolePermissionUpsert) SetPermissionID(v string) *RolePermissionUpsert {
-	u.Set(rolepermission.FieldPermissionID, v)
-	return u
-}
-
-// UpdatePermissionID sets the "permission_id" field to the value that was provided on create.
-func (u *RolePermissionUpsert) UpdatePermissionID() *RolePermissionUpsert {
-	u.SetExcluded(rolepermission.FieldPermissionID)
-	return u
-}
-
 // SetFields sets the "fields" field.
 func (u *RolePermissionUpsert) SetFields(v []string) *RolePermissionUpsert {
 	u.Set(rolepermission.FieldFields, v)
@@ -263,6 +239,14 @@ func (u *RolePermissionUpsert) UpdateFields() *RolePermissionUpsert {
 //		Exec(ctx)
 func (u *RolePermissionUpsertOne) UpdateNewValues() *RolePermissionUpsertOne {
 	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		if _, exists := u.create.mutation.RoleID(); exists {
+			s.SetIgnore(rolepermission.FieldRoleID)
+		}
+		if _, exists := u.create.mutation.PermissionID(); exists {
+			s.SetIgnore(rolepermission.FieldPermissionID)
+		}
+	}))
 	return u
 }
 
@@ -291,34 +275,6 @@ func (u *RolePermissionUpsertOne) Update(set func(*RolePermissionUpsert)) *RoleP
 		set(&RolePermissionUpsert{UpdateSet: update})
 	}))
 	return u
-}
-
-// SetRoleID sets the "role_id" field.
-func (u *RolePermissionUpsertOne) SetRoleID(v int64) *RolePermissionUpsertOne {
-	return u.Update(func(s *RolePermissionUpsert) {
-		s.SetRoleID(v)
-	})
-}
-
-// UpdateRoleID sets the "role_id" field to the value that was provided on create.
-func (u *RolePermissionUpsertOne) UpdateRoleID() *RolePermissionUpsertOne {
-	return u.Update(func(s *RolePermissionUpsert) {
-		s.UpdateRoleID()
-	})
-}
-
-// SetPermissionID sets the "permission_id" field.
-func (u *RolePermissionUpsertOne) SetPermissionID(v string) *RolePermissionUpsertOne {
-	return u.Update(func(s *RolePermissionUpsert) {
-		s.SetPermissionID(v)
-	})
-}
-
-// UpdatePermissionID sets the "permission_id" field to the value that was provided on create.
-func (u *RolePermissionUpsertOne) UpdatePermissionID() *RolePermissionUpsertOne {
-	return u.Update(func(s *RolePermissionUpsert) {
-		s.UpdatePermissionID()
-	})
 }
 
 // SetFields sets the "fields" field.
@@ -504,6 +460,16 @@ type RolePermissionUpsertBulk struct {
 //		Exec(ctx)
 func (u *RolePermissionUpsertBulk) UpdateNewValues() *RolePermissionUpsertBulk {
 	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		for _, b := range u.create.builders {
+			if _, exists := b.mutation.RoleID(); exists {
+				s.SetIgnore(rolepermission.FieldRoleID)
+			}
+			if _, exists := b.mutation.PermissionID(); exists {
+				s.SetIgnore(rolepermission.FieldPermissionID)
+			}
+		}
+	}))
 	return u
 }
 
@@ -532,34 +498,6 @@ func (u *RolePermissionUpsertBulk) Update(set func(*RolePermissionUpsert)) *Role
 		set(&RolePermissionUpsert{UpdateSet: update})
 	}))
 	return u
-}
-
-// SetRoleID sets the "role_id" field.
-func (u *RolePermissionUpsertBulk) SetRoleID(v int64) *RolePermissionUpsertBulk {
-	return u.Update(func(s *RolePermissionUpsert) {
-		s.SetRoleID(v)
-	})
-}
-
-// UpdateRoleID sets the "role_id" field to the value that was provided on create.
-func (u *RolePermissionUpsertBulk) UpdateRoleID() *RolePermissionUpsertBulk {
-	return u.Update(func(s *RolePermissionUpsert) {
-		s.UpdateRoleID()
-	})
-}
-
-// SetPermissionID sets the "permission_id" field.
-func (u *RolePermissionUpsertBulk) SetPermissionID(v string) *RolePermissionUpsertBulk {
-	return u.Update(func(s *RolePermissionUpsert) {
-		s.SetPermissionID(v)
-	})
-}
-
-// UpdatePermissionID sets the "permission_id" field to the value that was provided on create.
-func (u *RolePermissionUpsertBulk) UpdatePermissionID() *RolePermissionUpsertBulk {
-	return u.Update(func(s *RolePermissionUpsert) {
-		s.UpdatePermissionID()
-	})
 }
 
 // SetFields sets the "fields" field.

@@ -9,7 +9,6 @@ import (
 	"rbac/ent/permission"
 	"rbac/ent/predicate"
 	"rbac/ent/role"
-	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -57,19 +56,6 @@ func (pu *PermissionUpdate) ClearDescription() *PermissionUpdate {
 	return pu
 }
 
-// SetAppID sets the "app_id" field.
-func (pu *PermissionUpdate) SetAppID(i int32) *PermissionUpdate {
-	pu.mutation.ResetAppID()
-	pu.mutation.SetAppID(i)
-	return pu
-}
-
-// AddAppID adds i to the "app_id" field.
-func (pu *PermissionUpdate) AddAppID(i int32) *PermissionUpdate {
-	pu.mutation.AddAppID(i)
-	return pu
-}
-
 // SetFields sets the "fields" field.
 func (pu *PermissionUpdate) SetFields(s []string) *PermissionUpdate {
 	pu.mutation.SetFields(s)
@@ -85,20 +71,6 @@ func (pu *PermissionUpdate) AppendFields(s []string) *PermissionUpdate {
 // ClearFields clears the value of the "fields" field.
 func (pu *PermissionUpdate) ClearFields() *PermissionUpdate {
 	pu.mutation.ClearFields()
-	return pu
-}
-
-// SetCreatedAt sets the "created_at" field.
-func (pu *PermissionUpdate) SetCreatedAt(t time.Time) *PermissionUpdate {
-	pu.mutation.SetCreatedAt(t)
-	return pu
-}
-
-// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
-func (pu *PermissionUpdate) SetNillableCreatedAt(t *time.Time) *PermissionUpdate {
-	if t != nil {
-		pu.SetCreatedAt(*t)
-	}
 	return pu
 }
 
@@ -207,12 +179,6 @@ func (pu *PermissionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if pu.mutation.DescriptionCleared() {
 		_spec.ClearField(permission.FieldDescription, field.TypeString)
 	}
-	if value, ok := pu.mutation.AppID(); ok {
-		_spec.SetField(permission.FieldAppID, field.TypeInt32, value)
-	}
-	if value, ok := pu.mutation.AddedAppID(); ok {
-		_spec.AddField(permission.FieldAppID, field.TypeInt32, value)
-	}
 	if value, ok := pu.mutation.GetFields(); ok {
 		_spec.SetField(permission.FieldFields, field.TypeJSON, value)
 	}
@@ -223,9 +189,6 @@ func (pu *PermissionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if pu.mutation.FieldsCleared() {
 		_spec.ClearField(permission.FieldFields, field.TypeJSON)
-	}
-	if value, ok := pu.mutation.CreatedAt(); ok {
-		_spec.SetField(permission.FieldCreatedAt, field.TypeTime, value)
 	}
 	if pu.mutation.RolesCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -320,19 +283,6 @@ func (puo *PermissionUpdateOne) ClearDescription() *PermissionUpdateOne {
 	return puo
 }
 
-// SetAppID sets the "app_id" field.
-func (puo *PermissionUpdateOne) SetAppID(i int32) *PermissionUpdateOne {
-	puo.mutation.ResetAppID()
-	puo.mutation.SetAppID(i)
-	return puo
-}
-
-// AddAppID adds i to the "app_id" field.
-func (puo *PermissionUpdateOne) AddAppID(i int32) *PermissionUpdateOne {
-	puo.mutation.AddAppID(i)
-	return puo
-}
-
 // SetFields sets the "fields" field.
 func (puo *PermissionUpdateOne) SetFields(s []string) *PermissionUpdateOne {
 	puo.mutation.SetFields(s)
@@ -348,20 +298,6 @@ func (puo *PermissionUpdateOne) AppendFields(s []string) *PermissionUpdateOne {
 // ClearFields clears the value of the "fields" field.
 func (puo *PermissionUpdateOne) ClearFields() *PermissionUpdateOne {
 	puo.mutation.ClearFields()
-	return puo
-}
-
-// SetCreatedAt sets the "created_at" field.
-func (puo *PermissionUpdateOne) SetCreatedAt(t time.Time) *PermissionUpdateOne {
-	puo.mutation.SetCreatedAt(t)
-	return puo
-}
-
-// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
-func (puo *PermissionUpdateOne) SetNillableCreatedAt(t *time.Time) *PermissionUpdateOne {
-	if t != nil {
-		puo.SetCreatedAt(*t)
-	}
 	return puo
 }
 
@@ -500,12 +436,6 @@ func (puo *PermissionUpdateOne) sqlSave(ctx context.Context) (_node *Permission,
 	if puo.mutation.DescriptionCleared() {
 		_spec.ClearField(permission.FieldDescription, field.TypeString)
 	}
-	if value, ok := puo.mutation.AppID(); ok {
-		_spec.SetField(permission.FieldAppID, field.TypeInt32, value)
-	}
-	if value, ok := puo.mutation.AddedAppID(); ok {
-		_spec.AddField(permission.FieldAppID, field.TypeInt32, value)
-	}
 	if value, ok := puo.mutation.GetFields(); ok {
 		_spec.SetField(permission.FieldFields, field.TypeJSON, value)
 	}
@@ -516,9 +446,6 @@ func (puo *PermissionUpdateOne) sqlSave(ctx context.Context) (_node *Permission,
 	}
 	if puo.mutation.FieldsCleared() {
 		_spec.ClearField(permission.FieldFields, field.TypeJSON)
-	}
-	if value, ok := puo.mutation.CreatedAt(); ok {
-		_spec.SetField(permission.FieldCreatedAt, field.TypeTime, value)
 	}
 	if puo.mutation.RolesCleared() {
 		edge := &sqlgraph.EdgeSpec{

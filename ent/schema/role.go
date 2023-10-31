@@ -16,10 +16,12 @@ type Role struct {
 func (Role) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int64("id").Immutable(),
-		field.String("name"),
-		field.String("description"),
-		field.Int64("team_id"),
+		field.String("name").MaxLen(32).NotEmpty(),
+		field.String("description").Optional().Default(""),
+		field.Int64("team_id").Nillable(),
 		field.Time("created_at").Default(time.Now),
+		field.Time("updated_at").Nillable(),
+		field.Time("deleted_at").Nillable(),
 	}
 }
 

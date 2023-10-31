@@ -4,7 +4,6 @@ package permission
 
 import (
 	"rbac/ent/predicate"
-	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -76,13 +75,8 @@ func Description(v string) predicate.Permission {
 }
 
 // AppID applies equality check predicate on the "app_id" field. It's identical to AppIDEQ.
-func AppID(v int32) predicate.Permission {
+func AppID(v string) predicate.Permission {
 	return predicate.Permission(sql.FieldEQ(FieldAppID, v))
-}
-
-// CreatedAt applies equality check predicate on the "created_at" field. It's identical to CreatedAtEQ.
-func CreatedAt(v time.Time) predicate.Permission {
-	return predicate.Permission(sql.FieldEQ(FieldCreatedAt, v))
 }
 
 // NameEQ applies the EQ predicate on the "name" field.
@@ -226,43 +220,68 @@ func DescriptionContainsFold(v string) predicate.Permission {
 }
 
 // AppIDEQ applies the EQ predicate on the "app_id" field.
-func AppIDEQ(v int32) predicate.Permission {
+func AppIDEQ(v string) predicate.Permission {
 	return predicate.Permission(sql.FieldEQ(FieldAppID, v))
 }
 
 // AppIDNEQ applies the NEQ predicate on the "app_id" field.
-func AppIDNEQ(v int32) predicate.Permission {
+func AppIDNEQ(v string) predicate.Permission {
 	return predicate.Permission(sql.FieldNEQ(FieldAppID, v))
 }
 
 // AppIDIn applies the In predicate on the "app_id" field.
-func AppIDIn(vs ...int32) predicate.Permission {
+func AppIDIn(vs ...string) predicate.Permission {
 	return predicate.Permission(sql.FieldIn(FieldAppID, vs...))
 }
 
 // AppIDNotIn applies the NotIn predicate on the "app_id" field.
-func AppIDNotIn(vs ...int32) predicate.Permission {
+func AppIDNotIn(vs ...string) predicate.Permission {
 	return predicate.Permission(sql.FieldNotIn(FieldAppID, vs...))
 }
 
 // AppIDGT applies the GT predicate on the "app_id" field.
-func AppIDGT(v int32) predicate.Permission {
+func AppIDGT(v string) predicate.Permission {
 	return predicate.Permission(sql.FieldGT(FieldAppID, v))
 }
 
 // AppIDGTE applies the GTE predicate on the "app_id" field.
-func AppIDGTE(v int32) predicate.Permission {
+func AppIDGTE(v string) predicate.Permission {
 	return predicate.Permission(sql.FieldGTE(FieldAppID, v))
 }
 
 // AppIDLT applies the LT predicate on the "app_id" field.
-func AppIDLT(v int32) predicate.Permission {
+func AppIDLT(v string) predicate.Permission {
 	return predicate.Permission(sql.FieldLT(FieldAppID, v))
 }
 
 // AppIDLTE applies the LTE predicate on the "app_id" field.
-func AppIDLTE(v int32) predicate.Permission {
+func AppIDLTE(v string) predicate.Permission {
 	return predicate.Permission(sql.FieldLTE(FieldAppID, v))
+}
+
+// AppIDContains applies the Contains predicate on the "app_id" field.
+func AppIDContains(v string) predicate.Permission {
+	return predicate.Permission(sql.FieldContains(FieldAppID, v))
+}
+
+// AppIDHasPrefix applies the HasPrefix predicate on the "app_id" field.
+func AppIDHasPrefix(v string) predicate.Permission {
+	return predicate.Permission(sql.FieldHasPrefix(FieldAppID, v))
+}
+
+// AppIDHasSuffix applies the HasSuffix predicate on the "app_id" field.
+func AppIDHasSuffix(v string) predicate.Permission {
+	return predicate.Permission(sql.FieldHasSuffix(FieldAppID, v))
+}
+
+// AppIDEqualFold applies the EqualFold predicate on the "app_id" field.
+func AppIDEqualFold(v string) predicate.Permission {
+	return predicate.Permission(sql.FieldEqualFold(FieldAppID, v))
+}
+
+// AppIDContainsFold applies the ContainsFold predicate on the "app_id" field.
+func AppIDContainsFold(v string) predicate.Permission {
+	return predicate.Permission(sql.FieldContainsFold(FieldAppID, v))
 }
 
 // FieldsIsNil applies the IsNil predicate on the "fields" field.
@@ -273,46 +292,6 @@ func FieldsIsNil() predicate.Permission {
 // FieldsNotNil applies the NotNil predicate on the "fields" field.
 func FieldsNotNil() predicate.Permission {
 	return predicate.Permission(sql.FieldNotNull(FieldFields))
-}
-
-// CreatedAtEQ applies the EQ predicate on the "created_at" field.
-func CreatedAtEQ(v time.Time) predicate.Permission {
-	return predicate.Permission(sql.FieldEQ(FieldCreatedAt, v))
-}
-
-// CreatedAtNEQ applies the NEQ predicate on the "created_at" field.
-func CreatedAtNEQ(v time.Time) predicate.Permission {
-	return predicate.Permission(sql.FieldNEQ(FieldCreatedAt, v))
-}
-
-// CreatedAtIn applies the In predicate on the "created_at" field.
-func CreatedAtIn(vs ...time.Time) predicate.Permission {
-	return predicate.Permission(sql.FieldIn(FieldCreatedAt, vs...))
-}
-
-// CreatedAtNotIn applies the NotIn predicate on the "created_at" field.
-func CreatedAtNotIn(vs ...time.Time) predicate.Permission {
-	return predicate.Permission(sql.FieldNotIn(FieldCreatedAt, vs...))
-}
-
-// CreatedAtGT applies the GT predicate on the "created_at" field.
-func CreatedAtGT(v time.Time) predicate.Permission {
-	return predicate.Permission(sql.FieldGT(FieldCreatedAt, v))
-}
-
-// CreatedAtGTE applies the GTE predicate on the "created_at" field.
-func CreatedAtGTE(v time.Time) predicate.Permission {
-	return predicate.Permission(sql.FieldGTE(FieldCreatedAt, v))
-}
-
-// CreatedAtLT applies the LT predicate on the "created_at" field.
-func CreatedAtLT(v time.Time) predicate.Permission {
-	return predicate.Permission(sql.FieldLT(FieldCreatedAt, v))
-}
-
-// CreatedAtLTE applies the LTE predicate on the "created_at" field.
-func CreatedAtLTE(v time.Time) predicate.Permission {
-	return predicate.Permission(sql.FieldLTE(FieldCreatedAt, v))
 }
 
 // HasRoles applies the HasEdge predicate on the "roles" edge.

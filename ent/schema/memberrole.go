@@ -7,22 +7,23 @@ import (
 	"entgo.io/ent/schema/index"
 )
 
-// UsersRoles holds the schema definition for the UsersRoles entity.
-type UsersRoles struct {
+// MemberRole holds the schema definition for the MemberRole entity.
+type MemberRole struct {
 	ent.Schema
 }
 
-// Fields of the UsersRoles.
-func (UsersRoles) Fields() []ent.Field {
+// Fields of the MemberRole.
+func (MemberRole) Fields() []ent.Field {
 	return []ent.Field{
-		field.Int64("user_id"),
+		field.Int64("id").Immutable().Unique(),
+		field.Int64("member_id").Immutable(),
 		field.Int64("role_id"),
 		field.Int64("team_id"),
 	}
 }
 
-// Edges of the UsersRoles.
-func (UsersRoles) Edges() []ent.Edge {
+// Edges of the MemberRole.
+func (MemberRole) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("role", Role.Type).
 			Required().
@@ -35,9 +36,8 @@ func (UsersRoles) Edges() []ent.Edge {
 	}
 }
 
-// Indexes of the UsersRoles
-func (UsersRoles) Indexes() []ent.Index {
+func (MemberRole) Indexes() []ent.Index {
 	return []ent.Index{
-		index.Fields("user_id", "role_id").Unique(),
+		index.Fields("member_id", "role_id", "team_id").Unique(),
 	}
 }

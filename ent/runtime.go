@@ -18,13 +18,57 @@ func init() {
 	// permissionDescName is the schema descriptor for name field.
 	permissionDescName := permissionFields[1].Descriptor()
 	// permission.NameValidator is a validator for the "name" field. It is called by the builders before save.
-	permission.NameValidator = permissionDescName.Validators[0].(func(string) error)
-	// permissionDescCreatedAt is the schema descriptor for created_at field.
-	permissionDescCreatedAt := permissionFields[5].Descriptor()
-	// permission.DefaultCreatedAt holds the default value on creation for the created_at field.
-	permission.DefaultCreatedAt = permissionDescCreatedAt.Default.(func() time.Time)
+	permission.NameValidator = func() func(string) error {
+		validators := permissionDescName.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(name string) error {
+			for _, fn := range fns {
+				if err := fn(name); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// permissionDescDescription is the schema descriptor for description field.
+	permissionDescDescription := permissionFields[2].Descriptor()
+	// permission.DefaultDescription holds the default value on creation for the description field.
+	permission.DefaultDescription = permissionDescDescription.Default.(string)
+	// permissionDescAppID is the schema descriptor for app_id field.
+	permissionDescAppID := permissionFields[3].Descriptor()
+	// permission.AppIDValidator is a validator for the "app_id" field. It is called by the builders before save.
+	permission.AppIDValidator = permissionDescAppID.Validators[0].(func(string) error)
+	// permissionDescFields is the schema descriptor for fields field.
+	permissionDescFields := permissionFields[4].Descriptor()
+	// permission.DefaultFields holds the default value on creation for the fields field.
+	permission.DefaultFields = permissionDescFields.Default.([]string)
 	roleFields := schema.Role{}.Fields()
 	_ = roleFields
+	// roleDescName is the schema descriptor for name field.
+	roleDescName := roleFields[1].Descriptor()
+	// role.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	role.NameValidator = func() func(string) error {
+		validators := roleDescName.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(name string) error {
+			for _, fn := range fns {
+				if err := fn(name); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// roleDescDescription is the schema descriptor for description field.
+	roleDescDescription := roleFields[2].Descriptor()
+	// role.DefaultDescription holds the default value on creation for the description field.
+	role.DefaultDescription = roleDescDescription.Default.(string)
 	// roleDescCreatedAt is the schema descriptor for created_at field.
 	roleDescCreatedAt := roleFields[4].Descriptor()
 	// role.DefaultCreatedAt holds the default value on creation for the created_at field.
