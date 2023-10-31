@@ -1,14 +1,14 @@
 syntax = "proto3";
 
-package api.check_permissions.v1;
+package api.rbac.check_permissions.v1;
 
 
 import "google/api/annotations.proto";
 import "errors/errors.proto";
 
-option go_package = "rbac/api/check_permissions/v1;check_permissions_v1";
+option go_package = "rbac/api/rbac/check_permissions/v1;check_permissions_v1";
 option java_multiple_files = true;
-option java_package = "api.check_permissions.v1";
+option java_package = "api.rbac.check_permissions.v1";
 
 service CheckPermissions {
 	rpc CheckPermissions (CheckPermissionsRequest) returns (CheckPermissionsReply) {

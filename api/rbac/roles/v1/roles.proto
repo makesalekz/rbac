@@ -5,11 +5,11 @@ import "google/api/annotations.proto";
 import "errors/errors.proto";
 import "api/rbac/permissions/v1/permissions.proto";
 
-package api.roles.v1;
+package api.rbac.roles.v1;
 
-option go_package = "rbac/api/roles/v1;roles_v1";
+option go_package = "rbac/api/rbac/roles/v1;roles_v1";
 option java_multiple_files = true;
-option java_package = "api.roles.v1";
+option java_package = "api.rbac.roles.v1";
 
 service Roles {
   rpc CreateRole (CreateRoleRequest) returns (RoleReply) {
@@ -108,7 +108,7 @@ message AddPermissionToRoleRequest {
 
 message AddPermissionToRoleReply {
   int64 roleId = 1;
-  api.permissions.v1.PermissionReply permissions = 2;
+  api.rbac.permissions.v1.PermissionReply permissions = 2;
 }
 
 message RemovePermissionFromRoleRequest {
@@ -121,5 +121,5 @@ message RolesPermissionsRequest {
 }
 
 message RolesPermissionsReply {
-  repeated api.permissions.v1.PermissionReply permissions = 1;
+  repeated api.rbac.permissions.v1.PermissionReply permissions = 1;
 }

@@ -3,11 +3,11 @@ syntax = "proto3";
 import "google/api/annotations.proto";
 import "errors/errors.proto";
 
-package api.permissions.v1;
+package api.rbac.permissions.v1;
 
-option go_package = "rbac/api/permissions/v1;permissions_v1";
+option go_package = "rbac/api/rbac/permissions/v1;permissions_v1";
 option java_multiple_files = true;
-option java_package = "api.permissions.v1";
+option java_package = "api.rbac.permissions.v1";
 
 service Permissions {
 	rpc CreatePermission (CreatePermissionRequest) returns (PermissionReply) {
