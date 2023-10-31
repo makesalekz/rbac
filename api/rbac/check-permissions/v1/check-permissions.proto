@@ -13,11 +13,12 @@ option java_package = "api.check_permissions.v1";
 service CheckPermissions {
 	rpc CheckPermissions (CheckPermissionsRequest) returns (CheckPermissionsReply) {
 		option (google.api.http) = {
-			post: "/v1/check-permission"
+			post: "/v1/rbac/check-permission"
 			body: "*"
 		};
 	}
 }
+
 
 message CheckPermissionsRequest {
 	int64 userId = 1;
@@ -25,28 +26,10 @@ message CheckPermissionsRequest {
 	repeated string permissions = 3;
 }
 
-message HasPermission {
-	string permission = 1;
-	bool hasPermission = 2;
+message ListOfFields {
+	repeated string field = 1;
 }
 
 message CheckPermissionsReply {
-	bool hasSomePermissions = 1;
-	bool hasEveryPermissions = 2;
-	repeated HasPermission hasPermissions = 3;
-}
-
-enum ErrorReason {
-	// Set default error code.
-	option (errors.default_code) = 500;
-
-	// Set the error code separately for an enumeration.
-	INTERNAL = 0;
-	GRPC_CONNECTION = 1;
-	SERVICE_FAILED = 2;
-	DATABASE_QUERY = 3;
-
-	UNAUTHORIZED = 10 [(errors.code) = 401];
-
-	USER_NOT_FOUND = 20 [(errors.code) = 404];
+	map<string, ListOfFields> permissions = 1;
 }
