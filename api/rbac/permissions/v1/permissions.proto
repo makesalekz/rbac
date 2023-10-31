@@ -2,7 +2,6 @@ syntax = "proto3";
 
 import "google/api/annotations.proto";
 import "errors/errors.proto";
-import "api/utils/utils.proto";
 
 package api.permissions.v1;
 
@@ -13,29 +12,29 @@ option java_package = "api.permissions.v1";
 service Permissions {
 	rpc CreatePermission (CreatePermissionRequest) returns (PermissionReply) {
 		option (google.api.http) = {
-			post: "/v1/permissions"
+			post: "/v1/rbac/permissions"
 			body: "*"
 		};
 	};
 	rpc UpdatePermission (UpdatePermissionRequest) returns (PermissionReply) {
 		option (google.api.http) = {
-			put: "/v1/permissions/{permissionId}"
+			put: "/v1/rbac/permissions/{permissionId}"
 			body: "*"
 		};
 	};
 	rpc DeletePermission (DeletePermissionRequest) returns (EmptyReply) {
 		option (google.api.http) = {
-			delete: "/v1/permissions/{permissionId}"
+			delete: "/v1/rbac/permissions/{permissionId}"
 		};
 	};
 	rpc GetPermission (GetPermissionRequest) returns (PermissionReply) {
 		option (google.api.http) = {
-			get: "/v1/permissions/{permissionId}"
+			get: "/v1/rbac/permissions/{permissionId}"
 		};
 	};
 	rpc ListPermissions (ListPermissionsRequest) returns (ListPermissionsReply){
 		option (google.api.http) = {
-			get: "/v1/permissions"
+			get: "/v1/rbac/permissions"
 		};
 	};
 }
@@ -49,7 +48,8 @@ message PermissionReply {
 	string name = 2;
 	string description = 3;
 	int32 appId = 4;
-	repeated string fields = 5;
+	int32 level = 5;
+	repeated string fields = 6;
 }
 
 message CreatePermissionRequest {
@@ -57,14 +57,16 @@ message CreatePermissionRequest {
 	int32 appId = 2;
 	string name = 3;
 	string description = 4;
-	repeated string fields = 5;
+	int32 level = 5;
+	repeated string fields = 6;
 }
 
 message UpdatePermissionRequest {
 	string permissionId = 1;
 	string name = 2;
 	string description = 3;
-	repeated string fields = 4;
+	int32 level = 4;
+	repeated string fields = 5;
 }
 
 message DeletePermissionRequest {
@@ -78,26 +80,8 @@ message GetPermissionRequest {
 message ListPermissionsRequest {
 	int32 appId = 1;
 	repeated string ids = 2;
-	utils.PaginateRequest paginate = 3;
 }
 
 message ListPermissionsReply {
 	repeated PermissionReply permissions = 1;
-	utils.PaginateReply paginate = 2;
-}
-
-
-enum ErrorReason {
-	// Set default error code.
-	option (errors.default_code) = 500;
-
-	// Set the error code separately for an enumeration.
-	INTERNAL = 0;
-	GRPC_CONNECTION = 1;
-	SERVICE_FAILED = 2;
-	DATABASE_QUERY = 3;
-
-	UNAUTHORIZED = 10 [(errors.code) = 401];
-
-	USER_NOT_FOUND = 20 [(errors.code) = 404];
 }
