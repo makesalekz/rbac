@@ -3,8 +3,7 @@ syntax = "proto3";
 
 import "google/api/annotations.proto";
 import "errors/errors.proto";
-import "api/utils/utils.proto";
-import "api/permissions/v1/permissions.proto";
+import "api/rbac/permissions/v1/permissions.proto";
 
 package api.roles.v1;
 
@@ -15,45 +14,45 @@ option java_package = "api.roles.v1";
 service Roles {
   rpc CreateRole (CreateRoleRequest) returns (RoleReply) {
     option (google.api.http) = {
-      post: "/v1/roles"
+      post: "/v1/rbac/roles"
       body: "*"
     };
   };
   rpc UpdateRole (UpdateRoleRequest) returns (RoleReply) {
     option (google.api.http) = {
-      put: "/v1/roles/{roleId}"
+      put: "/v1/rbac/roles/{roleId}"
       body: "*"
     };
   };
   rpc DeleteRole (DeleteRoleRequest) returns (EmptyReply) {
     option (google.api.http) = {
-      delete: "/v1/roles/{roleId}"
+      delete: "/v1/rbac/roles/{roleId}"
     };
   };
   rpc GetRole (GetRoleRequest) returns (RoleReply) {
     option (google.api.http) = {
-      get: "/v1/roles/{roleId}"
+      get: "/v1/rbac/roles/{roleId}"
     };
   };
   rpc ListRoles (ListRolesRequest) returns (ListRolesReply){
     option (google.api.http) = {
-      get: "/v1/roles"
+      get: "/v1/rbac/roles"
     };
   };
   rpc AddPermissionToRole (AddPermissionToRoleRequest) returns (AddPermissionToRoleReply){
     option (google.api.http) = {
-      post: "/v1/roles/{roleId}/permissions"
+      post: "/v1/rbac/roles/{roleId}/permissions"
       body: "*"
     };
   };
   rpc RemovePermissionFromRole (RemovePermissionFromRoleRequest) returns (EmptyReply){
     option (google.api.http) = {
-      delete: "/v1/roles/{roleId}/permissions/{permissionId}"
+      delete: "/v1/rbac/roles/{roleId}/permissions/{permissionId}"
     };
   };
   rpc ListRolePermissions (RolesPermissionsRequest) returns (RolesPermissionsReply){
     option (google.api.http) = {
-      get: "/v1/roles/{roleId}/permissions"
+      get: "/v1/rbac/roles/{roleId}/permissions"
     };
   };
 }
@@ -67,6 +66,9 @@ message RoleReply {
   string name = 2;
   string description = 3;
   int64 teamId = 4;
+  string createdAt = 5;
+  string updatedAt = 6;
+  string deletedAt = 7;
 }
 
 message CreateRoleRequest {
@@ -92,12 +94,10 @@ message GetRoleRequest {
 message ListRolesRequest {
   int64 teamId = 1;
   optional string name = 2;
-  utils.PaginateRequest paginate = 3;
 }
 
 message ListRolesReply {
   repeated RoleReply roles = 1;
-  utils.PaginateReply paginate = 2;
 }
 
 message AddPermissionToRoleRequest {
@@ -118,26 +118,8 @@ message RemovePermissionFromRoleRequest {
 
 message RolesPermissionsRequest {
   int64 roleId = 1;
-  utils.PaginateRequest paginate = 2;
 }
 
 message RolesPermissionsReply {
   repeated api.permissions.v1.PermissionReply permissions = 1;
-  utils.PaginateReply paginate = 2;
-}
-
-
-enum ErrorReason {
-  // Set default error code.
-  option (errors.default_code) = 500;
-
-  // Set the error code separately for an enumeration.
-  INTERNAL = 0;
-  GRPC_CONNECTION = 1;
-  SERVICE_FAILED = 2;
-  DATABASE_QUERY = 3;
-
-  UNAUTHORIZED = 10 [(errors.code) = 401];
-
-  USER_NOT_FOUND = 20 [(errors.code) = 404];
 }
