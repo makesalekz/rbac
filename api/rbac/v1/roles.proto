@@ -2,7 +2,7 @@
 syntax = "proto3";
 
 import "google/api/annotations.proto";
-import "api/rbac/models/models.proto";
+import "api/rbac/v1/models.proto";
 
 package api.rbac.roles.v1;
 
@@ -36,7 +36,8 @@ service Roles {
   };
   rpc ListRoles (ListRolesRequest) returns (ListRolesReply){
     option (google.api.http) = {
-      get: "/v1/rbac/roles"
+      post: "/v1/rbac/roles/list"
+      body: "*"
     };
   };
   rpc AddPermissionToRole (AddPermissionToRoleRequest) returns (AddPermissionToRoleReply){
@@ -52,7 +53,8 @@ service Roles {
   };
   rpc ListRolePermissions (RolesPermissionsRequest) returns (RolesPermissionsReply){
     option (google.api.http) = {
-      get: "/v1/rbac/roles/{roleId}/permissions"
+      post: "/v1/rbac/roles/{roleId}/permissions"
+      body: "*"
     };
   };
 }

@@ -3,7 +3,7 @@ syntax = "proto3";
 package api.rbac.users_roles.v1;
 
 import "google/api/annotations.proto";
-import "api/rbac/models/models.proto";
+import "api/rbac/v1/models.proto";
 
 option go_package = "rbac/api/rbac/users_roles/v1;users_roles_v1";
 option java_multiple_files = true;
@@ -23,12 +23,14 @@ service UsersRoles {
   }
   rpc ListUserRoles (ListUserRolesRequest) returns (ListUsersRolesReply) {
     option (google.api.http) = {
-      get: "/v1/rbac/users/{userId}"
+      post: "/v1/rbac/users/list"
+      body: "*"
     };
   }
   rpc ListUserRolesByTeam (ListUserRolesByTeamRequest) returns (ListUsersRolesReply) {
     option (google.api.http) = {
-      get: "/v1/rbac/teams/{teamId}"
+      post: "/v1/rbac/teams/list"
+      body: "*"
     };
   }
 }
