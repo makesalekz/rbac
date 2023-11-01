@@ -3,6 +3,7 @@ module rbac
 go 1.19
 
 replace iam => ./third_party/iam
+replace teams => ./third_party/teams
 
 require (
 	entgo.io/ent v0.12.3
