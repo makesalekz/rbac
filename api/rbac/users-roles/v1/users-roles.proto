@@ -3,89 +3,61 @@ syntax = "proto3";
 package api.rbac.users_roles.v1;
 
 import "google/api/annotations.proto";
-import "errors/errors.proto";
-import "api/rbac/roles/v1/roles.proto";
+import "api/rbac/models/models.proto";
 
 option go_package = "rbac/api/rbac/users_roles/v1;users_roles_v1";
 option java_multiple_files = true;
 option java_package = "api.rbac.users_roles.v1";
 
 service UsersRoles {
-	rpc AssignRoleToUser (CreateUsersRolesRequest) returns (CreateUsersRolesReply) {
-		option (google.api.http) = {
-			post: "/v1/rbac/assigns"
-			body: "*"
-		};
-	}
-	rpc DeleteRoleFromUser (DeleteUsersRolesRequest) returns (EmptyReply) {
-		option (google.api.http) = {
-			delete: "/v1/rbac/assigns/{assignId}"
-		};
-	}
-	rpc ListUserRoles (ListUserRolesRequest) returns (ListUsersRolesReply) {
-		option (google.api.http) = {
-			get: "/v1/rbac/users/{userId}"
-		};
-	}
-	rpc ListUserRolesByTeam (ListUserRolesByTeamRequest) returns (ListUsersRolesReply) {
-		option (google.api.http) = {
-			get: "/v1/rbac/teams/{teamId}"
-		};
-	}
+  rpc AssignRoleToUser (CreateUsersRolesRequest) returns (UserRolesReply) {
+    option (google.api.http) = {
+      post: "/v1/rbac/assigns"
+      body: "*"
+    };
+  }
+  rpc DeleteRoleFromUser (DeleteUsersRolesRequest) returns (EmptyReply) {
+    option (google.api.http) = {
+      delete: "/v1/rbac/assigns/{assignId}"
+    };
+  }
+  rpc ListUserRoles (ListUserRolesRequest) returns (ListUsersRolesReply) {
+    option (google.api.http) = {
+      get: "/v1/rbac/users/{userId}"
+    };
+  }
+  rpc ListUserRolesByTeam (ListUserRolesByTeamRequest) returns (ListUsersRolesReply) {
+    option (google.api.http) = {
+      get: "/v1/rbac/teams/{teamId}"
+    };
+  }
 }
-
-message EmptyRequest {}
-message EmptyReply {}
 
 message CreateUsersRolesRequest {
-	int64 userId = 1;
-	int64 roleId = 2;
-	int64 teamId = 3;
+  int64 userId = 1;
+  int64 roleId = 2;
+  int64 teamId = 3;
 }
-message CreateUsersRolesReply {
-	int64 assignId = 1;
-	int64 userId = 2;
-	int64 teamId = 3;
-	api.rbac.roles.v1.RoleReply role = 4;
+
+message UserRolesReply {
+  int64 assignId = 1;
+  int64 userId = 2;
+  int64 teamId = 3;
+  RoleReply role = 4;
 }
 
 message DeleteUsersRolesRequest {
-	int64 assignId = 1;
+  int64 assignId = 1;
 }
 
 message ListUserRolesRequest {
-	int64 userId = 1;
-}
-
-message UserRole {
-	int64 assignId = 1;
-	int64 userId = 2;
-	int64 teamId = 3;
-	api.rbac.roles.v1.RoleReply role = 4;
+  int64 userId = 1;
 }
 
 message ListUsersRolesReply {
-	repeated UserRole userRoles = 1;
+  repeated UserRolesReply userRoles = 1;
 }
 
 message ListUserRolesByTeamRequest {
-	int64 teamId = 1;
-}
-
-enum ErrorReason {
-	// Set default error code.
-	option (errors.default_code) = 500;
-
-	// Set the error code separately for an enumeration.
-	INTERNAL = 0;
-	GRPC_CONNECTION = 1;
-	SERVICE_FAILED = 2;
-	DATABASE_QUERY = 3;
-
-	INVALID_REQUEST = 10 [(errors.code) = 400];
-	INVALID_PHONE_NUMBER = 11 [(errors.code) = 400];
-	INVALID_TOKEN = 12 [(errors.code) = 401];
-	INVALID_CODE = 13 [(errors.code) = 401];
-
-	USER_NOT_FOUND = 20 [(errors.code) = 404];
+  int64 teamId = 1;
 }

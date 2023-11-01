@@ -11,6 +11,7 @@ import (
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
+	rbac "rbac/api/rbac"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -29,8 +30,8 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type UsersRolesClient interface {
-	AssignRoleToUser(ctx context.Context, in *CreateUsersRolesRequest, opts ...grpc.CallOption) (*CreateUsersRolesReply, error)
-	DeleteRoleFromUser(ctx context.Context, in *DeleteUsersRolesRequest, opts ...grpc.CallOption) (*EmptyReply, error)
+	AssignRoleToUser(ctx context.Context, in *CreateUsersRolesRequest, opts ...grpc.CallOption) (*UserRolesReply, error)
+	DeleteRoleFromUser(ctx context.Context, in *DeleteUsersRolesRequest, opts ...grpc.CallOption) (*rbac.EmptyReply, error)
 	ListUserRoles(ctx context.Context, in *ListUserRolesRequest, opts ...grpc.CallOption) (*ListUsersRolesReply, error)
 	ListUserRolesByTeam(ctx context.Context, in *ListUserRolesByTeamRequest, opts ...grpc.CallOption) (*ListUsersRolesReply, error)
 }
@@ -43,8 +44,8 @@ func NewUsersRolesClient(cc grpc.ClientConnInterface) UsersRolesClient {
 	return &usersRolesClient{cc}
 }
 
-func (c *usersRolesClient) AssignRoleToUser(ctx context.Context, in *CreateUsersRolesRequest, opts ...grpc.CallOption) (*CreateUsersRolesReply, error) {
-	out := new(CreateUsersRolesReply)
+func (c *usersRolesClient) AssignRoleToUser(ctx context.Context, in *CreateUsersRolesRequest, opts ...grpc.CallOption) (*UserRolesReply, error) {
+	out := new(UserRolesReply)
 	err := c.cc.Invoke(ctx, UsersRoles_AssignRoleToUser_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -52,8 +53,8 @@ func (c *usersRolesClient) AssignRoleToUser(ctx context.Context, in *CreateUsers
 	return out, nil
 }
 
-func (c *usersRolesClient) DeleteRoleFromUser(ctx context.Context, in *DeleteUsersRolesRequest, opts ...grpc.CallOption) (*EmptyReply, error) {
-	out := new(EmptyReply)
+func (c *usersRolesClient) DeleteRoleFromUser(ctx context.Context, in *DeleteUsersRolesRequest, opts ...grpc.CallOption) (*rbac.EmptyReply, error) {
+	out := new(rbac.EmptyReply)
 	err := c.cc.Invoke(ctx, UsersRoles_DeleteRoleFromUser_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -83,8 +84,8 @@ func (c *usersRolesClient) ListUserRolesByTeam(ctx context.Context, in *ListUser
 // All implementations must embed UnimplementedUsersRolesServer
 // for forward compatibility
 type UsersRolesServer interface {
-	AssignRoleToUser(context.Context, *CreateUsersRolesRequest) (*CreateUsersRolesReply, error)
-	DeleteRoleFromUser(context.Context, *DeleteUsersRolesRequest) (*EmptyReply, error)
+	AssignRoleToUser(context.Context, *CreateUsersRolesRequest) (*UserRolesReply, error)
+	DeleteRoleFromUser(context.Context, *DeleteUsersRolesRequest) (*rbac.EmptyReply, error)
 	ListUserRoles(context.Context, *ListUserRolesRequest) (*ListUsersRolesReply, error)
 	ListUserRolesByTeam(context.Context, *ListUserRolesByTeamRequest) (*ListUsersRolesReply, error)
 	mustEmbedUnimplementedUsersRolesServer()
@@ -94,10 +95,10 @@ type UsersRolesServer interface {
 type UnimplementedUsersRolesServer struct {
 }
 
-func (UnimplementedUsersRolesServer) AssignRoleToUser(context.Context, *CreateUsersRolesRequest) (*CreateUsersRolesReply, error) {
+func (UnimplementedUsersRolesServer) AssignRoleToUser(context.Context, *CreateUsersRolesRequest) (*UserRolesReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AssignRoleToUser not implemented")
 }
-func (UnimplementedUsersRolesServer) DeleteRoleFromUser(context.Context, *DeleteUsersRolesRequest) (*EmptyReply, error) {
+func (UnimplementedUsersRolesServer) DeleteRoleFromUser(context.Context, *DeleteUsersRolesRequest) (*rbac.EmptyReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteRoleFromUser not implemented")
 }
 func (UnimplementedUsersRolesServer) ListUserRoles(context.Context, *ListUserRolesRequest) (*ListUsersRolesReply, error) {

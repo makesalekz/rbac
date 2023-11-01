@@ -10,6 +10,7 @@ import (
 	context "context"
 	http "github.com/go-kratos/kratos/v2/transport/http"
 	binding "github.com/go-kratos/kratos/v2/transport/http/binding"
+	rbac "rbac/api/rbac"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -25,8 +26,8 @@ const OperationUsersRolesListUserRoles = "/api.rbac.users_roles.v1.UsersRoles/Li
 const OperationUsersRolesListUserRolesByTeam = "/api.rbac.users_roles.v1.UsersRoles/ListUserRolesByTeam"
 
 type UsersRolesHTTPServer interface {
-	AssignRoleToUser(context.Context, *CreateUsersRolesRequest) (*CreateUsersRolesReply, error)
-	DeleteRoleFromUser(context.Context, *DeleteUsersRolesRequest) (*EmptyReply, error)
+	AssignRoleToUser(context.Context, *CreateUsersRolesRequest) (*UserRolesReply, error)
+	DeleteRoleFromUser(context.Context, *DeleteUsersRolesRequest) (*rbac.EmptyReply, error)
 	ListUserRoles(context.Context, *ListUserRolesRequest) (*ListUsersRolesReply, error)
 	ListUserRolesByTeam(context.Context, *ListUserRolesByTeamRequest) (*ListUsersRolesReply, error)
 }
@@ -56,7 +57,7 @@ func _UsersRoles_AssignRoleToUser0_HTTP_Handler(srv UsersRolesHTTPServer) func(c
 		if err != nil {
 			return err
 		}
-		reply := out.(*CreateUsersRolesReply)
+		reply := out.(*UserRolesReply)
 		return ctx.Result(200, reply)
 	}
 }
@@ -78,7 +79,7 @@ func _UsersRoles_DeleteRoleFromUser0_HTTP_Handler(srv UsersRolesHTTPServer) func
 		if err != nil {
 			return err
 		}
-		reply := out.(*EmptyReply)
+		reply := out.(*rbac.EmptyReply)
 		return ctx.Result(200, reply)
 	}
 }
@@ -128,8 +129,8 @@ func _UsersRoles_ListUserRolesByTeam0_HTTP_Handler(srv UsersRolesHTTPServer) fun
 }
 
 type UsersRolesHTTPClient interface {
-	AssignRoleToUser(ctx context.Context, req *CreateUsersRolesRequest, opts ...http.CallOption) (rsp *CreateUsersRolesReply, err error)
-	DeleteRoleFromUser(ctx context.Context, req *DeleteUsersRolesRequest, opts ...http.CallOption) (rsp *EmptyReply, err error)
+	AssignRoleToUser(ctx context.Context, req *CreateUsersRolesRequest, opts ...http.CallOption) (rsp *UserRolesReply, err error)
+	DeleteRoleFromUser(ctx context.Context, req *DeleteUsersRolesRequest, opts ...http.CallOption) (rsp *rbac.EmptyReply, err error)
 	ListUserRoles(ctx context.Context, req *ListUserRolesRequest, opts ...http.CallOption) (rsp *ListUsersRolesReply, err error)
 	ListUserRolesByTeam(ctx context.Context, req *ListUserRolesByTeamRequest, opts ...http.CallOption) (rsp *ListUsersRolesReply, err error)
 }
@@ -142,8 +143,8 @@ func NewUsersRolesHTTPClient(client *http.Client) UsersRolesHTTPClient {
 	return &UsersRolesHTTPClientImpl{client}
 }
 
-func (c *UsersRolesHTTPClientImpl) AssignRoleToUser(ctx context.Context, in *CreateUsersRolesRequest, opts ...http.CallOption) (*CreateUsersRolesReply, error) {
-	var out CreateUsersRolesReply
+func (c *UsersRolesHTTPClientImpl) AssignRoleToUser(ctx context.Context, in *CreateUsersRolesRequest, opts ...http.CallOption) (*UserRolesReply, error) {
+	var out UserRolesReply
 	pattern := "/v1/rbac/assigns"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationUsersRolesAssignRoleToUser))
@@ -155,8 +156,8 @@ func (c *UsersRolesHTTPClientImpl) AssignRoleToUser(ctx context.Context, in *Cre
 	return &out, err
 }
 
-func (c *UsersRolesHTTPClientImpl) DeleteRoleFromUser(ctx context.Context, in *DeleteUsersRolesRequest, opts ...http.CallOption) (*EmptyReply, error) {
-	var out EmptyReply
+func (c *UsersRolesHTTPClientImpl) DeleteRoleFromUser(ctx context.Context, in *DeleteUsersRolesRequest, opts ...http.CallOption) (*rbac.EmptyReply, error) {
+	var out rbac.EmptyReply
 	pattern := "/v1/rbac/assigns/{assignId}"
 	path := binding.EncodeURL(pattern, in, true)
 	opts = append(opts, http.Operation(OperationUsersRolesDeleteRoleFromUser))

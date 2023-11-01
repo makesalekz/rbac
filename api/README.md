@@ -18,6 +18,5 @@ kratos proto client api/check-permissions/v1/check-permissions.proto
 ## Generate the source code of service by proto file
 
 ```bash
-kratos proto server api/roles/v1/roles.proto -t internal/service
 kratos proto server api/server/v1/server.proto -t internal/service
 ```

@@ -4,50 +4,29 @@ package api.rbac.check_permissions.v1;
 
 
 import "google/api/annotations.proto";
-import "errors/errors.proto";
 
 option go_package = "rbac/api/rbac/check_permissions/v1;check_permissions_v1";
 option java_multiple_files = true;
 option java_package = "api.rbac.check_permissions.v1";
 
 service CheckPermissions {
-	rpc CheckPermissions (CheckPermissionsRequest) returns (CheckPermissionsReply) {
-		option (google.api.http) = {
-			post: "/v1/rbac/check-permission"
-			body: "*"
-		};
-	}
+  rpc CheckPermissions (CheckPermissionsRequest) returns (CheckPermissionsReply) {
+    option (google.api.http) = {
+      post: "/v1/rbac/check-permission"
+      body: "*"
+    };
+  }
 }
-
-
 message CheckPermissionsRequest {
-	int64 userId = 1;
-	int64 teamId = 2;
-	repeated string permissions = 3;
+  int64 userId = 1;
+  int64 teamId = 2;
+  repeated string permissions = 3;
 }
 
 message ListOfFields {
-	repeated string field = 1;
+  repeated string field = 1;
 }
 
-message CheckPermissionsReply {
-	map<string, ListOfFields> permissions = 1;
-}
-
-enum ErrorReason {
-	// Set default error code.
-	option (errors.default_code) = 500;
-
-	// Set the error code separately for an enumeration.
-	INTERNAL = 0;
-	GRPC_CONNECTION = 1;
-	SERVICE_FAILED = 2;
-	DATABASE_QUERY = 3;
-
-	INVALID_REQUEST = 10 [(errors.code) = 400];
-	INVALID_PHONE_NUMBER = 11 [(errors.code) = 400];
-	INVALID_TOKEN = 12 [(errors.code) = 401];
-	INVALID_CODE = 13 [(errors.code) = 401];
-
-	USER_NOT_FOUND = 20 [(errors.code) = 404];
+message CheckPermissionsReply{
+  map<string, ListOfFields> permissions = 1;
 }

@@ -11,6 +11,7 @@ import (
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
+	rbac "rbac/api/rbac"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -30,10 +31,10 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type PermissionsClient interface {
-	CreatePermission(ctx context.Context, in *CreatePermissionRequest, opts ...grpc.CallOption) (*PermissionReply, error)
-	UpdatePermission(ctx context.Context, in *UpdatePermissionRequest, opts ...grpc.CallOption) (*PermissionReply, error)
-	DeletePermission(ctx context.Context, in *DeletePermissionRequest, opts ...grpc.CallOption) (*EmptyReply, error)
-	GetPermission(ctx context.Context, in *GetPermissionRequest, opts ...grpc.CallOption) (*PermissionReply, error)
+	CreatePermission(ctx context.Context, in *CreatePermissionRequest, opts ...grpc.CallOption) (*rbac.PermissionReply, error)
+	UpdatePermission(ctx context.Context, in *UpdatePermissionRequest, opts ...grpc.CallOption) (*rbac.PermissionReply, error)
+	DeletePermission(ctx context.Context, in *DeletePermissionRequest, opts ...grpc.CallOption) (*rbac.EmptyReply, error)
+	GetPermission(ctx context.Context, in *GetPermissionRequest, opts ...grpc.CallOption) (*rbac.PermissionReply, error)
 	ListPermissions(ctx context.Context, in *ListPermissionsRequest, opts ...grpc.CallOption) (*ListPermissionsReply, error)
 }
 
@@ -45,8 +46,8 @@ func NewPermissionsClient(cc grpc.ClientConnInterface) PermissionsClient {
 	return &permissionsClient{cc}
 }
 
-func (c *permissionsClient) CreatePermission(ctx context.Context, in *CreatePermissionRequest, opts ...grpc.CallOption) (*PermissionReply, error) {
-	out := new(PermissionReply)
+func (c *permissionsClient) CreatePermission(ctx context.Context, in *CreatePermissionRequest, opts ...grpc.CallOption) (*rbac.PermissionReply, error) {
+	out := new(rbac.PermissionReply)
 	err := c.cc.Invoke(ctx, Permissions_CreatePermission_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -54,8 +55,8 @@ func (c *permissionsClient) CreatePermission(ctx context.Context, in *CreatePerm
 	return out, nil
 }
 
-func (c *permissionsClient) UpdatePermission(ctx context.Context, in *UpdatePermissionRequest, opts ...grpc.CallOption) (*PermissionReply, error) {
-	out := new(PermissionReply)
+func (c *permissionsClient) UpdatePermission(ctx context.Context, in *UpdatePermissionRequest, opts ...grpc.CallOption) (*rbac.PermissionReply, error) {
+	out := new(rbac.PermissionReply)
 	err := c.cc.Invoke(ctx, Permissions_UpdatePermission_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -63,8 +64,8 @@ func (c *permissionsClient) UpdatePermission(ctx context.Context, in *UpdatePerm
 	return out, nil
 }
 
-func (c *permissionsClient) DeletePermission(ctx context.Context, in *DeletePermissionRequest, opts ...grpc.CallOption) (*EmptyReply, error) {
-	out := new(EmptyReply)
+func (c *permissionsClient) DeletePermission(ctx context.Context, in *DeletePermissionRequest, opts ...grpc.CallOption) (*rbac.EmptyReply, error) {
+	out := new(rbac.EmptyReply)
 	err := c.cc.Invoke(ctx, Permissions_DeletePermission_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -72,8 +73,8 @@ func (c *permissionsClient) DeletePermission(ctx context.Context, in *DeletePerm
 	return out, nil
 }
 
-func (c *permissionsClient) GetPermission(ctx context.Context, in *GetPermissionRequest, opts ...grpc.CallOption) (*PermissionReply, error) {
-	out := new(PermissionReply)
+func (c *permissionsClient) GetPermission(ctx context.Context, in *GetPermissionRequest, opts ...grpc.CallOption) (*rbac.PermissionReply, error) {
+	out := new(rbac.PermissionReply)
 	err := c.cc.Invoke(ctx, Permissions_GetPermission_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -94,10 +95,10 @@ func (c *permissionsClient) ListPermissions(ctx context.Context, in *ListPermiss
 // All implementations must embed UnimplementedPermissionsServer
 // for forward compatibility
 type PermissionsServer interface {
-	CreatePermission(context.Context, *CreatePermissionRequest) (*PermissionReply, error)
-	UpdatePermission(context.Context, *UpdatePermissionRequest) (*PermissionReply, error)
-	DeletePermission(context.Context, *DeletePermissionRequest) (*EmptyReply, error)
-	GetPermission(context.Context, *GetPermissionRequest) (*PermissionReply, error)
+	CreatePermission(context.Context, *CreatePermissionRequest) (*rbac.PermissionReply, error)
+	UpdatePermission(context.Context, *UpdatePermissionRequest) (*rbac.PermissionReply, error)
+	DeletePermission(context.Context, *DeletePermissionRequest) (*rbac.EmptyReply, error)
+	GetPermission(context.Context, *GetPermissionRequest) (*rbac.PermissionReply, error)
 	ListPermissions(context.Context, *ListPermissionsRequest) (*ListPermissionsReply, error)
 	mustEmbedUnimplementedPermissionsServer()
 }
@@ -106,16 +107,16 @@ type PermissionsServer interface {
 type UnimplementedPermissionsServer struct {
 }
 
-func (UnimplementedPermissionsServer) CreatePermission(context.Context, *CreatePermissionRequest) (*PermissionReply, error) {
+func (UnimplementedPermissionsServer) CreatePermission(context.Context, *CreatePermissionRequest) (*rbac.PermissionReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreatePermission not implemented")
 }
-func (UnimplementedPermissionsServer) UpdatePermission(context.Context, *UpdatePermissionRequest) (*PermissionReply, error) {
+func (UnimplementedPermissionsServer) UpdatePermission(context.Context, *UpdatePermissionRequest) (*rbac.PermissionReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdatePermission not implemented")
 }
-func (UnimplementedPermissionsServer) DeletePermission(context.Context, *DeletePermissionRequest) (*EmptyReply, error) {
+func (UnimplementedPermissionsServer) DeletePermission(context.Context, *DeletePermissionRequest) (*rbac.EmptyReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeletePermission not implemented")
 }
-func (UnimplementedPermissionsServer) GetPermission(context.Context, *GetPermissionRequest) (*PermissionReply, error) {
+func (UnimplementedPermissionsServer) GetPermission(context.Context, *GetPermissionRequest) (*rbac.PermissionReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetPermission not implemented")
 }
 func (UnimplementedPermissionsServer) ListPermissions(context.Context, *ListPermissionsRequest) (*ListPermissionsReply, error) {
