@@ -10,3 +10,5 @@ nats: nats://localhost:4222
 discovery:
   iam: localhost:9000
   iam_timeout: 30s
+  teams: localhost:9010
+  teams_timeout: 30s
