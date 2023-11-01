@@ -89,9 +89,11 @@ func (ru *RoleUpdate) SetUpdatedAt(t time.Time) *RoleUpdate {
 	return ru
 }
 
-// SetDeletedAt sets the "deleted_at" field.
-func (ru *RoleUpdate) SetDeletedAt(t time.Time) *RoleUpdate {
-	ru.mutation.SetDeletedAt(t)
+// SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
+func (ru *RoleUpdate) SetNillableUpdatedAt(t *time.Time) *RoleUpdate {
+	if t != nil {
+		ru.SetUpdatedAt(*t)
+	}
 	return ru
 }
 
@@ -211,9 +213,6 @@ func (ru *RoleUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := ru.mutation.UpdatedAt(); ok {
 		_spec.SetField(role.FieldUpdatedAt, field.TypeTime, value)
-	}
-	if value, ok := ru.mutation.DeletedAt(); ok {
-		_spec.SetField(role.FieldDeletedAt, field.TypeTime, value)
 	}
 	if ru.mutation.PermissionsCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -341,9 +340,11 @@ func (ruo *RoleUpdateOne) SetUpdatedAt(t time.Time) *RoleUpdateOne {
 	return ruo
 }
 
-// SetDeletedAt sets the "deleted_at" field.
-func (ruo *RoleUpdateOne) SetDeletedAt(t time.Time) *RoleUpdateOne {
-	ruo.mutation.SetDeletedAt(t)
+// SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
+func (ruo *RoleUpdateOne) SetNillableUpdatedAt(t *time.Time) *RoleUpdateOne {
+	if t != nil {
+		ruo.SetUpdatedAt(*t)
+	}
 	return ruo
 }
 
@@ -493,9 +494,6 @@ func (ruo *RoleUpdateOne) sqlSave(ctx context.Context) (_node *Role, err error) 
 	}
 	if value, ok := ruo.mutation.UpdatedAt(); ok {
 		_spec.SetField(role.FieldUpdatedAt, field.TypeTime, value)
-	}
-	if value, ok := ruo.mutation.DeletedAt(); ok {
-		_spec.SetField(role.FieldDeletedAt, field.TypeTime, value)
 	}
 	if ruo.mutation.PermissionsCleared() {
 		edge := &sqlgraph.EdgeSpec{

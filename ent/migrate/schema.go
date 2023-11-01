@@ -73,7 +73,6 @@ var (
 		{Name: "team_id", Type: field.TypeInt64},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
-		{Name: "deleted_at", Type: field.TypeTime},
 		{Name: "permission_roles", Type: field.TypeString, Nullable: true},
 	}
 	// RolesTable holds the schema information for the "roles" table.
@@ -84,7 +83,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "roles_permissions_roles",
-				Columns:    []*schema.Column{RolesColumns[7]},
+				Columns:    []*schema.Column{RolesColumns[6]},
 				RefColumns: []*schema.Column{PermissionsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},

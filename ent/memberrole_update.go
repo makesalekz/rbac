@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"rbac/ent/memberrole"
 	"rbac/ent/predicate"
-	"rbac/ent/role"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -29,49 +28,9 @@ func (mru *MemberRoleUpdate) Where(ps ...predicate.MemberRole) *MemberRoleUpdate
 	return mru
 }
 
-// SetRoleID sets the "role_id" field.
-func (mru *MemberRoleUpdate) SetRoleID(i int64) *MemberRoleUpdate {
-	mru.mutation.SetRoleID(i)
-	return mru
-}
-
-// SetTeamID sets the "team_id" field.
-func (mru *MemberRoleUpdate) SetTeamID(i int64) *MemberRoleUpdate {
-	mru.mutation.SetTeamID(i)
-	return mru
-}
-
-// SetRole sets the "role" edge to the Role entity.
-func (mru *MemberRoleUpdate) SetRole(r *Role) *MemberRoleUpdate {
-	return mru.SetRoleID(r.ID)
-}
-
-// SetTeamsID sets the "teams" edge to the Role entity by ID.
-func (mru *MemberRoleUpdate) SetTeamsID(id int64) *MemberRoleUpdate {
-	mru.mutation.SetTeamsID(id)
-	return mru
-}
-
-// SetTeams sets the "teams" edge to the Role entity.
-func (mru *MemberRoleUpdate) SetTeams(r *Role) *MemberRoleUpdate {
-	return mru.SetTeamsID(r.ID)
-}
-
 // Mutation returns the MemberRoleMutation object of the builder.
 func (mru *MemberRoleUpdate) Mutation() *MemberRoleMutation {
 	return mru.mutation
-}
-
-// ClearRole clears the "role" edge to the Role entity.
-func (mru *MemberRoleUpdate) ClearRole() *MemberRoleUpdate {
-	mru.mutation.ClearRole()
-	return mru
-}
-
-// ClearTeams clears the "teams" edge to the Role entity.
-func (mru *MemberRoleUpdate) ClearTeams() *MemberRoleUpdate {
-	mru.mutation.ClearTeams()
-	return mru
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -130,64 +89,6 @@ func (mru *MemberRoleUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
-	if mru.mutation.RoleCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   memberrole.RoleTable,
-			Columns: []string{memberrole.RoleColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(role.FieldID, field.TypeInt64),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := mru.mutation.RoleIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   memberrole.RoleTable,
-			Columns: []string{memberrole.RoleColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(role.FieldID, field.TypeInt64),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if mru.mutation.TeamsCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   memberrole.TeamsTable,
-			Columns: []string{memberrole.TeamsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(role.FieldID, field.TypeInt64),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := mru.mutation.TeamsIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   memberrole.TeamsTable,
-			Columns: []string{memberrole.TeamsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(role.FieldID, field.TypeInt64),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
 	_spec.AddModifiers(mru.modifiers...)
 	if n, err = sqlgraph.UpdateNodes(ctx, mru.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -210,49 +111,9 @@ type MemberRoleUpdateOne struct {
 	modifiers []func(*sql.UpdateBuilder)
 }
 
-// SetRoleID sets the "role_id" field.
-func (mruo *MemberRoleUpdateOne) SetRoleID(i int64) *MemberRoleUpdateOne {
-	mruo.mutation.SetRoleID(i)
-	return mruo
-}
-
-// SetTeamID sets the "team_id" field.
-func (mruo *MemberRoleUpdateOne) SetTeamID(i int64) *MemberRoleUpdateOne {
-	mruo.mutation.SetTeamID(i)
-	return mruo
-}
-
-// SetRole sets the "role" edge to the Role entity.
-func (mruo *MemberRoleUpdateOne) SetRole(r *Role) *MemberRoleUpdateOne {
-	return mruo.SetRoleID(r.ID)
-}
-
-// SetTeamsID sets the "teams" edge to the Role entity by ID.
-func (mruo *MemberRoleUpdateOne) SetTeamsID(id int64) *MemberRoleUpdateOne {
-	mruo.mutation.SetTeamsID(id)
-	return mruo
-}
-
-// SetTeams sets the "teams" edge to the Role entity.
-func (mruo *MemberRoleUpdateOne) SetTeams(r *Role) *MemberRoleUpdateOne {
-	return mruo.SetTeamsID(r.ID)
-}
-
 // Mutation returns the MemberRoleMutation object of the builder.
 func (mruo *MemberRoleUpdateOne) Mutation() *MemberRoleMutation {
 	return mruo.mutation
-}
-
-// ClearRole clears the "role" edge to the Role entity.
-func (mruo *MemberRoleUpdateOne) ClearRole() *MemberRoleUpdateOne {
-	mruo.mutation.ClearRole()
-	return mruo
-}
-
-// ClearTeams clears the "teams" edge to the Role entity.
-func (mruo *MemberRoleUpdateOne) ClearTeams() *MemberRoleUpdateOne {
-	mruo.mutation.ClearTeams()
-	return mruo
 }
 
 // Where appends a list predicates to the MemberRoleUpdate builder.
@@ -340,64 +201,6 @@ func (mruo *MemberRoleUpdateOne) sqlSave(ctx context.Context) (_node *MemberRole
 				ps[i](selector)
 			}
 		}
-	}
-	if mruo.mutation.RoleCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   memberrole.RoleTable,
-			Columns: []string{memberrole.RoleColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(role.FieldID, field.TypeInt64),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := mruo.mutation.RoleIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   memberrole.RoleTable,
-			Columns: []string{memberrole.RoleColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(role.FieldID, field.TypeInt64),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if mruo.mutation.TeamsCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   memberrole.TeamsTable,
-			Columns: []string{memberrole.TeamsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(role.FieldID, field.TypeInt64),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := mruo.mutation.TeamsIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   memberrole.TeamsTable,
-			Columns: []string{memberrole.TeamsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(role.FieldID, field.TypeInt64),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_spec.AddModifiers(mruo.modifiers...)
 	_node = &MemberRole{config: mruo.config}

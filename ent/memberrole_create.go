@@ -234,30 +234,6 @@ type (
 	}
 )
 
-// SetRoleID sets the "role_id" field.
-func (u *MemberRoleUpsert) SetRoleID(v int64) *MemberRoleUpsert {
-	u.Set(memberrole.FieldRoleID, v)
-	return u
-}
-
-// UpdateRoleID sets the "role_id" field to the value that was provided on create.
-func (u *MemberRoleUpsert) UpdateRoleID() *MemberRoleUpsert {
-	u.SetExcluded(memberrole.FieldRoleID)
-	return u
-}
-
-// SetTeamID sets the "team_id" field.
-func (u *MemberRoleUpsert) SetTeamID(v int64) *MemberRoleUpsert {
-	u.Set(memberrole.FieldTeamID, v)
-	return u
-}
-
-// UpdateTeamID sets the "team_id" field to the value that was provided on create.
-func (u *MemberRoleUpsert) UpdateTeamID() *MemberRoleUpsert {
-	u.SetExcluded(memberrole.FieldTeamID)
-	return u
-}
-
 // UpdateNewValues updates the mutable fields using the new values that were set on create except the ID field.
 // Using this option is equivalent to using:
 //
@@ -277,6 +253,12 @@ func (u *MemberRoleUpsertOne) UpdateNewValues() *MemberRoleUpsertOne {
 		}
 		if _, exists := u.create.mutation.MemberID(); exists {
 			s.SetIgnore(memberrole.FieldMemberID)
+		}
+		if _, exists := u.create.mutation.RoleID(); exists {
+			s.SetIgnore(memberrole.FieldRoleID)
+		}
+		if _, exists := u.create.mutation.TeamID(); exists {
+			s.SetIgnore(memberrole.FieldTeamID)
 		}
 	}))
 	return u
@@ -307,34 +289,6 @@ func (u *MemberRoleUpsertOne) Update(set func(*MemberRoleUpsert)) *MemberRoleUps
 		set(&MemberRoleUpsert{UpdateSet: update})
 	}))
 	return u
-}
-
-// SetRoleID sets the "role_id" field.
-func (u *MemberRoleUpsertOne) SetRoleID(v int64) *MemberRoleUpsertOne {
-	return u.Update(func(s *MemberRoleUpsert) {
-		s.SetRoleID(v)
-	})
-}
-
-// UpdateRoleID sets the "role_id" field to the value that was provided on create.
-func (u *MemberRoleUpsertOne) UpdateRoleID() *MemberRoleUpsertOne {
-	return u.Update(func(s *MemberRoleUpsert) {
-		s.UpdateRoleID()
-	})
-}
-
-// SetTeamID sets the "team_id" field.
-func (u *MemberRoleUpsertOne) SetTeamID(v int64) *MemberRoleUpsertOne {
-	return u.Update(func(s *MemberRoleUpsert) {
-		s.SetTeamID(v)
-	})
-}
-
-// UpdateTeamID sets the "team_id" field to the value that was provided on create.
-func (u *MemberRoleUpsertOne) UpdateTeamID() *MemberRoleUpsertOne {
-	return u.Update(func(s *MemberRoleUpsert) {
-		s.UpdateTeamID()
-	})
 }
 
 // Exec executes the query.
@@ -517,6 +471,12 @@ func (u *MemberRoleUpsertBulk) UpdateNewValues() *MemberRoleUpsertBulk {
 			if _, exists := b.mutation.MemberID(); exists {
 				s.SetIgnore(memberrole.FieldMemberID)
 			}
+			if _, exists := b.mutation.RoleID(); exists {
+				s.SetIgnore(memberrole.FieldRoleID)
+			}
+			if _, exists := b.mutation.TeamID(); exists {
+				s.SetIgnore(memberrole.FieldTeamID)
+			}
 		}
 	}))
 	return u
@@ -547,34 +507,6 @@ func (u *MemberRoleUpsertBulk) Update(set func(*MemberRoleUpsert)) *MemberRoleUp
 		set(&MemberRoleUpsert{UpdateSet: update})
 	}))
 	return u
-}
-
-// SetRoleID sets the "role_id" field.
-func (u *MemberRoleUpsertBulk) SetRoleID(v int64) *MemberRoleUpsertBulk {
-	return u.Update(func(s *MemberRoleUpsert) {
-		s.SetRoleID(v)
-	})
-}
-
-// UpdateRoleID sets the "role_id" field to the value that was provided on create.
-func (u *MemberRoleUpsertBulk) UpdateRoleID() *MemberRoleUpsertBulk {
-	return u.Update(func(s *MemberRoleUpsert) {
-		s.UpdateRoleID()
-	})
-}
-
-// SetTeamID sets the "team_id" field.
-func (u *MemberRoleUpsertBulk) SetTeamID(v int64) *MemberRoleUpsertBulk {
-	return u.Update(func(s *MemberRoleUpsert) {
-		s.SetTeamID(v)
-	})
-}
-
-// UpdateTeamID sets the "team_id" field to the value that was provided on create.
-func (u *MemberRoleUpsertBulk) UpdateTeamID() *MemberRoleUpsertBulk {
-	return u.Update(func(s *MemberRoleUpsert) {
-		s.UpdateTeamID()
-	})
 }
 
 // Exec executes the query.

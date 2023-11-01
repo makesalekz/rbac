@@ -69,9 +69,11 @@ func (rc *RoleCreate) SetUpdatedAt(t time.Time) *RoleCreate {
 	return rc
 }
 
-// SetDeletedAt sets the "deleted_at" field.
-func (rc *RoleCreate) SetDeletedAt(t time.Time) *RoleCreate {
-	rc.mutation.SetDeletedAt(t)
+// SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
+func (rc *RoleCreate) SetNillableUpdatedAt(t *time.Time) *RoleCreate {
+	if t != nil {
+		rc.SetUpdatedAt(*t)
+	}
 	return rc
 }
 
@@ -139,6 +141,10 @@ func (rc *RoleCreate) defaults() {
 		v := role.DefaultCreatedAt()
 		rc.mutation.SetCreatedAt(v)
 	}
+	if _, ok := rc.mutation.UpdatedAt(); !ok {
+		v := role.DefaultUpdatedAt()
+		rc.mutation.SetUpdatedAt(v)
+	}
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -159,9 +165,6 @@ func (rc *RoleCreate) check() error {
 	}
 	if _, ok := rc.mutation.UpdatedAt(); !ok {
 		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "Role.updated_at"`)}
-	}
-	if _, ok := rc.mutation.DeletedAt(); !ok {
-		return &ValidationError{Name: "deleted_at", err: errors.New(`ent: missing required field "Role.deleted_at"`)}
 	}
 	return nil
 }
@@ -214,11 +217,7 @@ func (rc *RoleCreate) createSpec() (*Role, *sqlgraph.CreateSpec) {
 	}
 	if value, ok := rc.mutation.UpdatedAt(); ok {
 		_spec.SetField(role.FieldUpdatedAt, field.TypeTime, value)
-		_node.UpdatedAt = &value
-	}
-	if value, ok := rc.mutation.DeletedAt(); ok {
-		_spec.SetField(role.FieldDeletedAt, field.TypeTime, value)
-		_node.DeletedAt = &value
+		_node.UpdatedAt = value
 	}
 	if nodes := rc.mutation.PermissionsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -360,18 +359,6 @@ func (u *RoleUpsert) UpdateUpdatedAt() *RoleUpsert {
 	return u
 }
 
-// SetDeletedAt sets the "deleted_at" field.
-func (u *RoleUpsert) SetDeletedAt(v time.Time) *RoleUpsert {
-	u.Set(role.FieldDeletedAt, v)
-	return u
-}
-
-// UpdateDeletedAt sets the "deleted_at" field to the value that was provided on create.
-func (u *RoleUpsert) UpdateDeletedAt() *RoleUpsert {
-	u.SetExcluded(role.FieldDeletedAt)
-	return u
-}
-
 // UpdateNewValues updates the mutable fields using the new values that were set on create except the ID field.
 // Using this option is equivalent to using:
 //
@@ -501,20 +488,6 @@ func (u *RoleUpsertOne) SetUpdatedAt(v time.Time) *RoleUpsertOne {
 func (u *RoleUpsertOne) UpdateUpdatedAt() *RoleUpsertOne {
 	return u.Update(func(s *RoleUpsert) {
 		s.UpdateUpdatedAt()
-	})
-}
-
-// SetDeletedAt sets the "deleted_at" field.
-func (u *RoleUpsertOne) SetDeletedAt(v time.Time) *RoleUpsertOne {
-	return u.Update(func(s *RoleUpsert) {
-		s.SetDeletedAt(v)
-	})
-}
-
-// UpdateDeletedAt sets the "deleted_at" field to the value that was provided on create.
-func (u *RoleUpsertOne) UpdateDeletedAt() *RoleUpsertOne {
-	return u.Update(func(s *RoleUpsert) {
-		s.UpdateDeletedAt()
 	})
 }
 
@@ -809,20 +782,6 @@ func (u *RoleUpsertBulk) SetUpdatedAt(v time.Time) *RoleUpsertBulk {
 func (u *RoleUpsertBulk) UpdateUpdatedAt() *RoleUpsertBulk {
 	return u.Update(func(s *RoleUpsert) {
 		s.UpdateUpdatedAt()
-	})
-}
-
-// SetDeletedAt sets the "deleted_at" field.
-func (u *RoleUpsertBulk) SetDeletedAt(v time.Time) *RoleUpsertBulk {
-	return u.Update(func(s *RoleUpsert) {
-		s.SetDeletedAt(v)
-	})
-}
-
-// UpdateDeletedAt sets the "deleted_at" field to the value that was provided on create.
-func (u *RoleUpsertBulk) UpdateDeletedAt() *RoleUpsertBulk {
-	return u.Update(func(s *RoleUpsert) {
-		s.UpdateDeletedAt()
 	})
 }
 

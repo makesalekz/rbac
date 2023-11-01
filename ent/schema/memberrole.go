@@ -17,8 +17,8 @@ func (MemberRole) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int64("id").Immutable().Unique(),
 		field.Int64("member_id").Immutable(),
-		field.Int64("role_id"),
-		field.Int64("team_id"),
+		field.Int64("role_id").Immutable(),
+		field.Int64("team_id").Immutable(),
 	}
 }
 
@@ -28,11 +28,13 @@ func (MemberRole) Edges() []ent.Edge {
 		edge.To("role", Role.Type).
 			Required().
 			Unique().
-			Field("role_id"),
+			Field("role_id").
+			Immutable(),
 		edge.To("teams", Role.Type).
 			Required().
 			Unique().
-			Field("team_id"),
+			Field("team_id").
+			Immutable(),
 	}
 }
 

@@ -695,7 +695,7 @@ func (c *RolePermissionClient) Delete() *RolePermissionDelete {
 }
 
 // DeleteOne returns a builder for deleting the given entity.
-func (c *RolePermissionClient) DeleteOne(rp RolePermission) *RolePermissionDeleteOne {
+func (c *RolePermissionClient) DeleteOne(rp *RolePermission) *RolePermissionDeleteOne {
 	return c.DeleteOneID(rp.ID)
 }
 

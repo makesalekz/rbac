@@ -4,6 +4,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
+	"rbac/ent/mixins"
 	"time"
 )
 
@@ -20,8 +21,7 @@ func (Role) Fields() []ent.Field {
 		field.String("description").Optional().Default(""),
 		field.Int64("team_id").Nillable(),
 		field.Time("created_at").Default(time.Now),
-		field.Time("updated_at").Nillable(),
-		field.Time("deleted_at").Nillable(),
+		field.Time("updated_at").Default(time.Now),
 	}
 }
 
@@ -29,5 +29,11 @@ func (Role) Fields() []ent.Field {
 func (Role) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("permissions", Permission.Type),
+	}
+}
+
+func (Role) Mixin() []ent.Mixin {
+	return []ent.Mixin{
+		mixins.SoftDeleteMixin{},
 	}
 }

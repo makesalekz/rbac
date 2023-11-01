@@ -67,7 +67,6 @@ var schemaGraph = func() *sqlgraph.Schema {
 			role.FieldTeamID:      {Type: field.TypeInt64, Column: role.FieldTeamID},
 			role.FieldCreatedAt:   {Type: field.TypeTime, Column: role.FieldCreatedAt},
 			role.FieldUpdatedAt:   {Type: field.TypeTime, Column: role.FieldUpdatedAt},
-			role.FieldDeletedAt:   {Type: field.TypeTime, Column: role.FieldDeletedAt},
 		},
 	}
 	graph.Nodes[3] = &sqlgraph.Node{
@@ -387,11 +386,6 @@ func (f *RoleFilter) WhereCreatedAt(p entql.TimeP) {
 // WhereUpdatedAt applies the entql time.Time predicate on the updated_at field.
 func (f *RoleFilter) WhereUpdatedAt(p entql.TimeP) {
 	f.Where(p.Field(role.FieldUpdatedAt))
-}
-
-// WhereDeletedAt applies the entql time.Time predicate on the deleted_at field.
-func (f *RoleFilter) WhereDeletedAt(p entql.TimeP) {
-	f.Where(p.Field(role.FieldDeletedAt))
 }
 
 // WhereHasPermissions applies a predicate to check if query has an edge permissions.
