@@ -8,18 +8,6 @@ import (
 	"rbac/ent"
 )
 
-// The MemberRoleFunc type is an adapter to allow the use of ordinary
-// function as MemberRole mutator.
-type MemberRoleFunc func(context.Context, *ent.MemberRoleMutation) (ent.Value, error)
-
-// Mutate calls f(ctx, m).
-func (f MemberRoleFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	if mv, ok := m.(*ent.MemberRoleMutation); ok {
-		return f(ctx, mv)
-	}
-	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.MemberRoleMutation", m)
-}
-
 // The PermissionFunc type is an adapter to allow the use of ordinary
 // function as Permission mutator.
 type PermissionFunc func(context.Context, *ent.PermissionMutation) (ent.Value, error)
@@ -54,6 +42,30 @@ func (f RolePermissionFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Val
 		return f(ctx, mv)
 	}
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.RolePermissionMutation", m)
+}
+
+// The TeamFunc type is an adapter to allow the use of ordinary
+// function as Team mutator.
+type TeamFunc func(context.Context, *ent.TeamMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f TeamFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.TeamMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.TeamMutation", m)
+}
+
+// The TeamIdentityRoleFunc type is an adapter to allow the use of ordinary
+// function as TeamIdentityRole mutator.
+type TeamIdentityRoleFunc func(context.Context, *ent.TeamIdentityRoleMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f TeamIdentityRoleFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.TeamIdentityRoleMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.TeamIdentityRoleMutation", m)
 }
 
 // Condition is a hook condition function.

@@ -12,14 +12,16 @@ import (
 // Tx is a transactional client that is created by calling Client.Tx().
 type Tx struct {
 	config
-	// MemberRole is the client for interacting with the MemberRole builders.
-	MemberRole *MemberRoleClient
 	// Permission is the client for interacting with the Permission builders.
 	Permission *PermissionClient
 	// Role is the client for interacting with the Role builders.
 	Role *RoleClient
 	// RolePermission is the client for interacting with the RolePermission builders.
 	RolePermission *RolePermissionClient
+	// Team is the client for interacting with the Team builders.
+	Team *TeamClient
+	// TeamIdentityRole is the client for interacting with the TeamIdentityRole builders.
+	TeamIdentityRole *TeamIdentityRoleClient
 
 	// lazily loaded.
 	client     *Client
@@ -151,10 +153,11 @@ func (tx *Tx) Client() *Client {
 }
 
 func (tx *Tx) init() {
-	tx.MemberRole = NewMemberRoleClient(tx.config)
 	tx.Permission = NewPermissionClient(tx.config)
 	tx.Role = NewRoleClient(tx.config)
 	tx.RolePermission = NewRolePermissionClient(tx.config)
+	tx.Team = NewTeamClient(tx.config)
+	tx.TeamIdentityRole = NewTeamIdentityRoleClient(tx.config)
 }
 
 // txDriver wraps the given dialect.Tx with a nop dialect.Driver implementation.
@@ -164,7 +167,7 @@ func (tx *Tx) init() {
 // of them in order to commit or rollback the transaction.
 //
 // If a closed transaction is embedded in one of the generated entities, and the entity
-// applies a query, for example: MemberRole.QueryXXX(), the query will be executed
+// applies a query, for example: Permission.QueryXXX(), the query will be executed
 // through the driver which created this transaction.
 //
 // Note that txDriver is not goroutine safe.

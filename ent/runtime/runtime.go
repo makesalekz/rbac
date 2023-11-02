@@ -2,7 +2,129 @@
 
 package runtime
 
-// The schema-stitching logic is generated in rbac/ent/runtime.go
+import (
+	"rbac/ent/permission"
+	"rbac/ent/role"
+	"rbac/ent/rolepermission"
+	"rbac/ent/schema"
+	"rbac/ent/team"
+	"rbac/ent/teamidentityrole"
+	"time"
+)
+
+// The init function reads all schema descriptors with runtime code
+// (default values, validators, hooks and policies) and stitches it
+// to their package variables.
+func init() {
+	permissionFields := schema.Permission{}.Fields()
+	_ = permissionFields
+	// permissionDescName is the schema descriptor for name field.
+	permissionDescName := permissionFields[1].Descriptor()
+	// permission.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	permission.NameValidator = func() func(string) error {
+		validators := permissionDescName.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(name string) error {
+			for _, fn := range fns {
+				if err := fn(name); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// permissionDescDescription is the schema descriptor for description field.
+	permissionDescDescription := permissionFields[2].Descriptor()
+	// permission.DefaultDescription holds the default value on creation for the description field.
+	permission.DefaultDescription = permissionDescDescription.Default.(string)
+	// permissionDescAppID is the schema descriptor for app_id field.
+	permissionDescAppID := permissionFields[3].Descriptor()
+	// permission.AppIDValidator is a validator for the "app_id" field. It is called by the builders before save.
+	permission.AppIDValidator = permissionDescAppID.Validators[0].(func(string) error)
+	// permissionDescFields is the schema descriptor for fields field.
+	permissionDescFields := permissionFields[4].Descriptor()
+	// permission.DefaultFields holds the default value on creation for the fields field.
+	permission.DefaultFields = permissionDescFields.Default.([]string)
+	roleMixin := schema.Role{}.Mixin()
+	roleMixinHooks0 := roleMixin[0].Hooks()
+	role.Hooks[0] = roleMixinHooks0[0]
+	roleMixinInters0 := roleMixin[0].Interceptors()
+	role.Interceptors[0] = roleMixinInters0[0]
+	roleFields := schema.Role{}.Fields()
+	_ = roleFields
+	// roleDescName is the schema descriptor for name field.
+	roleDescName := roleFields[1].Descriptor()
+	// role.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	role.NameValidator = func() func(string) error {
+		validators := roleDescName.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(name string) error {
+			for _, fn := range fns {
+				if err := fn(name); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// roleDescDescription is the schema descriptor for description field.
+	roleDescDescription := roleFields[2].Descriptor()
+	// role.DefaultDescription holds the default value on creation for the description field.
+	role.DefaultDescription = roleDescDescription.Default.(string)
+	// roleDescIsSystem is the schema descriptor for is_system field.
+	roleDescIsSystem := roleFields[4].Descriptor()
+	// role.DefaultIsSystem holds the default value on creation for the is_system field.
+	role.DefaultIsSystem = roleDescIsSystem.Default.(bool)
+	// roleDescCreatedAt is the schema descriptor for created_at field.
+	roleDescCreatedAt := roleFields[5].Descriptor()
+	// role.DefaultCreatedAt holds the default value on creation for the created_at field.
+	role.DefaultCreatedAt = roleDescCreatedAt.Default.(func() time.Time)
+	// roleDescUpdatedAt is the schema descriptor for updated_at field.
+	roleDescUpdatedAt := roleFields[6].Descriptor()
+	// role.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	role.DefaultUpdatedAt = roleDescUpdatedAt.Default.(func() time.Time)
+	rolepermissionFields := schema.RolePermission{}.Fields()
+	_ = rolepermissionFields
+	// rolepermissionDescDeny is the schema descriptor for deny field.
+	rolepermissionDescDeny := rolepermissionFields[3].Descriptor()
+	// rolepermission.DefaultDeny holds the default value on creation for the deny field.
+	rolepermission.DefaultDeny = rolepermissionDescDeny.Default.(bool)
+	teamMixin := schema.Team{}.Mixin()
+	teamMixinHooks0 := teamMixin[0].Hooks()
+	team.Hooks[0] = teamMixinHooks0[0]
+	teamMixinInters0 := teamMixin[0].Interceptors()
+	team.Interceptors[0] = teamMixinInters0[0]
+	teamFields := schema.Team{}.Fields()
+	_ = teamFields
+	// teamDescDescription is the schema descriptor for description field.
+	teamDescDescription := teamFields[5].Descriptor()
+	// team.DefaultDescription holds the default value on creation for the description field.
+	team.DefaultDescription = teamDescDescription.Default.(string)
+	// teamDescCreatedAt is the schema descriptor for created_at field.
+	teamDescCreatedAt := teamFields[6].Descriptor()
+	// team.DefaultCreatedAt holds the default value on creation for the created_at field.
+	team.DefaultCreatedAt = teamDescCreatedAt.Default.(func() time.Time)
+	// teamDescUpdatedAt is the schema descriptor for updated_at field.
+	teamDescUpdatedAt := teamFields[7].Descriptor()
+	// team.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	team.DefaultUpdatedAt = teamDescUpdatedAt.Default.(func() time.Time)
+	teamidentityroleFields := schema.TeamIdentityRole{}.Fields()
+	_ = teamidentityroleFields
+	// teamidentityroleDescTeamID is the schema descriptor for team_id field.
+	teamidentityroleDescTeamID := teamidentityroleFields[1].Descriptor()
+	// teamidentityrole.DefaultTeamID holds the default value on creation for the team_id field.
+	teamidentityrole.DefaultTeamID = teamidentityroleDescTeamID.Default.(int64)
+	// teamidentityroleDescIdentityID is the schema descriptor for identity_id field.
+	teamidentityroleDescIdentityID := teamidentityroleFields[2].Descriptor()
+	// teamidentityrole.DefaultIdentityID holds the default value on creation for the identity_id field.
+	teamidentityrole.DefaultIdentityID = teamidentityroleDescIdentityID.Default.(int64)
+}
 
 const (
 	Version = "v0.12.3"                                         // Version of ent codegen.

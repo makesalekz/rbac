@@ -19,10 +19,14 @@ type RolePermission struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID int64 `json:"id,omitempty"`
+	// TenantID holds the value of the "tenant_id" field.
+	TenantID int64 `json:"tenant_id,omitempty"`
 	// RoleID holds the value of the "role_id" field.
 	RoleID int64 `json:"role_id,omitempty"`
 	// PermissionID holds the value of the "permission_id" field.
 	PermissionID string `json:"permission_id,omitempty"`
+	// Deny holds the value of the "deny" field.
+	Deny bool `json:"deny,omitempty"`
 	// Fields holds the value of the "fields" field.
 	Fields []string `json:"fields,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -75,7 +79,9 @@ func (*RolePermission) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case rolepermission.FieldFields:
 			values[i] = new([]byte)
-		case rolepermission.FieldID, rolepermission.FieldRoleID:
+		case rolepermission.FieldDeny:
+			values[i] = new(sql.NullBool)
+		case rolepermission.FieldID, rolepermission.FieldTenantID, rolepermission.FieldRoleID:
 			values[i] = new(sql.NullInt64)
 		case rolepermission.FieldPermissionID:
 			values[i] = new(sql.NullString)
@@ -100,6 +106,12 @@ func (rp *RolePermission) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			rp.ID = int64(value.Int64)
+		case rolepermission.FieldTenantID:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field tenant_id", values[i])
+			} else if value.Valid {
+				rp.TenantID = value.Int64
+			}
 		case rolepermission.FieldRoleID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field role_id", values[i])
@@ -111,6 +123,12 @@ func (rp *RolePermission) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field permission_id", values[i])
 			} else if value.Valid {
 				rp.PermissionID = value.String
+			}
+		case rolepermission.FieldDeny:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field deny", values[i])
+			} else if value.Valid {
+				rp.Deny = value.Bool
 			}
 		case rolepermission.FieldFields:
 			if value, ok := values[i].(*[]byte); !ok {
@@ -166,11 +184,17 @@ func (rp *RolePermission) String() string {
 	var builder strings.Builder
 	builder.WriteString("RolePermission(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", rp.ID))
+	builder.WriteString("tenant_id=")
+	builder.WriteString(fmt.Sprintf("%v", rp.TenantID))
+	builder.WriteString(", ")
 	builder.WriteString("role_id=")
 	builder.WriteString(fmt.Sprintf("%v", rp.RoleID))
 	builder.WriteString(", ")
 	builder.WriteString("permission_id=")
 	builder.WriteString(rp.PermissionID)
+	builder.WriteString(", ")
+	builder.WriteString("deny=")
+	builder.WriteString(fmt.Sprintf("%v", rp.Deny))
 	builder.WriteString(", ")
 	builder.WriteString("fields=")
 	builder.WriteString(fmt.Sprintf("%v", rp.Fields))

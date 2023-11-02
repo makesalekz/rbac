@@ -30,6 +30,26 @@ func (ru *RoleUpdate) Where(ps ...predicate.Role) *RoleUpdate {
 	return ru
 }
 
+// SetDeletedAt sets the "deleted_at" field.
+func (ru *RoleUpdate) SetDeletedAt(t time.Time) *RoleUpdate {
+	ru.mutation.SetDeletedAt(t)
+	return ru
+}
+
+// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
+func (ru *RoleUpdate) SetNillableDeletedAt(t *time.Time) *RoleUpdate {
+	if t != nil {
+		ru.SetDeletedAt(*t)
+	}
+	return ru
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (ru *RoleUpdate) ClearDeletedAt() *RoleUpdate {
+	ru.mutation.ClearDeletedAt()
+	return ru
+}
+
 // SetName sets the "name" field.
 func (ru *RoleUpdate) SetName(s string) *RoleUpdate {
 	ru.mutation.SetName(s)
@@ -56,16 +76,30 @@ func (ru *RoleUpdate) ClearDescription() *RoleUpdate {
 	return ru
 }
 
-// SetTeamID sets the "team_id" field.
-func (ru *RoleUpdate) SetTeamID(i int64) *RoleUpdate {
-	ru.mutation.ResetTeamID()
-	ru.mutation.SetTeamID(i)
+// SetTenantID sets the "tenant_id" field.
+func (ru *RoleUpdate) SetTenantID(i int64) *RoleUpdate {
+	ru.mutation.ResetTenantID()
+	ru.mutation.SetTenantID(i)
 	return ru
 }
 
-// AddTeamID adds i to the "team_id" field.
-func (ru *RoleUpdate) AddTeamID(i int64) *RoleUpdate {
-	ru.mutation.AddTeamID(i)
+// AddTenantID adds i to the "tenant_id" field.
+func (ru *RoleUpdate) AddTenantID(i int64) *RoleUpdate {
+	ru.mutation.AddTenantID(i)
+	return ru
+}
+
+// SetIsSystem sets the "is_system" field.
+func (ru *RoleUpdate) SetIsSystem(b bool) *RoleUpdate {
+	ru.mutation.SetIsSystem(b)
+	return ru
+}
+
+// SetNillableIsSystem sets the "is_system" field if the given value is not nil.
+func (ru *RoleUpdate) SetNillableIsSystem(b *bool) *RoleUpdate {
+	if b != nil {
+		ru.SetIsSystem(*b)
+	}
 	return ru
 }
 
@@ -193,6 +227,12 @@ func (ru *RoleUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
+	if value, ok := ru.mutation.DeletedAt(); ok {
+		_spec.SetField(role.FieldDeletedAt, field.TypeTime, value)
+	}
+	if ru.mutation.DeletedAtCleared() {
+		_spec.ClearField(role.FieldDeletedAt, field.TypeTime)
+	}
 	if value, ok := ru.mutation.Name(); ok {
 		_spec.SetField(role.FieldName, field.TypeString, value)
 	}
@@ -202,11 +242,14 @@ func (ru *RoleUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if ru.mutation.DescriptionCleared() {
 		_spec.ClearField(role.FieldDescription, field.TypeString)
 	}
-	if value, ok := ru.mutation.TeamID(); ok {
-		_spec.SetField(role.FieldTeamID, field.TypeInt64, value)
+	if value, ok := ru.mutation.TenantID(); ok {
+		_spec.SetField(role.FieldTenantID, field.TypeInt64, value)
 	}
-	if value, ok := ru.mutation.AddedTeamID(); ok {
-		_spec.AddField(role.FieldTeamID, field.TypeInt64, value)
+	if value, ok := ru.mutation.AddedTenantID(); ok {
+		_spec.AddField(role.FieldTenantID, field.TypeInt64, value)
+	}
+	if value, ok := ru.mutation.IsSystem(); ok {
+		_spec.SetField(role.FieldIsSystem, field.TypeBool, value)
 	}
 	if value, ok := ru.mutation.CreatedAt(); ok {
 		_spec.SetField(role.FieldCreatedAt, field.TypeTime, value)
@@ -281,6 +324,26 @@ type RoleUpdateOne struct {
 	modifiers []func(*sql.UpdateBuilder)
 }
 
+// SetDeletedAt sets the "deleted_at" field.
+func (ruo *RoleUpdateOne) SetDeletedAt(t time.Time) *RoleUpdateOne {
+	ruo.mutation.SetDeletedAt(t)
+	return ruo
+}
+
+// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
+func (ruo *RoleUpdateOne) SetNillableDeletedAt(t *time.Time) *RoleUpdateOne {
+	if t != nil {
+		ruo.SetDeletedAt(*t)
+	}
+	return ruo
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (ruo *RoleUpdateOne) ClearDeletedAt() *RoleUpdateOne {
+	ruo.mutation.ClearDeletedAt()
+	return ruo
+}
+
 // SetName sets the "name" field.
 func (ruo *RoleUpdateOne) SetName(s string) *RoleUpdateOne {
 	ruo.mutation.SetName(s)
@@ -307,16 +370,30 @@ func (ruo *RoleUpdateOne) ClearDescription() *RoleUpdateOne {
 	return ruo
 }
 
-// SetTeamID sets the "team_id" field.
-func (ruo *RoleUpdateOne) SetTeamID(i int64) *RoleUpdateOne {
-	ruo.mutation.ResetTeamID()
-	ruo.mutation.SetTeamID(i)
+// SetTenantID sets the "tenant_id" field.
+func (ruo *RoleUpdateOne) SetTenantID(i int64) *RoleUpdateOne {
+	ruo.mutation.ResetTenantID()
+	ruo.mutation.SetTenantID(i)
 	return ruo
 }
 
-// AddTeamID adds i to the "team_id" field.
-func (ruo *RoleUpdateOne) AddTeamID(i int64) *RoleUpdateOne {
-	ruo.mutation.AddTeamID(i)
+// AddTenantID adds i to the "tenant_id" field.
+func (ruo *RoleUpdateOne) AddTenantID(i int64) *RoleUpdateOne {
+	ruo.mutation.AddTenantID(i)
+	return ruo
+}
+
+// SetIsSystem sets the "is_system" field.
+func (ruo *RoleUpdateOne) SetIsSystem(b bool) *RoleUpdateOne {
+	ruo.mutation.SetIsSystem(b)
+	return ruo
+}
+
+// SetNillableIsSystem sets the "is_system" field if the given value is not nil.
+func (ruo *RoleUpdateOne) SetNillableIsSystem(b *bool) *RoleUpdateOne {
+	if b != nil {
+		ruo.SetIsSystem(*b)
+	}
 	return ruo
 }
 
@@ -474,6 +551,12 @@ func (ruo *RoleUpdateOne) sqlSave(ctx context.Context) (_node *Role, err error) 
 			}
 		}
 	}
+	if value, ok := ruo.mutation.DeletedAt(); ok {
+		_spec.SetField(role.FieldDeletedAt, field.TypeTime, value)
+	}
+	if ruo.mutation.DeletedAtCleared() {
+		_spec.ClearField(role.FieldDeletedAt, field.TypeTime)
+	}
 	if value, ok := ruo.mutation.Name(); ok {
 		_spec.SetField(role.FieldName, field.TypeString, value)
 	}
@@ -483,11 +566,14 @@ func (ruo *RoleUpdateOne) sqlSave(ctx context.Context) (_node *Role, err error) 
 	if ruo.mutation.DescriptionCleared() {
 		_spec.ClearField(role.FieldDescription, field.TypeString)
 	}
-	if value, ok := ruo.mutation.TeamID(); ok {
-		_spec.SetField(role.FieldTeamID, field.TypeInt64, value)
+	if value, ok := ruo.mutation.TenantID(); ok {
+		_spec.SetField(role.FieldTenantID, field.TypeInt64, value)
 	}
-	if value, ok := ruo.mutation.AddedTeamID(); ok {
-		_spec.AddField(role.FieldTeamID, field.TypeInt64, value)
+	if value, ok := ruo.mutation.AddedTenantID(); ok {
+		_spec.AddField(role.FieldTenantID, field.TypeInt64, value)
+	}
+	if value, ok := ruo.mutation.IsSystem(); ok {
+		_spec.SetField(role.FieldIsSystem, field.TypeBool, value)
 	}
 	if value, ok := ruo.mutation.CreatedAt(); ok {
 		_spec.SetField(role.FieldCreatedAt, field.TypeTime, value)

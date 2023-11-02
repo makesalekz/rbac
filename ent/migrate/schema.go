@@ -8,40 +8,6 @@ import (
 )
 
 var (
-	// MemberRolesColumns holds the columns for the "member_roles" table.
-	MemberRolesColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeInt64, Increment: true},
-		{Name: "member_id", Type: field.TypeInt64},
-		{Name: "role_id", Type: field.TypeInt64},
-		{Name: "team_id", Type: field.TypeInt64},
-	}
-	// MemberRolesTable holds the schema information for the "member_roles" table.
-	MemberRolesTable = &schema.Table{
-		Name:       "member_roles",
-		Columns:    MemberRolesColumns,
-		PrimaryKey: []*schema.Column{MemberRolesColumns[0]},
-		ForeignKeys: []*schema.ForeignKey{
-			{
-				Symbol:     "member_roles_roles_role",
-				Columns:    []*schema.Column{MemberRolesColumns[2]},
-				RefColumns: []*schema.Column{RolesColumns[0]},
-				OnDelete:   schema.NoAction,
-			},
-			{
-				Symbol:     "member_roles_roles_teams",
-				Columns:    []*schema.Column{MemberRolesColumns[3]},
-				RefColumns: []*schema.Column{RolesColumns[0]},
-				OnDelete:   schema.NoAction,
-			},
-		},
-		Indexes: []*schema.Index{
-			{
-				Name:    "memberrole_member_id_role_id_team_id",
-				Unique:  true,
-				Columns: []*schema.Column{MemberRolesColumns[1], MemberRolesColumns[2], MemberRolesColumns[3]},
-			},
-		},
-	}
 	// PermissionsColumns holds the columns for the "permissions" table.
 	PermissionsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString},
@@ -68,9 +34,11 @@ var (
 	// RolesColumns holds the columns for the "roles" table.
 	RolesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt64, Increment: true},
+		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
 		{Name: "name", Type: field.TypeString, Size: 32},
 		{Name: "description", Type: field.TypeString, Nullable: true, Default: ""},
-		{Name: "team_id", Type: field.TypeInt64},
+		{Name: "tenant_id", Type: field.TypeInt64},
+		{Name: "is_system", Type: field.TypeBool, Default: false},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "permission_roles", Type: field.TypeString, Nullable: true},
@@ -83,7 +51,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "roles_permissions_roles",
-				Columns:    []*schema.Column{RolesColumns[6]},
+				Columns:    []*schema.Column{RolesColumns[8]},
 				RefColumns: []*schema.Column{PermissionsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
@@ -92,6 +60,8 @@ var (
 	// RolePermissionsColumns holds the columns for the "role_permissions" table.
 	RolePermissionsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt64, Increment: true},
+		{Name: "tenant_id", Type: field.TypeInt64},
+		{Name: "deny", Type: field.TypeBool, Default: false},
 		{Name: "fields", Type: field.TypeJSON},
 		{Name: "role_id", Type: field.TypeInt64},
 		{Name: "permission_id", Type: field.TypeString},
@@ -104,13 +74,13 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "role_permissions_roles_role",
-				Columns:    []*schema.Column{RolePermissionsColumns[2]},
+				Columns:    []*schema.Column{RolePermissionsColumns[4]},
 				RefColumns: []*schema.Column{RolesColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
 				Symbol:     "role_permissions_permissions_permission",
-				Columns:    []*schema.Column{RolePermissionsColumns[3]},
+				Columns:    []*schema.Column{RolePermissionsColumns[5]},
 				RefColumns: []*schema.Column{PermissionsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
@@ -119,24 +89,80 @@ var (
 			{
 				Name:    "rolepermission_role_id_permission_id",
 				Unique:  true,
-				Columns: []*schema.Column{RolePermissionsColumns[2], RolePermissionsColumns[3]},
+				Columns: []*schema.Column{RolePermissionsColumns[4], RolePermissionsColumns[5]},
+			},
+		},
+	}
+	// TeamsColumns holds the columns for the "teams" table.
+	TeamsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt64, Increment: true},
+		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
+		{Name: "taner_id", Type: field.TypeInt64},
+		{Name: "parents_ids", Type: field.TypeOther, Nullable: true, SchemaType: map[string]string{"postgres": "bigint[]"}},
+		{Name: "name", Type: field.TypeString},
+		{Name: "description", Type: field.TypeString, Nullable: true, Default: ""},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "parent_id", Type: field.TypeInt64, Nullable: true},
+	}
+	// TeamsTable holds the schema information for the "teams" table.
+	TeamsTable = &schema.Table{
+		Name:       "teams",
+		Columns:    TeamsColumns,
+		PrimaryKey: []*schema.Column{TeamsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "teams_teams_children",
+				Columns:    []*schema.Column{TeamsColumns[8]},
+				RefColumns: []*schema.Column{TeamsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
+	// TeamIdentityRolesColumns holds the columns for the "team_identity_roles" table.
+	TeamIdentityRolesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt64, Increment: true},
+		{Name: "tenant_id", Type: field.TypeInt64},
+		{Name: "identity_id", Type: field.TypeInt64, Default: 0},
+		{Name: "role_id", Type: field.TypeInt64},
+		{Name: "team_id", Type: field.TypeInt64, Default: 0},
+	}
+	// TeamIdentityRolesTable holds the schema information for the "team_identity_roles" table.
+	TeamIdentityRolesTable = &schema.Table{
+		Name:       "team_identity_roles",
+		Columns:    TeamIdentityRolesColumns,
+		PrimaryKey: []*schema.Column{TeamIdentityRolesColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "team_identity_roles_roles_role",
+				Columns:    []*schema.Column{TeamIdentityRolesColumns[3]},
+				RefColumns: []*schema.Column{RolesColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "team_identity_roles_teams_team",
+				Columns:    []*schema.Column{TeamIdentityRolesColumns[4]},
+				RefColumns: []*schema.Column{TeamsColumns[0]},
+				OnDelete:   schema.NoAction,
 			},
 		},
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
-		MemberRolesTable,
 		PermissionsTable,
 		RolesTable,
 		RolePermissionsTable,
+		TeamsTable,
+		TeamIdentityRolesTable,
 	}
 )
 
 func init() {
-	MemberRolesTable.ForeignKeys[0].RefTable = RolesTable
-	MemberRolesTable.ForeignKeys[1].RefTable = RolesTable
 	PermissionsTable.ForeignKeys[0].RefTable = RolesTable
 	RolesTable.ForeignKeys[0].RefTable = PermissionsTable
 	RolePermissionsTable.ForeignKeys[0].RefTable = RolesTable
 	RolePermissionsTable.ForeignKeys[1].RefTable = PermissionsTable
+	TeamsTable.ForeignKeys[0].RefTable = TeamsTable
+	TeamIdentityRolesTable.ForeignKeys[0].RefTable = RolesTable
+	TeamIdentityRolesTable.ForeignKeys[1].RefTable = TeamsTable
 }

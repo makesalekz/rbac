@@ -23,6 +23,12 @@ type RolePermissionCreate struct {
 	conflict []sql.ConflictOption
 }
 
+// SetTenantID sets the "tenant_id" field.
+func (rpc *RolePermissionCreate) SetTenantID(i int64) *RolePermissionCreate {
+	rpc.mutation.SetTenantID(i)
+	return rpc
+}
+
 // SetRoleID sets the "role_id" field.
 func (rpc *RolePermissionCreate) SetRoleID(i int64) *RolePermissionCreate {
 	rpc.mutation.SetRoleID(i)
@@ -32,6 +38,20 @@ func (rpc *RolePermissionCreate) SetRoleID(i int64) *RolePermissionCreate {
 // SetPermissionID sets the "permission_id" field.
 func (rpc *RolePermissionCreate) SetPermissionID(s string) *RolePermissionCreate {
 	rpc.mutation.SetPermissionID(s)
+	return rpc
+}
+
+// SetDeny sets the "deny" field.
+func (rpc *RolePermissionCreate) SetDeny(b bool) *RolePermissionCreate {
+	rpc.mutation.SetDeny(b)
+	return rpc
+}
+
+// SetNillableDeny sets the "deny" field if the given value is not nil.
+func (rpc *RolePermissionCreate) SetNillableDeny(b *bool) *RolePermissionCreate {
+	if b != nil {
+		rpc.SetDeny(*b)
+	}
 	return rpc
 }
 
@@ -58,6 +78,7 @@ func (rpc *RolePermissionCreate) Mutation() *RolePermissionMutation {
 
 // Save creates the RolePermission in the database.
 func (rpc *RolePermissionCreate) Save(ctx context.Context) (*RolePermission, error) {
+	rpc.defaults()
 	return withHooks(ctx, rpc.sqlSave, rpc.mutation, rpc.hooks)
 }
 
@@ -83,13 +104,27 @@ func (rpc *RolePermissionCreate) ExecX(ctx context.Context) {
 	}
 }
 
+// defaults sets the default values of the builder before save.
+func (rpc *RolePermissionCreate) defaults() {
+	if _, ok := rpc.mutation.Deny(); !ok {
+		v := rolepermission.DefaultDeny
+		rpc.mutation.SetDeny(v)
+	}
+}
+
 // check runs all checks and user-defined validators on the builder.
 func (rpc *RolePermissionCreate) check() error {
+	if _, ok := rpc.mutation.TenantID(); !ok {
+		return &ValidationError{Name: "tenant_id", err: errors.New(`ent: missing required field "RolePermission.tenant_id"`)}
+	}
 	if _, ok := rpc.mutation.RoleID(); !ok {
 		return &ValidationError{Name: "role_id", err: errors.New(`ent: missing required field "RolePermission.role_id"`)}
 	}
 	if _, ok := rpc.mutation.PermissionID(); !ok {
 		return &ValidationError{Name: "permission_id", err: errors.New(`ent: missing required field "RolePermission.permission_id"`)}
+	}
+	if _, ok := rpc.mutation.Deny(); !ok {
+		return &ValidationError{Name: "deny", err: errors.New(`ent: missing required field "RolePermission.deny"`)}
 	}
 	if _, ok := rpc.mutation.GetFields(); !ok {
 		return &ValidationError{Name: "fields", err: errors.New(`ent: missing required field "RolePermission.fields"`)}
@@ -127,6 +162,14 @@ func (rpc *RolePermissionCreate) createSpec() (*RolePermission, *sqlgraph.Create
 		_spec = sqlgraph.NewCreateSpec(rolepermission.Table, sqlgraph.NewFieldSpec(rolepermission.FieldID, field.TypeInt64))
 	)
 	_spec.OnConflict = rpc.conflict
+	if value, ok := rpc.mutation.TenantID(); ok {
+		_spec.SetField(rolepermission.FieldTenantID, field.TypeInt64, value)
+		_node.TenantID = value
+	}
+	if value, ok := rpc.mutation.Deny(); ok {
+		_spec.SetField(rolepermission.FieldDeny, field.TypeBool, value)
+		_node.Deny = value
+	}
 	if value, ok := rpc.mutation.GetFields(); ok {
 		_spec.SetField(rolepermission.FieldFields, field.TypeJSON, value)
 		_node.Fields = value
@@ -172,7 +215,7 @@ func (rpc *RolePermissionCreate) createSpec() (*RolePermission, *sqlgraph.Create
 // of the `INSERT` statement. For example:
 //
 //	client.RolePermission.Create().
-//		SetRoleID(v).
+//		SetTenantID(v).
 //		OnConflict(
 //			// Update the row with the new values
 //			// the was proposed for insertion.
@@ -181,7 +224,7 @@ func (rpc *RolePermissionCreate) createSpec() (*RolePermission, *sqlgraph.Create
 //		// Override some of the fields with custom
 //		// update values.
 //		Update(func(u *ent.RolePermissionUpsert) {
-//			SetRoleID(v+v).
+//			SetTenantID(v+v).
 //		}).
 //		Exec(ctx)
 func (rpc *RolePermissionCreate) OnConflict(opts ...sql.ConflictOption) *RolePermissionUpsertOne {
@@ -217,6 +260,18 @@ type (
 	}
 )
 
+// SetDeny sets the "deny" field.
+func (u *RolePermissionUpsert) SetDeny(v bool) *RolePermissionUpsert {
+	u.Set(rolepermission.FieldDeny, v)
+	return u
+}
+
+// UpdateDeny sets the "deny" field to the value that was provided on create.
+func (u *RolePermissionUpsert) UpdateDeny() *RolePermissionUpsert {
+	u.SetExcluded(rolepermission.FieldDeny)
+	return u
+}
+
 // SetFields sets the "fields" field.
 func (u *RolePermissionUpsert) SetFields(v []string) *RolePermissionUpsert {
 	u.Set(rolepermission.FieldFields, v)
@@ -240,6 +295,9 @@ func (u *RolePermissionUpsert) UpdateFields() *RolePermissionUpsert {
 func (u *RolePermissionUpsertOne) UpdateNewValues() *RolePermissionUpsertOne {
 	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
 	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		if _, exists := u.create.mutation.TenantID(); exists {
+			s.SetIgnore(rolepermission.FieldTenantID)
+		}
 		if _, exists := u.create.mutation.RoleID(); exists {
 			s.SetIgnore(rolepermission.FieldRoleID)
 		}
@@ -275,6 +333,20 @@ func (u *RolePermissionUpsertOne) Update(set func(*RolePermissionUpsert)) *RoleP
 		set(&RolePermissionUpsert{UpdateSet: update})
 	}))
 	return u
+}
+
+// SetDeny sets the "deny" field.
+func (u *RolePermissionUpsertOne) SetDeny(v bool) *RolePermissionUpsertOne {
+	return u.Update(func(s *RolePermissionUpsert) {
+		s.SetDeny(v)
+	})
+}
+
+// UpdateDeny sets the "deny" field to the value that was provided on create.
+func (u *RolePermissionUpsertOne) UpdateDeny() *RolePermissionUpsertOne {
+	return u.Update(func(s *RolePermissionUpsert) {
+		s.UpdateDeny()
+	})
 }
 
 // SetFields sets the "fields" field.
@@ -339,6 +411,7 @@ func (rpcb *RolePermissionCreateBulk) Save(ctx context.Context) ([]*RolePermissi
 	for i := range rpcb.builders {
 		func(i int, root context.Context) {
 			builder := rpcb.builders[i]
+			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*RolePermissionMutation)
 				if !ok {
@@ -421,7 +494,7 @@ func (rpcb *RolePermissionCreateBulk) ExecX(ctx context.Context) {
 //		// Override some of the fields with custom
 //		// update values.
 //		Update(func(u *ent.RolePermissionUpsert) {
-//			SetRoleID(v+v).
+//			SetTenantID(v+v).
 //		}).
 //		Exec(ctx)
 func (rpcb *RolePermissionCreateBulk) OnConflict(opts ...sql.ConflictOption) *RolePermissionUpsertBulk {
@@ -462,6 +535,9 @@ func (u *RolePermissionUpsertBulk) UpdateNewValues() *RolePermissionUpsertBulk {
 	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
 	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
 		for _, b := range u.create.builders {
+			if _, exists := b.mutation.TenantID(); exists {
+				s.SetIgnore(rolepermission.FieldTenantID)
+			}
 			if _, exists := b.mutation.RoleID(); exists {
 				s.SetIgnore(rolepermission.FieldRoleID)
 			}
@@ -498,6 +574,20 @@ func (u *RolePermissionUpsertBulk) Update(set func(*RolePermissionUpsert)) *Role
 		set(&RolePermissionUpsert{UpdateSet: update})
 	}))
 	return u
+}
+
+// SetDeny sets the "deny" field.
+func (u *RolePermissionUpsertBulk) SetDeny(v bool) *RolePermissionUpsertBulk {
+	return u.Update(func(s *RolePermissionUpsert) {
+		s.SetDeny(v)
+	})
+}
+
+// UpdateDeny sets the "deny" field to the value that was provided on create.
+func (u *RolePermissionUpsertBulk) UpdateDeny() *RolePermissionUpsertBulk {
+	return u.Update(func(s *RolePermissionUpsert) {
+		s.UpdateDeny()
+	})
 }
 
 // SetFields sets the "fields" field.

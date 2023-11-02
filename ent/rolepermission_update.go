@@ -29,6 +29,20 @@ func (rpu *RolePermissionUpdate) Where(ps ...predicate.RolePermission) *RolePerm
 	return rpu
 }
 
+// SetDeny sets the "deny" field.
+func (rpu *RolePermissionUpdate) SetDeny(b bool) *RolePermissionUpdate {
+	rpu.mutation.SetDeny(b)
+	return rpu
+}
+
+// SetNillableDeny sets the "deny" field if the given value is not nil.
+func (rpu *RolePermissionUpdate) SetNillableDeny(b *bool) *RolePermissionUpdate {
+	if b != nil {
+		rpu.SetDeny(*b)
+	}
+	return rpu
+}
+
 // SetFields sets the "fields" field.
 func (rpu *RolePermissionUpdate) SetFields(s []string) *RolePermissionUpdate {
 	rpu.mutation.SetFields(s)
@@ -102,6 +116,9 @@ func (rpu *RolePermissionUpdate) sqlSave(ctx context.Context) (n int, err error)
 			}
 		}
 	}
+	if value, ok := rpu.mutation.Deny(); ok {
+		_spec.SetField(rolepermission.FieldDeny, field.TypeBool, value)
+	}
 	if value, ok := rpu.mutation.GetFields(); ok {
 		_spec.SetField(rolepermission.FieldFields, field.TypeJSON, value)
 	}
@@ -130,6 +147,20 @@ type RolePermissionUpdateOne struct {
 	hooks     []Hook
 	mutation  *RolePermissionMutation
 	modifiers []func(*sql.UpdateBuilder)
+}
+
+// SetDeny sets the "deny" field.
+func (rpuo *RolePermissionUpdateOne) SetDeny(b bool) *RolePermissionUpdateOne {
+	rpuo.mutation.SetDeny(b)
+	return rpuo
+}
+
+// SetNillableDeny sets the "deny" field if the given value is not nil.
+func (rpuo *RolePermissionUpdateOne) SetNillableDeny(b *bool) *RolePermissionUpdateOne {
+	if b != nil {
+		rpuo.SetDeny(*b)
+	}
+	return rpuo
 }
 
 // SetFields sets the "fields" field.
@@ -234,6 +265,9 @@ func (rpuo *RolePermissionUpdateOne) sqlSave(ctx context.Context) (_node *RolePe
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := rpuo.mutation.Deny(); ok {
+		_spec.SetField(rolepermission.FieldDeny, field.TypeBool, value)
 	}
 	if value, ok := rpuo.mutation.GetFields(); ok {
 		_spec.SetField(rolepermission.FieldFields, field.TypeJSON, value)

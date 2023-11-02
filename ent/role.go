@@ -17,12 +17,16 @@ type Role struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID int64 `json:"id,omitempty"`
+	// DeletedAt holds the value of the "deleted_at" field.
+	DeletedAt *time.Time `json:"deleted_at,omitempty"`
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
 	// Description holds the value of the "description" field.
 	Description string `json:"description,omitempty"`
-	// TeamID holds the value of the "team_id" field.
-	TeamID *int64 `json:"team_id,omitempty"`
+	// TenantID holds the value of the "tenant_id" field.
+	TenantID *int64 `json:"tenant_id,omitempty"`
+	// IsSystem holds the value of the "is_system" field.
+	IsSystem bool `json:"is_system,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
@@ -57,11 +61,13 @@ func (*Role) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case role.FieldID, role.FieldTeamID:
+		case role.FieldIsSystem:
+			values[i] = new(sql.NullBool)
+		case role.FieldID, role.FieldTenantID:
 			values[i] = new(sql.NullInt64)
 		case role.FieldName, role.FieldDescription:
 			values[i] = new(sql.NullString)
-		case role.FieldCreatedAt, role.FieldUpdatedAt:
+		case role.FieldDeletedAt, role.FieldCreatedAt, role.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
 		case role.ForeignKeys[0]: // permission_roles
 			values[i] = new(sql.NullString)
@@ -86,6 +92,13 @@ func (r *Role) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			r.ID = int64(value.Int64)
+		case role.FieldDeletedAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field deleted_at", values[i])
+			} else if value.Valid {
+				r.DeletedAt = new(time.Time)
+				*r.DeletedAt = value.Time
+			}
 		case role.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field name", values[i])
@@ -98,12 +111,18 @@ func (r *Role) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				r.Description = value.String
 			}
-		case role.FieldTeamID:
+		case role.FieldTenantID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field team_id", values[i])
+				return fmt.Errorf("unexpected type %T for field tenant_id", values[i])
 			} else if value.Valid {
-				r.TeamID = new(int64)
-				*r.TeamID = value.Int64
+				r.TenantID = new(int64)
+				*r.TenantID = value.Int64
+			}
+		case role.FieldIsSystem:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field is_system", values[i])
+			} else if value.Valid {
+				r.IsSystem = value.Bool
 			}
 		case role.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
@@ -165,16 +184,24 @@ func (r *Role) String() string {
 	var builder strings.Builder
 	builder.WriteString("Role(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", r.ID))
+	if v := r.DeletedAt; v != nil {
+		builder.WriteString("deleted_at=")
+		builder.WriteString(v.Format(time.ANSIC))
+	}
+	builder.WriteString(", ")
 	builder.WriteString("name=")
 	builder.WriteString(r.Name)
 	builder.WriteString(", ")
 	builder.WriteString("description=")
 	builder.WriteString(r.Description)
 	builder.WriteString(", ")
-	if v := r.TeamID; v != nil {
-		builder.WriteString("team_id=")
+	if v := r.TenantID; v != nil {
+		builder.WriteString("tenant_id=")
 		builder.WriteString(fmt.Sprintf("%v", *v))
 	}
+	builder.WriteString(", ")
+	builder.WriteString("is_system=")
+	builder.WriteString(fmt.Sprintf("%v", r.IsSystem))
 	builder.WriteString(", ")
 	builder.WriteString("created_at=")
 	builder.WriteString(r.CreatedAt.Format(time.ANSIC))

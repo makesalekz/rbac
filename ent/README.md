@@ -3,5 +3,5 @@
 ## Add new Ent Model
 
 ```bash
-go run entgo.io/ent/cmd/ent new MemberRole
+go run entgo.io/ent/cmd/ent new TeamIdentityRole
 ```

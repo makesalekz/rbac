@@ -12,10 +12,14 @@ const (
 	Label = "role_permission"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
+	// FieldTenantID holds the string denoting the tenant_id field in the database.
+	FieldTenantID = "tenant_id"
 	// FieldRoleID holds the string denoting the role_id field in the database.
 	FieldRoleID = "role_id"
 	// FieldPermissionID holds the string denoting the permission_id field in the database.
 	FieldPermissionID = "permission_id"
+	// FieldDeny holds the string denoting the deny field in the database.
+	FieldDeny = "deny"
 	// FieldFields holds the string denoting the fields field in the database.
 	FieldFields = "fields"
 	// EdgeRole holds the string denoting the role edge name in mutations.
@@ -43,8 +47,10 @@ const (
 // Columns holds all SQL columns for rolepermission fields.
 var Columns = []string{
 	FieldID,
+	FieldTenantID,
 	FieldRoleID,
 	FieldPermissionID,
+	FieldDeny,
 	FieldFields,
 }
 
@@ -58,12 +64,22 @@ func ValidColumn(column string) bool {
 	return false
 }
 
+var (
+	// DefaultDeny holds the default value on creation for the "deny" field.
+	DefaultDeny bool
+)
+
 // OrderOption defines the ordering options for the RolePermission queries.
 type OrderOption func(*sql.Selector)
 
 // ByID orders the results by the id field.
 func ByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldID, opts...).ToFunc()
+}
+
+// ByTenantID orders the results by the tenant_id field.
+func ByTenantID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldTenantID, opts...).ToFunc()
 }
 
 // ByRoleID orders the results by the role_id field.
@@ -74,6 +90,11 @@ func ByRoleID(opts ...sql.OrderTermOption) OrderOption {
 // ByPermissionID orders the results by the permission_id field.
 func ByPermissionID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldPermissionID, opts...).ToFunc()
+}
+
+// ByDeny orders the results by the deny field.
+func ByDeny(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldDeny, opts...).ToFunc()
 }
 
 // ByRoleField orders the results by role field.

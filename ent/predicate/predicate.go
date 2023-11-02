@@ -6,9 +6,6 @@ import (
 	"entgo.io/ent/dialect/sql"
 )
 
-// MemberRole is the predicate function for memberrole builders.
-type MemberRole func(*sql.Selector)
-
 // Permission is the predicate function for permission builders.
 type Permission func(*sql.Selector)
 
@@ -17,3 +14,9 @@ type Role func(*sql.Selector)
 
 // RolePermission is the predicate function for rolepermission builders.
 type RolePermission func(*sql.Selector)
+
+// Team is the predicate function for team builders.
+type Team func(*sql.Selector)
+
+// TeamIdentityRole is the predicate function for teamidentityrole builders.
+type TeamIdentityRole func(*sql.Selector)

@@ -55,6 +55,11 @@ func IDLTE(id int64) predicate.Role {
 	return predicate.Role(sql.FieldLTE(FieldID, id))
 }
 
+// DeletedAt applies equality check predicate on the "deleted_at" field. It's identical to DeletedAtEQ.
+func DeletedAt(v time.Time) predicate.Role {
+	return predicate.Role(sql.FieldEQ(FieldDeletedAt, v))
+}
+
 // Name applies equality check predicate on the "name" field. It's identical to NameEQ.
 func Name(v string) predicate.Role {
 	return predicate.Role(sql.FieldEQ(FieldName, v))
@@ -65,9 +70,14 @@ func Description(v string) predicate.Role {
 	return predicate.Role(sql.FieldEQ(FieldDescription, v))
 }
 
-// TeamID applies equality check predicate on the "team_id" field. It's identical to TeamIDEQ.
-func TeamID(v int64) predicate.Role {
-	return predicate.Role(sql.FieldEQ(FieldTeamID, v))
+// TenantID applies equality check predicate on the "tenant_id" field. It's identical to TenantIDEQ.
+func TenantID(v int64) predicate.Role {
+	return predicate.Role(sql.FieldEQ(FieldTenantID, v))
+}
+
+// IsSystem applies equality check predicate on the "is_system" field. It's identical to IsSystemEQ.
+func IsSystem(v bool) predicate.Role {
+	return predicate.Role(sql.FieldEQ(FieldIsSystem, v))
 }
 
 // CreatedAt applies equality check predicate on the "created_at" field. It's identical to CreatedAtEQ.
@@ -78,6 +88,56 @@ func CreatedAt(v time.Time) predicate.Role {
 // UpdatedAt applies equality check predicate on the "updated_at" field. It's identical to UpdatedAtEQ.
 func UpdatedAt(v time.Time) predicate.Role {
 	return predicate.Role(sql.FieldEQ(FieldUpdatedAt, v))
+}
+
+// DeletedAtEQ applies the EQ predicate on the "deleted_at" field.
+func DeletedAtEQ(v time.Time) predicate.Role {
+	return predicate.Role(sql.FieldEQ(FieldDeletedAt, v))
+}
+
+// DeletedAtNEQ applies the NEQ predicate on the "deleted_at" field.
+func DeletedAtNEQ(v time.Time) predicate.Role {
+	return predicate.Role(sql.FieldNEQ(FieldDeletedAt, v))
+}
+
+// DeletedAtIn applies the In predicate on the "deleted_at" field.
+func DeletedAtIn(vs ...time.Time) predicate.Role {
+	return predicate.Role(sql.FieldIn(FieldDeletedAt, vs...))
+}
+
+// DeletedAtNotIn applies the NotIn predicate on the "deleted_at" field.
+func DeletedAtNotIn(vs ...time.Time) predicate.Role {
+	return predicate.Role(sql.FieldNotIn(FieldDeletedAt, vs...))
+}
+
+// DeletedAtGT applies the GT predicate on the "deleted_at" field.
+func DeletedAtGT(v time.Time) predicate.Role {
+	return predicate.Role(sql.FieldGT(FieldDeletedAt, v))
+}
+
+// DeletedAtGTE applies the GTE predicate on the "deleted_at" field.
+func DeletedAtGTE(v time.Time) predicate.Role {
+	return predicate.Role(sql.FieldGTE(FieldDeletedAt, v))
+}
+
+// DeletedAtLT applies the LT predicate on the "deleted_at" field.
+func DeletedAtLT(v time.Time) predicate.Role {
+	return predicate.Role(sql.FieldLT(FieldDeletedAt, v))
+}
+
+// DeletedAtLTE applies the LTE predicate on the "deleted_at" field.
+func DeletedAtLTE(v time.Time) predicate.Role {
+	return predicate.Role(sql.FieldLTE(FieldDeletedAt, v))
+}
+
+// DeletedAtIsNil applies the IsNil predicate on the "deleted_at" field.
+func DeletedAtIsNil() predicate.Role {
+	return predicate.Role(sql.FieldIsNull(FieldDeletedAt))
+}
+
+// DeletedAtNotNil applies the NotNil predicate on the "deleted_at" field.
+func DeletedAtNotNil() predicate.Role {
+	return predicate.Role(sql.FieldNotNull(FieldDeletedAt))
 }
 
 // NameEQ applies the EQ predicate on the "name" field.
@@ -220,44 +280,54 @@ func DescriptionContainsFold(v string) predicate.Role {
 	return predicate.Role(sql.FieldContainsFold(FieldDescription, v))
 }
 
-// TeamIDEQ applies the EQ predicate on the "team_id" field.
-func TeamIDEQ(v int64) predicate.Role {
-	return predicate.Role(sql.FieldEQ(FieldTeamID, v))
+// TenantIDEQ applies the EQ predicate on the "tenant_id" field.
+func TenantIDEQ(v int64) predicate.Role {
+	return predicate.Role(sql.FieldEQ(FieldTenantID, v))
 }
 
-// TeamIDNEQ applies the NEQ predicate on the "team_id" field.
-func TeamIDNEQ(v int64) predicate.Role {
-	return predicate.Role(sql.FieldNEQ(FieldTeamID, v))
+// TenantIDNEQ applies the NEQ predicate on the "tenant_id" field.
+func TenantIDNEQ(v int64) predicate.Role {
+	return predicate.Role(sql.FieldNEQ(FieldTenantID, v))
 }
 
-// TeamIDIn applies the In predicate on the "team_id" field.
-func TeamIDIn(vs ...int64) predicate.Role {
-	return predicate.Role(sql.FieldIn(FieldTeamID, vs...))
+// TenantIDIn applies the In predicate on the "tenant_id" field.
+func TenantIDIn(vs ...int64) predicate.Role {
+	return predicate.Role(sql.FieldIn(FieldTenantID, vs...))
 }
 
-// TeamIDNotIn applies the NotIn predicate on the "team_id" field.
-func TeamIDNotIn(vs ...int64) predicate.Role {
-	return predicate.Role(sql.FieldNotIn(FieldTeamID, vs...))
+// TenantIDNotIn applies the NotIn predicate on the "tenant_id" field.
+func TenantIDNotIn(vs ...int64) predicate.Role {
+	return predicate.Role(sql.FieldNotIn(FieldTenantID, vs...))
 }
 
-// TeamIDGT applies the GT predicate on the "team_id" field.
-func TeamIDGT(v int64) predicate.Role {
-	return predicate.Role(sql.FieldGT(FieldTeamID, v))
+// TenantIDGT applies the GT predicate on the "tenant_id" field.
+func TenantIDGT(v int64) predicate.Role {
+	return predicate.Role(sql.FieldGT(FieldTenantID, v))
 }
 
-// TeamIDGTE applies the GTE predicate on the "team_id" field.
-func TeamIDGTE(v int64) predicate.Role {
-	return predicate.Role(sql.FieldGTE(FieldTeamID, v))
+// TenantIDGTE applies the GTE predicate on the "tenant_id" field.
+func TenantIDGTE(v int64) predicate.Role {
+	return predicate.Role(sql.FieldGTE(FieldTenantID, v))
 }
 
-// TeamIDLT applies the LT predicate on the "team_id" field.
-func TeamIDLT(v int64) predicate.Role {
-	return predicate.Role(sql.FieldLT(FieldTeamID, v))
+// TenantIDLT applies the LT predicate on the "tenant_id" field.
+func TenantIDLT(v int64) predicate.Role {
+	return predicate.Role(sql.FieldLT(FieldTenantID, v))
 }
 
-// TeamIDLTE applies the LTE predicate on the "team_id" field.
-func TeamIDLTE(v int64) predicate.Role {
-	return predicate.Role(sql.FieldLTE(FieldTeamID, v))
+// TenantIDLTE applies the LTE predicate on the "tenant_id" field.
+func TenantIDLTE(v int64) predicate.Role {
+	return predicate.Role(sql.FieldLTE(FieldTenantID, v))
+}
+
+// IsSystemEQ applies the EQ predicate on the "is_system" field.
+func IsSystemEQ(v bool) predicate.Role {
+	return predicate.Role(sql.FieldEQ(FieldIsSystem, v))
+}
+
+// IsSystemNEQ applies the NEQ predicate on the "is_system" field.
+func IsSystemNEQ(v bool) predicate.Role {
+	return predicate.Role(sql.FieldNEQ(FieldIsSystem, v))
 }
 
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.

@@ -23,6 +23,20 @@ type RoleCreate struct {
 	conflict []sql.ConflictOption
 }
 
+// SetDeletedAt sets the "deleted_at" field.
+func (rc *RoleCreate) SetDeletedAt(t time.Time) *RoleCreate {
+	rc.mutation.SetDeletedAt(t)
+	return rc
+}
+
+// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
+func (rc *RoleCreate) SetNillableDeletedAt(t *time.Time) *RoleCreate {
+	if t != nil {
+		rc.SetDeletedAt(*t)
+	}
+	return rc
+}
+
 // SetName sets the "name" field.
 func (rc *RoleCreate) SetName(s string) *RoleCreate {
 	rc.mutation.SetName(s)
@@ -43,9 +57,23 @@ func (rc *RoleCreate) SetNillableDescription(s *string) *RoleCreate {
 	return rc
 }
 
-// SetTeamID sets the "team_id" field.
-func (rc *RoleCreate) SetTeamID(i int64) *RoleCreate {
-	rc.mutation.SetTeamID(i)
+// SetTenantID sets the "tenant_id" field.
+func (rc *RoleCreate) SetTenantID(i int64) *RoleCreate {
+	rc.mutation.SetTenantID(i)
+	return rc
+}
+
+// SetIsSystem sets the "is_system" field.
+func (rc *RoleCreate) SetIsSystem(b bool) *RoleCreate {
+	rc.mutation.SetIsSystem(b)
+	return rc
+}
+
+// SetNillableIsSystem sets the "is_system" field if the given value is not nil.
+func (rc *RoleCreate) SetNillableIsSystem(b *bool) *RoleCreate {
+	if b != nil {
+		rc.SetIsSystem(*b)
+	}
 	return rc
 }
 
@@ -105,7 +133,9 @@ func (rc *RoleCreate) Mutation() *RoleMutation {
 
 // Save creates the Role in the database.
 func (rc *RoleCreate) Save(ctx context.Context) (*Role, error) {
-	rc.defaults()
+	if err := rc.defaults(); err != nil {
+		return nil, err
+	}
 	return withHooks(ctx, rc.sqlSave, rc.mutation, rc.hooks)
 }
 
@@ -132,19 +162,30 @@ func (rc *RoleCreate) ExecX(ctx context.Context) {
 }
 
 // defaults sets the default values of the builder before save.
-func (rc *RoleCreate) defaults() {
+func (rc *RoleCreate) defaults() error {
 	if _, ok := rc.mutation.Description(); !ok {
 		v := role.DefaultDescription
 		rc.mutation.SetDescription(v)
 	}
+	if _, ok := rc.mutation.IsSystem(); !ok {
+		v := role.DefaultIsSystem
+		rc.mutation.SetIsSystem(v)
+	}
 	if _, ok := rc.mutation.CreatedAt(); !ok {
+		if role.DefaultCreatedAt == nil {
+			return fmt.Errorf("ent: uninitialized role.DefaultCreatedAt (forgotten import ent/runtime?)")
+		}
 		v := role.DefaultCreatedAt()
 		rc.mutation.SetCreatedAt(v)
 	}
 	if _, ok := rc.mutation.UpdatedAt(); !ok {
+		if role.DefaultUpdatedAt == nil {
+			return fmt.Errorf("ent: uninitialized role.DefaultUpdatedAt (forgotten import ent/runtime?)")
+		}
 		v := role.DefaultUpdatedAt()
 		rc.mutation.SetUpdatedAt(v)
 	}
+	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -157,8 +198,11 @@ func (rc *RoleCreate) check() error {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Role.name": %w`, err)}
 		}
 	}
-	if _, ok := rc.mutation.TeamID(); !ok {
-		return &ValidationError{Name: "team_id", err: errors.New(`ent: missing required field "Role.team_id"`)}
+	if _, ok := rc.mutation.TenantID(); !ok {
+		return &ValidationError{Name: "tenant_id", err: errors.New(`ent: missing required field "Role.tenant_id"`)}
+	}
+	if _, ok := rc.mutation.IsSystem(); !ok {
+		return &ValidationError{Name: "is_system", err: errors.New(`ent: missing required field "Role.is_system"`)}
 	}
 	if _, ok := rc.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "Role.created_at"`)}
@@ -199,6 +243,10 @@ func (rc *RoleCreate) createSpec() (*Role, *sqlgraph.CreateSpec) {
 		_node.ID = id
 		_spec.ID.Value = id
 	}
+	if value, ok := rc.mutation.DeletedAt(); ok {
+		_spec.SetField(role.FieldDeletedAt, field.TypeTime, value)
+		_node.DeletedAt = &value
+	}
 	if value, ok := rc.mutation.Name(); ok {
 		_spec.SetField(role.FieldName, field.TypeString, value)
 		_node.Name = value
@@ -207,9 +255,13 @@ func (rc *RoleCreate) createSpec() (*Role, *sqlgraph.CreateSpec) {
 		_spec.SetField(role.FieldDescription, field.TypeString, value)
 		_node.Description = value
 	}
-	if value, ok := rc.mutation.TeamID(); ok {
-		_spec.SetField(role.FieldTeamID, field.TypeInt64, value)
-		_node.TeamID = &value
+	if value, ok := rc.mutation.TenantID(); ok {
+		_spec.SetField(role.FieldTenantID, field.TypeInt64, value)
+		_node.TenantID = &value
+	}
+	if value, ok := rc.mutation.IsSystem(); ok {
+		_spec.SetField(role.FieldIsSystem, field.TypeBool, value)
+		_node.IsSystem = value
 	}
 	if value, ok := rc.mutation.CreatedAt(); ok {
 		_spec.SetField(role.FieldCreatedAt, field.TypeTime, value)
@@ -242,7 +294,7 @@ func (rc *RoleCreate) createSpec() (*Role, *sqlgraph.CreateSpec) {
 // of the `INSERT` statement. For example:
 //
 //	client.Role.Create().
-//		SetName(v).
+//		SetDeletedAt(v).
 //		OnConflict(
 //			// Update the row with the new values
 //			// the was proposed for insertion.
@@ -251,7 +303,7 @@ func (rc *RoleCreate) createSpec() (*Role, *sqlgraph.CreateSpec) {
 //		// Override some of the fields with custom
 //		// update values.
 //		Update(func(u *ent.RoleUpsert) {
-//			SetName(v+v).
+//			SetDeletedAt(v+v).
 //		}).
 //		Exec(ctx)
 func (rc *RoleCreate) OnConflict(opts ...sql.ConflictOption) *RoleUpsertOne {
@@ -287,6 +339,24 @@ type (
 	}
 )
 
+// SetDeletedAt sets the "deleted_at" field.
+func (u *RoleUpsert) SetDeletedAt(v time.Time) *RoleUpsert {
+	u.Set(role.FieldDeletedAt, v)
+	return u
+}
+
+// UpdateDeletedAt sets the "deleted_at" field to the value that was provided on create.
+func (u *RoleUpsert) UpdateDeletedAt() *RoleUpsert {
+	u.SetExcluded(role.FieldDeletedAt)
+	return u
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (u *RoleUpsert) ClearDeletedAt() *RoleUpsert {
+	u.SetNull(role.FieldDeletedAt)
+	return u
+}
+
 // SetName sets the "name" field.
 func (u *RoleUpsert) SetName(v string) *RoleUpsert {
 	u.Set(role.FieldName, v)
@@ -317,21 +387,33 @@ func (u *RoleUpsert) ClearDescription() *RoleUpsert {
 	return u
 }
 
-// SetTeamID sets the "team_id" field.
-func (u *RoleUpsert) SetTeamID(v int64) *RoleUpsert {
-	u.Set(role.FieldTeamID, v)
+// SetTenantID sets the "tenant_id" field.
+func (u *RoleUpsert) SetTenantID(v int64) *RoleUpsert {
+	u.Set(role.FieldTenantID, v)
 	return u
 }
 
-// UpdateTeamID sets the "team_id" field to the value that was provided on create.
-func (u *RoleUpsert) UpdateTeamID() *RoleUpsert {
-	u.SetExcluded(role.FieldTeamID)
+// UpdateTenantID sets the "tenant_id" field to the value that was provided on create.
+func (u *RoleUpsert) UpdateTenantID() *RoleUpsert {
+	u.SetExcluded(role.FieldTenantID)
 	return u
 }
 
-// AddTeamID adds v to the "team_id" field.
-func (u *RoleUpsert) AddTeamID(v int64) *RoleUpsert {
-	u.Add(role.FieldTeamID, v)
+// AddTenantID adds v to the "tenant_id" field.
+func (u *RoleUpsert) AddTenantID(v int64) *RoleUpsert {
+	u.Add(role.FieldTenantID, v)
+	return u
+}
+
+// SetIsSystem sets the "is_system" field.
+func (u *RoleUpsert) SetIsSystem(v bool) *RoleUpsert {
+	u.Set(role.FieldIsSystem, v)
+	return u
+}
+
+// UpdateIsSystem sets the "is_system" field to the value that was provided on create.
+func (u *RoleUpsert) UpdateIsSystem() *RoleUpsert {
+	u.SetExcluded(role.FieldIsSystem)
 	return u
 }
 
@@ -407,6 +489,27 @@ func (u *RoleUpsertOne) Update(set func(*RoleUpsert)) *RoleUpsertOne {
 	return u
 }
 
+// SetDeletedAt sets the "deleted_at" field.
+func (u *RoleUpsertOne) SetDeletedAt(v time.Time) *RoleUpsertOne {
+	return u.Update(func(s *RoleUpsert) {
+		s.SetDeletedAt(v)
+	})
+}
+
+// UpdateDeletedAt sets the "deleted_at" field to the value that was provided on create.
+func (u *RoleUpsertOne) UpdateDeletedAt() *RoleUpsertOne {
+	return u.Update(func(s *RoleUpsert) {
+		s.UpdateDeletedAt()
+	})
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (u *RoleUpsertOne) ClearDeletedAt() *RoleUpsertOne {
+	return u.Update(func(s *RoleUpsert) {
+		s.ClearDeletedAt()
+	})
+}
+
 // SetName sets the "name" field.
 func (u *RoleUpsertOne) SetName(v string) *RoleUpsertOne {
 	return u.Update(func(s *RoleUpsert) {
@@ -442,24 +545,38 @@ func (u *RoleUpsertOne) ClearDescription() *RoleUpsertOne {
 	})
 }
 
-// SetTeamID sets the "team_id" field.
-func (u *RoleUpsertOne) SetTeamID(v int64) *RoleUpsertOne {
+// SetTenantID sets the "tenant_id" field.
+func (u *RoleUpsertOne) SetTenantID(v int64) *RoleUpsertOne {
 	return u.Update(func(s *RoleUpsert) {
-		s.SetTeamID(v)
+		s.SetTenantID(v)
 	})
 }
 
-// AddTeamID adds v to the "team_id" field.
-func (u *RoleUpsertOne) AddTeamID(v int64) *RoleUpsertOne {
+// AddTenantID adds v to the "tenant_id" field.
+func (u *RoleUpsertOne) AddTenantID(v int64) *RoleUpsertOne {
 	return u.Update(func(s *RoleUpsert) {
-		s.AddTeamID(v)
+		s.AddTenantID(v)
 	})
 }
 
-// UpdateTeamID sets the "team_id" field to the value that was provided on create.
-func (u *RoleUpsertOne) UpdateTeamID() *RoleUpsertOne {
+// UpdateTenantID sets the "tenant_id" field to the value that was provided on create.
+func (u *RoleUpsertOne) UpdateTenantID() *RoleUpsertOne {
 	return u.Update(func(s *RoleUpsert) {
-		s.UpdateTeamID()
+		s.UpdateTenantID()
+	})
+}
+
+// SetIsSystem sets the "is_system" field.
+func (u *RoleUpsertOne) SetIsSystem(v bool) *RoleUpsertOne {
+	return u.Update(func(s *RoleUpsert) {
+		s.SetIsSystem(v)
+	})
+}
+
+// UpdateIsSystem sets the "is_system" field to the value that was provided on create.
+func (u *RoleUpsertOne) UpdateIsSystem() *RoleUpsertOne {
+	return u.Update(func(s *RoleUpsert) {
+		s.UpdateIsSystem()
 	})
 }
 
@@ -622,7 +739,7 @@ func (rcb *RoleCreateBulk) ExecX(ctx context.Context) {
 //		// Override some of the fields with custom
 //		// update values.
 //		Update(func(u *ent.RoleUpsert) {
-//			SetName(v+v).
+//			SetDeletedAt(v+v).
 //		}).
 //		Exec(ctx)
 func (rcb *RoleCreateBulk) OnConflict(opts ...sql.ConflictOption) *RoleUpsertBulk {
@@ -701,6 +818,27 @@ func (u *RoleUpsertBulk) Update(set func(*RoleUpsert)) *RoleUpsertBulk {
 	return u
 }
 
+// SetDeletedAt sets the "deleted_at" field.
+func (u *RoleUpsertBulk) SetDeletedAt(v time.Time) *RoleUpsertBulk {
+	return u.Update(func(s *RoleUpsert) {
+		s.SetDeletedAt(v)
+	})
+}
+
+// UpdateDeletedAt sets the "deleted_at" field to the value that was provided on create.
+func (u *RoleUpsertBulk) UpdateDeletedAt() *RoleUpsertBulk {
+	return u.Update(func(s *RoleUpsert) {
+		s.UpdateDeletedAt()
+	})
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (u *RoleUpsertBulk) ClearDeletedAt() *RoleUpsertBulk {
+	return u.Update(func(s *RoleUpsert) {
+		s.ClearDeletedAt()
+	})
+}
+
 // SetName sets the "name" field.
 func (u *RoleUpsertBulk) SetName(v string) *RoleUpsertBulk {
 	return u.Update(func(s *RoleUpsert) {
@@ -736,24 +874,38 @@ func (u *RoleUpsertBulk) ClearDescription() *RoleUpsertBulk {
 	})
 }
 
-// SetTeamID sets the "team_id" field.
-func (u *RoleUpsertBulk) SetTeamID(v int64) *RoleUpsertBulk {
+// SetTenantID sets the "tenant_id" field.
+func (u *RoleUpsertBulk) SetTenantID(v int64) *RoleUpsertBulk {
 	return u.Update(func(s *RoleUpsert) {
-		s.SetTeamID(v)
+		s.SetTenantID(v)
 	})
 }
 
-// AddTeamID adds v to the "team_id" field.
-func (u *RoleUpsertBulk) AddTeamID(v int64) *RoleUpsertBulk {
+// AddTenantID adds v to the "tenant_id" field.
+func (u *RoleUpsertBulk) AddTenantID(v int64) *RoleUpsertBulk {
 	return u.Update(func(s *RoleUpsert) {
-		s.AddTeamID(v)
+		s.AddTenantID(v)
 	})
 }
 
-// UpdateTeamID sets the "team_id" field to the value that was provided on create.
-func (u *RoleUpsertBulk) UpdateTeamID() *RoleUpsertBulk {
+// UpdateTenantID sets the "tenant_id" field to the value that was provided on create.
+func (u *RoleUpsertBulk) UpdateTenantID() *RoleUpsertBulk {
 	return u.Update(func(s *RoleUpsert) {
-		s.UpdateTeamID()
+		s.UpdateTenantID()
+	})
+}
+
+// SetIsSystem sets the "is_system" field.
+func (u *RoleUpsertBulk) SetIsSystem(v bool) *RoleUpsertBulk {
+	return u.Update(func(s *RoleUpsert) {
+		s.SetIsSystem(v)
+	})
+}
+
+// UpdateIsSystem sets the "is_system" field to the value that was provided on create.
+func (u *RoleUpsertBulk) UpdateIsSystem() *RoleUpsertBulk {
+	return u.Update(func(s *RoleUpsert) {
+		s.UpdateIsSystem()
 	})
 }
 
