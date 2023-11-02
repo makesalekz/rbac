@@ -1,0 +1,78 @@
+syntax = "proto3";
+
+package api.rbac.v1;
+
+import "google/api/annotations.proto";
+import "api/rbac/v1/models.proto";
+
+option go_package = "teams/api/teams/v1;teams_v1";
+option java_multiple_files = true;
+option java_package = "api.teams.v1";
+
+service Teams {
+  rpc CreateTeam (CreateTeamRequest) returns (TeamReply) {
+    option (google.api.http) = {
+      post: "/v1/teams"
+      body: "*"
+    };
+  };
+  rpc UpdateTeam (UpdateTeamRequest) returns (TeamReply) {
+    option (google.api.http) = {
+      put: "/v1/teams/{teamId}"
+      body: "*"
+    };
+  };
+  rpc DeleteTeam (TeamRequest) returns (EmptyReply) {
+    option (google.api.http) = {
+      delete: "/v1/teams/{teamId}"
+    };
+  };
+  rpc GetTeam (TeamRequest) returns (TeamReply) {
+    option (google.api.http) = {
+      get: "/v1/teams/{teamId}"
+    };
+  };
+  rpc GetTeamTree (TeamRequest) returns (TeamReply) {
+    option (google.api.http) = {
+      get: "/v1/teams/{teamId}/tree"
+    };
+  };
+  rpc ListTeams (ListTeamsRequest) returns (ListTeamsReply) {
+    option (google.api.http) = {
+      post: "/v1/teams/list"
+      body: "*"
+    };
+  };
+}
+
+message CreateTeamRequest {
+  string name = 1;
+  string description = 2;
+  int64 tenantId = 3;
+  int64 parentId = 4;
+}
+
+message UpdateTeamRequest {
+  int64 teamId = 1;
+  string name = 2;
+  string description = 3;
+}
+
+message TeamRequest {
+  int64 teamId = 1;
+}
+
+message TeamReply {
+  Team team = 1;
+  optional int64 memberId = 2;
+}
+
+message ListTeamsRequest {
+  int64 ownerId = 1;
+  int64 parentId = 2;
+  PaginateRequest paginate = 3;
+}
+message ListTeamsReply {
+  repeated Team teams = 1;
+  PaginateReply paginate = 2;
+}
