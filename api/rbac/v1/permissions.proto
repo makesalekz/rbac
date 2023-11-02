@@ -3,7 +3,7 @@ syntax = "proto3";
 import "google/api/annotations.proto";
 import "api/rbac/v1/models.proto";
 
-package api.rbac.permissions.v1;
+package api.rbac.v1;
 
 option go_package = "rbac/api/rbac/permissions/v1;permissions_v1";
 option java_multiple_files = true;
@@ -45,16 +45,14 @@ message CreatePermissionRequest {
 	string appId = 2;
 	string name = 3;
 	string description = 4;
-	int32 level = 5;
-	repeated string fields = 6;
+	repeated string fields = 5;
 }
 
 message UpdatePermissionRequest {
 	string permissionId = 1;
 	string name = 2;
 	string description = 3;
-	int32 level = 4;
-	repeated string fields = 5;
+	repeated string fields = 4;
 }
 
 message DeletePermissionRequest {
