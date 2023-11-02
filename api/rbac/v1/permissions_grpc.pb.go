@@ -4,14 +4,13 @@
 // - protoc             v4.24.4
 // source: api/rbac/v1/permissions.proto
 
-package permissions_v1
+package rbac_v1
 
 import (
 	context "context"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
-	rbac "rbac/api/rbac"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -20,21 +19,21 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	Permissions_CreatePermission_FullMethodName = "/api.rbac.permissions.v1.Permissions/CreatePermission"
-	Permissions_UpdatePermission_FullMethodName = "/api.rbac.permissions.v1.Permissions/UpdatePermission"
-	Permissions_DeletePermission_FullMethodName = "/api.rbac.permissions.v1.Permissions/DeletePermission"
-	Permissions_GetPermission_FullMethodName    = "/api.rbac.permissions.v1.Permissions/GetPermission"
-	Permissions_ListPermissions_FullMethodName  = "/api.rbac.permissions.v1.Permissions/ListPermissions"
+	Permissions_CreatePermission_FullMethodName = "/api.v1.Permissions/CreatePermission"
+	Permissions_UpdatePermission_FullMethodName = "/api.v1.Permissions/UpdatePermission"
+	Permissions_DeletePermission_FullMethodName = "/api.v1.Permissions/DeletePermission"
+	Permissions_GetPermission_FullMethodName    = "/api.v1.Permissions/GetPermission"
+	Permissions_ListPermissions_FullMethodName  = "/api.v1.Permissions/ListPermissions"
 )
 
 // PermissionsClient is the client API for Permissions service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type PermissionsClient interface {
-	CreatePermission(ctx context.Context, in *CreatePermissionRequest, opts ...grpc.CallOption) (*rbac.PermissionReply, error)
-	UpdatePermission(ctx context.Context, in *UpdatePermissionRequest, opts ...grpc.CallOption) (*rbac.PermissionReply, error)
-	DeletePermission(ctx context.Context, in *DeletePermissionRequest, opts ...grpc.CallOption) (*rbac.EmptyReply, error)
-	GetPermission(ctx context.Context, in *GetPermissionRequest, opts ...grpc.CallOption) (*rbac.PermissionReply, error)
+	CreatePermission(ctx context.Context, in *CreatePermissionRequest, opts ...grpc.CallOption) (*PermissionReply, error)
+	UpdatePermission(ctx context.Context, in *UpdatePermissionRequest, opts ...grpc.CallOption) (*PermissionReply, error)
+	DeletePermission(ctx context.Context, in *DeletePermissionRequest, opts ...grpc.CallOption) (*EmptyReply, error)
+	GetPermission(ctx context.Context, in *GetPermissionRequest, opts ...grpc.CallOption) (*PermissionReply, error)
 	ListPermissions(ctx context.Context, in *ListPermissionsRequest, opts ...grpc.CallOption) (*ListPermissionsReply, error)
 }
 
@@ -46,8 +45,8 @@ func NewPermissionsClient(cc grpc.ClientConnInterface) PermissionsClient {
 	return &permissionsClient{cc}
 }
 
-func (c *permissionsClient) CreatePermission(ctx context.Context, in *CreatePermissionRequest, opts ...grpc.CallOption) (*rbac.PermissionReply, error) {
-	out := new(rbac.PermissionReply)
+func (c *permissionsClient) CreatePermission(ctx context.Context, in *CreatePermissionRequest, opts ...grpc.CallOption) (*PermissionReply, error) {
+	out := new(PermissionReply)
 	err := c.cc.Invoke(ctx, Permissions_CreatePermission_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -55,8 +54,8 @@ func (c *permissionsClient) CreatePermission(ctx context.Context, in *CreatePerm
 	return out, nil
 }
 
-func (c *permissionsClient) UpdatePermission(ctx context.Context, in *UpdatePermissionRequest, opts ...grpc.CallOption) (*rbac.PermissionReply, error) {
-	out := new(rbac.PermissionReply)
+func (c *permissionsClient) UpdatePermission(ctx context.Context, in *UpdatePermissionRequest, opts ...grpc.CallOption) (*PermissionReply, error) {
+	out := new(PermissionReply)
 	err := c.cc.Invoke(ctx, Permissions_UpdatePermission_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -64,8 +63,8 @@ func (c *permissionsClient) UpdatePermission(ctx context.Context, in *UpdatePerm
 	return out, nil
 }
 
-func (c *permissionsClient) DeletePermission(ctx context.Context, in *DeletePermissionRequest, opts ...grpc.CallOption) (*rbac.EmptyReply, error) {
-	out := new(rbac.EmptyReply)
+func (c *permissionsClient) DeletePermission(ctx context.Context, in *DeletePermissionRequest, opts ...grpc.CallOption) (*EmptyReply, error) {
+	out := new(EmptyReply)
 	err := c.cc.Invoke(ctx, Permissions_DeletePermission_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -73,8 +72,8 @@ func (c *permissionsClient) DeletePermission(ctx context.Context, in *DeletePerm
 	return out, nil
 }
 
-func (c *permissionsClient) GetPermission(ctx context.Context, in *GetPermissionRequest, opts ...grpc.CallOption) (*rbac.PermissionReply, error) {
-	out := new(rbac.PermissionReply)
+func (c *permissionsClient) GetPermission(ctx context.Context, in *GetPermissionRequest, opts ...grpc.CallOption) (*PermissionReply, error) {
+	out := new(PermissionReply)
 	err := c.cc.Invoke(ctx, Permissions_GetPermission_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -95,10 +94,10 @@ func (c *permissionsClient) ListPermissions(ctx context.Context, in *ListPermiss
 // All implementations must embed UnimplementedPermissionsServer
 // for forward compatibility
 type PermissionsServer interface {
-	CreatePermission(context.Context, *CreatePermissionRequest) (*rbac.PermissionReply, error)
-	UpdatePermission(context.Context, *UpdatePermissionRequest) (*rbac.PermissionReply, error)
-	DeletePermission(context.Context, *DeletePermissionRequest) (*rbac.EmptyReply, error)
-	GetPermission(context.Context, *GetPermissionRequest) (*rbac.PermissionReply, error)
+	CreatePermission(context.Context, *CreatePermissionRequest) (*PermissionReply, error)
+	UpdatePermission(context.Context, *UpdatePermissionRequest) (*PermissionReply, error)
+	DeletePermission(context.Context, *DeletePermissionRequest) (*EmptyReply, error)
+	GetPermission(context.Context, *GetPermissionRequest) (*PermissionReply, error)
 	ListPermissions(context.Context, *ListPermissionsRequest) (*ListPermissionsReply, error)
 	mustEmbedUnimplementedPermissionsServer()
 }
@@ -107,16 +106,16 @@ type PermissionsServer interface {
 type UnimplementedPermissionsServer struct {
 }
 
-func (UnimplementedPermissionsServer) CreatePermission(context.Context, *CreatePermissionRequest) (*rbac.PermissionReply, error) {
+func (UnimplementedPermissionsServer) CreatePermission(context.Context, *CreatePermissionRequest) (*PermissionReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreatePermission not implemented")
 }
-func (UnimplementedPermissionsServer) UpdatePermission(context.Context, *UpdatePermissionRequest) (*rbac.PermissionReply, error) {
+func (UnimplementedPermissionsServer) UpdatePermission(context.Context, *UpdatePermissionRequest) (*PermissionReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdatePermission not implemented")
 }
-func (UnimplementedPermissionsServer) DeletePermission(context.Context, *DeletePermissionRequest) (*rbac.EmptyReply, error) {
+func (UnimplementedPermissionsServer) DeletePermission(context.Context, *DeletePermissionRequest) (*EmptyReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeletePermission not implemented")
 }
-func (UnimplementedPermissionsServer) GetPermission(context.Context, *GetPermissionRequest) (*rbac.PermissionReply, error) {
+func (UnimplementedPermissionsServer) GetPermission(context.Context, *GetPermissionRequest) (*PermissionReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetPermission not implemented")
 }
 func (UnimplementedPermissionsServer) ListPermissions(context.Context, *ListPermissionsRequest) (*ListPermissionsReply, error) {
@@ -229,7 +228,7 @@ func _Permissions_ListPermissions_Handler(srv interface{}, ctx context.Context, 
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var Permissions_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "api.rbac.permissions.v1.Permissions",
+	ServiceName: "api.v1.Permissions",
 	HandlerType: (*PermissionsServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{

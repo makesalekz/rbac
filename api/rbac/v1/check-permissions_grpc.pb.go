@@ -4,7 +4,7 @@
 // - protoc             v4.24.4
 // source: api/rbac/v1/check-permissions.proto
 
-package check_permissions_v1
+package rbac_v1
 
 import (
 	context "context"
@@ -19,7 +19,7 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	CheckPermissions_CheckPermissions_FullMethodName = "/api.rbac.check_permissions.v1.CheckPermissions/CheckPermissions"
+	CheckPermissions_CheckPermissions_FullMethodName = "/api.rbac.v1.CheckPermissions/CheckPermissions"
 )
 
 // CheckPermissionsClient is the client API for CheckPermissions service.
@@ -96,7 +96,7 @@ func _CheckPermissions_CheckPermissions_Handler(srv interface{}, ctx context.Con
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var CheckPermissions_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "api.rbac.check_permissions.v1.CheckPermissions",
+	ServiceName: "api.rbac.v1.CheckPermissions",
 	HandlerType: (*CheckPermissionsServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{

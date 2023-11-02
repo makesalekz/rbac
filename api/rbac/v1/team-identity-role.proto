@@ -5,7 +5,7 @@ package api.rbac.v1;
 import "google/api/annotations.proto";
 import "api/rbac/v1/models.proto";
 
-option go_package = "rbac/api/rbac/v1;team_identity_role_v1";
+option go_package = "rbac/api/rbac/v1;rbac_v1";
 option java_multiple_files = true;
 option java_package = "api.rbac.v1";
 

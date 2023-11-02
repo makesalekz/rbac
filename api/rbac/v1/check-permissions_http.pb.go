@@ -4,7 +4,7 @@
 // - protoc             v4.24.4
 // source: api/rbac/v1/check-permissions.proto
 
-package check_permissions_v1
+package rbac_v1
 
 import (
 	context "context"
@@ -19,7 +19,7 @@ var _ = binding.EncodeURL
 
 const _ = http.SupportPackageIsVersion1
 
-const OperationCheckPermissionsCheckPermissions = "/api.rbac.check_permissions.v1.CheckPermissions/CheckPermissions"
+const OperationCheckPermissionsCheckPermissions = "/api.rbac.v1.CheckPermissions/CheckPermissions"
 
 type CheckPermissionsHTTPServer interface {
 	CheckPermissions(context.Context, *CheckPermissionsRequest) (*CheckPermissionsReply, error)
