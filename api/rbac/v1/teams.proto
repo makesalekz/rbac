@@ -5,9 +5,9 @@ package api.rbac.v1;
 import "google/api/annotations.proto";
 import "api/rbac/v1/models.proto";
 
-option go_package = "teams/api/teams/v1;teams_v1";
+option go_package = "rbac/api/rbac/v1;teams_v1";
 option java_multiple_files = true;
-option java_package = "api.teams.v1";
+option java_package = "api.rbac.v1";
 
 service Teams {
   rpc CreateTeam (CreateTeamRequest) returns (TeamReply) {

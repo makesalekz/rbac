@@ -5,9 +5,9 @@ import "api/rbac/v1/models.proto";
 
 package api.rbac.v1;
 
-option go_package = "rbac/api/rbac/permissions/v1;permissions_v1";
+option go_package = "rbac/api/rbac/v1;permissions_v1";
 option java_multiple_files = true;
-option java_package = "api.rbac.permissions.v1";
+option java_package = "api.rbac.v1";
 
 service Permissions {
 	rpc CreatePermission (CreatePermissionRequest) returns (PermissionReply) {
