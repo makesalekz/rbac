@@ -30,4 +30,6 @@ message Server {
 message Discovery {
   string iam = 1;
   google.protobuf.Duration iam_timeout = 2;
+  string teams = 3;
+  google.protobuf.Duration teams_timeout = 4;
 }

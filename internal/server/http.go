@@ -1,8 +1,7 @@
 package server
 
 import (
-	permissions_v1 "rbac/api/permissions/v1"
-	roles_v1 "rbac/api/roles/v1"
+	"rbac/api/rbac/v1"
 	"rbac/internal/conf"
 	"rbac/internal/data"
 	"rbac/internal/service"
@@ -43,8 +42,8 @@ func NewHTTPServer(
 	}
 	srv := khttp.NewServer(opts...)
 
-	roles_v1.RegisterRolesHTTPServer(srv, roleSrvc)
-	permissions_v1.RegisterPermissionsHTTPServer(srv, permissionsSrvc)
+	v1.roles_v1.RegisterRolesHTTPServer(srv, roleSrvc)
+	v1.RegisterPermissionsHTTPServer(srv, permissionsSrvc)
 
 	return srv
 }

@@ -3,19 +3,19 @@
 
 openapi: 3.0.3
 info:
-    title: Dummy API
+    title: Teams API
     version: 0.0.1
 paths:
-    /v1/dummy:
+    /v1/teams:
         post:
             tags:
-                - Dummy
-            operationId: Dummy_CreateDummy
+                - Teams
+            operationId: Teams_CreateTeam
             requestBody:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/api.dummy.v1.DummyRequest'
+                            $ref: '#/components/schemas/CreateTeamRequest'
                 required: true
             responses:
                 "200":
@@ -23,14 +23,276 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/api.dummy.v1.DummyReply'
+                                $ref: '#/components/schemas/TeamReply'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /v1/teams/list:
+        post:
+            tags:
+                - Teams
+            operationId: Teams_ListTeams
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/ListTeamsRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ListTeamsReply'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /v1/teams/{teamId}:
+        get:
+            tags:
+                - Teams
+            operationId: Teams_GetTeam
+            parameters:
+                - name: teamId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/TeamReply'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+        put:
+            tags:
+                - Teams
+            operationId: Teams_UpdateTeam
+            parameters:
+                - name: teamId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/UpdateTeamRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/TeamReply'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+        delete:
+            tags:
+                - Teams
+            operationId: Teams_DeleteTeam
+            parameters:
+                - name: teamId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/EmptyReply'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /v1/teams/{teamId}/tree:
+        get:
+            tags:
+                - Teams
+            operationId: Teams_GetTeamTree
+            parameters:
+                - name: teamId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/TeamReply'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
 components:
     schemas:
-        api.dummy.v1.DummyReply:
+        CreateTeamRequest:
+            type: object
+            properties:
+                name:
+                    type: string
+                description:
+                    type: string
+                tenantId:
+                    type: string
+                parentId:
+                    type: string
+        EmptyReply:
             type: object
             properties: {}
-        api.dummy.v1.DummyRequest:
+        GoogleProtobufAny:
             type: object
-            properties: {}
+            properties:
+                '@type':
+                    type: string
+                    description: The type of the serialized message.
+            additionalProperties: true
+            description: Contains an arbitrary serialized message along with a @type that describes the type of the serialized message.
+        ListTeamsReply:
+            type: object
+            properties:
+                teams:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/Team'
+                paginate:
+                    $ref: '#/components/schemas/PaginateReply'
+        ListTeamsRequest:
+            type: object
+            properties:
+                ownerId:
+                    type: string
+                parentId:
+                    type: string
+                paginate:
+                    $ref: '#/components/schemas/PaginateRequest'
+        PaginateReply:
+            type: object
+            properties:
+                total:
+                    type: integer
+                    format: int32
+                fromId:
+                    type: string
+                toId:
+                    type: string
+                fromDate:
+                    type: string
+                toDate:
+                    type: string
+                fromLabel:
+                    type: string
+        PaginateRequest:
+            type: object
+            properties:
+                limit:
+                    type: integer
+                    format: int32
+                fromId:
+                    type: string
+                toId:
+                    type: string
+                aroundId:
+                    type: string
+                fromDate:
+                    type: string
+                toDate:
+                    type: string
+                aroundDate:
+                    type: string
+                fromLabel:
+                    type: string
+                descending:
+                    type: boolean
+            description: '---------------------------------- Pagination ----------------------------------'
+        Status:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    description: The status code, which should be an enum value of [google.rpc.Code][google.rpc.Code].
+                    format: int32
+                message:
+                    type: string
+                    description: A developer-facing error message, which should be in English. Any user-facing error message should be localized and sent in the [google.rpc.Status.details][google.rpc.Status.details] field, or localized by the client.
+                details:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/GoogleProtobufAny'
+                    description: A list of messages that carry the error details.  There is a common set of message types for APIs to use.
+            description: 'The `Status` type defines a logical error model that is suitable for different programming environments, including REST APIs and RPC APIs. It is used by [gRPC](https://github.com/grpc). Each `Status` message contains three pieces of data: error code, error message, and error details. You can find out more about this error model and how to work with it in the [API Design Guide](https://cloud.google.com/apis/design/errors).'
+        Team:
+            type: object
+            properties:
+                id:
+                    type: string
+                ownerId:
+                    type: string
+                parentId:
+                    type: string
+                parentsIds:
+                    type: array
+                    items:
+                        type: string
+                name:
+                    type: string
+                description:
+                    type: string
+                tenantId:
+                    type: string
+                createdAt:
+                    type: string
+                updatedAt:
+                    type: string
+                subs:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/Team'
+        TeamReply:
+            type: object
+            properties:
+                team:
+                    $ref: '#/components/schemas/Team'
+                memberId:
+                    type: string
+        UpdateTeamRequest:
+            type: object
+            properties:
+                teamId:
+                    type: string
+                name:
+                    type: string
+                description:
+                    type: string
 tags:
-    - name: Dummy
+    - name: Teams

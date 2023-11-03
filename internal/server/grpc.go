@@ -1,8 +1,7 @@
 package server
 
 import (
-	permissions_v1 "rbac/api/permissions/v1"
-	roles_v1 "rbac/api/roles/v1"
+	"rbac/api/rbac/v1"
 	"rbac/internal/conf"
 	"rbac/internal/data"
 	"rbac/internal/service"
@@ -40,8 +39,8 @@ func NewGRPCServer(c *conf.Bootstrap, logger log.Logger, jwtp *data.JwtProcessor
 	}
 	srv := grpc.NewServer(opts...)
 
-	roles_v1.RegisterRolesServer(srv, roleSrvc)
-	permissions_v1.RegisterPermissionsServer(srv, permissionsSrvc)
+	v1.roles_v1.RegisterRolesServer(srv, roleSrvc)
+	v1.RegisterPermissionsServer(srv, permissionsSrvc)
 
 	return srv
 }

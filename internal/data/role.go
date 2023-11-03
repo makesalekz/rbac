@@ -4,7 +4,6 @@ import (
 	"context"
 	"rbac/ent"
 	"rbac/ent/role"
-	"time"
 )
 
 type UpdateRoleDto struct {
@@ -82,15 +81,7 @@ func (r *roleRepo) UpdateRole(ctx context.Context, roleId int64, roleDto UpdateR
 }
 
 func (r *roleRepo) DeleteRole(ctx context.Context, roleId int64) error {
-	role, err := r.db.Role.Get(ctx, roleId)
-	if err != nil {
-		return err
-	}
-	_, err = role.Update().SetDeletedAt(time.Now()).Save(ctx)
-	if err != nil {
-		return err
-	}
-	return nil
+	return r.db.Role.DeleteOneID(roleId).Exec(ctx)
 }
 
 func (r *roleRepo) GetRoleById(ctx context.Context, roleId int64) (*ent.Role, error) {
@@ -109,7 +100,6 @@ func (r *roleRepo) GetRolesList(ctx context.Context, teamId int64, name string) 
 	if teamId != 0 {
 		query = query.Where(role.TeamID(teamId))
 	}
-	query = query.Where(role.DeletedAtIsNil())
 	return query.All(ctx)
 }
 
@@ -142,7 +132,7 @@ func (r *roleRepo) AddPermissionToRole(ctx context.Context, roleId int64, permis
 }
 
 func (r *roleRepo) RemovePermissionFromRole(ctx context.Context, roleId int64, permissionId string) error {
-	return r.db.RolePermission.DeleteOne(ent.RolePermission{
+	return r.db.RolePermission.DeleteOne(&ent.RolePermission{
 		ID:           0,
 		RoleID:       roleId,
 		PermissionID: permissionId,

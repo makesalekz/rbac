@@ -43,7 +43,13 @@ func wireApp(bootstrap *conf.Bootstrap, logger log.Logger) (*kratos.App, func(),
 		return nil, nil, err
 	}
 	rolesService := service.NewRolesService(logger, jwtProcessor, rolesUsecase)
-	permissionsService := service.NewPermissionsService(logger, jwtProcessor)
+	permissionRepo := data.NewPermissionRepo(dataData)
+	permissionsUsecase, err := biz.NewPermissionUsecase(logger, config, permissionRepo)
+	if err != nil {
+		cleanup()
+		return nil, nil, err
+	}
+	permissionsService := service.NewPermissionsService(logger, jwtProcessor, permissionsUsecase)
 	grpcServer := server.NewGRPCServer(bootstrap, logger, jwtProcessor, rolesService, permissionsService)
 	httpServer := server.NewHTTPServer(bootstrap, logger, jwtProcessor, rolesService, permissionsService)
 	app := newApp(logger, config, grpcServer, httpServer)
