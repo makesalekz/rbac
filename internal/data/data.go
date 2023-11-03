@@ -19,7 +19,9 @@ var ProviderSet = wire.NewSet(
 	NewJwtProcessor,
 	NewNatsClient,
 	NewRoleRepo,
+	NewTeamsRepo,
 	NewPermissionRepo,
+	NewTeamIdentityRoleRepo,
 )
 
 // Data .
