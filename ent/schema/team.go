@@ -20,7 +20,7 @@ type Team struct {
 func (Team) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int64("id"),
-		field.Int64("taner_id"),
+		field.Int64("tenant_id"),
 		field.Int64("parent_id").Nillable().Optional(),
 		field.Other("parents_ids", &pgtype.Int8Array{}).
 			SchemaType(map[string]string{

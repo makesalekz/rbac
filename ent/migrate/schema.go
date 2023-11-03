@@ -97,7 +97,7 @@ var (
 	TeamsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt64, Increment: true},
 		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
-		{Name: "taner_id", Type: field.TypeInt64},
+		{Name: "tenant_id", Type: field.TypeInt64},
 		{Name: "parents_ids", Type: field.TypeOther, Nullable: true, SchemaType: map[string]string{"postgres": "bigint[]"}},
 		{Name: "name", Type: field.TypeString},
 		{Name: "description", Type: field.TypeString, Nullable: true, Default: ""},

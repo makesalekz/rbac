@@ -2206,8 +2206,8 @@ type TeamMutation struct {
 	typ             string
 	id              *int64
 	deleted_at      *time.Time
-	taner_id        *int64
-	addtaner_id     *int64
+	tenant_id       *int64
+	addtenant_id    *int64
 	parents_ids     **pgtype.Int8Array
 	name            *string
 	description     *string
@@ -2377,60 +2377,60 @@ func (m *TeamMutation) ResetDeletedAt() {
 	delete(m.clearedFields, team.FieldDeletedAt)
 }
 
-// SetTanerID sets the "taner_id" field.
-func (m *TeamMutation) SetTanerID(i int64) {
-	m.taner_id = &i
-	m.addtaner_id = nil
+// SetTenantID sets the "tenant_id" field.
+func (m *TeamMutation) SetTenantID(i int64) {
+	m.tenant_id = &i
+	m.addtenant_id = nil
 }
 
-// TanerID returns the value of the "taner_id" field in the mutation.
-func (m *TeamMutation) TanerID() (r int64, exists bool) {
-	v := m.taner_id
+// TenantID returns the value of the "tenant_id" field in the mutation.
+func (m *TeamMutation) TenantID() (r int64, exists bool) {
+	v := m.tenant_id
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldTanerID returns the old "taner_id" field's value of the Team entity.
+// OldTenantID returns the old "tenant_id" field's value of the Team entity.
 // If the Team object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *TeamMutation) OldTanerID(ctx context.Context) (v int64, err error) {
+func (m *TeamMutation) OldTenantID(ctx context.Context) (v int64, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldTanerID is only allowed on UpdateOne operations")
+		return v, errors.New("OldTenantID is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldTanerID requires an ID field in the mutation")
+		return v, errors.New("OldTenantID requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldTanerID: %w", err)
+		return v, fmt.Errorf("querying old value for OldTenantID: %w", err)
 	}
-	return oldValue.TanerID, nil
+	return oldValue.TenantID, nil
 }
 
-// AddTanerID adds i to the "taner_id" field.
-func (m *TeamMutation) AddTanerID(i int64) {
-	if m.addtaner_id != nil {
-		*m.addtaner_id += i
+// AddTenantID adds i to the "tenant_id" field.
+func (m *TeamMutation) AddTenantID(i int64) {
+	if m.addtenant_id != nil {
+		*m.addtenant_id += i
 	} else {
-		m.addtaner_id = &i
+		m.addtenant_id = &i
 	}
 }
 
-// AddedTanerID returns the value that was added to the "taner_id" field in this mutation.
-func (m *TeamMutation) AddedTanerID() (r int64, exists bool) {
-	v := m.addtaner_id
+// AddedTenantID returns the value that was added to the "tenant_id" field in this mutation.
+func (m *TeamMutation) AddedTenantID() (r int64, exists bool) {
+	v := m.addtenant_id
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// ResetTanerID resets all changes to the "taner_id" field.
-func (m *TeamMutation) ResetTanerID() {
-	m.taner_id = nil
-	m.addtaner_id = nil
+// ResetTenantID resets all changes to the "tenant_id" field.
+func (m *TeamMutation) ResetTenantID() {
+	m.tenant_id = nil
+	m.addtenant_id = nil
 }
 
 // SetParentID sets the "parent_id" field.
@@ -2806,8 +2806,8 @@ func (m *TeamMutation) Fields() []string {
 	if m.deleted_at != nil {
 		fields = append(fields, team.FieldDeletedAt)
 	}
-	if m.taner_id != nil {
-		fields = append(fields, team.FieldTanerID)
+	if m.tenant_id != nil {
+		fields = append(fields, team.FieldTenantID)
 	}
 	if m.parent != nil {
 		fields = append(fields, team.FieldParentID)
@@ -2837,8 +2837,8 @@ func (m *TeamMutation) Field(name string) (ent.Value, bool) {
 	switch name {
 	case team.FieldDeletedAt:
 		return m.DeletedAt()
-	case team.FieldTanerID:
-		return m.TanerID()
+	case team.FieldTenantID:
+		return m.TenantID()
 	case team.FieldParentID:
 		return m.ParentID()
 	case team.FieldParentsIds:
@@ -2862,8 +2862,8 @@ func (m *TeamMutation) OldField(ctx context.Context, name string) (ent.Value, er
 	switch name {
 	case team.FieldDeletedAt:
 		return m.OldDeletedAt(ctx)
-	case team.FieldTanerID:
-		return m.OldTanerID(ctx)
+	case team.FieldTenantID:
+		return m.OldTenantID(ctx)
 	case team.FieldParentID:
 		return m.OldParentID(ctx)
 	case team.FieldParentsIds:
@@ -2892,12 +2892,12 @@ func (m *TeamMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetDeletedAt(v)
 		return nil
-	case team.FieldTanerID:
+	case team.FieldTenantID:
 		v, ok := value.(int64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetTanerID(v)
+		m.SetTenantID(v)
 		return nil
 	case team.FieldParentID:
 		v, ok := value.(int64)
@@ -2949,8 +2949,8 @@ func (m *TeamMutation) SetField(name string, value ent.Value) error {
 // this mutation.
 func (m *TeamMutation) AddedFields() []string {
 	var fields []string
-	if m.addtaner_id != nil {
-		fields = append(fields, team.FieldTanerID)
+	if m.addtenant_id != nil {
+		fields = append(fields, team.FieldTenantID)
 	}
 	return fields
 }
@@ -2960,8 +2960,8 @@ func (m *TeamMutation) AddedFields() []string {
 // was not set, or was not defined in the schema.
 func (m *TeamMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
-	case team.FieldTanerID:
-		return m.AddedTanerID()
+	case team.FieldTenantID:
+		return m.AddedTenantID()
 	}
 	return nil, false
 }
@@ -2971,12 +2971,12 @@ func (m *TeamMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *TeamMutation) AddField(name string, value ent.Value) error {
 	switch name {
-	case team.FieldTanerID:
+	case team.FieldTenantID:
 		v, ok := value.(int64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.AddTanerID(v)
+		m.AddTenantID(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Team numeric field %s", name)
@@ -3035,8 +3035,8 @@ func (m *TeamMutation) ResetField(name string) error {
 	case team.FieldDeletedAt:
 		m.ResetDeletedAt()
 		return nil
-	case team.FieldTanerID:
-		m.ResetTanerID()
+	case team.FieldTenantID:
+		m.ResetTenantID()
 		return nil
 	case team.FieldParentID:
 		m.ResetParentID()

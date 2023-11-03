@@ -3,6 +3,7 @@ package biz
 import (
 	"context"
 	_ "embed"
+	rbacv1 "rbac/api/rbac/v1"
 
 	"rbac/ent"
 	"rbac/internal/data"
@@ -40,6 +41,10 @@ func (uc *PermissionsUsecase) UpdatePermission(ctx context.Context, permissionId
 }
 
 func (uc *PermissionsUsecase) DeletePermission(ctx context.Context, permissionId string) error {
+	_, err := uc.GetPermissionById(ctx, permissionId)
+	if err != nil {
+		return rbacv1.ErrorNotFound("Permission with given ID not found")
+	}
 	return uc.permissionRepo.DeletePermission(ctx, permissionId)
 }
 

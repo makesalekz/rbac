@@ -86,7 +86,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 		Type: "Team",
 		Fields: map[string]*sqlgraph.FieldSpec{
 			team.FieldDeletedAt:   {Type: field.TypeTime, Column: team.FieldDeletedAt},
-			team.FieldTanerID:     {Type: field.TypeInt64, Column: team.FieldTanerID},
+			team.FieldTenantID:    {Type: field.TypeInt64, Column: team.FieldTenantID},
 			team.FieldParentID:    {Type: field.TypeInt64, Column: team.FieldParentID},
 			team.FieldParentsIds:  {Type: field.TypeOther, Column: team.FieldParentsIds},
 			team.FieldName:        {Type: field.TypeString, Column: team.FieldName},
@@ -518,9 +518,9 @@ func (f *TeamFilter) WhereDeletedAt(p entql.TimeP) {
 	f.Where(p.Field(team.FieldDeletedAt))
 }
 
-// WhereTanerID applies the entql int64 predicate on the taner_id field.
-func (f *TeamFilter) WhereTanerID(p entql.Int64P) {
-	f.Where(p.Field(team.FieldTanerID))
+// WhereTenantID applies the entql int64 predicate on the tenant_id field.
+func (f *TeamFilter) WhereTenantID(p entql.Int64P) {
+	f.Where(p.Field(team.FieldTenantID))
 }
 
 // WhereParentID applies the entql int64 predicate on the parent_id field.
