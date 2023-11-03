@@ -40,7 +40,7 @@ service Roles {
       body: "*"
     };
   };
-  rpc AddPermissionToRole (AddPermissionToRoleRequest) returns (AddPermissionToRoleReply){
+  rpc AddPermissionToRole (AddPermissionToRoleRequest) returns (RolePermissionReply){
     option (google.api.http) = {
       post: "/v1/rbac/roles/{roleId}/permissions"
       body: "*"
@@ -96,7 +96,7 @@ message AddPermissionToRoleRequest {
   repeated string fields = 5;
 }
 
-message AddPermissionToRoleReply {
+message RolePermissionReply {
   RoleReply role = 1;
   PermissionReply permission = 2;
   int64 tenantId = 3;
@@ -116,9 +116,5 @@ message RolesPermissionsRequest {
 }
 
 message RolesPermissionsReply {
-  RoleReply role = 1;
-  int64 tenantId = 2;
-  optional bool deny = 3;
-  repeated string fields = 4;
-  repeated PermissionReply permissions = 5;
+  repeated RolePermissionReply permissions = 1;
 }

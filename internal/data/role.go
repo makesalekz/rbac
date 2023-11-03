@@ -4,6 +4,7 @@ import (
 	"context"
 	"rbac/ent"
 	"rbac/ent/role"
+	"rbac/ent/rolepermission"
 )
 
 type UpdateRoleDto struct {
@@ -14,7 +15,15 @@ type UpdateRoleDto struct {
 type CreateRoleDto struct {
 	Name        string
 	Description string
-	TeamId      int64
+	TenantId    int64
+}
+
+type CreateRolePermissionDto struct {
+	RoleId       int64
+	PermissionId string
+	TenantId     int64
+	Deny         bool
+	Fields       []string
 }
 
 // RoleRepo
@@ -25,9 +34,9 @@ type RoleRepo interface {
 	GetRoleById(ctx context.Context, roleId int64) (*ent.Role, error)
 	GetRoleByIds(ctx context.Context, ids []int64) ([]*ent.Role, error)
 	GetRolesList(ctx context.Context, teamId int64, name string) ([]*ent.Role, error)
-	AddPermissionToRole(ctx context.Context, roleId int64, permissionId string, fields []string) (*ent.Permission, error)
-	RemovePermissionFromRole(ctx context.Context, roleId int64, permissionId string) error
-	ListRolePermissions(ctx context.Context, roleId int64) ([]*ent.Permission, error)
+	AddPermissionToRole(ctx context.Context, dto CreateRolePermissionDto) (*ent.RolePermission, error)
+	RemovePermissionFromRole(ctx context.Context, roleId, tenantId int64, permissionId string) error
+	ListRolePermissions(ctx context.Context, roleId, tenantId int64) ([]*ent.RolePermission, error)
 }
 
 type roleRepo struct {
@@ -62,7 +71,7 @@ func (r *roleRepo) CreateRole(ctx context.Context, roleDto CreateRoleDto) (*ent.
 	return r.db.Role.Create().
 		SetName(roleDto.Name).
 		SetDescription(roleDto.Description).
-		SetTeamID(roleDto.TeamId).Save(ctx)
+		SetTenantID(roleDto.TenantId).Save(ctx)
 }
 
 func (r *roleRepo) UpdateRole(ctx context.Context, roleId int64, roleDto UpdateRoleDto) (*ent.Role, error) {
@@ -92,55 +101,66 @@ func (r *roleRepo) GetRoleByIds(ctx context.Context, ids []int64) ([]*ent.Role, 
 	return r.db.Role.Query().Where(role.IDIn(ids...)).All(ctx)
 }
 
-func (r *roleRepo) GetRolesList(ctx context.Context, teamId int64, name string) ([]*ent.Role, error) {
+func (r *roleRepo) GetRolesList(ctx context.Context, tenantId int64, name string) ([]*ent.Role, error) {
 	query := r.db.Role.Query()
 	if name != "" {
 		query = query.Where(role.NameContains(name))
 	}
-	if teamId != 0 {
-		query = query.Where(role.TeamID(teamId))
+	if tenantId != 0 {
+		query = query.Where(role.TenantID(tenantId))
 	}
 	return query.All(ctx)
 }
 
-func (r *roleRepo) AddPermissionToRole(ctx context.Context, roleId int64, permissionId string, fields []string) (*ent.Permission, error) {
+func (r *roleRepo) AddPermissionToRole(ctx context.Context, dto CreateRolePermissionDto) (*ent.RolePermission, error) {
 	// check if role exists
-	role, err := r.db.Role.Get(ctx, roleId)
+	role, err := r.db.Role.Get(ctx, dto.RoleId)
 	if err != nil {
 		return nil, err
 	}
 	// check if permission exists
-	permission, err := r.db.Permission.Get(ctx, permissionId)
+	permission, err := r.db.Permission.Get(ctx, dto.PermissionId)
 	if err != nil {
 		return nil, err
 	}
 
-	isValid := validateFields(permission.Fields, fields)
+	isValid := validateFields(permission.Fields, dto.Fields)
 	if !isValid {
 		panic("Invalid fields")
 	}
 
-	_, err = r.db.RolePermission.Create().
-		SetFields(fields).
+	rolePermissionSave, err := r.db.RolePermission.Create().
+		SetFields(dto.Fields).
 		SetRole(role).
 		SetPermission(permission).
+		SetTenantID(dto.TenantId).
+		SetDeny(dto.Deny).
 		Save(ctx)
 	if err != nil {
 		return nil, err
 	}
-	return permission, nil
+	if err != nil {
+		return nil, err
+	}
+	return rolePermissionSave, nil
 }
 
-func (r *roleRepo) RemovePermissionFromRole(ctx context.Context, roleId int64, permissionId string) error {
+func (r *roleRepo) RemovePermissionFromRole(ctx context.Context, roleId, tenantId int64, permissionId string) error {
 	return r.db.RolePermission.DeleteOne(&ent.RolePermission{
-		ID:           0,
 		RoleID:       roleId,
 		PermissionID: permissionId,
+		TenantID:     tenantId,
 	}).Exec(ctx)
 }
 
-func (r *roleRepo) ListRolePermissions(ctx context.Context, roleId int64) ([]*ent.Permission, error) {
-	query := r.db.Role.Query().Where(role.ID(roleId)).QueryPermissions()
+func (r *roleRepo) ListRolePermissions(ctx context.Context, roleId, tenantId int64) ([]*ent.RolePermission, error) {
+	query := r.db.RolePermission.
+		Query().
+		Where(
+			rolepermission.HasRoleWith(role.ID(roleId)),
+			rolepermission.TenantIDEQ(tenantId),
+		)
+
 	return query.All(ctx)
 }
 

@@ -3,19 +3,19 @@
 
 openapi: 3.0.3
 info:
-    title: Teams API
+    title: Roles API
     version: 0.0.1
 paths:
-    /v1/teams:
+    /v1/rbac/roles:
         post:
             tags:
-                - Teams
-            operationId: Teams_CreateTeam
+                - Roles
+            operationId: Roles_CreateRole
             requestBody:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateTeamRequest'
+                            $ref: '#/components/schemas/CreateRoleRequest'
                 required: true
             responses:
                 "200":
@@ -23,23 +23,23 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/TeamReply'
+                                $ref: '#/components/schemas/RoleReply'
                 default:
                     description: Default error response
                     content:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/Status'
-    /v1/teams/list:
+    /v1/rbac/roles/list:
         post:
             tags:
-                - Teams
-            operationId: Teams_ListTeams
+                - Roles
+            operationId: Roles_ListRoles
             requestBody:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/ListTeamsRequest'
+                            $ref: '#/components/schemas/ListRolesRequest'
                 required: true
             responses:
                 "200":
@@ -47,20 +47,20 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/ListTeamsReply'
+                                $ref: '#/components/schemas/ListRolesReply'
                 default:
                     description: Default error response
                     content:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/Status'
-    /v1/teams/{teamId}:
+    /v1/rbac/roles/{roleId}:
         get:
             tags:
-                - Teams
-            operationId: Teams_GetTeam
+                - Roles
+            operationId: Roles_GetRole
             parameters:
-                - name: teamId
+                - name: roleId
                   in: path
                   required: true
                   schema:
@@ -71,7 +71,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/TeamReply'
+                                $ref: '#/components/schemas/RoleReply'
                 default:
                     description: Default error response
                     content:
@@ -80,10 +80,10 @@ paths:
                                 $ref: '#/components/schemas/Status'
         put:
             tags:
-                - Teams
-            operationId: Teams_UpdateTeam
+                - Roles
+            operationId: Roles_UpdateRole
             parameters:
-                - name: teamId
+                - name: roleId
                   in: path
                   required: true
                   schema:
@@ -92,7 +92,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/UpdateTeamRequest'
+                            $ref: '#/components/schemas/UpdateRoleRequest'
                 required: true
             responses:
                 "200":
@@ -100,7 +100,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/TeamReply'
+                                $ref: '#/components/schemas/RoleReply'
                 default:
                     description: Default error response
                     content:
@@ -109,10 +109,10 @@ paths:
                                 $ref: '#/components/schemas/Status'
         delete:
             tags:
-                - Teams
-            operationId: Teams_DeleteTeam
+                - Roles
+            operationId: Roles_DeleteRole
             parameters:
-                - name: teamId
+                - name: roleId
                   in: path
                   required: true
                   schema:
@@ -130,15 +130,54 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/Status'
-    /v1/teams/{teamId}/tree:
-        get:
+    /v1/rbac/roles/{roleId}/permissions:
+        post:
             tags:
-                - Teams
-            operationId: Teams_GetTeamTree
+                - Roles
+            operationId: Roles_ListRolePermissions
             parameters:
-                - name: teamId
+                - name: roleId
                   in: path
                   required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/RolesPermissionsRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/RolesPermissionsReply'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /v1/rbac/roles/{roleId}/permissions/{permissionId}:
+        delete:
+            tags:
+                - Roles
+            operationId: Roles_RemovePermissionFromRole
+            parameters:
+                - name: roleId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+                - name: permissionId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+                - name: tenantId
+                  in: query
                   schema:
                     type: string
             responses:
@@ -147,7 +186,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/TeamReply'
+                                $ref: '#/components/schemas/EmptyReply'
                 default:
                     description: Default error response
                     content:
@@ -156,7 +195,22 @@ paths:
                                 $ref: '#/components/schemas/Status'
 components:
     schemas:
-        CreateTeamRequest:
+        AddPermissionToRoleRequest:
+            type: object
+            properties:
+                roleId:
+                    type: string
+                permissionId:
+                    type: string
+                tenantId:
+                    type: string
+                deny:
+                    type: boolean
+                fields:
+                    type: array
+                    items:
+                        type: string
+        CreateRoleRequest:
             type: object
             properties:
                 name:
@@ -164,8 +218,6 @@ components:
                 description:
                     type: string
                 tenantId:
-                    type: string
-                parentId:
                     type: string
         EmptyReply:
             type: object
@@ -178,63 +230,83 @@ components:
                     description: The type of the serialized message.
             additionalProperties: true
             description: Contains an arbitrary serialized message along with a @type that describes the type of the serialized message.
-        ListTeamsReply:
+        ListRolesReply:
             type: object
             properties:
-                teams:
+                roles:
                     type: array
                     items:
-                        $ref: '#/components/schemas/Team'
-                paginate:
-                    $ref: '#/components/schemas/PaginateReply'
-        ListTeamsRequest:
+                        $ref: '#/components/schemas/RoleReply'
+        ListRolesRequest:
             type: object
             properties:
-                ownerId:
+                tenantId:
                     type: string
-                parentId:
+                name:
                     type: string
-                paginate:
-                    $ref: '#/components/schemas/PaginateRequest'
-        PaginateReply:
+        PermissionReply:
             type: object
             properties:
-                total:
-                    type: integer
-                    format: int32
-                fromId:
+                id:
                     type: string
-                toId:
+                name:
                     type: string
-                fromDate:
+                description:
                     type: string
-                toDate:
+                appId:
                     type: string
-                fromLabel:
-                    type: string
-        PaginateRequest:
+                fields:
+                    type: array
+                    items:
+                        type: string
+        RolePermissionReply:
             type: object
             properties:
-                limit:
-                    type: integer
-                    format: int32
-                fromId:
+                role:
+                    $ref: '#/components/schemas/RoleReply'
+                permission:
+                    $ref: '#/components/schemas/PermissionReply'
+                tenantId:
                     type: string
-                toId:
-                    type: string
-                aroundId:
-                    type: string
-                fromDate:
-                    type: string
-                toDate:
-                    type: string
-                aroundDate:
-                    type: string
-                fromLabel:
-                    type: string
-                descending:
+                deny:
                     type: boolean
-            description: '---------------------------------- Pagination ----------------------------------'
+                fields:
+                    type: array
+                    items:
+                        type: string
+        RoleReply:
+            type: object
+            properties:
+                id:
+                    type: string
+                name:
+                    type: string
+                description:
+                    type: string
+                tenantId:
+                    type: string
+                isSystem:
+                    type: boolean
+                createdAt:
+                    type: string
+                updatedAt:
+                    type: string
+                deletedAt:
+                    type: string
+        RolesPermissionsReply:
+            type: object
+            properties:
+                permissions:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/RolePermissionReply'
+        RolesPermissionsRequest:
+            type: object
+            properties:
+                roleId:
+                    type: string
+                tenantId:
+                    type: string
         Status:
             type: object
             properties:
@@ -251,48 +323,14 @@ components:
                         $ref: '#/components/schemas/GoogleProtobufAny'
                     description: A list of messages that carry the error details.  There is a common set of message types for APIs to use.
             description: 'The `Status` type defines a logical error model that is suitable for different programming environments, including REST APIs and RPC APIs. It is used by [gRPC](https://github.com/grpc). Each `Status` message contains three pieces of data: error code, error message, and error details. You can find out more about this error model and how to work with it in the [API Design Guide](https://cloud.google.com/apis/design/errors).'
-        Team:
+        UpdateRoleRequest:
             type: object
             properties:
-                id:
-                    type: string
-                ownerId:
-                    type: string
-                parentId:
-                    type: string
-                parentsIds:
-                    type: array
-                    items:
-                        type: string
-                name:
-                    type: string
-                description:
-                    type: string
-                tenantId:
-                    type: string
-                createdAt:
-                    type: string
-                updatedAt:
-                    type: string
-                subs:
-                    type: array
-                    items:
-                        $ref: '#/components/schemas/Team'
-        TeamReply:
-            type: object
-            properties:
-                team:
-                    $ref: '#/components/schemas/Team'
-                memberId:
-                    type: string
-        UpdateTeamRequest:
-            type: object
-            properties:
-                teamId:
+                roleId:
                     type: string
                 name:
                     type: string
                 description:
                     type: string
 tags:
-    - name: Teams
+    - name: Roles
