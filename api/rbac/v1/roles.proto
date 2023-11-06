@@ -2,7 +2,7 @@
 syntax = "proto3";
 
 import "google/api/annotations.proto";
-import "api/rbac/v1/models.proto";
+import "rbac/v1/models.proto";
 
 package api.rbac.v1;
 
