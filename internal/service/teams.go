@@ -124,7 +124,7 @@ func (s *TeamsService) GetTeamTree(ctx context.Context, req *v1.TeamRequest) (*v
 
 func (s *TeamsService) ListTeams(ctx context.Context, req *v1.ListTeamsRequest) (*v1.ListTeamsReply, error) {
 	list, err := s.tu.ListTeams(ctx, data.TeamsListFilter{
-		TenantId: req.OwnerId,
+		TenantId: req.TenantId,
 		ParentId: req.ParentId,
 	}, req.Paginate)
 	if err != nil {
