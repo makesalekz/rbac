@@ -13,7 +13,7 @@ import (
 )
 
 type TeamDto struct {
-	OwnerId     int64
+	TenantId    int64
 	Name        string
 	Description string
 	ParentId    int64
@@ -29,7 +29,7 @@ type TeamsListFilter struct {
 type TeamsRepo interface {
 	CreateTeam(ctx context.Context, dto TeamDto) (*ent.Team, error)
 	UpdateTeam(ctx context.Context, teamId int64, dto TeamDto) (*ent.Team, error)
-	DeleteTeam(ctx context.Context, teamId, ownerId int64) error
+	DeleteTeam(ctx context.Context, teamId, tenantId int64) error
 	GetTeam(ctx context.Context, teamId int64, getTree bool) (*ent.Team, error)
 	ListTeams(ctx context.Context, filter TeamsListFilter, paginate *teams_v1.PaginateRequest) ([]*ent.Team, error)
 	CountListTeams(ctx context.Context, filter TeamsListFilter) (int32, error)
@@ -58,7 +58,7 @@ func (r *teamsRepo) CreateTeam(ctx context.Context, dto TeamDto) (*ent.Team, err
 	}()
 
 	query := tx.Team.Create().
-		SetTenantID(dto.OwnerId).
+		SetTenantID(dto.TenantId).
 		SetName(dto.Name).
 		SetDescription(dto.Description)
 
@@ -93,14 +93,14 @@ func (r *teamsRepo) CreateTeam(ctx context.Context, dto TeamDto) (*ent.Team, err
 
 func (r *teamsRepo) UpdateTeam(ctx context.Context, teamId int64, dto TeamDto) (*ent.Team, error) {
 	return r.db.Team.UpdateOneID(teamId).
-		Where(team.TenantID(dto.OwnerId)).
+		Where(team.TenantID(dto.TenantId)).
 		SetName(dto.Name).
 		SetDescription(dto.Description).
 		Save(ctx)
 }
 
-func (r *teamsRepo) DeleteTeam(ctx context.Context, teamId, ownerId int64) error {
-	return r.db.Team.DeleteOneID(teamId).Where(team.TenantID(ownerId)).Exec(ctx)
+func (r *teamsRepo) DeleteTeam(ctx context.Context, teamId, tenantId int64) error {
+	return r.db.Team.DeleteOneID(teamId).Where(team.TenantID(tenantId)).Exec(ctx)
 }
 
 func (r *teamsRepo) GetTeam(ctx context.Context, teamId int64, getTree bool) (*ent.Team, error) {

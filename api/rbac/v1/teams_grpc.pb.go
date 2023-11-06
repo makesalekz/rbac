@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.3.0
 // - protoc             v4.24.4
-// source: api/rbac/v1/teams.proto
+// source: rbac/v1/teams.proto
 
 package rbac_v1
 
@@ -290,5 +290,5 @@ var Teams_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "api/rbac/v1/teams.proto",
+	Metadata: "rbac/v1/teams.proto",
 }

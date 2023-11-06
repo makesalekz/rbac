@@ -59,7 +59,7 @@ func (s *TeamsService) CreateTeam(ctx context.Context, req *v1.CreateTeamRequest
 		ParentId:    req.ParentId,
 	})
 	if err != nil {
-		return nil, err
+		return nil, v1.ErrorUnauthorized("Unauthorized")
 	}
 	return &v1.TeamReply{
 		Team: replyTeam(team),

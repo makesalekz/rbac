@@ -712,12 +712,16 @@ func (u *TeamUpsertOne) IDX(ctx context.Context) int64 {
 // TeamCreateBulk is the builder for creating many Team entities in bulk.
 type TeamCreateBulk struct {
 	config
+	err      error
 	builders []*TeamCreate
 	conflict []sql.ConflictOption
 }
 
 // Save creates the Team entities in the database.
 func (tcb *TeamCreateBulk) Save(ctx context.Context) ([]*Team, error) {
+	if tcb.err != nil {
+		return nil, tcb.err
+	}
 	specs := make([]*sqlgraph.CreateSpec, len(tcb.builders))
 	nodes := make([]*Team, len(tcb.builders))
 	mutators := make([]Mutator, len(tcb.builders))
@@ -1035,6 +1039,9 @@ func (u *TeamUpsertBulk) UpdateUpdatedAt() *TeamUpsertBulk {
 
 // Exec executes the query.
 func (u *TeamUpsertBulk) Exec(ctx context.Context) error {
+	if u.create.err != nil {
+		return u.create.err
+	}
 	for i, b := range u.create.builders {
 		if len(b.conflict) != 0 {
 			return fmt.Errorf("ent: OnConflict was set for builder %d. Set it on the TeamCreateBulk instead", i)

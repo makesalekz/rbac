@@ -38,19 +38,21 @@ func NewTeamsUsecase(logger log.Logger, c *data.Config, jwt *data.JwtProcessor, 
 }
 
 func (uc *TeamsUsecase) CreateTeam(ctx context.Context, dto data.TeamDto) (*ent.Team, error) {
-	userId, ok := uc.jwt.GetUserIdFromContext(ctx)
+	userID, tenant, ok := uc.jwt.GetTenantClaimsFromContext(ctx)
 	if !ok {
 		return nil, v1.ErrorUnauthorized("Unauthorized")
 	}
 
-	dto.OwnerId = userId
+	if dto.TenantId == 0 {
+		dto.TenantId = tenant.TenantId
+	}
 
 	if dto.ParentId != 0 {
 		parentTeam, err := uc.repo.GetTeam(ctx, dto.ParentId, false)
 		if err != nil {
 			return nil, err
 		}
-		dto.OwnerId = parentTeam.TenantID
+		dto.TenantId = parentTeam.TenantID
 
 		var parentsIds []int64
 		parentTeam.ParentsIds.AssignTo(&parentsIds)
@@ -65,7 +67,7 @@ func (uc *TeamsUsecase) CreateTeam(ctx context.Context, dto data.TeamDto) (*ent.
 			}
 
 			// TODO: use rbac
-			if orgTeam.TenantID != userId {
+			if orgTeam.TenantID != userID {
 				return nil, v1.ErrorForbidden("Forbidden")
 			}
 		}
@@ -75,23 +77,25 @@ func (uc *TeamsUsecase) CreateTeam(ctx context.Context, dto data.TeamDto) (*ent.
 }
 
 func (uc *TeamsUsecase) UpdateTeam(ctx context.Context, teamId int64, dto data.TeamDto) (*ent.Team, error) {
-	userId, ok := uc.jwt.GetUserIdFromContext(ctx)
+	_, tenant, ok := uc.jwt.GetTenantClaimsFromContext(ctx)
 	if !ok {
 		return nil, v1.ErrorUnauthorized("Unauthorized")
 	}
 
-	dto.OwnerId = userId
+	if dto.TenantId == 0 {
+		dto.TenantId = tenant.TenantId
+	}
 
 	return uc.repo.UpdateTeam(ctx, teamId, dto)
 }
 
 func (uc *TeamsUsecase) DeleteTeam(ctx context.Context, teamId int64) error {
-	userId, ok := uc.jwt.GetUserIdFromContext(ctx)
+	_, tenant, ok := uc.jwt.GetTenantClaimsFromContext(ctx)
 	if !ok {
 		return v1.ErrorUnauthorized("Unauthorized")
 	}
 
-	return uc.repo.DeleteTeam(ctx, teamId, userId)
+	return uc.repo.DeleteTeam(ctx, teamId, tenant.TenantId)
 }
 
 func (uc *TeamsUsecase) GetTeam(ctx context.Context, teamId int64, getTree bool) (*ent.Team, error) {
