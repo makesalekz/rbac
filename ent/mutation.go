@@ -1844,6 +1844,7 @@ func (m *RolePermissionMutation) ResetFields() {
 // ClearRole clears the "role" edge to the Role entity.
 func (m *RolePermissionMutation) ClearRole() {
 	m.clearedrole = true
+	m.clearedFields[rolepermission.FieldRoleID] = struct{}{}
 }
 
 // RoleCleared reports if the "role" edge to the Role entity was cleared.
@@ -1870,6 +1871,7 @@ func (m *RolePermissionMutation) ResetRole() {
 // ClearPermission clears the "permission" edge to the Permission entity.
 func (m *RolePermissionMutation) ClearPermission() {
 	m.clearedpermission = true
+	m.clearedFields[rolepermission.FieldPermissionID] = struct{}{}
 }
 
 // PermissionCleared reports if the "permission" edge to the Permission entity was cleared.
@@ -2691,6 +2693,7 @@ func (m *TeamMutation) ResetUpdatedAt() {
 // ClearParent clears the "parent" edge to the Team entity.
 func (m *TeamMutation) ClearParent() {
 	m.clearedparent = true
+	m.clearedFields[team.FieldParentID] = struct{}{}
 }
 
 // ParentCleared reports if the "parent" edge to the Team entity was cleared.
@@ -3467,6 +3470,7 @@ func (m *TeamIdentityRoleMutation) ResetRoleID() {
 // ClearRole clears the "role" edge to the Role entity.
 func (m *TeamIdentityRoleMutation) ClearRole() {
 	m.clearedrole = true
+	m.clearedFields[teamidentityrole.FieldRoleID] = struct{}{}
 }
 
 // RoleCleared reports if the "role" edge to the Role entity was cleared.
@@ -3493,6 +3497,7 @@ func (m *TeamIdentityRoleMutation) ResetRole() {
 // ClearTeam clears the "team" edge to the Team entity.
 func (m *TeamIdentityRoleMutation) ClearTeam() {
 	m.clearedteam = true
+	m.clearedFields[teamidentityrole.FieldTeamID] = struct{}{}
 }
 
 // TeamCleared reports if the "team" edge to the Team entity was cleared.

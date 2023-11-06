@@ -3,19 +3,19 @@
 
 openapi: 3.0.3
 info:
-    title: Roles API
+    title: Permissions API
     version: 0.0.1
 paths:
-    /v1/rbac/roles:
+    /v1/rbac/permissions:
         post:
             tags:
-                - Roles
-            operationId: Roles_CreateRole
+                - Permissions
+            operationId: Permissions_CreatePermission
             requestBody:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateRoleRequest'
+                            $ref: '#/components/schemas/CreatePermissionRequest'
                 required: true
             responses:
                 "200":
@@ -23,23 +23,23 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/RoleReply'
+                                $ref: '#/components/schemas/PermissionReply'
                 default:
                     description: Default error response
                     content:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/Status'
-    /v1/rbac/roles/list:
+    /v1/rbac/permissions/list:
         post:
             tags:
-                - Roles
-            operationId: Roles_ListRoles
+                - Permissions
+            operationId: Permissions_ListPermissions
             requestBody:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/ListRolesRequest'
+                            $ref: '#/components/schemas/ListPermissionsRequest'
                 required: true
             responses:
                 "200":
@@ -47,20 +47,20 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/ListRolesReply'
+                                $ref: '#/components/schemas/ListPermissionsReply'
                 default:
                     description: Default error response
                     content:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/Status'
-    /v1/rbac/roles/{roleId}:
+    /v1/rbac/permissions/{permissionId}:
         get:
             tags:
-                - Roles
-            operationId: Roles_GetRole
+                - Permissions
+            operationId: Permissions_GetPermission
             parameters:
-                - name: roleId
+                - name: permissionId
                   in: path
                   required: true
                   schema:
@@ -71,7 +71,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/RoleReply'
+                                $ref: '#/components/schemas/PermissionReply'
                 default:
                     description: Default error response
                     content:
@@ -80,104 +80,41 @@ paths:
                                 $ref: '#/components/schemas/Status'
         put:
             tags:
-                - Roles
-            operationId: Roles_UpdateRole
+                - Permissions
+            operationId: Permissions_UpdatePermission
             parameters:
-                - name: roleId
-                  in: path
-                  required: true
-                  schema:
-                    type: string
-            requestBody:
-                content:
-                    application/json:
-                        schema:
-                            $ref: '#/components/schemas/UpdateRoleRequest'
-                required: true
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/RoleReply'
-                default:
-                    description: Default error response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Status'
-        delete:
-            tags:
-                - Roles
-            operationId: Roles_DeleteRole
-            parameters:
-                - name: roleId
-                  in: path
-                  required: true
-                  schema:
-                    type: string
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/EmptyReply'
-                default:
-                    description: Default error response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Status'
-    /v1/rbac/roles/{roleId}/permissions:
-        post:
-            tags:
-                - Roles
-            operationId: Roles_ListRolePermissions
-            parameters:
-                - name: roleId
-                  in: path
-                  required: true
-                  schema:
-                    type: string
-            requestBody:
-                content:
-                    application/json:
-                        schema:
-                            $ref: '#/components/schemas/RolesPermissionsRequest'
-                required: true
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/RolesPermissionsReply'
-                default:
-                    description: Default error response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Status'
-    /v1/rbac/roles/{roleId}/permissions/{permissionId}:
-        delete:
-            tags:
-                - Roles
-            operationId: Roles_RemovePermissionFromRole
-            parameters:
-                - name: roleId
-                  in: path
-                  required: true
-                  schema:
-                    type: string
                 - name: permissionId
                   in: path
                   required: true
                   schema:
                     type: string
-                - name: tenantId
-                  in: query
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/UpdatePermissionRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/PermissionReply'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+        delete:
+            tags:
+                - Permissions
+            operationId: Permissions_DeletePermission
+            parameters:
+                - name: permissionId
+                  in: path
+                  required: true
                   schema:
                     type: string
             responses:
@@ -195,30 +132,21 @@ paths:
                                 $ref: '#/components/schemas/Status'
 components:
     schemas:
-        AddPermissionToRoleRequest:
+        CreatePermissionRequest:
             type: object
             properties:
-                roleId:
+                id:
                     type: string
-                permissionId:
+                appId:
                     type: string
-                tenantId:
-                    type: string
-                deny:
-                    type: boolean
-                fields:
-                    type: array
-                    items:
-                        type: string
-        CreateRoleRequest:
-            type: object
-            properties:
                 name:
                     type: string
                 description:
                     type: string
-                tenantId:
-                    type: string
+                fields:
+                    type: array
+                    items:
+                        type: string
         EmptyReply:
             type: object
             properties: {}
@@ -230,20 +158,22 @@ components:
                     description: The type of the serialized message.
             additionalProperties: true
             description: Contains an arbitrary serialized message along with a @type that describes the type of the serialized message.
-        ListRolesReply:
+        ListPermissionsReply:
             type: object
             properties:
-                roles:
+                permissions:
                     type: array
                     items:
-                        $ref: '#/components/schemas/RoleReply'
-        ListRolesRequest:
+                        $ref: '#/components/schemas/PermissionReply'
+        ListPermissionsRequest:
             type: object
             properties:
-                tenantId:
+                appId:
                     type: string
-                name:
-                    type: string
+                ids:
+                    type: array
+                    items:
+                        type: string
         PermissionReply:
             type: object
             properties:
@@ -259,54 +189,6 @@ components:
                     type: array
                     items:
                         type: string
-        RolePermissionReply:
-            type: object
-            properties:
-                role:
-                    $ref: '#/components/schemas/RoleReply'
-                permission:
-                    $ref: '#/components/schemas/PermissionReply'
-                tenantId:
-                    type: string
-                deny:
-                    type: boolean
-                fields:
-                    type: array
-                    items:
-                        type: string
-        RoleReply:
-            type: object
-            properties:
-                id:
-                    type: string
-                name:
-                    type: string
-                description:
-                    type: string
-                tenantId:
-                    type: string
-                isSystem:
-                    type: boolean
-                createdAt:
-                    type: string
-                updatedAt:
-                    type: string
-                deletedAt:
-                    type: string
-        RolesPermissionsReply:
-            type: object
-            properties:
-                permissions:
-                    type: array
-                    items:
-                        $ref: '#/components/schemas/RolePermissionReply'
-        RolesPermissionsRequest:
-            type: object
-            properties:
-                roleId:
-                    type: string
-                tenantId:
-                    type: string
         Status:
             type: object
             properties:
@@ -323,14 +205,18 @@ components:
                         $ref: '#/components/schemas/GoogleProtobufAny'
                     description: A list of messages that carry the error details.  There is a common set of message types for APIs to use.
             description: 'The `Status` type defines a logical error model that is suitable for different programming environments, including REST APIs and RPC APIs. It is used by [gRPC](https://github.com/grpc). Each `Status` message contains three pieces of data: error code, error message, and error details. You can find out more about this error model and how to work with it in the [API Design Guide](https://cloud.google.com/apis/design/errors).'
-        UpdateRoleRequest:
+        UpdatePermissionRequest:
             type: object
             properties:
-                roleId:
+                permissionId:
                     type: string
                 name:
                     type: string
                 description:
                     type: string
+                fields:
+                    type: array
+                    items:
+                        type: string
 tags:
-    - name: Roles
+    - name: Permissions

@@ -37,21 +37,36 @@ func wireApp(bootstrap *conf.Bootstrap, logger log.Logger) (*kratos.App, func(),
 		return nil, nil, err
 	}
 	roleRepo := data.NewRoleRepo(dataData)
-	rolesUsecase, err := biz.NewRolesUsecase(logger, config, roleRepo)
+	rolesUsecase, err := biz.NewRolesUsecase(logger, jwtProcessor, roleRepo)
 	if err != nil {
 		cleanup()
 		return nil, nil, err
 	}
-	rolesService := service.NewRolesService(logger, jwtProcessor, rolesUsecase)
+	rolesService := service.NewRolesService(rolesUsecase)
 	permissionRepo := data.NewPermissionRepo(dataData)
-	permissionsUsecase, err := biz.NewPermissionUsecase(logger, config, permissionRepo)
+	permissionsUsecase, err := biz.NewPermissionUsecase(logger, jwtProcessor, permissionRepo)
 	if err != nil {
 		cleanup()
 		return nil, nil, err
 	}
-	permissionsService := service.NewPermissionsService(logger, jwtProcessor, permissionsUsecase)
-	grpcServer := server.NewGRPCServer(bootstrap, logger, jwtProcessor, rolesService, permissionsService)
-	httpServer := server.NewHTTPServer(bootstrap, logger, jwtProcessor, rolesService, permissionsService)
+	permissionsService := service.NewPermissionsService(permissionsUsecase)
+	teamsRepo := data.NewTeamsRepo(dataData)
+	teamsUsecase, err := biz.NewTeamsUsecase(logger, config, jwtProcessor, teamsRepo)
+	if err != nil {
+		cleanup()
+		return nil, nil, err
+	}
+	teamsService := service.NewTeamsService(teamsUsecase)
+	teamIdentityRoleRepo := data.NewTeamIdentityRoleRepo(dataData)
+	teamIdentityUsecase, err := biz.NewTeamIdentityUsecase(logger, config, jwtProcessor, teamIdentityRoleRepo, roleRepo, teamsRepo)
+	if err != nil {
+		cleanup()
+		return nil, nil, err
+	}
+	teamIdentityRoleService := service.NewTeamIdentityRoleService(teamIdentityUsecase)
+	checkPermissionsService := service.NewCheckPermissionsService(teamIdentityUsecase)
+	grpcServer := server.NewGRPCServer(bootstrap, logger, jwtProcessor, rolesService, permissionsService, teamsService, teamIdentityRoleService, checkPermissionsService)
+	httpServer := server.NewHTTPServer(bootstrap, logger, jwtProcessor, rolesService, permissionsService, teamsService, teamIdentityRoleService, checkPermissionsService)
 	app := newApp(logger, config, grpcServer, httpServer)
 	return app, func() {
 		cleanup()
