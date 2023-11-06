@@ -455,12 +455,16 @@ func (u *PermissionUpsertOne) IDX(ctx context.Context) string {
 // PermissionCreateBulk is the builder for creating many Permission entities in bulk.
 type PermissionCreateBulk struct {
 	config
+	err      error
 	builders []*PermissionCreate
 	conflict []sql.ConflictOption
 }
 
 // Save creates the Permission entities in the database.
 func (pcb *PermissionCreateBulk) Save(ctx context.Context) ([]*Permission, error) {
+	if pcb.err != nil {
+		return nil, pcb.err
+	}
 	specs := make([]*sqlgraph.CreateSpec, len(pcb.builders))
 	nodes := make([]*Permission, len(pcb.builders))
 	mutators := make([]Mutator, len(pcb.builders))
@@ -686,6 +690,9 @@ func (u *PermissionUpsertBulk) ClearFields() *PermissionUpsertBulk {
 
 // Exec executes the query.
 func (u *PermissionUpsertBulk) Exec(ctx context.Context) error {
+	if u.create.err != nil {
+		return u.create.err
+	}
 	for i, b := range u.create.builders {
 		if len(b.conflict) != 0 {
 			return fmt.Errorf("ent: OnConflict was set for builder %d. Set it on the PermissionCreateBulk instead", i)

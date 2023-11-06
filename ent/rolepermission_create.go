@@ -399,12 +399,16 @@ func (u *RolePermissionUpsertOne) IDX(ctx context.Context) int64 {
 // RolePermissionCreateBulk is the builder for creating many RolePermission entities in bulk.
 type RolePermissionCreateBulk struct {
 	config
+	err      error
 	builders []*RolePermissionCreate
 	conflict []sql.ConflictOption
 }
 
 // Save creates the RolePermission entities in the database.
 func (rpcb *RolePermissionCreateBulk) Save(ctx context.Context) ([]*RolePermission, error) {
+	if rpcb.err != nil {
+		return nil, rpcb.err
+	}
 	specs := make([]*sqlgraph.CreateSpec, len(rpcb.builders))
 	nodes := make([]*RolePermission, len(rpcb.builders))
 	mutators := make([]Mutator, len(rpcb.builders))
@@ -606,6 +610,9 @@ func (u *RolePermissionUpsertBulk) UpdateFields() *RolePermissionUpsertBulk {
 
 // Exec executes the query.
 func (u *RolePermissionUpsertBulk) Exec(ctx context.Context) error {
+	if u.create.err != nil {
+		return u.create.err
+	}
 	for i, b := range u.create.builders {
 		if len(b.conflict) != 0 {
 			return fmt.Errorf("ent: OnConflict was set for builder %d. Set it on the RolePermissionCreateBulk instead", i)

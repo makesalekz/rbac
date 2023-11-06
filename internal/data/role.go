@@ -29,13 +29,13 @@ type CreateRolePermissionDto struct {
 // RoleRepo
 type RoleRepo interface {
 	CreateRole(ctx context.Context, roleDto CreateRoleDto) (*ent.Role, error)
-	UpdateRole(ctx context.Context, roleId int64, roleDto UpdateRoleDto) (*ent.Role, error)
-	DeleteRole(ctx context.Context, roleId int64) error
-	GetRoleById(ctx context.Context, roleId int64) (*ent.Role, error)
+	UpdateRole(ctx context.Context, roleID int64, roleDto UpdateRoleDto) (*ent.Role, error)
+	DeleteRole(ctx context.Context, roleID int64) error
+	GetRoleById(ctx context.Context, roleID int64) (*ent.Role, error)
 	GetRoleByIds(ctx context.Context, ids []int64) ([]*ent.Role, error)
-	GetRolesList(ctx context.Context, teamId int64, name string) ([]*ent.Role, error)
+	GetRolesList(ctx context.Context, teamID int64, name string) ([]*ent.Role, error)
 	AddPermissionToRole(ctx context.Context, dto CreateRolePermissionDto) (*ent.RolePermission, error)
-	RemovePermissionFromRole(ctx context.Context, roleId, tenantId int64, permissionId string) error
+	RemovePermissionFromRole(ctx context.Context, roleID, tenantId int64, permissionId string) error
 	ListRolePermissions(ctx context.Context, roleId, tenantId int64) ([]*ent.RolePermission, error)
 }
 
