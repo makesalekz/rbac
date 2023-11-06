@@ -1,7 +1,7 @@
 package server
 
 import (
-	"rbac/api/rbac/v1"
+	v1 "rbac/api/rbac/v1"
 	"rbac/internal/conf"
 	"rbac/internal/data"
 	"rbac/internal/service"
@@ -18,6 +18,9 @@ import (
 func NewGRPCServer(c *conf.Bootstrap, logger log.Logger, jwtp *data.JwtProcessor,
 	roleSrvc *service.RolesService,
 	permissionsSrvc *service.PermissionsService,
+	teamSrvc *service.TeamsService,
+	teamIdentityRolesSrvc *service.TeamIdentityRoleService,
+	checkPermissionSrvc *service.CheckPermissionsService,
 ) *grpc.Server {
 	var opts = []grpc.ServerOption{
 		grpc.Middleware(
@@ -39,8 +42,11 @@ func NewGRPCServer(c *conf.Bootstrap, logger log.Logger, jwtp *data.JwtProcessor
 	}
 	srv := grpc.NewServer(opts...)
 
-	v1.roles_v1.RegisterRolesServer(srv, roleSrvc)
+	v1.RegisterRolesServer(srv, roleSrvc)
 	v1.RegisterPermissionsServer(srv, permissionsSrvc)
+	v1.RegisterTeamsServer(srv, teamSrvc)
+	v1.RegisterTeamIdentityRoleServer(srv, teamIdentityRolesSrvc)
+	v1.RegisterCheckPermissionsServer(srv, checkPermissionSrvc)
 
 	return srv
 }

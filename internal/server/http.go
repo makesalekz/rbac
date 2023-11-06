@@ -1,7 +1,7 @@
 package server
 
 import (
-	"rbac/api/rbac/v1"
+	v1 "rbac/api/rbac/v1"
 	"rbac/internal/conf"
 	"rbac/internal/data"
 	"rbac/internal/service"
@@ -21,6 +21,9 @@ func NewHTTPServer(
 	jwtp *data.JwtProcessor,
 	roleSrvc *service.RolesService,
 	permissionsSrvc *service.PermissionsService,
+	teamSrvc *service.TeamsService,
+	teamIdentityRolesSrvc *service.TeamIdentityRoleService,
+	checkPermissionSrvc *service.CheckPermissionsService,
 ) *khttp.Server {
 	var opts = []khttp.ServerOption{
 		khttp.Middleware(
@@ -42,8 +45,11 @@ func NewHTTPServer(
 	}
 	srv := khttp.NewServer(opts...)
 
-	v1.roles_v1.RegisterRolesHTTPServer(srv, roleSrvc)
+	v1.RegisterRolesHTTPServer(srv, roleSrvc)
 	v1.RegisterPermissionsHTTPServer(srv, permissionsSrvc)
+	v1.RegisterTeamsHTTPServer(srv, teamSrvc)
+	v1.RegisterTeamIdentityRoleHTTPServer(srv, teamIdentityRolesSrvc)
+	v1.RegisterCheckPermissionsHTTPServer(srv, checkPermissionSrvc)
 
 	return srv
 }
