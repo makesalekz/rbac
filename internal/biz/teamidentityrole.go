@@ -68,6 +68,32 @@ func (u *TeamIdentityUsecase) ListTeamRoles(ctx context.Context, dto data.ListTe
 	return u.repo.ListTeamRoles(ctx, dto)
 }
 
+func (u *TeamIdentityUsecase) CheckPermissions(ctx context.Context, teamId int64, permissions []string) (map[string]*rbacv1.ListOfFields, error) {
+	_, tenant, ok := u.jwt.GetTenantClaimsFromContext(ctx)
+	if !ok {
+		return nil, rbacv1.ErrorForbidden("forbidden")
+	}
+	teamIdentityRoles, err := u.repo.ListTeamPermissions(ctx, data.ListTeamPermissionsDto{
+		TeamId:     teamId,
+		TenantId:   tenant.TenantId,
+		Permission: permissions,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	result := make(map[string]*rbacv1.ListOfFields)
+	for _, role := range teamIdentityRoles {
+		for _, permission := range role.Edges.Role.Edges.Permissions {
+			result[permission.Name] = &rbacv1.ListOfFields{
+				Field: permission.Fields,
+			}
+		}
+	}
+
+	return result, nil
+}
+
 // NewTeamIdentityUsecase .
 func NewTeamIdentityUsecase(logger log.Logger, c *data.Config, jwt *data.JwtProcessor, repo data.TeamIdentityRoleRepo, roleRepo data.RoleRepo, teamRepo data.TeamsRepo) (*TeamIdentityUsecase, error) {
 	return &TeamIdentityUsecase{

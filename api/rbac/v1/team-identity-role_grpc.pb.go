@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.3.0
 // - protoc             v4.24.4
-// source: api/rbac/v1/team-identity-role.proto
+// source: rbac/v1/team-identity-role.proto
 
 package rbac_v1
 
@@ -19,10 +19,10 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	TeamIdentityRole_AssignRole_FullMethodName        = "/api.v1.TeamIdentityRole/AssignRole"
-	TeamIdentityRole_DeleteRole_FullMethodName        = "/api.v1.TeamIdentityRole/DeleteRole"
-	TeamIdentityRole_ListIdentityRoles_FullMethodName = "/api.v1.TeamIdentityRole/ListIdentityRoles"
-	TeamIdentityRole_ListTeamRoles_FullMethodName     = "/api.v1.TeamIdentityRole/ListTeamRoles"
+	TeamIdentityRole_AssignRole_FullMethodName        = "/api.rbac.v1.TeamIdentityRole/AssignRole"
+	TeamIdentityRole_DeleteRole_FullMethodName        = "/api.rbac.v1.TeamIdentityRole/DeleteRole"
+	TeamIdentityRole_ListIdentityRoles_FullMethodName = "/api.rbac.v1.TeamIdentityRole/ListIdentityRoles"
+	TeamIdentityRole_ListTeamRoles_FullMethodName     = "/api.rbac.v1.TeamIdentityRole/ListTeamRoles"
 )
 
 // TeamIdentityRoleClient is the client API for TeamIdentityRole service.
@@ -195,7 +195,7 @@ func _TeamIdentityRole_ListTeamRoles_Handler(srv interface{}, ctx context.Contex
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var TeamIdentityRole_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "api.v1.TeamIdentityRole",
+	ServiceName: "api.rbac.v1.TeamIdentityRole",
 	HandlerType: (*TeamIdentityRoleServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
@@ -216,5 +216,5 @@ var TeamIdentityRole_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "api/rbac/v1/team-identity-role.proto",
+	Metadata: "rbac/v1/team-identity-role.proto",
 }

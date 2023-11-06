@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-http v2.7.1
 // - protoc             v4.24.4
-// source: api/rbac/v1/team-identity-role.proto
+// source: rbac/v1/team-identity-role.proto
 
 package rbac_v1
 
