@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.3.0
 // - protoc             v4.24.4
-// source: api/rbac/v1/check-permissions.proto
+// source: rbac/v1/check-permissions.proto
 
 package rbac_v1
 
@@ -105,5 +105,5 @@ var CheckPermissions_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "api/rbac/v1/check-permissions.proto",
+	Metadata: "rbac/v1/check-permissions.proto",
 }
