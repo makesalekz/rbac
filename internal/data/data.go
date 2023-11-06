@@ -4,12 +4,11 @@ import (
 	"context"
 	"os"
 
-	"rbac/ent"
-	"rbac/internal/conf"
-
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/google/wire"
-	_ "github.com/lib/pq"
+	"rbac/ent" //nolint:typecheck
+	_ "rbac/ent/runtime"
+	"rbac/internal/conf"
 )
 
 // ProviderSet is data providers.
