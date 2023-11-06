@@ -29,6 +29,14 @@ func (rpc *RolePermissionCreate) SetTenantID(i int64) *RolePermissionCreate {
 	return rpc
 }
 
+// SetNillableTenantID sets the "tenant_id" field if the given value is not nil.
+func (rpc *RolePermissionCreate) SetNillableTenantID(i *int64) *RolePermissionCreate {
+	if i != nil {
+		rpc.SetTenantID(*i)
+	}
+	return rpc
+}
+
 // SetRoleID sets the "role_id" field.
 func (rpc *RolePermissionCreate) SetRoleID(i int64) *RolePermissionCreate {
 	rpc.mutation.SetRoleID(i)
@@ -106,6 +114,10 @@ func (rpc *RolePermissionCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (rpc *RolePermissionCreate) defaults() {
+	if _, ok := rpc.mutation.TenantID(); !ok {
+		v := rolepermission.DefaultTenantID
+		rpc.mutation.SetTenantID(v)
+	}
 	if _, ok := rpc.mutation.Deny(); !ok {
 		v := rolepermission.DefaultDeny
 		rpc.mutation.SetDeny(v)
@@ -164,7 +176,7 @@ func (rpc *RolePermissionCreate) createSpec() (*RolePermission, *sqlgraph.Create
 	_spec.OnConflict = rpc.conflict
 	if value, ok := rpc.mutation.TenantID(); ok {
 		_spec.SetField(rolepermission.FieldTenantID, field.TypeInt64, value)
-		_node.TenantID = value
+		_node.TenantID = &value
 	}
 	if value, ok := rpc.mutation.Deny(); ok {
 		_spec.SetField(rolepermission.FieldDeny, field.TypeBool, value)

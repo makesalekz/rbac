@@ -37,6 +37,7 @@ type RoleRepo interface {
 	AddPermissionToRole(ctx context.Context, dto CreateRolePermissionDto) (*ent.RolePermission, error)
 	RemovePermissionFromRole(ctx context.Context, roleID, tenantId int64, permissionId string) error
 	ListRolePermissions(ctx context.Context, roleId, tenantId int64) ([]*ent.RolePermission, error)
+	ListRolesPermissions(ctx context.Context, roleId []int64, tenantId int64, permissions []string) ([]*ent.RolePermission, error)
 }
 
 type roleRepo struct {
@@ -149,7 +150,7 @@ func (r *roleRepo) RemovePermissionFromRole(ctx context.Context, roleId, tenantI
 	return r.db.RolePermission.DeleteOne(&ent.RolePermission{
 		RoleID:       roleId,
 		PermissionID: permissionId,
-		TenantID:     tenantId,
+		TenantID:     &tenantId,
 	}).Exec(ctx)
 }
 
@@ -161,6 +162,20 @@ func (r *roleRepo) ListRolePermissions(ctx context.Context, roleId, tenantId int
 			rolepermission.TenantIDEQ(tenantId),
 		)
 
+	return query.All(ctx)
+}
+
+func (r *roleRepo) ListRolesPermissions(ctx context.Context, roleIds []int64, tenantId int64, permissions []string) ([]*ent.RolePermission, error) {
+	query := r.db.RolePermission.
+		Query().
+		Where(
+			rolepermission.HasRoleWith(role.IDIn(roleIds...)),
+			rolepermission.TenantIDEQ(tenantId),
+			rolepermission.TenantID(0),
+		)
+	if len(permissions) != 0 {
+		query = query.Where(rolepermission.PermissionIDIn(permissions...))
+	}
 	return query.All(ctx)
 }
 

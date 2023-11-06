@@ -73,20 +73,25 @@ func (u *TeamIdentityUsecase) CheckPermissions(ctx context.Context, teamId int64
 	if !ok {
 		return nil, rbacv1.ErrorForbidden("forbidden")
 	}
-	teamIdentityRoles, err := u.repo.ListTeamPermissions(ctx, data.ListTeamPermissionsDto{
-		TeamId:     teamId,
-		TenantId:   tenant.TenantId,
-		Permission: permissions,
+	teamIdentityRoles, err := u.repo.ListTeamRoles(ctx, data.ListTeamRolesDto{
+		TeamId:   teamId,
+		TenantId: tenant.TenantId,
 	})
 	if err != nil {
 		return nil, err
 	}
 
+	roleIds := make([]int64, 0)
+	for _, teamIdentityRole := range teamIdentityRoles {
+		roleIds = append(roleIds, teamIdentityRole.RoleID)
+	}
+	rolesPermissions, err := u.roleRepo.ListRolesPermissions(ctx, roleIds, tenant.TenantId, permissions)
+
 	result := make(map[string]*rbacv1.ListOfFields)
-	for _, role := range teamIdentityRoles {
-		for _, permission := range role.Edges.Role.Edges.Permissions {
-			result[permission.Name] = &rbacv1.ListOfFields{
-				Field: permission.Fields,
+	for _, rolePermission := range rolesPermissions {
+		if _, ok := result[rolePermission.PermissionID]; !ok && !rolePermission.Deny {
+			result[rolePermission.PermissionID] = &rbacv1.ListOfFields{
+				Field: rolePermission.Fields,
 			}
 		}
 	}

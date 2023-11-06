@@ -65,6 +65,8 @@ func ValidColumn(column string) bool {
 }
 
 var (
+	// DefaultTenantID holds the default value on creation for the "tenant_id" field.
+	DefaultTenantID int64
 	// DefaultDeny holds the default value on creation for the "deny" field.
 	DefaultDeny bool
 )

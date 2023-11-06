@@ -60,7 +60,7 @@ var (
 	// RolePermissionsColumns holds the columns for the "role_permissions" table.
 	RolePermissionsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt64, Increment: true},
-		{Name: "tenant_id", Type: field.TypeInt64},
+		{Name: "tenant_id", Type: field.TypeInt64, Default: 0},
 		{Name: "deny", Type: field.TypeBool, Default: false},
 		{Name: "fields", Type: field.TypeJSON},
 		{Name: "role_id", Type: field.TypeInt64},

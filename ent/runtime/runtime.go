@@ -91,6 +91,10 @@ func init() {
 	role.DefaultUpdatedAt = roleDescUpdatedAt.Default.(func() time.Time)
 	rolepermissionFields := schema.RolePermission{}.Fields()
 	_ = rolepermissionFields
+	// rolepermissionDescTenantID is the schema descriptor for tenant_id field.
+	rolepermissionDescTenantID := rolepermissionFields[0].Descriptor()
+	// rolepermission.DefaultTenantID holds the default value on creation for the tenant_id field.
+	rolepermission.DefaultTenantID = rolepermissionDescTenantID.Default.(int64)
 	// rolepermissionDescDeny is the schema descriptor for deny field.
 	rolepermissionDescDeny := rolepermissionFields[3].Descriptor()
 	// rolepermission.DefaultDeny holds the default value on creation for the deny field.
