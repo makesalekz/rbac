@@ -349,12 +349,16 @@ func (u *TeamIdentityRoleUpsertOne) IDX(ctx context.Context) int64 {
 // TeamIdentityRoleCreateBulk is the builder for creating many TeamIdentityRole entities in bulk.
 type TeamIdentityRoleCreateBulk struct {
 	config
+	err      error
 	builders []*TeamIdentityRoleCreate
 	conflict []sql.ConflictOption
 }
 
 // Save creates the TeamIdentityRole entities in the database.
 func (tircb *TeamIdentityRoleCreateBulk) Save(ctx context.Context) ([]*TeamIdentityRole, error) {
+	if tircb.err != nil {
+		return nil, tircb.err
+	}
 	specs := make([]*sqlgraph.CreateSpec, len(tircb.builders))
 	nodes := make([]*TeamIdentityRole, len(tircb.builders))
 	mutators := make([]Mutator, len(tircb.builders))
@@ -531,6 +535,9 @@ func (u *TeamIdentityRoleUpsertBulk) Update(set func(*TeamIdentityRoleUpsert)) *
 
 // Exec executes the query.
 func (u *TeamIdentityRoleUpsertBulk) Exec(ctx context.Context) error {
+	if u.create.err != nil {
+		return u.create.err
+	}
 	for i, b := range u.create.builders {
 		if len(b.conflict) != 0 {
 			return fmt.Errorf("ent: OnConflict was set for builder %d. Set it on the TeamIdentityRoleCreateBulk instead", i)
