@@ -472,27 +472,27 @@ func file_api_rbac_v1_permissions_proto_rawDescGZIP() []byte {
 
 var file_api_rbac_v1_permissions_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
 var file_api_rbac_v1_permissions_proto_goTypes = []interface{}{
-	(*CreatePermissionRequest)(nil), // 0: api.v1.CreatePermissionRequest
-	(*UpdatePermissionRequest)(nil), // 1: api.v1.UpdatePermissionRequest
-	(*DeletePermissionRequest)(nil), // 2: api.v1.DeletePermissionRequest
-	(*GetPermissionRequest)(nil),    // 3: api.v1.GetPermissionRequest
-	(*ListPermissionsRequest)(nil),  // 4: api.v1.ListPermissionsRequest
-	(*ListPermissionsReply)(nil),    // 5: api.v1.ListPermissionsReply
-	(*PermissionReply)(nil),         // 6: api.v1.PermissionReply
-	(*EmptyReply)(nil),              // 7: api.v1.EmptyReply
+	(*CreatePermissionRequest)(nil), // 0: api.rbac.v1.CreatePermissionRequest
+	(*UpdatePermissionRequest)(nil), // 1: api.rbac.v1.UpdatePermissionRequest
+	(*DeletePermissionRequest)(nil), // 2: api.rbac.v1.DeletePermissionRequest
+	(*GetPermissionRequest)(nil),    // 3: api.rbac.v1.GetPermissionRequest
+	(*ListPermissionsRequest)(nil),  // 4: api.rbac.v1.ListPermissionsRequest
+	(*ListPermissionsReply)(nil),    // 5: api.rbac.v1.ListPermissionsReply
+	(*PermissionReply)(nil),         // 6: api.rbac.v1.PermissionReply
+	(*EmptyReply)(nil),              // 7: api.rbac.v1.EmptyReply
 }
 var file_api_rbac_v1_permissions_proto_depIdxs = []int32{
-	6, // 0: api.v1.ListPermissionsReply.permissions:type_name -> api.v1.PermissionReply
-	0, // 1: api.v1.Permissions.CreatePermission:input_type -> api.v1.CreatePermissionRequest
-	1, // 2: api.v1.Permissions.UpdatePermission:input_type -> api.v1.UpdatePermissionRequest
-	2, // 3: api.v1.Permissions.DeletePermission:input_type -> api.v1.DeletePermissionRequest
-	3, // 4: api.v1.Permissions.GetPermission:input_type -> api.v1.GetPermissionRequest
-	4, // 5: api.v1.Permissions.ListPermissions:input_type -> api.v1.ListPermissionsRequest
-	6, // 6: api.v1.Permissions.CreatePermission:output_type -> api.v1.PermissionReply
-	6, // 7: api.v1.Permissions.UpdatePermission:output_type -> api.v1.PermissionReply
-	7, // 8: api.v1.Permissions.DeletePermission:output_type -> api.v1.EmptyReply
-	6, // 9: api.v1.Permissions.GetPermission:output_type -> api.v1.PermissionReply
-	5, // 10: api.v1.Permissions.ListPermissions:output_type -> api.v1.ListPermissionsReply
+	6, // 0: api.rbac.v1.ListPermissionsReply.permissions:type_name -> api.rbac.v1.PermissionReply
+	0, // 1: api.rbac.v1.Permissions.CreatePermission:input_type -> api.rbac.v1.CreatePermissionRequest
+	1, // 2: api.rbac.v1.Permissions.UpdatePermission:input_type -> api.rbac.v1.UpdatePermissionRequest
+	2, // 3: api.rbac.v1.Permissions.DeletePermission:input_type -> api.rbac.v1.DeletePermissionRequest
+	3, // 4: api.rbac.v1.Permissions.GetPermission:input_type -> api.rbac.v1.GetPermissionRequest
+	4, // 5: api.rbac.v1.Permissions.ListPermissions:input_type -> api.rbac.v1.ListPermissionsRequest
+	6, // 6: api.rbac.v1.Permissions.CreatePermission:output_type -> api.rbac.v1.PermissionReply
+	6, // 7: api.rbac.v1.Permissions.UpdatePermission:output_type -> api.rbac.v1.PermissionReply
+	7, // 8: api.rbac.v1.Permissions.DeletePermission:output_type -> api.rbac.v1.EmptyReply
+	6, // 9: api.rbac.v1.Permissions.GetPermission:output_type -> api.rbac.v1.PermissionReply
+	5, // 10: api.rbac.v1.Permissions.ListPermissions:output_type -> api.rbac.v1.ListPermissionsReply
 	6, // [6:11] is the sub-list for method output_type
 	1, // [1:6] is the sub-list for method input_type
 	1, // [1:1] is the sub-list for extension type_name
@@ -505,6 +505,7 @@ func file_api_rbac_v1_permissions_proto_init() {
 	if File_api_rbac_v1_permissions_proto != nil {
 		return
 	}
+	file_api_rbac_v1_models_proto_init()
 	if !protoimpl.UnsafeEnabled {
 		file_api_rbac_v1_permissions_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*CreatePermissionRequest); i {

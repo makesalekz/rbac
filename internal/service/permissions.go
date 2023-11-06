@@ -2,10 +2,9 @@ package service
 
 import (
 	"context"
+	pb "rbac/api/rbac/v1"
 	"rbac/internal/biz"
 	"rbac/internal/data"
-
-	pb "rbac/api/rbac/v1"
 )
 
 type PermissionsService struct {

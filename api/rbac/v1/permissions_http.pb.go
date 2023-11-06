@@ -19,11 +19,11 @@ var _ = binding.EncodeURL
 
 const _ = http.SupportPackageIsVersion1
 
-const OperationPermissionsCreatePermission = "/api.v1.Permissions/CreatePermission"
-const OperationPermissionsDeletePermission = "/api.v1.Permissions/DeletePermission"
-const OperationPermissionsGetPermission = "/api.v1.Permissions/GetPermission"
-const OperationPermissionsListPermissions = "/api.v1.Permissions/ListPermissions"
-const OperationPermissionsUpdatePermission = "/api.v1.Permissions/UpdatePermission"
+const OperationPermissionsCreatePermission = "/api.rbac.v1.Permissions/CreatePermission"
+const OperationPermissionsDeletePermission = "/api.rbac.v1.Permissions/DeletePermission"
+const OperationPermissionsGetPermission = "/api.rbac.v1.Permissions/GetPermission"
+const OperationPermissionsListPermissions = "/api.rbac.v1.Permissions/ListPermissions"
+const OperationPermissionsUpdatePermission = "/api.rbac.v1.Permissions/UpdatePermission"
 
 type PermissionsHTTPServer interface {
 	CreatePermission(context.Context, *CreatePermissionRequest) (*PermissionReply, error)
