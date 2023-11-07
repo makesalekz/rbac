@@ -10,7 +10,7 @@ import (
 type AssignRoleDto struct {
 	RoleId     int64
 	TeamId     int64
-	IdentityId int64
+	IdentityId string
 	TenantId   int64
 }
 
@@ -19,18 +19,19 @@ type DeleteRoleDto struct {
 }
 
 type ListIdentityRolesDto struct {
-	IdentityId int64
+	IdentityId string
 	TenantId   int64
 }
 
 type ListTeamRolesDto struct {
 	TeamId     int64
 	TenantId   int64
-	IdentityID int64
+	IdentityID string
 }
 
 // TeamIdentityRoleRepo
 type TeamIdentityRoleRepo interface {
+	GetAssignedRoleById(ctx context.Context, assignId, tenantId int64) (*ent.TeamIdentityRole, error)
 	AssignRole(ctx context.Context, dto AssignRoleDto) (*ent.TeamIdentityRole, error)
 	DeleteIdentityRole(ctx context.Context, dto DeleteRoleDto) error
 	ListIdentityRoles(ctx context.Context, dto ListIdentityRolesDto) ([]*ent.TeamIdentityRole, error)
@@ -39,6 +40,15 @@ type TeamIdentityRoleRepo interface {
 
 type teamIdentityRoleRepo struct {
 	db *ent.Client
+}
+
+func (t *teamIdentityRoleRepo) GetAssignedRoleById(ctx context.Context, assignId, tenantId int64) (*ent.TeamIdentityRole, error) {
+	return t.db.TeamIdentityRole.Query().
+		Where(
+			teamidentityrole.ID(assignId),
+			teamidentityrole.TenantID(tenantId),
+		).
+		First(ctx)
 }
 
 func (t *teamIdentityRoleRepo) ListTeamRoles(ctx context.Context, dto ListTeamRolesDto) ([]*ent.TeamIdentityRole, error) {
@@ -51,7 +61,7 @@ func (t *teamIdentityRoleRepo) ListTeamRoles(ctx context.Context, dto ListTeamRo
 		query = query.Where(teamidentityrole.TenantID(dto.TenantId))
 	}
 
-	if dto.IdentityID != 0 {
+	if dto.IdentityID != "" {
 		query = query.Where(teamidentityrole.IdentityID(dto.IdentityID))
 	}
 	return query.All(ctx)
