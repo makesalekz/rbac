@@ -33,7 +33,7 @@ func (u *TeamIdentityUsecase) AssignRole(ctx context.Context, dto data.AssignRol
 		return nil, rbacv1.ErrorNotFound("role not found")
 	}
 	// check team
-	_, err = u.teamRepo.GetTeam(ctx, dto.TeamId, false)
+	_, err = u.teamRepo.GetTeam(ctx, dto.TeamId, tenant.TenantId, false)
 	if err != nil {
 		return nil, rbacv1.ErrorNotFound("team not found")
 	}

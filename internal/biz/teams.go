@@ -43,12 +43,12 @@ func (uc *TeamsUsecase) CreateTeam(ctx context.Context, dto data.TeamDto) (*ent.
 		return nil, v1.ErrorUnauthorized("Unauthorized")
 	}
 
-	if dto.TenantId == 0 {
-		dto.TenantId = tenant.TenantId
+	if dto.TenantId == tenant.TenantId {
+		return nil, v1.ErrorForbidden("Forbidden")
 	}
 
 	if dto.ParentId != 0 {
-		parentTeam, err := uc.repo.GetTeam(ctx, dto.ParentId, false)
+		parentTeam, err := uc.repo.GetTeam(ctx, dto.ParentId, tenant.TenantId, false)
 		if err != nil {
 			return nil, err
 		}
@@ -61,7 +61,7 @@ func (uc *TeamsUsecase) CreateTeam(ctx context.Context, dto data.TeamDto) (*ent.
 		orgTeam := parentTeam
 		orgId := dto.ParentsIds[0]
 		if orgId != dto.ParentId {
-			orgTeam, err = uc.repo.GetTeam(ctx, orgId, false)
+			orgTeam, err = uc.repo.GetTeam(ctx, orgId, tenant.TenantId, false)
 			if err != nil {
 				return nil, err
 			}
@@ -82,8 +82,8 @@ func (uc *TeamsUsecase) UpdateTeam(ctx context.Context, teamId int64, dto data.T
 		return nil, v1.ErrorUnauthorized("Unauthorized")
 	}
 
-	if dto.TenantId == 0 {
-		dto.TenantId = tenant.TenantId
+	if dto.TenantId == tenant.TenantId {
+		return nil, v1.ErrorForbidden("Forbidden")
 	}
 
 	return uc.repo.UpdateTeam(ctx, teamId, dto)
@@ -94,12 +94,20 @@ func (uc *TeamsUsecase) DeleteTeam(ctx context.Context, teamId int64) error {
 	if !ok {
 		return v1.ErrorUnauthorized("Unauthorized")
 	}
+	_, err := uc.repo.GetTeam(ctx, teamId, tenant.TenantId, false)
+	if err != nil {
+		return err
+	}
 
 	return uc.repo.DeleteTeam(ctx, teamId, tenant.TenantId)
 }
 
 func (uc *TeamsUsecase) GetTeam(ctx context.Context, teamId int64, getTree bool) (*ent.Team, error) {
-	return uc.repo.GetTeam(ctx, teamId, getTree)
+	_, tenant, ok := uc.jwt.GetTenantClaimsFromContext(ctx)
+	if !ok {
+		return nil, v1.ErrorUnauthorized("Unauthorized")
+	}
+	return uc.repo.GetTeam(ctx, teamId, tenant.TenantId, getTree)
 }
 
 func (uc *TeamsUsecase) ListTeams(ctx context.Context, filter data.TeamsListFilter, paginate *v1.PaginateRequest) (*TeamsList, error) {

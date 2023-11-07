@@ -30,7 +30,7 @@ type TeamsRepo interface {
 	CreateTeam(ctx context.Context, dto TeamDto) (*ent.Team, error)
 	UpdateTeam(ctx context.Context, teamId int64, dto TeamDto) (*ent.Team, error)
 	DeleteTeam(ctx context.Context, teamId, tenantId int64) error
-	GetTeam(ctx context.Context, teamId int64, getTree bool) (*ent.Team, error)
+	GetTeam(ctx context.Context, teamId, tenantId int64, getTree bool) (*ent.Team, error)
 	ListTeams(ctx context.Context, filter TeamsListFilter, paginate *teams_v1.PaginateRequest) ([]*ent.Team, error)
 	CountListTeams(ctx context.Context, filter TeamsListFilter) (int32, error)
 }
@@ -103,8 +103,8 @@ func (r *teamsRepo) DeleteTeam(ctx context.Context, teamId, tenantId int64) erro
 	return r.db.Team.DeleteOneID(teamId).Where(team.TenantID(tenantId)).Exec(ctx)
 }
 
-func (r *teamsRepo) GetTeam(ctx context.Context, teamId int64, getTree bool) (*ent.Team, error) {
-	team, err := r.db.Team.Query().Where(team.ID(teamId)).Only(ctx)
+func (r *teamsRepo) GetTeam(ctx context.Context, teamId, tenantId int64, getTree bool) (*ent.Team, error) {
+	team, err := r.db.Team.Query().Where(team.ID(teamId), team.TenantID(tenantId)).Only(ctx)
 	if err != nil {
 		return nil, err
 	}
