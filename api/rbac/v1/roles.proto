@@ -53,7 +53,7 @@ service Roles {
   };
   rpc ListRolePermissions (RolesPermissionsRequest) returns (RolesPermissionsReply){
     option (google.api.http) = {
-      post: "/v1/rbac/roles/{roleId}/permissions"
+      post: "/v1/rbac/roles/{roleId}/permissions/list"
       body: "*"
     };
   };

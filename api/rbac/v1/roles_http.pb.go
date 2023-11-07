@@ -48,7 +48,7 @@ func RegisterRolesHTTPServer(s *http.Server, srv RolesHTTPServer) {
 	r.POST("/v1/rbac/roles/list", _Roles_ListRoles0_HTTP_Handler(srv))
 	r.POST("/v1/rbac/roles/{roleId}/permissions", _Roles_AddPermissionToRole0_HTTP_Handler(srv))
 	r.DELETE("/v1/rbac/roles/{roleId}/permissions/{permissionId}", _Roles_RemovePermissionFromRole0_HTTP_Handler(srv))
-	r.POST("/v1/rbac/roles/{roleId}/permissions", _Roles_ListRolePermissions0_HTTP_Handler(srv))
+	r.POST("/v1/rbac/roles/{roleId}/permissions/list", _Roles_ListRolePermissions0_HTTP_Handler(srv))
 }
 
 func _Roles_CreateRole0_HTTP_Handler(srv RolesHTTPServer) func(ctx http.Context) error {
@@ -309,7 +309,7 @@ func (c *RolesHTTPClientImpl) GetRole(ctx context.Context, in *GetRoleRequest, o
 
 func (c *RolesHTTPClientImpl) ListRolePermissions(ctx context.Context, in *RolesPermissionsRequest, opts ...http.CallOption) (*RolesPermissionsReply, error) {
 	var out RolesPermissionsReply
-	pattern := "/v1/rbac/roles/{roleId}/permissions"
+	pattern := "/v1/rbac/roles/{roleId}/permissions/list"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationRolesListRolePermissions))
 	opts = append(opts, http.PathTemplate(pattern))
