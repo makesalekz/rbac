@@ -32,7 +32,7 @@ func (uc *RolesUsecase) GetRoleById(ctx context.Context, roleId int64) (*ent.Rol
 		return nil, v1.ErrorUnauthorized("Unauthorized")
 	}
 	uc.log.Debug("GetRoleById", "userId", userId, "tenant", tenant)
-	return uc.roleRepo.GetRoleById(ctx, roleId)
+	return uc.roleRepo.GetRoleById(ctx, roleId, tenant.TenantId)
 }
 
 func (uc *RolesUsecase) UpdateRole(ctx context.Context, roleId int64, data data.UpdateRoleDto) (*ent.Role, error) {
@@ -41,6 +41,13 @@ func (uc *RolesUsecase) UpdateRole(ctx context.Context, roleId int64, data data.
 		return nil, v1.ErrorUnauthorized("Unauthorized")
 	}
 	uc.log.Debug("UpdateRole", "userId", userId, "tenant", tenant, "data", data)
+	entry, err := uc.roleRepo.GetRoleById(ctx, roleId, tenant.TenantId)
+	if err != nil {
+		return nil, v1.ErrorNotFound("Role not found")
+	}
+	if entry.IsSystem {
+		return nil, v1.ErrorForbidden("Forbidden")
+	}
 	return uc.roleRepo.UpdateRole(ctx, roleId, data)
 }
 
@@ -50,6 +57,13 @@ func (uc *RolesUsecase) DeleteRole(ctx context.Context, roleId int64) error {
 		return v1.ErrorUnauthorized("Unauthorized")
 	}
 	uc.log.Debug("DeleteRole", "userId", userId, "tenant", tenant)
+	entry, err := uc.roleRepo.GetRoleById(ctx, roleId, tenant.TenantId)
+	if err != nil {
+		return v1.ErrorNotFound("Role not found")
+	}
+	if entry.IsSystem {
+		return v1.ErrorForbidden("Forbidden")
+	}
 	return uc.roleRepo.DeleteRole(ctx, roleId)
 }
 

@@ -98,7 +98,7 @@ func (s *RolesService) AddPermissionToRole(ctx context.Context, req *pb.AddPermi
 			Id:    rolePermission.Edges.Permission.ID,
 			AppId: rolePermission.Edges.Permission.AppID,
 		},
-		TenantId: rolePermission.TenantID,
+		TenantId: *rolePermission.TenantID,
 		Fields:   rolePermission.Fields,
 		Deny:     &rolePermission.Deny,
 	}, nil
@@ -123,7 +123,7 @@ func (s *RolesService) ListRolePermissions(ctx context.Context, req *pb.RolesPer
 				Id:    rp.Edges.Permission.ID,
 				AppId: rp.Edges.Permission.AppID,
 			},
-			TenantId: rp.TenantID,
+			TenantId: *rp.TenantID,
 			Fields:   rp.Fields,
 			Deny:     &rp.Deny,
 		}

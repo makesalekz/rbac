@@ -31,7 +31,7 @@ type RoleRepo interface {
 	CreateRole(ctx context.Context, roleDto CreateRoleDto) (*ent.Role, error)
 	UpdateRole(ctx context.Context, roleID int64, roleDto UpdateRoleDto) (*ent.Role, error)
 	DeleteRole(ctx context.Context, roleID int64) error
-	GetRoleById(ctx context.Context, roleID int64) (*ent.Role, error)
+	GetRoleById(ctx context.Context, roleID, tenantId int64) (*ent.Role, error)
 	GetRoleByIds(ctx context.Context, ids []int64) ([]*ent.Role, error)
 	GetRolesList(ctx context.Context, teamID int64, name string) ([]*ent.Role, error)
 	AddPermissionToRole(ctx context.Context, dto CreateRolePermissionDto) (*ent.RolePermission, error)
@@ -94,8 +94,10 @@ func (r *roleRepo) DeleteRole(ctx context.Context, roleId int64) error {
 	return r.db.Role.DeleteOneID(roleId).Exec(ctx)
 }
 
-func (r *roleRepo) GetRoleById(ctx context.Context, roleId int64) (*ent.Role, error) {
-	return r.db.Role.Get(ctx, roleId)
+func (r *roleRepo) GetRoleById(ctx context.Context, roleId, tenantId int64) (*ent.Role, error) {
+	query := r.db.Role.Query()
+	query = query.Where(role.ID(roleId), role.TenantID(tenantId))
+	return query.First(ctx)
 }
 
 func (r *roleRepo) GetRoleByIds(ctx context.Context, ids []int64) ([]*ent.Role, error) {
