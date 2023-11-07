@@ -44,15 +44,15 @@ func (tirc *TeamIdentityRoleCreate) SetNillableTeamID(i *int64) *TeamIdentityRol
 }
 
 // SetIdentityID sets the "identity_id" field.
-func (tirc *TeamIdentityRoleCreate) SetIdentityID(i int64) *TeamIdentityRoleCreate {
-	tirc.mutation.SetIdentityID(i)
+func (tirc *TeamIdentityRoleCreate) SetIdentityID(s string) *TeamIdentityRoleCreate {
+	tirc.mutation.SetIdentityID(s)
 	return tirc
 }
 
 // SetNillableIdentityID sets the "identity_id" field if the given value is not nil.
-func (tirc *TeamIdentityRoleCreate) SetNillableIdentityID(i *int64) *TeamIdentityRoleCreate {
-	if i != nil {
-		tirc.SetIdentityID(*i)
+func (tirc *TeamIdentityRoleCreate) SetNillableIdentityID(s *string) *TeamIdentityRoleCreate {
+	if s != nil {
+		tirc.SetIdentityID(*s)
 	}
 	return tirc
 }
@@ -170,7 +170,7 @@ func (tirc *TeamIdentityRoleCreate) createSpec() (*TeamIdentityRole, *sqlgraph.C
 		_node.TenantID = value
 	}
 	if value, ok := tirc.mutation.IdentityID(); ok {
-		_spec.SetField(teamidentityrole.FieldIdentityID, field.TypeInt64, value)
+		_spec.SetField(teamidentityrole.FieldIdentityID, field.TypeString, value)
 		_node.IdentityID = &value
 	}
 	if nodes := tirc.mutation.RoleIDs(); len(nodes) > 0 {

@@ -65,7 +65,7 @@ var (
 	// DefaultTeamID holds the default value on creation for the "team_id" field.
 	DefaultTeamID int64
 	// DefaultIdentityID holds the default value on creation for the "identity_id" field.
-	DefaultIdentityID int64
+	DefaultIdentityID string
 )
 
 // OrderOption defines the ordering options for the TeamIdentityRole queries.

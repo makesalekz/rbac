@@ -127,7 +127,7 @@ func init() {
 	// teamidentityroleDescIdentityID is the schema descriptor for identity_id field.
 	teamidentityroleDescIdentityID := teamidentityroleFields[2].Descriptor()
 	// teamidentityrole.DefaultIdentityID holds the default value on creation for the identity_id field.
-	teamidentityrole.DefaultIdentityID = teamidentityroleDescIdentityID.Default.(int64)
+	teamidentityrole.DefaultIdentityID = teamidentityroleDescIdentityID.Default.(string)
 }
 
 const (

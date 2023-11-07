@@ -3168,21 +3168,20 @@ func (m *TeamMutation) ResetEdge(name string) error {
 // TeamIdentityRoleMutation represents an operation that mutates the TeamIdentityRole nodes in the graph.
 type TeamIdentityRoleMutation struct {
 	config
-	op             Op
-	typ            string
-	id             *int64
-	tenant_id      *int64
-	addtenant_id   *int64
-	identity_id    *int64
-	addidentity_id *int64
-	clearedFields  map[string]struct{}
-	role           *int64
-	clearedrole    bool
-	team           *int64
-	clearedteam    bool
-	done           bool
-	oldValue       func(context.Context) (*TeamIdentityRole, error)
-	predicates     []predicate.TeamIdentityRole
+	op            Op
+	typ           string
+	id            *int64
+	tenant_id     *int64
+	addtenant_id  *int64
+	identity_id   *string
+	clearedFields map[string]struct{}
+	role          *int64
+	clearedrole   bool
+	team          *int64
+	clearedteam   bool
+	done          bool
+	oldValue      func(context.Context) (*TeamIdentityRole, error)
+	predicates    []predicate.TeamIdentityRole
 }
 
 var _ ent.Mutation = (*TeamIdentityRoleMutation)(nil)
@@ -3376,13 +3375,12 @@ func (m *TeamIdentityRoleMutation) ResetTeamID() {
 }
 
 // SetIdentityID sets the "identity_id" field.
-func (m *TeamIdentityRoleMutation) SetIdentityID(i int64) {
-	m.identity_id = &i
-	m.addidentity_id = nil
+func (m *TeamIdentityRoleMutation) SetIdentityID(s string) {
+	m.identity_id = &s
 }
 
 // IdentityID returns the value of the "identity_id" field in the mutation.
-func (m *TeamIdentityRoleMutation) IdentityID() (r int64, exists bool) {
+func (m *TeamIdentityRoleMutation) IdentityID() (r string, exists bool) {
 	v := m.identity_id
 	if v == nil {
 		return
@@ -3393,7 +3391,7 @@ func (m *TeamIdentityRoleMutation) IdentityID() (r int64, exists bool) {
 // OldIdentityID returns the old "identity_id" field's value of the TeamIdentityRole entity.
 // If the TeamIdentityRole object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *TeamIdentityRoleMutation) OldIdentityID(ctx context.Context) (v *int64, err error) {
+func (m *TeamIdentityRoleMutation) OldIdentityID(ctx context.Context) (v *string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldIdentityID is only allowed on UpdateOne operations")
 	}
@@ -3407,28 +3405,9 @@ func (m *TeamIdentityRoleMutation) OldIdentityID(ctx context.Context) (v *int64,
 	return oldValue.IdentityID, nil
 }
 
-// AddIdentityID adds i to the "identity_id" field.
-func (m *TeamIdentityRoleMutation) AddIdentityID(i int64) {
-	if m.addidentity_id != nil {
-		*m.addidentity_id += i
-	} else {
-		m.addidentity_id = &i
-	}
-}
-
-// AddedIdentityID returns the value that was added to the "identity_id" field in this mutation.
-func (m *TeamIdentityRoleMutation) AddedIdentityID() (r int64, exists bool) {
-	v := m.addidentity_id
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
 // ResetIdentityID resets all changes to the "identity_id" field.
 func (m *TeamIdentityRoleMutation) ResetIdentityID() {
 	m.identity_id = nil
-	m.addidentity_id = nil
 }
 
 // SetRoleID sets the "role_id" field.
@@ -3625,7 +3604,7 @@ func (m *TeamIdentityRoleMutation) SetField(name string, value ent.Value) error 
 		m.SetTeamID(v)
 		return nil
 	case teamidentityrole.FieldIdentityID:
-		v, ok := value.(int64)
+		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -3649,9 +3628,6 @@ func (m *TeamIdentityRoleMutation) AddedFields() []string {
 	if m.addtenant_id != nil {
 		fields = append(fields, teamidentityrole.FieldTenantID)
 	}
-	if m.addidentity_id != nil {
-		fields = append(fields, teamidentityrole.FieldIdentityID)
-	}
 	return fields
 }
 
@@ -3662,8 +3638,6 @@ func (m *TeamIdentityRoleMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
 	case teamidentityrole.FieldTenantID:
 		return m.AddedTenantID()
-	case teamidentityrole.FieldIdentityID:
-		return m.AddedIdentityID()
 	}
 	return nil, false
 }
@@ -3679,13 +3653,6 @@ func (m *TeamIdentityRoleMutation) AddField(name string, value ent.Value) error 
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddTenantID(v)
-		return nil
-	case teamidentityrole.FieldIdentityID:
-		v, ok := value.(int64)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddIdentityID(v)
 		return nil
 	}
 	return fmt.Errorf("unknown TeamIdentityRole numeric field %s", name)

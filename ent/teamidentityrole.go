@@ -23,7 +23,7 @@ type TeamIdentityRole struct {
 	// TeamID holds the value of the "team_id" field.
 	TeamID *int64 `json:"team_id,omitempty"`
 	// IdentityID holds the value of the "identity_id" field.
-	IdentityID *int64 `json:"identity_id,omitempty"`
+	IdentityID *string `json:"identity_id,omitempty"`
 	// RoleID holds the value of the "role_id" field.
 	RoleID int64 `json:"role_id,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -74,8 +74,10 @@ func (*TeamIdentityRole) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case teamidentityrole.FieldID, teamidentityrole.FieldTenantID, teamidentityrole.FieldTeamID, teamidentityrole.FieldIdentityID, teamidentityrole.FieldRoleID:
+		case teamidentityrole.FieldID, teamidentityrole.FieldTenantID, teamidentityrole.FieldTeamID, teamidentityrole.FieldRoleID:
 			values[i] = new(sql.NullInt64)
+		case teamidentityrole.FieldIdentityID:
+			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -111,11 +113,11 @@ func (tir *TeamIdentityRole) assignValues(columns []string, values []any) error 
 				*tir.TeamID = value.Int64
 			}
 		case teamidentityrole.FieldIdentityID:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
+			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field identity_id", values[i])
 			} else if value.Valid {
-				tir.IdentityID = new(int64)
-				*tir.IdentityID = value.Int64
+				tir.IdentityID = new(string)
+				*tir.IdentityID = value.String
 			}
 		case teamidentityrole.FieldRoleID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -179,7 +181,7 @@ func (tir *TeamIdentityRole) String() string {
 	builder.WriteString(", ")
 	if v := tir.IdentityID; v != nil {
 		builder.WriteString("identity_id=")
-		builder.WriteString(fmt.Sprintf("%v", *v))
+		builder.WriteString(*v)
 	}
 	builder.WriteString(", ")
 	builder.WriteString("role_id=")

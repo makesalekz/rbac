@@ -65,7 +65,7 @@ func TeamID(v int64) predicate.TeamIdentityRole {
 }
 
 // IdentityID applies equality check predicate on the "identity_id" field. It's identical to IdentityIDEQ.
-func IdentityID(v int64) predicate.TeamIdentityRole {
+func IdentityID(v string) predicate.TeamIdentityRole {
 	return predicate.TeamIdentityRole(sql.FieldEQ(FieldIdentityID, v))
 }
 
@@ -135,43 +135,68 @@ func TeamIDNotIn(vs ...int64) predicate.TeamIdentityRole {
 }
 
 // IdentityIDEQ applies the EQ predicate on the "identity_id" field.
-func IdentityIDEQ(v int64) predicate.TeamIdentityRole {
+func IdentityIDEQ(v string) predicate.TeamIdentityRole {
 	return predicate.TeamIdentityRole(sql.FieldEQ(FieldIdentityID, v))
 }
 
 // IdentityIDNEQ applies the NEQ predicate on the "identity_id" field.
-func IdentityIDNEQ(v int64) predicate.TeamIdentityRole {
+func IdentityIDNEQ(v string) predicate.TeamIdentityRole {
 	return predicate.TeamIdentityRole(sql.FieldNEQ(FieldIdentityID, v))
 }
 
 // IdentityIDIn applies the In predicate on the "identity_id" field.
-func IdentityIDIn(vs ...int64) predicate.TeamIdentityRole {
+func IdentityIDIn(vs ...string) predicate.TeamIdentityRole {
 	return predicate.TeamIdentityRole(sql.FieldIn(FieldIdentityID, vs...))
 }
 
 // IdentityIDNotIn applies the NotIn predicate on the "identity_id" field.
-func IdentityIDNotIn(vs ...int64) predicate.TeamIdentityRole {
+func IdentityIDNotIn(vs ...string) predicate.TeamIdentityRole {
 	return predicate.TeamIdentityRole(sql.FieldNotIn(FieldIdentityID, vs...))
 }
 
 // IdentityIDGT applies the GT predicate on the "identity_id" field.
-func IdentityIDGT(v int64) predicate.TeamIdentityRole {
+func IdentityIDGT(v string) predicate.TeamIdentityRole {
 	return predicate.TeamIdentityRole(sql.FieldGT(FieldIdentityID, v))
 }
 
 // IdentityIDGTE applies the GTE predicate on the "identity_id" field.
-func IdentityIDGTE(v int64) predicate.TeamIdentityRole {
+func IdentityIDGTE(v string) predicate.TeamIdentityRole {
 	return predicate.TeamIdentityRole(sql.FieldGTE(FieldIdentityID, v))
 }
 
 // IdentityIDLT applies the LT predicate on the "identity_id" field.
-func IdentityIDLT(v int64) predicate.TeamIdentityRole {
+func IdentityIDLT(v string) predicate.TeamIdentityRole {
 	return predicate.TeamIdentityRole(sql.FieldLT(FieldIdentityID, v))
 }
 
 // IdentityIDLTE applies the LTE predicate on the "identity_id" field.
-func IdentityIDLTE(v int64) predicate.TeamIdentityRole {
+func IdentityIDLTE(v string) predicate.TeamIdentityRole {
 	return predicate.TeamIdentityRole(sql.FieldLTE(FieldIdentityID, v))
+}
+
+// IdentityIDContains applies the Contains predicate on the "identity_id" field.
+func IdentityIDContains(v string) predicate.TeamIdentityRole {
+	return predicate.TeamIdentityRole(sql.FieldContains(FieldIdentityID, v))
+}
+
+// IdentityIDHasPrefix applies the HasPrefix predicate on the "identity_id" field.
+func IdentityIDHasPrefix(v string) predicate.TeamIdentityRole {
+	return predicate.TeamIdentityRole(sql.FieldHasPrefix(FieldIdentityID, v))
+}
+
+// IdentityIDHasSuffix applies the HasSuffix predicate on the "identity_id" field.
+func IdentityIDHasSuffix(v string) predicate.TeamIdentityRole {
+	return predicate.TeamIdentityRole(sql.FieldHasSuffix(FieldIdentityID, v))
+}
+
+// IdentityIDEqualFold applies the EqualFold predicate on the "identity_id" field.
+func IdentityIDEqualFold(v string) predicate.TeamIdentityRole {
+	return predicate.TeamIdentityRole(sql.FieldEqualFold(FieldIdentityID, v))
+}
+
+// IdentityIDContainsFold applies the ContainsFold predicate on the "identity_id" field.
+func IdentityIDContainsFold(v string) predicate.TeamIdentityRole {
+	return predicate.TeamIdentityRole(sql.FieldContainsFold(FieldIdentityID, v))
 }
 
 // RoleIDEQ applies the EQ predicate on the "role_id" field.

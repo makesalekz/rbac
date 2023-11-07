@@ -108,7 +108,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 		Fields: map[string]*sqlgraph.FieldSpec{
 			teamidentityrole.FieldTenantID:   {Type: field.TypeInt64, Column: teamidentityrole.FieldTenantID},
 			teamidentityrole.FieldTeamID:     {Type: field.TypeInt64, Column: teamidentityrole.FieldTeamID},
-			teamidentityrole.FieldIdentityID: {Type: field.TypeInt64, Column: teamidentityrole.FieldIdentityID},
+			teamidentityrole.FieldIdentityID: {Type: field.TypeString, Column: teamidentityrole.FieldIdentityID},
 			teamidentityrole.FieldRoleID:     {Type: field.TypeInt64, Column: teamidentityrole.FieldRoleID},
 		},
 	}
@@ -631,8 +631,8 @@ func (f *TeamIdentityRoleFilter) WhereTeamID(p entql.Int64P) {
 	f.Where(p.Field(teamidentityrole.FieldTeamID))
 }
 
-// WhereIdentityID applies the entql int64 predicate on the identity_id field.
-func (f *TeamIdentityRoleFilter) WhereIdentityID(p entql.Int64P) {
+// WhereIdentityID applies the entql string predicate on the identity_id field.
+func (f *TeamIdentityRoleFilter) WhereIdentityID(p entql.StringP) {
 	f.Where(p.Field(teamidentityrole.FieldIdentityID))
 }
 
