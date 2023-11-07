@@ -234,6 +234,30 @@ paths:
         post:
             tags:
                 - Roles
+            operationId: Roles_AddPermissionToRole
+            parameters:
+                - name: roleId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.rbac.v1.AddPermissionToRoleRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.rbac.v1.RolePermissionReply'
+    /v1/rbac/roles/{roleId}/permissions/list:
+        post:
+            tags:
+                - Roles
             operationId: Roles_ListRolePermissions
             parameters:
                 - name: roleId
@@ -449,8 +473,6 @@ components:
         api.rbac.v1.AssignRoleRequest:
             type: object
             properties:
-                assignId:
-                    type: string
                 tenantId:
                     type: string
                 teamId:
