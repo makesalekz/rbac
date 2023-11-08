@@ -480,10 +480,7 @@ func (tirq *TeamIdentityRoleQuery) loadTeam(ctx context.Context, query *TeamQuer
 	ids := make([]int64, 0, len(nodes))
 	nodeids := make(map[int64][]*TeamIdentityRole)
 	for i := range nodes {
-		if nodes[i].TeamID == nil {
-			continue
-		}
-		fk := *nodes[i].TeamID
+		fk := nodes[i].TeamID
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}

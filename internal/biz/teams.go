@@ -38,17 +38,18 @@ func NewTeamsUsecase(logger log.Logger, c *data.Config, jwt *data.JwtProcessor, 
 }
 
 func (uc *TeamsUsecase) CreateTeam(ctx context.Context, dto data.TeamDto) (*ent.Team, error) {
-	userID, tenant, ok := uc.jwt.GetTenantClaimsFromContext(ctx)
+	claims, ok := uc.jwt.GetTenantClaimsFromContext(ctx)
 	if !ok {
 		return nil, v1.ErrorUnauthorized("Unauthorized")
 	}
 
-	if dto.TenantId == tenant.TenantId {
+	if dto.TenantId == claims.TenantId {
 		return nil, v1.ErrorForbidden("Forbidden")
 	}
+	// todo checkPermissions for create team
 
 	if dto.ParentId != 0 {
-		parentTeam, err := uc.repo.GetTeam(ctx, dto.ParentId, tenant.TenantId, false)
+		parentTeam, err := uc.repo.GetTeam(ctx, dto.ParentId, claims.TenantId, false)
 		if err != nil {
 			return nil, err
 		}
@@ -61,13 +62,13 @@ func (uc *TeamsUsecase) CreateTeam(ctx context.Context, dto data.TeamDto) (*ent.
 		orgTeam := parentTeam
 		orgId := dto.ParentsIds[0]
 		if orgId != dto.ParentId {
-			orgTeam, err = uc.repo.GetTeam(ctx, orgId, tenant.TenantId, false)
+			orgTeam, err = uc.repo.GetTeam(ctx, orgId, claims.TenantId, false)
 			if err != nil {
 				return nil, err
 			}
 
 			// TODO: use rbac
-			if orgTeam.TenantID != userID {
+			if orgTeam.TenantID != claims.TenantId {
 				return nil, v1.ErrorForbidden("Forbidden")
 			}
 		}
@@ -77,40 +78,47 @@ func (uc *TeamsUsecase) CreateTeam(ctx context.Context, dto data.TeamDto) (*ent.
 }
 
 func (uc *TeamsUsecase) UpdateTeam(ctx context.Context, teamId int64, dto data.TeamDto) (*ent.Team, error) {
-	_, tenant, ok := uc.jwt.GetTenantClaimsFromContext(ctx)
+	claims, ok := uc.jwt.GetTenantClaimsFromContext(ctx)
 	if !ok {
 		return nil, v1.ErrorUnauthorized("Unauthorized")
 	}
 
-	if dto.TenantId == tenant.TenantId {
+	if dto.TenantId == claims.TenantId {
 		return nil, v1.ErrorForbidden("Forbidden")
 	}
-
+	// todo checkPermissions for delete team
 	return uc.repo.UpdateTeam(ctx, teamId, dto)
 }
 
 func (uc *TeamsUsecase) DeleteTeam(ctx context.Context, teamId int64) error {
-	_, tenant, ok := uc.jwt.GetTenantClaimsFromContext(ctx)
+	claims, ok := uc.jwt.GetTenantClaimsFromContext(ctx)
 	if !ok {
 		return v1.ErrorUnauthorized("Unauthorized")
 	}
-	_, err := uc.repo.GetTeam(ctx, teamId, tenant.TenantId, false)
+	_, err := uc.repo.GetTeam(ctx, teamId, claims.TenantId, false)
 	if err != nil {
 		return err
 	}
-
-	return uc.repo.DeleteTeam(ctx, teamId, tenant.TenantId)
+	// todo checkPermissions for delete team
+	return uc.repo.DeleteTeam(ctx, teamId, claims.TenantId)
 }
 
 func (uc *TeamsUsecase) GetTeam(ctx context.Context, teamId int64, getTree bool) (*ent.Team, error) {
-	_, tenant, ok := uc.jwt.GetTenantClaimsFromContext(ctx)
+	claims, ok := uc.jwt.GetTenantClaimsFromContext(ctx)
 	if !ok {
 		return nil, v1.ErrorUnauthorized("Unauthorized")
 	}
-	return uc.repo.GetTeam(ctx, teamId, tenant.TenantId, getTree)
+	return uc.repo.GetTeam(ctx, teamId, claims.TenantId, getTree)
 }
 
 func (uc *TeamsUsecase) ListTeams(ctx context.Context, filter data.TeamsListFilter, paginate *v1.PaginateRequest) (*TeamsList, error) {
+	claims, ok := uc.jwt.GetTenantClaimsFromContext(ctx)
+	if !ok {
+		return nil, v1.ErrorUnauthorized("Unauthorized")
+	}
+	if claims.TenantId != filter.TenantId {
+		return nil, v1.ErrorForbidden("Forbidden")
+	}
 	if paginate == nil {
 		paginate = &v1.PaginateRequest{}
 	}

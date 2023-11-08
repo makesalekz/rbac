@@ -65,9 +65,6 @@ func (tiru *TeamIdentityRoleUpdate) check() error {
 	if _, ok := tiru.mutation.RoleID(); tiru.mutation.RoleCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "TeamIdentityRole.role"`)
 	}
-	if _, ok := tiru.mutation.TeamID(); tiru.mutation.TeamCleared() && !ok {
-		return errors.New(`ent: clearing a required unique edge "TeamIdentityRole.team"`)
-	}
 	return nil
 }
 
@@ -160,9 +157,6 @@ func (tiruo *TeamIdentityRoleUpdateOne) ExecX(ctx context.Context) {
 func (tiruo *TeamIdentityRoleUpdateOne) check() error {
 	if _, ok := tiruo.mutation.RoleID(); tiruo.mutation.RoleCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "TeamIdentityRole.role"`)
-	}
-	if _, ok := tiruo.mutation.TeamID(); tiruo.mutation.TeamCleared() && !ok {
-		return errors.New(`ent: clearing a required unique edge "TeamIdentityRole.team"`)
 	}
 	return nil
 }

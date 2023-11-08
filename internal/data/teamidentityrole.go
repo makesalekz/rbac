@@ -24,9 +24,9 @@ type ListIdentityRolesDto struct {
 }
 
 type ListTeamRolesDto struct {
-	TeamId     int64
-	TenantId   int64
-	IdentityID string
+	TeamId      int64
+	TenantId    int64
+	IdentityIDs []string
 }
 
 // TeamIdentityRoleRepo
@@ -61,8 +61,8 @@ func (t *teamIdentityRoleRepo) ListTeamRoles(ctx context.Context, dto ListTeamRo
 		query = query.Where(teamidentityrole.TenantID(dto.TenantId))
 	}
 
-	if dto.IdentityID != "" {
-		query = query.Where(teamidentityrole.IdentityID(dto.IdentityID))
+	if len(dto.IdentityIDs) != 0 {
+		query = query.Where(teamidentityrole.IdentityIDIn(dto.IdentityIDs...))
 	}
 	return query.All(ctx)
 }

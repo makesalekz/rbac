@@ -22,20 +22,22 @@ type TeamIdentityUsecase struct {
 }
 
 func (u *TeamIdentityUsecase) AssignRole(ctx context.Context, dto data.AssignRoleDto) (*ent.TeamIdentityRole, error) {
-	// check jwt
-	_, tenant, ok := u.jwt.GetTenantClaimsFromContext(ctx)
+	claims, ok := u.jwt.GetTenantClaimsFromContext(ctx)
 	if !ok {
 		return nil, rbacv1.ErrorForbidden("forbidden")
 	}
-	// check role
-	_, err := u.roleRepo.GetRoleById(ctx, dto.RoleId, tenant.TenantId)
+	// todo checkPermissions can assign role to tenant identity
+	_, err := u.roleRepo.GetRoleById(ctx, dto.RoleId, claims.TenantId)
 	if err != nil {
 		return nil, rbacv1.ErrorNotFound("role not found")
 	}
-	// check team
-	_, err = u.teamRepo.GetTeam(ctx, dto.TeamId, tenant.TenantId, false)
+	_, err = u.teamRepo.GetTeam(ctx, dto.TeamId, claims.TenantId, false)
 	if err != nil {
 		return nil, rbacv1.ErrorNotFound("team not found")
+	}
+
+	if dto.TenantId != claims.TenantId {
+		return nil, rbacv1.ErrorForbidden("forbidden")
 	}
 	teamIdentityRole, err := u.repo.AssignRole(ctx, dto)
 	if err != nil {
@@ -45,11 +47,12 @@ func (u *TeamIdentityUsecase) AssignRole(ctx context.Context, dto data.AssignRol
 }
 
 func (u *TeamIdentityUsecase) DeleteIdentityRole(ctx context.Context, deleteDto data.DeleteRoleDto) error {
-	_, tenant, ok := u.jwt.GetTenantClaimsFromContext(ctx)
+	claims, ok := u.jwt.GetTenantClaimsFromContext(ctx)
 	if !ok {
 		return rbacv1.ErrorUnauthorized("unauthorized")
 	}
-	_, err := u.repo.GetAssignedRoleById(ctx, deleteDto.AssignId, tenant.TenantId)
+	// todo checkPermissions can delete identity role
+	_, err := u.repo.GetAssignedRoleById(ctx, deleteDto.AssignId, claims.TenantId)
 	if err != nil {
 		return rbacv1.ErrorForbidden("forbidden")
 	}
@@ -57,35 +60,36 @@ func (u *TeamIdentityUsecase) DeleteIdentityRole(ctx context.Context, deleteDto 
 }
 
 func (u *TeamIdentityUsecase) ListIdentityRoles(ctx context.Context, dto data.ListIdentityRolesDto) ([]*ent.TeamIdentityRole, error) {
-	_, tenant, ok := u.jwt.GetTenantClaimsFromContext(ctx)
+	claims, ok := u.jwt.GetTenantClaimsFromContext(ctx)
 	if !ok {
 		return nil, rbacv1.ErrorUnauthorized("forbidden")
 	}
-	if dto.TenantId != tenant.TenantId {
+	if dto.TenantId != claims.TenantId {
 		return nil, rbacv1.ErrorForbidden("forbidden")
 	}
 	return u.repo.ListIdentityRoles(ctx, dto)
 }
 
 func (u *TeamIdentityUsecase) ListTeamRoles(ctx context.Context, dto data.ListTeamRolesDto) ([]*ent.TeamIdentityRole, error) {
-	_, tenant, ok := u.jwt.GetTenantClaimsFromContext(ctx)
+	claims, ok := u.jwt.GetTenantClaimsFromContext(ctx)
 	if !ok {
 		return nil, rbacv1.ErrorUnauthorized("forbidden")
 	}
-	if dto.TenantId != tenant.TenantId {
+	if dto.TenantId != claims.TenantId {
 		return nil, rbacv1.ErrorForbidden("forbidden")
 	}
 	return u.repo.ListTeamRoles(ctx, dto)
 }
 
 func (u *TeamIdentityUsecase) CheckPermissions(ctx context.Context, teamId int64, permissions []string) (map[string]*rbacv1.ListOfFields, error) {
-	_, tenant, ok := u.jwt.GetTenantClaimsFromContext(ctx)
+	claims, ok := u.jwt.GetTenantClaimsFromContext(ctx)
 	if !ok {
 		return nil, rbacv1.ErrorUnauthorized("forbidden")
 	}
 	teamIdentityRoles, err := u.repo.ListTeamRoles(ctx, data.ListTeamRolesDto{
-		TeamId:   teamId,
-		TenantId: tenant.TenantId,
+		TeamId:      teamId,
+		TenantId:    claims.TenantId,
+		IdentityIDs: claims.GetIdentities(),
 	})
 	if err != nil {
 		return nil, err
@@ -95,7 +99,7 @@ func (u *TeamIdentityUsecase) CheckPermissions(ctx context.Context, teamId int64
 	for _, teamIdentityRole := range teamIdentityRoles {
 		roleIds = append(roleIds, teamIdentityRole.RoleID)
 	}
-	rolesPermissions, err := u.roleRepo.ListRolesPermissions(ctx, roleIds, tenant.TenantId, permissions)
+	rolesPermissions, err := u.roleRepo.ListRolesPermissions(ctx, roleIds, claims.TenantId, permissions)
 
 	result := make(map[string]*rbacv1.ListOfFields)
 	for _, rolePermission := range rolesPermissions {

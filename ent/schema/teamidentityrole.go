@@ -15,8 +15,8 @@ type TeamIdentityRole struct {
 func (TeamIdentityRole) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int64("tenant_id").Immutable(),
-		field.Int64("team_id").Immutable().Nillable().Default(0),
-		field.String("identity_id").Immutable().Nillable().Default(""),
+		field.Int64("team_id").Immutable().Optional().Default(0),
+		field.String("identity_id").Immutable().Default("0"),
 		field.Int64("role_id").Immutable(),
 	}
 }
@@ -29,7 +29,6 @@ func (TeamIdentityRole) Edges() []ent.Edge {
 			Unique().
 			Field("role_id").Immutable(),
 		edge.To("team", Team.Type).
-			Required().
 			Unique().
 			Field("team_id").Immutable(),
 	}

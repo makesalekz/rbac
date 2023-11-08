@@ -3355,7 +3355,7 @@ func (m *TeamIdentityRoleMutation) TeamID() (r int64, exists bool) {
 // OldTeamID returns the old "team_id" field's value of the TeamIdentityRole entity.
 // If the TeamIdentityRole object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *TeamIdentityRoleMutation) OldTeamID(ctx context.Context) (v *int64, err error) {
+func (m *TeamIdentityRoleMutation) OldTeamID(ctx context.Context) (v int64, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldTeamID is only allowed on UpdateOne operations")
 	}
@@ -3369,9 +3369,22 @@ func (m *TeamIdentityRoleMutation) OldTeamID(ctx context.Context) (v *int64, err
 	return oldValue.TeamID, nil
 }
 
+// ClearTeamID clears the value of the "team_id" field.
+func (m *TeamIdentityRoleMutation) ClearTeamID() {
+	m.team = nil
+	m.clearedFields[teamidentityrole.FieldTeamID] = struct{}{}
+}
+
+// TeamIDCleared returns if the "team_id" field was cleared in this mutation.
+func (m *TeamIdentityRoleMutation) TeamIDCleared() bool {
+	_, ok := m.clearedFields[teamidentityrole.FieldTeamID]
+	return ok
+}
+
 // ResetTeamID resets all changes to the "team_id" field.
 func (m *TeamIdentityRoleMutation) ResetTeamID() {
 	m.team = nil
+	delete(m.clearedFields, teamidentityrole.FieldTeamID)
 }
 
 // SetIdentityID sets the "identity_id" field.
@@ -3391,7 +3404,7 @@ func (m *TeamIdentityRoleMutation) IdentityID() (r string, exists bool) {
 // OldIdentityID returns the old "identity_id" field's value of the TeamIdentityRole entity.
 // If the TeamIdentityRole object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *TeamIdentityRoleMutation) OldIdentityID(ctx context.Context) (v *string, err error) {
+func (m *TeamIdentityRoleMutation) OldIdentityID(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldIdentityID is only allowed on UpdateOne operations")
 	}
@@ -3481,7 +3494,7 @@ func (m *TeamIdentityRoleMutation) ClearTeam() {
 
 // TeamCleared reports if the "team" edge to the Team entity was cleared.
 func (m *TeamIdentityRoleMutation) TeamCleared() bool {
-	return m.clearedteam
+	return m.TeamIDCleared() || m.clearedteam
 }
 
 // TeamIDs returns the "team" edge IDs in the mutation.
@@ -3661,7 +3674,11 @@ func (m *TeamIdentityRoleMutation) AddField(name string, value ent.Value) error 
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *TeamIdentityRoleMutation) ClearedFields() []string {
-	return nil
+	var fields []string
+	if m.FieldCleared(teamidentityrole.FieldTeamID) {
+		fields = append(fields, teamidentityrole.FieldTeamID)
+	}
+	return fields
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -3674,6 +3691,11 @@ func (m *TeamIdentityRoleMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *TeamIdentityRoleMutation) ClearField(name string) error {
+	switch name {
+	case teamidentityrole.FieldTeamID:
+		m.ClearTeamID()
+		return nil
+	}
 	return fmt.Errorf("unknown TeamIdentityRole nullable field %s", name)
 }
 

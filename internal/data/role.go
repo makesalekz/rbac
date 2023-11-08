@@ -2,6 +2,7 @@ package data
 
 import (
 	"context"
+	"rbac/api/rbac/v1"
 	"rbac/ent"
 	"rbac/ent/role"
 	"rbac/ent/rolepermission"
@@ -129,7 +130,7 @@ func (r *roleRepo) AddPermissionToRole(ctx context.Context, dto CreateRolePermis
 
 	isValid := validateFields(permission.Fields, dto.Fields)
 	if !isValid {
-		panic("Invalid fields")
+		return nil, rbac_v1.ErrorInvalidRequest("Invalid fields")
 	}
 
 	rolePermissionSave, err := r.db.RolePermission.Create().
@@ -171,12 +172,11 @@ func (r *roleRepo) ListRolesPermissions(ctx context.Context, roleIds []int64, te
 	query := r.db.RolePermission.
 		Query().
 		Where(
-			rolepermission.HasRoleWith(role.IDIn(roleIds...)),
-			rolepermission.TenantIDEQ(tenantId),
-			rolepermission.TenantID(0),
+			rolepermission.RoleIDIn(roleIds...),
+			rolepermission.TenantIDIn(tenantId, 0),
 		)
 	if len(permissions) != 0 {
-		query = query.Where(rolepermission.PermissionIDIn(permissions...))
+		query = query.Where(rolepermission.RoleIDIn(roleIds...))
 	}
 	return query.All(ctx)
 }

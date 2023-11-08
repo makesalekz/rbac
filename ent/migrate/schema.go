@@ -123,9 +123,9 @@ var (
 	TeamIdentityRolesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt64, Increment: true},
 		{Name: "tenant_id", Type: field.TypeInt64},
-		{Name: "identity_id", Type: field.TypeString, Default: ""},
+		{Name: "identity_id", Type: field.TypeString, Default: "0"},
 		{Name: "role_id", Type: field.TypeInt64},
-		{Name: "team_id", Type: field.TypeInt64, Default: 0},
+		{Name: "team_id", Type: field.TypeInt64, Nullable: true, Default: 0},
 	}
 	// TeamIdentityRolesTable holds the schema information for the "team_identity_roles" table.
 	TeamIdentityRolesTable = &schema.Table{
@@ -143,7 +143,7 @@ var (
 				Symbol:     "team_identity_roles_teams_team",
 				Columns:    []*schema.Column{TeamIdentityRolesColumns[4]},
 				RefColumns: []*schema.Column{TeamsColumns[0]},
-				OnDelete:   schema.NoAction,
+				OnDelete:   schema.SetNull,
 			},
 		},
 	}

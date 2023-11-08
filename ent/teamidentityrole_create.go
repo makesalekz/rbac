@@ -123,9 +123,6 @@ func (tirc *TeamIdentityRoleCreate) check() error {
 	if _, ok := tirc.mutation.TenantID(); !ok {
 		return &ValidationError{Name: "tenant_id", err: errors.New(`ent: missing required field "TeamIdentityRole.tenant_id"`)}
 	}
-	if _, ok := tirc.mutation.TeamID(); !ok {
-		return &ValidationError{Name: "team_id", err: errors.New(`ent: missing required field "TeamIdentityRole.team_id"`)}
-	}
 	if _, ok := tirc.mutation.IdentityID(); !ok {
 		return &ValidationError{Name: "identity_id", err: errors.New(`ent: missing required field "TeamIdentityRole.identity_id"`)}
 	}
@@ -134,9 +131,6 @@ func (tirc *TeamIdentityRoleCreate) check() error {
 	}
 	if _, ok := tirc.mutation.RoleID(); !ok {
 		return &ValidationError{Name: "role", err: errors.New(`ent: missing required edge "TeamIdentityRole.role"`)}
-	}
-	if _, ok := tirc.mutation.TeamID(); !ok {
-		return &ValidationError{Name: "team", err: errors.New(`ent: missing required edge "TeamIdentityRole.team"`)}
 	}
 	return nil
 }
@@ -171,7 +165,7 @@ func (tirc *TeamIdentityRoleCreate) createSpec() (*TeamIdentityRole, *sqlgraph.C
 	}
 	if value, ok := tirc.mutation.IdentityID(); ok {
 		_spec.SetField(teamidentityrole.FieldIdentityID, field.TypeString, value)
-		_node.IdentityID = &value
+		_node.IdentityID = value
 	}
 	if nodes := tirc.mutation.RoleIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -204,7 +198,7 @@ func (tirc *TeamIdentityRoleCreate) createSpec() (*TeamIdentityRole, *sqlgraph.C
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.TeamID = &nodes[0]
+		_node.TeamID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

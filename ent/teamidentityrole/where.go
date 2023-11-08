@@ -134,6 +134,16 @@ func TeamIDNotIn(vs ...int64) predicate.TeamIdentityRole {
 	return predicate.TeamIdentityRole(sql.FieldNotIn(FieldTeamID, vs...))
 }
 
+// TeamIDIsNil applies the IsNil predicate on the "team_id" field.
+func TeamIDIsNil() predicate.TeamIdentityRole {
+	return predicate.TeamIdentityRole(sql.FieldIsNull(FieldTeamID))
+}
+
+// TeamIDNotNil applies the NotNil predicate on the "team_id" field.
+func TeamIDNotNil() predicate.TeamIdentityRole {
+	return predicate.TeamIdentityRole(sql.FieldNotNull(FieldTeamID))
+}
+
 // IdentityIDEQ applies the EQ predicate on the "identity_id" field.
 func IdentityIDEQ(v string) predicate.TeamIdentityRole {
 	return predicate.TeamIdentityRole(sql.FieldEQ(FieldIdentityID, v))

@@ -47,17 +47,7 @@ func NewTeamsRepo(d *Data) TeamsRepo {
 }
 
 func (r *teamsRepo) CreateTeam(ctx context.Context, dto TeamDto) (*ent.Team, error) {
-	tx, err := r.db.Tx(ctx)
-	if err != nil {
-		return nil, err
-	}
-	defer func() {
-		if err != nil {
-			tx.Rollback()
-		}
-	}()
-
-	query := tx.Team.Create().
+	query := r.db.Team.Create().
 		SetTenantID(dto.TenantId).
 		SetName(dto.Name).
 		SetDescription(dto.Description)
@@ -71,24 +61,7 @@ func (r *teamsRepo) CreateTeam(ctx context.Context, dto TeamDto) (*ent.Team, err
 	if len(dto.ParentsIds) > 0 {
 		parentsIds.Set(dto.ParentsIds)
 	}
-
-	team, err := query.SetParentsIds(parentsIds).Save(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	if team.ParentID == nil {
-		//_, err = tx.Member.Create().SetTeamID(team.ID).SetUserID(dto.TenantId).Save(ctx)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	err = tx.Commit()
-	if err != nil {
-		return nil, err
-	}
-	return team, nil
+	return query.SetParentsIds(parentsIds).Save(ctx)
 }
 
 func (r *teamsRepo) UpdateTeam(ctx context.Context, teamId int64, dto TeamDto) (*ent.Team, error) {

@@ -21,9 +21,9 @@ type TeamIdentityRole struct {
 	// TenantID holds the value of the "tenant_id" field.
 	TenantID int64 `json:"tenant_id,omitempty"`
 	// TeamID holds the value of the "team_id" field.
-	TeamID *int64 `json:"team_id,omitempty"`
+	TeamID int64 `json:"team_id,omitempty"`
 	// IdentityID holds the value of the "identity_id" field.
-	IdentityID *string `json:"identity_id,omitempty"`
+	IdentityID string `json:"identity_id,omitempty"`
 	// RoleID holds the value of the "role_id" field.
 	RoleID int64 `json:"role_id,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -109,15 +109,13 @@ func (tir *TeamIdentityRole) assignValues(columns []string, values []any) error 
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field team_id", values[i])
 			} else if value.Valid {
-				tir.TeamID = new(int64)
-				*tir.TeamID = value.Int64
+				tir.TeamID = value.Int64
 			}
 		case teamidentityrole.FieldIdentityID:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field identity_id", values[i])
 			} else if value.Valid {
-				tir.IdentityID = new(string)
-				*tir.IdentityID = value.String
+				tir.IdentityID = value.String
 			}
 		case teamidentityrole.FieldRoleID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -174,15 +172,11 @@ func (tir *TeamIdentityRole) String() string {
 	builder.WriteString("tenant_id=")
 	builder.WriteString(fmt.Sprintf("%v", tir.TenantID))
 	builder.WriteString(", ")
-	if v := tir.TeamID; v != nil {
-		builder.WriteString("team_id=")
-		builder.WriteString(fmt.Sprintf("%v", *v))
-	}
+	builder.WriteString("team_id=")
+	builder.WriteString(fmt.Sprintf("%v", tir.TeamID))
 	builder.WriteString(", ")
-	if v := tir.IdentityID; v != nil {
-		builder.WriteString("identity_id=")
-		builder.WriteString(*v)
-	}
+	builder.WriteString("identity_id=")
+	builder.WriteString(tir.IdentityID)
 	builder.WriteString(", ")
 	builder.WriteString("role_id=")
 	builder.WriteString(fmt.Sprintf("%v", tir.RoleID))

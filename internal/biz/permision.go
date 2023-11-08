@@ -27,38 +27,38 @@ func NewPermissionUsecase(logger log.Logger, jwt *data.JwtProcessor, permissionR
 }
 
 func (uc *PermissionsUsecase) GetPermissionById(ctx context.Context, permissionId string) (*ent.Permission, error) {
-	userId, _, ok := uc.jwt.GetTenantClaimsFromContext(ctx)
+	_, ok := uc.jwt.GetTenantClaimsFromContext(ctx)
 	if !ok {
 		return nil, rbacv1.ErrorUnauthorized("Unauthorized")
 	}
-	uc.log.Debug("GetPermissionById", "permissionId", permissionId, "userId", userId)
+	uc.log.Debug("GetPermissionById", "permissionId", permissionId)
 	return uc.permissionRepo.GetPermissionById(ctx, permissionId)
 }
 
 func (uc *PermissionsUsecase) CreatePermission(ctx context.Context, data data.CreatePermissionDto) (*ent.Permission, error) {
-	userId, _, ok := uc.jwt.GetTenantClaimsFromContext(ctx)
+	_, ok := uc.jwt.GetTenantClaimsFromContext(ctx)
 	if !ok {
 		return nil, rbacv1.ErrorUnauthorized("Unauthorized")
 	}
-	uc.log.Debug("CreatePermission", "data", data, "userId", userId)
+	uc.log.Debug("CreatePermission", "data", data)
 	return uc.permissionRepo.CreatePermission(ctx, data)
 }
 
 func (uc *PermissionsUsecase) UpdatePermission(ctx context.Context, permissionId string, data data.UpdatePermissionDto) (*ent.Permission, error) {
-	userId, _, ok := uc.jwt.GetTenantClaimsFromContext(ctx)
+	_, ok := uc.jwt.GetTenantClaimsFromContext(ctx)
 	if !ok {
 		return nil, rbacv1.ErrorUnauthorized("Unauthorized")
 	}
-	uc.log.Debug("UpdatePermission", "permissionId", permissionId, "data", data, "userId", userId)
+	uc.log.Debug("UpdatePermission", "permissionId", permissionId, "data", data)
 	return uc.permissionRepo.UpdatePermission(ctx, permissionId, data)
 }
 
 func (uc *PermissionsUsecase) DeletePermission(ctx context.Context, permissionId string) error {
-	userId, _, ok := uc.jwt.GetTenantClaimsFromContext(ctx)
+	_, ok := uc.jwt.GetTenantClaimsFromContext(ctx)
 	if !ok {
 		return rbacv1.ErrorUnauthorized("Unauthorized")
 	}
-	uc.log.Debug("DeletePermission", "permissionId", permissionId, "userId", userId)
+	uc.log.Debug("DeletePermission", "permissionId", permissionId)
 
 	_, err := uc.GetPermissionById(ctx, permissionId)
 	if err != nil {
@@ -68,10 +68,10 @@ func (uc *PermissionsUsecase) DeletePermission(ctx context.Context, permissionId
 }
 
 func (uc *PermissionsUsecase) GetPermissions(ctx context.Context, appId string, permissionIds []string) ([]*ent.Permission, error) {
-	userId, _, ok := uc.jwt.GetTenantClaimsFromContext(ctx)
+	_, ok := uc.jwt.GetTenantClaimsFromContext(ctx)
 	if !ok {
 		return nil, rbacv1.ErrorUnauthorized("Unauthorized")
 	}
-	uc.log.Debug("GetPermissions", "appId", appId, "permissionIds", permissionIds, "userId", userId)
+	uc.log.Debug("GetPermissions", "appId", appId, "permissionIds", permissionIds)
 	return uc.permissionRepo.GetPermissions(ctx, appId, permissionIds)
 }

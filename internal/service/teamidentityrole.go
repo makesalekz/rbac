@@ -32,7 +32,7 @@ func (s *TeamIdentityRoleService) AssignRole(ctx context.Context, req *pb.Assign
 	}
 	return &pb.TeamIdentityRoleReply{
 		TenantId:   identityRole.TenantID,
-		IdentityId: *identityRole.IdentityID,
+		IdentityId: identityRole.IdentityID,
 		Team: &pb.Team{
 			Id:          identityRole.Edges.Team.ID,
 			Name:        identityRole.Edges.Team.Name,
@@ -69,7 +69,7 @@ func (s *TeamIdentityRoleService) ListIdentityRoles(ctx context.Context, req *pb
 	for i, identityRole := range identityRoles {
 		result[i] = &pb.TeamIdentityRoleReply{
 			TenantId:   identityRole.TenantID,
-			IdentityId: *identityRole.IdentityID,
+			IdentityId: identityRole.IdentityID,
 			Team: &pb.Team{
 				Id:          identityRole.Edges.Team.ID,
 				Name:        identityRole.Edges.Team.Name,
@@ -101,7 +101,7 @@ func (s *TeamIdentityRoleService) ListTeamRoles(ctx context.Context, req *pb.Lis
 	for i, teamRole := range teamRoles {
 		result[i] = &pb.TeamIdentityRoleReply{
 			TenantId:   teamRole.TenantID,
-			IdentityId: *teamRole.IdentityID,
+			IdentityId: teamRole.IdentityID,
 			Team: &pb.Team{
 				Id:          teamRole.Edges.Team.ID,
 				Name:        teamRole.Edges.Team.Name,
