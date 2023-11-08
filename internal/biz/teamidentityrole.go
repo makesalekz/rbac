@@ -81,6 +81,27 @@ func (u *TeamIdentityUsecase) ListTeamRoles(ctx context.Context, dto data.ListTe
 	return u.repo.ListTeamRoles(ctx, dto)
 }
 
+func mergeFields(fields1 []string, fields2 []string) []string {
+	if len(fields1) > len(fields2) {
+		fields1, fields2 = fields2, fields1
+	}
+	for _, field := range fields2 {
+		if !contains(fields1, field) {
+			fields1 = append(fields1, field)
+		}
+	}
+	return fields1
+}
+
+func contains(fields []string, field string) bool {
+	for _, f := range fields {
+		if f == field {
+			return true
+		}
+	}
+	return false
+}
+
 func (u *TeamIdentityUsecase) CheckPermissions(ctx context.Context, teamId int64, permissions []string) (map[string]*rbacv1.ListOfFields, error) {
 	claims, ok := u.jwt.GetTenantClaimsFromContext(ctx)
 	if !ok {
@@ -100,13 +121,24 @@ func (u *TeamIdentityUsecase) CheckPermissions(ctx context.Context, teamId int64
 		roleIds = append(roleIds, teamIdentityRole.RoleID)
 	}
 	rolesPermissions, err := u.roleRepo.ListRolesPermissions(ctx, roleIds, claims.TenantId, permissions)
+	if err != nil {
+		return nil, err
+	}
 
 	result := make(map[string]*rbacv1.ListOfFields)
 	for _, rolePermission := range rolesPermissions {
-		if _, ok := result[rolePermission.PermissionID]; !ok && !rolePermission.Deny {
+		if _, ok := result[rolePermission.PermissionID]; !ok {
 			result[rolePermission.PermissionID] = &rbacv1.ListOfFields{
-				Field: rolePermission.Fields,
+				Fields: rolePermission.Fields,
 			}
+		} else {
+			result[rolePermission.PermissionID].Fields = mergeFields(result[rolePermission.PermissionID].Fields, rolePermission.Fields)
+		}
+	}
+
+	for _, rolePermission := range rolesPermissions {
+		if rolePermission.Deny {
+			delete(result, rolePermission.PermissionID)
 		}
 	}
 

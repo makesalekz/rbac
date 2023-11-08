@@ -552,7 +552,7 @@ components:
         api.rbac.v1.ListOfFields:
             type: object
             properties:
-                field:
+                fields:
                     type: array
                     items:
                         type: string

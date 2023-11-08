@@ -23,7 +23,7 @@ message CheckPermissionsRequest {
 }
 
 message ListOfFields {
-  repeated string field = 1;
+  repeated string fields = 1;
 }
 
 message CheckPermissionsReply{
