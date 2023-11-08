@@ -161,7 +161,7 @@ func (r *roleRepo) ListRolePermissions(ctx context.Context, roleId, tenantId int
 	query := r.db.RolePermission.
 		Query().
 		Where(
-			rolepermission.HasRoleWith(role.ID(roleId)),
+			rolepermission.RoleID(roleId),
 			rolepermission.TenantIDEQ(tenantId),
 		)
 

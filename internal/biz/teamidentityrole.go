@@ -26,6 +26,9 @@ func (u *TeamIdentityUsecase) AssignRole(ctx context.Context, dto data.AssignRol
 	if !ok {
 		return nil, rbacv1.ErrorForbidden("forbidden")
 	}
+	if dto.TenantId != claims.TenantId {
+		return nil, rbacv1.ErrorForbidden("forbidden")
+	}
 	// todo checkPermissions can assign role to tenant identity
 	_, err := u.roleRepo.GetRoleById(ctx, dto.RoleId, claims.TenantId)
 	if err != nil {
@@ -36,9 +39,6 @@ func (u *TeamIdentityUsecase) AssignRole(ctx context.Context, dto data.AssignRol
 		return nil, rbacv1.ErrorNotFound("team not found")
 	}
 
-	if dto.TenantId != claims.TenantId {
-		return nil, rbacv1.ErrorForbidden("forbidden")
-	}
 	teamIdentityRole, err := u.repo.AssignRole(ctx, dto)
 	if err != nil {
 		return nil, rbacv1.ErrorDatabaseQuery("assign role failed")

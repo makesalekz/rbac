@@ -16,7 +16,7 @@ func (TeamIdentityRole) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int64("tenant_id").Immutable(),
 		field.Int64("team_id").Immutable().Optional().Default(0),
-		field.String("identity_id").Immutable().Default("0"),
+		field.String("identity_id").Immutable().Default(""),
 		field.Int64("role_id").Immutable(),
 	}
 }

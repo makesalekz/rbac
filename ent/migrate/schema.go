@@ -123,7 +123,7 @@ var (
 	TeamIdentityRolesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt64, Increment: true},
 		{Name: "tenant_id", Type: field.TypeInt64},
-		{Name: "identity_id", Type: field.TypeString, Default: "0"},
+		{Name: "identity_id", Type: field.TypeString, Default: ""},
 		{Name: "role_id", Type: field.TypeInt64},
 		{Name: "team_id", Type: field.TypeInt64, Nullable: true, Default: 0},
 	}
