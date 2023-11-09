@@ -1,10 +1,10 @@
 package server
 
 import (
-	dummy_v1 "dummy/api/dummy/v1"
-	"dummy/internal/conf"
-	"dummy/internal/data"
-	"dummy/internal/service"
+	v1 "rbac/api/rbac/v1"
+	"rbac/internal/conf"
+	"rbac/internal/data"
+	"rbac/internal/service"
 
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-kratos/kratos/v2/middleware/auth/jwt"
@@ -15,7 +15,13 @@ import (
 )
 
 // NewGRPCServer new a gRPC server.
-func NewGRPCServer(c *conf.Bootstrap, logger log.Logger, jwtp *data.JwtProcessor, srvc *service.DummyService) *grpc.Server {
+func NewGRPCServer(c *conf.Bootstrap, logger log.Logger, jwtp *data.JwtProcessor,
+	roleSrvc *service.RolesService,
+	permissionsSrvc *service.PermissionsService,
+	teamSrvc *service.TeamsService,
+	teamIdentityRolesSrvc *service.TeamIdentityRoleService,
+	checkPermissionSrvc *service.CheckPermissionsService,
+) *grpc.Server {
 	var opts = []grpc.ServerOption{
 		grpc.Middleware(
 			recovery.Recovery(),
@@ -36,7 +42,11 @@ func NewGRPCServer(c *conf.Bootstrap, logger log.Logger, jwtp *data.JwtProcessor
 	}
 	srv := grpc.NewServer(opts...)
 
-	dummy_v1.RegisterDummyServer(srv, srvc)
+	v1.RegisterRolesServer(srv, roleSrvc)
+	v1.RegisterPermissionsServer(srv, permissionsSrvc)
+	v1.RegisterTeamsServer(srv, teamSrvc)
+	v1.RegisterTeamIdentityRoleServer(srv, teamIdentityRolesSrvc)
+	v1.RegisterCheckPermissionsServer(srv, checkPermissionSrvc)
 
 	return srv
 }

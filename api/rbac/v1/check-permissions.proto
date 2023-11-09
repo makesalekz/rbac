@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+package api.rbac.v1;
+
+
+import "google/api/annotations.proto";
+
+option go_package = "rbac/api/rbac/v1;rbac_v1";
+option java_multiple_files = true;
+option java_package = "api.rbac.v1";
+
+service CheckPermissions {
+  rpc CheckPermissions (CheckPermissionsRequest) returns (CheckPermissionsReply) {
+    option (google.api.http) = {
+      post: "/v1/rbac/check-permission"
+      body: "*"
+    };
+  }
+}
+message CheckPermissionsRequest {
+  int64 teamId = 2;
+  repeated string permissions = 3;
+}
+
+message ListOfFields {
+  repeated string fields = 1;
+}
+
+message CheckPermissionsReply{
+  map<string, ListOfFields> permissions = 1;
+}

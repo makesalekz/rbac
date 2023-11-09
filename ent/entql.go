@@ -3,7 +3,12 @@
 package ent
 
 import (
-	"dummy/ent/dummy"
+	"rbac/ent/permission"
+	"rbac/ent/predicate"
+	"rbac/ent/role"
+	"rbac/ent/rolepermission"
+	"rbac/ent/team"
+	"rbac/ent/teamidentityrole"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -13,24 +18,196 @@ import (
 
 // schemaGraph holds a representation of ent/schema at runtime.
 var schemaGraph = func() *sqlgraph.Schema {
-	graph := &sqlgraph.Schema{Nodes: make([]*sqlgraph.Node, 1)}
+	graph := &sqlgraph.Schema{Nodes: make([]*sqlgraph.Node, 5)}
 	graph.Nodes[0] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
-			Table:   dummy.Table,
-			Columns: dummy.Columns,
+			Table:   permission.Table,
+			Columns: permission.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt64,
-				Column: dummy.FieldID,
+				Type:   field.TypeString,
+				Column: permission.FieldID,
 			},
 		},
-		Type: "Dummy",
+		Type: "Permission",
 		Fields: map[string]*sqlgraph.FieldSpec{
-			dummy.FieldUserID:    {Type: field.TypeInt64, Column: dummy.FieldUserID},
-			dummy.FieldName:      {Type: field.TypeString, Column: dummy.FieldName},
-			dummy.FieldCreatedAt: {Type: field.TypeTime, Column: dummy.FieldCreatedAt},
-			dummy.FieldUpdatedAt: {Type: field.TypeTime, Column: dummy.FieldUpdatedAt},
+			permission.FieldName:        {Type: field.TypeString, Column: permission.FieldName},
+			permission.FieldDescription: {Type: field.TypeString, Column: permission.FieldDescription},
+			permission.FieldAppID:       {Type: field.TypeString, Column: permission.FieldAppID},
+			permission.FieldFields:      {Type: field.TypeJSON, Column: permission.FieldFields},
 		},
 	}
+	graph.Nodes[1] = &sqlgraph.Node{
+		NodeSpec: sqlgraph.NodeSpec{
+			Table:   role.Table,
+			Columns: role.Columns,
+			ID: &sqlgraph.FieldSpec{
+				Type:   field.TypeInt64,
+				Column: role.FieldID,
+			},
+		},
+		Type: "Role",
+		Fields: map[string]*sqlgraph.FieldSpec{
+			role.FieldDeletedAt:   {Type: field.TypeTime, Column: role.FieldDeletedAt},
+			role.FieldName:        {Type: field.TypeString, Column: role.FieldName},
+			role.FieldDescription: {Type: field.TypeString, Column: role.FieldDescription},
+			role.FieldTenantID:    {Type: field.TypeInt64, Column: role.FieldTenantID},
+			role.FieldIsSystem:    {Type: field.TypeBool, Column: role.FieldIsSystem},
+			role.FieldCreatedAt:   {Type: field.TypeTime, Column: role.FieldCreatedAt},
+			role.FieldUpdatedAt:   {Type: field.TypeTime, Column: role.FieldUpdatedAt},
+		},
+	}
+	graph.Nodes[2] = &sqlgraph.Node{
+		NodeSpec: sqlgraph.NodeSpec{
+			Table:   rolepermission.Table,
+			Columns: rolepermission.Columns,
+			ID: &sqlgraph.FieldSpec{
+				Type:   field.TypeInt64,
+				Column: rolepermission.FieldID,
+			},
+		},
+		Type: "RolePermission",
+		Fields: map[string]*sqlgraph.FieldSpec{
+			rolepermission.FieldTenantID:     {Type: field.TypeInt64, Column: rolepermission.FieldTenantID},
+			rolepermission.FieldRoleID:       {Type: field.TypeInt64, Column: rolepermission.FieldRoleID},
+			rolepermission.FieldPermissionID: {Type: field.TypeString, Column: rolepermission.FieldPermissionID},
+			rolepermission.FieldDeny:         {Type: field.TypeBool, Column: rolepermission.FieldDeny},
+			rolepermission.FieldFields:       {Type: field.TypeJSON, Column: rolepermission.FieldFields},
+		},
+	}
+	graph.Nodes[3] = &sqlgraph.Node{
+		NodeSpec: sqlgraph.NodeSpec{
+			Table:   team.Table,
+			Columns: team.Columns,
+			ID: &sqlgraph.FieldSpec{
+				Type:   field.TypeInt64,
+				Column: team.FieldID,
+			},
+		},
+		Type: "Team",
+		Fields: map[string]*sqlgraph.FieldSpec{
+			team.FieldDeletedAt:   {Type: field.TypeTime, Column: team.FieldDeletedAt},
+			team.FieldTenantID:    {Type: field.TypeInt64, Column: team.FieldTenantID},
+			team.FieldParentID:    {Type: field.TypeInt64, Column: team.FieldParentID},
+			team.FieldParentsIds:  {Type: field.TypeOther, Column: team.FieldParentsIds},
+			team.FieldName:        {Type: field.TypeString, Column: team.FieldName},
+			team.FieldDescription: {Type: field.TypeString, Column: team.FieldDescription},
+			team.FieldCreatedAt:   {Type: field.TypeTime, Column: team.FieldCreatedAt},
+			team.FieldUpdatedAt:   {Type: field.TypeTime, Column: team.FieldUpdatedAt},
+		},
+	}
+	graph.Nodes[4] = &sqlgraph.Node{
+		NodeSpec: sqlgraph.NodeSpec{
+			Table:   teamidentityrole.Table,
+			Columns: teamidentityrole.Columns,
+			ID: &sqlgraph.FieldSpec{
+				Type:   field.TypeInt64,
+				Column: teamidentityrole.FieldID,
+			},
+		},
+		Type: "TeamIdentityRole",
+		Fields: map[string]*sqlgraph.FieldSpec{
+			teamidentityrole.FieldTenantID:   {Type: field.TypeInt64, Column: teamidentityrole.FieldTenantID},
+			teamidentityrole.FieldTeamID:     {Type: field.TypeInt64, Column: teamidentityrole.FieldTeamID},
+			teamidentityrole.FieldIdentityID: {Type: field.TypeString, Column: teamidentityrole.FieldIdentityID},
+			teamidentityrole.FieldRoleID:     {Type: field.TypeInt64, Column: teamidentityrole.FieldRoleID},
+		},
+	}
+	graph.MustAddE(
+		"roles",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   permission.RolesTable,
+			Columns: []string{permission.RolesColumn},
+			Bidi:    false,
+		},
+		"Permission",
+		"Role",
+	)
+	graph.MustAddE(
+		"permissions",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   role.PermissionsTable,
+			Columns: []string{role.PermissionsColumn},
+			Bidi:    false,
+		},
+		"Role",
+		"Permission",
+	)
+	graph.MustAddE(
+		"role",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   rolepermission.RoleTable,
+			Columns: []string{rolepermission.RoleColumn},
+			Bidi:    false,
+		},
+		"RolePermission",
+		"Role",
+	)
+	graph.MustAddE(
+		"permission",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   rolepermission.PermissionTable,
+			Columns: []string{rolepermission.PermissionColumn},
+			Bidi:    false,
+		},
+		"RolePermission",
+		"Permission",
+	)
+	graph.MustAddE(
+		"parent",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   team.ParentTable,
+			Columns: []string{team.ParentColumn},
+			Bidi:    false,
+		},
+		"Team",
+		"Team",
+	)
+	graph.MustAddE(
+		"children",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   team.ChildrenTable,
+			Columns: []string{team.ChildrenColumn},
+			Bidi:    false,
+		},
+		"Team",
+		"Team",
+	)
+	graph.MustAddE(
+		"role",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   teamidentityrole.RoleTable,
+			Columns: []string{teamidentityrole.RoleColumn},
+			Bidi:    false,
+		},
+		"TeamIdentityRole",
+		"Role",
+	)
+	graph.MustAddE(
+		"team",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   teamidentityrole.TeamTable,
+			Columns: []string{teamidentityrole.TeamColumn},
+			Bidi:    false,
+		},
+		"TeamIdentityRole",
+		"Team",
+	)
 	return graph
 }()
 
@@ -41,33 +218,33 @@ type predicateAdder interface {
 }
 
 // addPredicate implements the predicateAdder interface.
-func (dq *DummyQuery) addPredicate(pred func(s *sql.Selector)) {
-	dq.predicates = append(dq.predicates, pred)
+func (pq *PermissionQuery) addPredicate(pred func(s *sql.Selector)) {
+	pq.predicates = append(pq.predicates, pred)
 }
 
-// Filter returns a Filter implementation to apply filters on the DummyQuery builder.
-func (dq *DummyQuery) Filter() *DummyFilter {
-	return &DummyFilter{config: dq.config, predicateAdder: dq}
+// Filter returns a Filter implementation to apply filters on the PermissionQuery builder.
+func (pq *PermissionQuery) Filter() *PermissionFilter {
+	return &PermissionFilter{config: pq.config, predicateAdder: pq}
 }
 
 // addPredicate implements the predicateAdder interface.
-func (m *DummyMutation) addPredicate(pred func(s *sql.Selector)) {
+func (m *PermissionMutation) addPredicate(pred func(s *sql.Selector)) {
 	m.predicates = append(m.predicates, pred)
 }
 
-// Filter returns an entql.Where implementation to apply filters on the DummyMutation builder.
-func (m *DummyMutation) Filter() *DummyFilter {
-	return &DummyFilter{config: m.config, predicateAdder: m}
+// Filter returns an entql.Where implementation to apply filters on the PermissionMutation builder.
+func (m *PermissionMutation) Filter() *PermissionFilter {
+	return &PermissionFilter{config: m.config, predicateAdder: m}
 }
 
-// DummyFilter provides a generic filtering capability at runtime for DummyQuery.
-type DummyFilter struct {
+// PermissionFilter provides a generic filtering capability at runtime for PermissionQuery.
+type PermissionFilter struct {
 	predicateAdder
 	config
 }
 
 // Where applies the entql predicate on the query filter.
-func (f *DummyFilter) Where(p entql.P) {
+func (f *PermissionFilter) Where(p entql.P) {
 	f.addPredicate(func(s *sql.Selector) {
 		if err := schemaGraph.EvalP(schemaGraph.Nodes[0].Type, p, s); err != nil {
 			s.AddError(err)
@@ -75,27 +252,419 @@ func (f *DummyFilter) Where(p entql.P) {
 	})
 }
 
-// WhereID applies the entql int64 predicate on the id field.
-func (f *DummyFilter) WhereID(p entql.Int64P) {
-	f.Where(p.Field(dummy.FieldID))
-}
-
-// WhereUserID applies the entql int64 predicate on the user_id field.
-func (f *DummyFilter) WhereUserID(p entql.Int64P) {
-	f.Where(p.Field(dummy.FieldUserID))
+// WhereID applies the entql string predicate on the id field.
+func (f *PermissionFilter) WhereID(p entql.StringP) {
+	f.Where(p.Field(permission.FieldID))
 }
 
 // WhereName applies the entql string predicate on the name field.
-func (f *DummyFilter) WhereName(p entql.StringP) {
-	f.Where(p.Field(dummy.FieldName))
+func (f *PermissionFilter) WhereName(p entql.StringP) {
+	f.Where(p.Field(permission.FieldName))
+}
+
+// WhereDescription applies the entql string predicate on the description field.
+func (f *PermissionFilter) WhereDescription(p entql.StringP) {
+	f.Where(p.Field(permission.FieldDescription))
+}
+
+// WhereAppID applies the entql string predicate on the app_id field.
+func (f *PermissionFilter) WhereAppID(p entql.StringP) {
+	f.Where(p.Field(permission.FieldAppID))
+}
+
+// WhereFields applies the entql json.RawMessage predicate on the fields field.
+func (f *PermissionFilter) WhereFields(p entql.BytesP) {
+	f.Where(p.Field(permission.FieldFields))
+}
+
+// WhereHasRoles applies a predicate to check if query has an edge roles.
+func (f *PermissionFilter) WhereHasRoles() {
+	f.Where(entql.HasEdge("roles"))
+}
+
+// WhereHasRolesWith applies a predicate to check if query has an edge roles with a given conditions (other predicates).
+func (f *PermissionFilter) WhereHasRolesWith(preds ...predicate.Role) {
+	f.Where(entql.HasEdgeWith("roles", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// addPredicate implements the predicateAdder interface.
+func (rq *RoleQuery) addPredicate(pred func(s *sql.Selector)) {
+	rq.predicates = append(rq.predicates, pred)
+}
+
+// Filter returns a Filter implementation to apply filters on the RoleQuery builder.
+func (rq *RoleQuery) Filter() *RoleFilter {
+	return &RoleFilter{config: rq.config, predicateAdder: rq}
+}
+
+// addPredicate implements the predicateAdder interface.
+func (m *RoleMutation) addPredicate(pred func(s *sql.Selector)) {
+	m.predicates = append(m.predicates, pred)
+}
+
+// Filter returns an entql.Where implementation to apply filters on the RoleMutation builder.
+func (m *RoleMutation) Filter() *RoleFilter {
+	return &RoleFilter{config: m.config, predicateAdder: m}
+}
+
+// RoleFilter provides a generic filtering capability at runtime for RoleQuery.
+type RoleFilter struct {
+	predicateAdder
+	config
+}
+
+// Where applies the entql predicate on the query filter.
+func (f *RoleFilter) Where(p entql.P) {
+	f.addPredicate(func(s *sql.Selector) {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[1].Type, p, s); err != nil {
+			s.AddError(err)
+		}
+	})
+}
+
+// WhereID applies the entql int64 predicate on the id field.
+func (f *RoleFilter) WhereID(p entql.Int64P) {
+	f.Where(p.Field(role.FieldID))
+}
+
+// WhereDeletedAt applies the entql time.Time predicate on the deleted_at field.
+func (f *RoleFilter) WhereDeletedAt(p entql.TimeP) {
+	f.Where(p.Field(role.FieldDeletedAt))
+}
+
+// WhereName applies the entql string predicate on the name field.
+func (f *RoleFilter) WhereName(p entql.StringP) {
+	f.Where(p.Field(role.FieldName))
+}
+
+// WhereDescription applies the entql string predicate on the description field.
+func (f *RoleFilter) WhereDescription(p entql.StringP) {
+	f.Where(p.Field(role.FieldDescription))
+}
+
+// WhereTenantID applies the entql int64 predicate on the tenant_id field.
+func (f *RoleFilter) WhereTenantID(p entql.Int64P) {
+	f.Where(p.Field(role.FieldTenantID))
+}
+
+// WhereIsSystem applies the entql bool predicate on the is_system field.
+func (f *RoleFilter) WhereIsSystem(p entql.BoolP) {
+	f.Where(p.Field(role.FieldIsSystem))
 }
 
 // WhereCreatedAt applies the entql time.Time predicate on the created_at field.
-func (f *DummyFilter) WhereCreatedAt(p entql.TimeP) {
-	f.Where(p.Field(dummy.FieldCreatedAt))
+func (f *RoleFilter) WhereCreatedAt(p entql.TimeP) {
+	f.Where(p.Field(role.FieldCreatedAt))
 }
 
 // WhereUpdatedAt applies the entql time.Time predicate on the updated_at field.
-func (f *DummyFilter) WhereUpdatedAt(p entql.TimeP) {
-	f.Where(p.Field(dummy.FieldUpdatedAt))
+func (f *RoleFilter) WhereUpdatedAt(p entql.TimeP) {
+	f.Where(p.Field(role.FieldUpdatedAt))
+}
+
+// WhereHasPermissions applies a predicate to check if query has an edge permissions.
+func (f *RoleFilter) WhereHasPermissions() {
+	f.Where(entql.HasEdge("permissions"))
+}
+
+// WhereHasPermissionsWith applies a predicate to check if query has an edge permissions with a given conditions (other predicates).
+func (f *RoleFilter) WhereHasPermissionsWith(preds ...predicate.Permission) {
+	f.Where(entql.HasEdgeWith("permissions", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// addPredicate implements the predicateAdder interface.
+func (rpq *RolePermissionQuery) addPredicate(pred func(s *sql.Selector)) {
+	rpq.predicates = append(rpq.predicates, pred)
+}
+
+// Filter returns a Filter implementation to apply filters on the RolePermissionQuery builder.
+func (rpq *RolePermissionQuery) Filter() *RolePermissionFilter {
+	return &RolePermissionFilter{config: rpq.config, predicateAdder: rpq}
+}
+
+// addPredicate implements the predicateAdder interface.
+func (m *RolePermissionMutation) addPredicate(pred func(s *sql.Selector)) {
+	m.predicates = append(m.predicates, pred)
+}
+
+// Filter returns an entql.Where implementation to apply filters on the RolePermissionMutation builder.
+func (m *RolePermissionMutation) Filter() *RolePermissionFilter {
+	return &RolePermissionFilter{config: m.config, predicateAdder: m}
+}
+
+// RolePermissionFilter provides a generic filtering capability at runtime for RolePermissionQuery.
+type RolePermissionFilter struct {
+	predicateAdder
+	config
+}
+
+// Where applies the entql predicate on the query filter.
+func (f *RolePermissionFilter) Where(p entql.P) {
+	f.addPredicate(func(s *sql.Selector) {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[2].Type, p, s); err != nil {
+			s.AddError(err)
+		}
+	})
+}
+
+// WhereID applies the entql int64 predicate on the id field.
+func (f *RolePermissionFilter) WhereID(p entql.Int64P) {
+	f.Where(p.Field(rolepermission.FieldID))
+}
+
+// WhereTenantID applies the entql int64 predicate on the tenant_id field.
+func (f *RolePermissionFilter) WhereTenantID(p entql.Int64P) {
+	f.Where(p.Field(rolepermission.FieldTenantID))
+}
+
+// WhereRoleID applies the entql int64 predicate on the role_id field.
+func (f *RolePermissionFilter) WhereRoleID(p entql.Int64P) {
+	f.Where(p.Field(rolepermission.FieldRoleID))
+}
+
+// WherePermissionID applies the entql string predicate on the permission_id field.
+func (f *RolePermissionFilter) WherePermissionID(p entql.StringP) {
+	f.Where(p.Field(rolepermission.FieldPermissionID))
+}
+
+// WhereDeny applies the entql bool predicate on the deny field.
+func (f *RolePermissionFilter) WhereDeny(p entql.BoolP) {
+	f.Where(p.Field(rolepermission.FieldDeny))
+}
+
+// WhereFields applies the entql json.RawMessage predicate on the fields field.
+func (f *RolePermissionFilter) WhereFields(p entql.BytesP) {
+	f.Where(p.Field(rolepermission.FieldFields))
+}
+
+// WhereHasRole applies a predicate to check if query has an edge role.
+func (f *RolePermissionFilter) WhereHasRole() {
+	f.Where(entql.HasEdge("role"))
+}
+
+// WhereHasRoleWith applies a predicate to check if query has an edge role with a given conditions (other predicates).
+func (f *RolePermissionFilter) WhereHasRoleWith(preds ...predicate.Role) {
+	f.Where(entql.HasEdgeWith("role", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// WhereHasPermission applies a predicate to check if query has an edge permission.
+func (f *RolePermissionFilter) WhereHasPermission() {
+	f.Where(entql.HasEdge("permission"))
+}
+
+// WhereHasPermissionWith applies a predicate to check if query has an edge permission with a given conditions (other predicates).
+func (f *RolePermissionFilter) WhereHasPermissionWith(preds ...predicate.Permission) {
+	f.Where(entql.HasEdgeWith("permission", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// addPredicate implements the predicateAdder interface.
+func (tq *TeamQuery) addPredicate(pred func(s *sql.Selector)) {
+	tq.predicates = append(tq.predicates, pred)
+}
+
+// Filter returns a Filter implementation to apply filters on the TeamQuery builder.
+func (tq *TeamQuery) Filter() *TeamFilter {
+	return &TeamFilter{config: tq.config, predicateAdder: tq}
+}
+
+// addPredicate implements the predicateAdder interface.
+func (m *TeamMutation) addPredicate(pred func(s *sql.Selector)) {
+	m.predicates = append(m.predicates, pred)
+}
+
+// Filter returns an entql.Where implementation to apply filters on the TeamMutation builder.
+func (m *TeamMutation) Filter() *TeamFilter {
+	return &TeamFilter{config: m.config, predicateAdder: m}
+}
+
+// TeamFilter provides a generic filtering capability at runtime for TeamQuery.
+type TeamFilter struct {
+	predicateAdder
+	config
+}
+
+// Where applies the entql predicate on the query filter.
+func (f *TeamFilter) Where(p entql.P) {
+	f.addPredicate(func(s *sql.Selector) {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[3].Type, p, s); err != nil {
+			s.AddError(err)
+		}
+	})
+}
+
+// WhereID applies the entql int64 predicate on the id field.
+func (f *TeamFilter) WhereID(p entql.Int64P) {
+	f.Where(p.Field(team.FieldID))
+}
+
+// WhereDeletedAt applies the entql time.Time predicate on the deleted_at field.
+func (f *TeamFilter) WhereDeletedAt(p entql.TimeP) {
+	f.Where(p.Field(team.FieldDeletedAt))
+}
+
+// WhereTenantID applies the entql int64 predicate on the tenant_id field.
+func (f *TeamFilter) WhereTenantID(p entql.Int64P) {
+	f.Where(p.Field(team.FieldTenantID))
+}
+
+// WhereParentID applies the entql int64 predicate on the parent_id field.
+func (f *TeamFilter) WhereParentID(p entql.Int64P) {
+	f.Where(p.Field(team.FieldParentID))
+}
+
+// WhereParentsIds applies the entql other predicate on the parents_ids field.
+func (f *TeamFilter) WhereParentsIds(p entql.OtherP) {
+	f.Where(p.Field(team.FieldParentsIds))
+}
+
+// WhereName applies the entql string predicate on the name field.
+func (f *TeamFilter) WhereName(p entql.StringP) {
+	f.Where(p.Field(team.FieldName))
+}
+
+// WhereDescription applies the entql string predicate on the description field.
+func (f *TeamFilter) WhereDescription(p entql.StringP) {
+	f.Where(p.Field(team.FieldDescription))
+}
+
+// WhereCreatedAt applies the entql time.Time predicate on the created_at field.
+func (f *TeamFilter) WhereCreatedAt(p entql.TimeP) {
+	f.Where(p.Field(team.FieldCreatedAt))
+}
+
+// WhereUpdatedAt applies the entql time.Time predicate on the updated_at field.
+func (f *TeamFilter) WhereUpdatedAt(p entql.TimeP) {
+	f.Where(p.Field(team.FieldUpdatedAt))
+}
+
+// WhereHasParent applies a predicate to check if query has an edge parent.
+func (f *TeamFilter) WhereHasParent() {
+	f.Where(entql.HasEdge("parent"))
+}
+
+// WhereHasParentWith applies a predicate to check if query has an edge parent with a given conditions (other predicates).
+func (f *TeamFilter) WhereHasParentWith(preds ...predicate.Team) {
+	f.Where(entql.HasEdgeWith("parent", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// WhereHasChildren applies a predicate to check if query has an edge children.
+func (f *TeamFilter) WhereHasChildren() {
+	f.Where(entql.HasEdge("children"))
+}
+
+// WhereHasChildrenWith applies a predicate to check if query has an edge children with a given conditions (other predicates).
+func (f *TeamFilter) WhereHasChildrenWith(preds ...predicate.Team) {
+	f.Where(entql.HasEdgeWith("children", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// addPredicate implements the predicateAdder interface.
+func (tirq *TeamIdentityRoleQuery) addPredicate(pred func(s *sql.Selector)) {
+	tirq.predicates = append(tirq.predicates, pred)
+}
+
+// Filter returns a Filter implementation to apply filters on the TeamIdentityRoleQuery builder.
+func (tirq *TeamIdentityRoleQuery) Filter() *TeamIdentityRoleFilter {
+	return &TeamIdentityRoleFilter{config: tirq.config, predicateAdder: tirq}
+}
+
+// addPredicate implements the predicateAdder interface.
+func (m *TeamIdentityRoleMutation) addPredicate(pred func(s *sql.Selector)) {
+	m.predicates = append(m.predicates, pred)
+}
+
+// Filter returns an entql.Where implementation to apply filters on the TeamIdentityRoleMutation builder.
+func (m *TeamIdentityRoleMutation) Filter() *TeamIdentityRoleFilter {
+	return &TeamIdentityRoleFilter{config: m.config, predicateAdder: m}
+}
+
+// TeamIdentityRoleFilter provides a generic filtering capability at runtime for TeamIdentityRoleQuery.
+type TeamIdentityRoleFilter struct {
+	predicateAdder
+	config
+}
+
+// Where applies the entql predicate on the query filter.
+func (f *TeamIdentityRoleFilter) Where(p entql.P) {
+	f.addPredicate(func(s *sql.Selector) {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[4].Type, p, s); err != nil {
+			s.AddError(err)
+		}
+	})
+}
+
+// WhereID applies the entql int64 predicate on the id field.
+func (f *TeamIdentityRoleFilter) WhereID(p entql.Int64P) {
+	f.Where(p.Field(teamidentityrole.FieldID))
+}
+
+// WhereTenantID applies the entql int64 predicate on the tenant_id field.
+func (f *TeamIdentityRoleFilter) WhereTenantID(p entql.Int64P) {
+	f.Where(p.Field(teamidentityrole.FieldTenantID))
+}
+
+// WhereTeamID applies the entql int64 predicate on the team_id field.
+func (f *TeamIdentityRoleFilter) WhereTeamID(p entql.Int64P) {
+	f.Where(p.Field(teamidentityrole.FieldTeamID))
+}
+
+// WhereIdentityID applies the entql string predicate on the identity_id field.
+func (f *TeamIdentityRoleFilter) WhereIdentityID(p entql.StringP) {
+	f.Where(p.Field(teamidentityrole.FieldIdentityID))
+}
+
+// WhereRoleID applies the entql int64 predicate on the role_id field.
+func (f *TeamIdentityRoleFilter) WhereRoleID(p entql.Int64P) {
+	f.Where(p.Field(teamidentityrole.FieldRoleID))
+}
+
+// WhereHasRole applies a predicate to check if query has an edge role.
+func (f *TeamIdentityRoleFilter) WhereHasRole() {
+	f.Where(entql.HasEdge("role"))
+}
+
+// WhereHasRoleWith applies a predicate to check if query has an edge role with a given conditions (other predicates).
+func (f *TeamIdentityRoleFilter) WhereHasRoleWith(preds ...predicate.Role) {
+	f.Where(entql.HasEdgeWith("role", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// WhereHasTeam applies a predicate to check if query has an edge team.
+func (f *TeamIdentityRoleFilter) WhereHasTeam() {
+	f.Where(entql.HasEdge("team"))
+}
+
+// WhereHasTeamWith applies a predicate to check if query has an edge team with a given conditions (other predicates).
+func (f *TeamIdentityRoleFilter) WhereHasTeamWith(preds ...predicate.Team) {
+	f.Where(entql.HasEdgeWith("team", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
 }

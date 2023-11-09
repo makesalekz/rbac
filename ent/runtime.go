@@ -2,28 +2,4 @@
 
 package ent
 
-import (
-	"dummy/ent/dummy"
-	"dummy/ent/schema"
-	"time"
-)
-
-// The init function reads all schema descriptors with runtime code
-// (default values, validators, hooks and policies) and stitches it
-// to their package variables.
-func init() {
-	dummyFields := schema.Dummy{}.Fields()
-	_ = dummyFields
-	// dummyDescName is the schema descriptor for name field.
-	dummyDescName := dummyFields[1].Descriptor()
-	// dummy.DefaultName holds the default value on creation for the name field.
-	dummy.DefaultName = dummyDescName.Default.(string)
-	// dummyDescCreatedAt is the schema descriptor for created_at field.
-	dummyDescCreatedAt := dummyFields[2].Descriptor()
-	// dummy.DefaultCreatedAt holds the default value on creation for the created_at field.
-	dummy.DefaultCreatedAt = dummyDescCreatedAt.Default.(func() time.Time)
-	// dummyDescUpdatedAt is the schema descriptor for updated_at field.
-	dummyDescUpdatedAt := dummyFields[3].Descriptor()
-	// dummy.DefaultUpdatedAt holds the default value on creation for the updated_at field.
-	dummy.DefaultUpdatedAt = dummyDescUpdatedAt.Default.(func() time.Time)
-}
+// The schema-stitching logic is generated in rbac/ent/runtime/runtime.go

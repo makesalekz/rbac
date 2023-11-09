@@ -1,0 +1,120 @@
+//kratos:client
+syntax = "proto3";
+
+import "google/api/annotations.proto";
+import "rbac/v1/models.proto";
+
+package api.rbac.v1;
+
+option go_package = "rbac/api/rbac/v1;rbac_v1";
+option java_multiple_files = true;
+option java_package = "api.rbac.v1";
+
+
+service Roles {
+  rpc CreateRole (CreateRoleRequest) returns (RoleReply) {
+    option (google.api.http) = {
+      post: "/v1/rbac/roles"
+      body: "*"
+    };
+  };
+  rpc UpdateRole (UpdateRoleRequest) returns (RoleReply) {
+    option (google.api.http) = {
+      put: "/v1/rbac/roles/{roleId}"
+      body: "*"
+    };
+  };
+  rpc DeleteRole (DeleteRoleRequest) returns (EmptyReply) {
+    option (google.api.http) = {
+      delete: "/v1/rbac/roles/{roleId}"
+    };
+  };
+  rpc GetRole (GetRoleRequest) returns (RoleReply) {
+    option (google.api.http) = {
+      get: "/v1/rbac/roles/{roleId}"
+    };
+  };
+  rpc ListRoles (ListRolesRequest) returns (ListRolesReply){
+    option (google.api.http) = {
+      post: "/v1/rbac/roles/list"
+      body: "*"
+    };
+  };
+  rpc AddPermissionToRole (AddPermissionToRoleRequest) returns (RolePermissionReply){
+    option (google.api.http) = {
+      post: "/v1/rbac/roles/{roleId}/permissions"
+      body: "*"
+    };
+  };
+  rpc RemovePermissionFromRole (RemovePermissionFromRoleRequest) returns (EmptyReply){
+    option (google.api.http) = {
+      delete: "/v1/rbac/roles/{roleId}/permissions/{permissionId}"
+    };
+  };
+  rpc ListRolePermissions (RolesPermissionsRequest) returns (RolesPermissionsReply){
+    option (google.api.http) = {
+      post: "/v1/rbac/roles/{roleId}/permissions/list"
+      body: "*"
+    };
+  };
+}
+
+message CreateRoleRequest {
+  string name = 1;
+  string description = 2;
+  int64 tenantId = 3;
+}
+
+message UpdateRoleRequest {
+  int64 roleId = 1;
+  string name = 2;
+  string description = 3;
+}
+
+message DeleteRoleRequest {
+  int64 roleId = 1;
+}
+
+message GetRoleRequest {
+  int64 roleId = 1;
+}
+
+message ListRolesRequest {
+  int64 tenantId = 1;
+  optional string name = 2;
+}
+
+message ListRolesReply {
+  repeated RoleReply roles = 1;
+}
+
+message AddPermissionToRoleRequest {
+  int64 roleId = 1;
+  string permissionId = 2;
+  int64 tenantId = 3;
+  optional bool deny = 4;
+  repeated string fields = 5;
+}
+
+message RolePermissionReply {
+  RoleReply role = 1;
+  PermissionReply permission = 2;
+  int64 tenantId = 3;
+  optional bool deny = 4;
+  repeated string fields = 5;
+}
+
+message RemovePermissionFromRoleRequest {
+  int64 roleId = 1;
+  string permissionId = 2;
+  int64 tenantId = 3;
+}
+
+message RolesPermissionsRequest {
+  int64 roleId = 1;
+  int64 tenantId = 2;
+}
+
+message RolesPermissionsReply {
+  repeated RolePermissionReply permissions = 1;
+}

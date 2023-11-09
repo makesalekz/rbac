@@ -1,10 +1,10 @@
 package server
 
 import (
-	dummy_v1 "dummy/api/dummy/v1"
-	"dummy/internal/conf"
-	"dummy/internal/data"
-	"dummy/internal/service"
+	v1 "rbac/api/rbac/v1"
+	"rbac/internal/conf"
+	"rbac/internal/data"
+	"rbac/internal/service"
 
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-kratos/kratos/v2/middleware/auth/jwt"
@@ -15,7 +15,16 @@ import (
 )
 
 // NewHTTPServer new an HTTP server.
-func NewHTTPServer(c *conf.Bootstrap, logger log.Logger, jwtp *data.JwtProcessor, srvc *service.DummyService) *khttp.Server {
+func NewHTTPServer(
+	c *conf.Bootstrap,
+	logger log.Logger,
+	jwtp *data.JwtProcessor,
+	roleSrvc *service.RolesService,
+	permissionsSrvc *service.PermissionsService,
+	teamSrvc *service.TeamsService,
+	teamIdentityRolesSrvc *service.TeamIdentityRoleService,
+	checkPermissionSrvc *service.CheckPermissionsService,
+) *khttp.Server {
 	var opts = []khttp.ServerOption{
 		khttp.Middleware(
 			recovery.Recovery(),
@@ -36,7 +45,11 @@ func NewHTTPServer(c *conf.Bootstrap, logger log.Logger, jwtp *data.JwtProcessor
 	}
 	srv := khttp.NewServer(opts...)
 
-	dummy_v1.RegisterDummyHTTPServer(srv, srvc)
+	v1.RegisterRolesHTTPServer(srv, roleSrvc)
+	v1.RegisterPermissionsHTTPServer(srv, permissionsSrvc)
+	v1.RegisterTeamsHTTPServer(srv, teamSrvc)
+	v1.RegisterTeamIdentityRoleHTTPServer(srv, teamIdentityRolesSrvc)
+	v1.RegisterCheckPermissionsHTTPServer(srv, checkPermissionSrvc)
 
 	return srv
 }

@@ -6,5 +6,17 @@ import (
 	"entgo.io/ent/dialect/sql"
 )
 
-// Dummy is the predicate function for dummy builders.
-type Dummy func(*sql.Selector)
+// Permission is the predicate function for permission builders.
+type Permission func(*sql.Selector)
+
+// Role is the predicate function for role builders.
+type Role func(*sql.Selector)
+
+// RolePermission is the predicate function for rolepermission builders.
+type RolePermission func(*sql.Selector)
+
+// Team is the predicate function for team builders.
+type Team func(*sql.Selector)
+
+// TeamIdentityRole is the predicate function for teamidentityrole builders.
+type TeamIdentityRole func(*sql.Selector)

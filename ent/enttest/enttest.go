@@ -4,11 +4,11 @@ package enttest
 
 import (
 	"context"
-	"dummy/ent"
+	"rbac/ent"
 	// required by schema hooks.
-	_ "dummy/ent/runtime"
+	_ "rbac/ent/runtime"
 
-	"dummy/ent/migrate"
+	"rbac/ent/migrate"
 
 	"entgo.io/ent/dialect/sql/schema"
 )

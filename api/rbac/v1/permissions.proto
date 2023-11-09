@@ -1,0 +1,73 @@
+syntax = "proto3";
+
+import "google/api/annotations.proto";
+import "rbac/v1/models.proto";
+
+package api.rbac.v1;
+
+option go_package = "rbac/api/rbac/v1;rbac_v1";
+option java_multiple_files = true;
+option java_package = "api.rbac.v1";
+
+service Permissions {
+	rpc CreatePermission (CreatePermissionRequest) returns (PermissionReply) {
+		option (google.api.http) = {
+			post: "/v1/rbac/permissions"
+			body: "*"
+		};
+	};
+	rpc UpdatePermission (UpdatePermissionRequest) returns (PermissionReply) {
+		option (google.api.http) = {
+			put: "/v1/rbac/permissions/{permissionId}"
+			body: "*"
+		};
+	};
+	rpc DeletePermission (DeletePermissionRequest) returns (EmptyReply) {
+		option (google.api.http) = {
+			delete: "/v1/rbac/permissions/{permissionId}"
+		};
+	};
+	rpc GetPermission (GetPermissionRequest) returns (PermissionReply) {
+		option (google.api.http) = {
+			get: "/v1/rbac/permissions/{permissionId}"
+		};
+	};
+	rpc ListPermissions (ListPermissionsRequest) returns (ListPermissionsReply){
+		option (google.api.http) = {
+			post: "/v1/rbac/permissions/list"
+			body: "*"
+		};
+	};
+}
+
+message CreatePermissionRequest {
+	string id = 1;
+	string appId = 2;
+	string name = 3;
+	string description = 4;
+	repeated string fields = 5;
+}
+
+message UpdatePermissionRequest {
+	string permissionId = 1;
+	string name = 2;
+	string description = 3;
+	repeated string fields = 4;
+}
+
+message DeletePermissionRequest {
+	string permissionId = 1;
+}
+
+message GetPermissionRequest {
+	string permissionId = 1;
+}
+
+message ListPermissionsRequest {
+	string appId = 1;
+	repeated string ids = 2;
+}
+
+message ListPermissionsReply {
+	repeated PermissionReply permissions = 1;
+}

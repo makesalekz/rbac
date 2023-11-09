@@ -13,11 +13,19 @@ type JwtProcessor struct {
 	jwtSecret []byte
 }
 
+type TenantClaims struct {
+	jwtv4.RegisteredClaims
+
+	TenantId  int64    `json:"tenant,omitempty"`
+	MemberId  string   `json:"member,omitempty"`
+	GroupsIds []string `json:"groups,omitempty"`
+}
+
 // NewJwtProcessor .
 func NewJwtProcessor(c *Config) (*JwtProcessor, error) {
 	secret, err := c.ReadGlobalSecretsFor(context.Background(), "jwt")
 	if err != nil {
-		return nil, fmt.Errorf("JWT_SECRET not found, error: %w", err)
+		return nil, fmt.Errorf("jwt secret not found, error: %w", err)
 	}
 
 	return &JwtProcessor{
@@ -55,4 +63,35 @@ func (j *JwtProcessor) GetClaimsFromContext(ctx context.Context) *jwtv4.Register
 	}
 
 	return claims
+}
+
+func (j *JwtProcessor) GetTenantClaimsFromContext(ctx context.Context) (*TenantClaims, bool) {
+	token, ok := jwt.FromContext(ctx)
+	if !ok {
+		return nil, false
+	}
+
+	claims, ok := token.(*TenantClaims)
+	if !ok {
+		return nil, false
+	}
+
+	return claims, true
+}
+
+func (tc *TenantClaims) GetUserId() int64 {
+	userId, err := strconv.ParseInt(tc.Subject, 10, 64)
+	if err != nil {
+		return 0
+	}
+
+	return userId
+}
+
+func (tc *TenantClaims) GetTenantId() int64 {
+	return tc.TenantId
+}
+
+func (tc *TenantClaims) GetIdentities() []string {
+	return append(tc.GroupsIds, tc.MemberId)
 }

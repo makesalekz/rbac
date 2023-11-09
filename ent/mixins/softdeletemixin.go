@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"time"
 
-	theent "dummy/ent"
-	"dummy/ent/hook"
-	"dummy/ent/intercept"
+	theent "rbac/ent"
+	"rbac/ent/hook"
+	"rbac/ent/intercept"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"

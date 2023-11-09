@@ -1,0 +1,68 @@
+syntax = "proto3";
+
+package api.rbac.v1;
+
+import "google/api/annotations.proto";
+import "rbac/v1/models.proto";
+
+option go_package = "rbac/api/rbac/v1;rbac_v1";
+option java_multiple_files = true;
+option java_package = "api.rbac.v1";
+
+service TeamIdentityRole {
+	rpc AssignRole (AssignRoleRequest) returns (TeamIdentityRoleReply) {
+		option (google.api.http) = {
+			post: "/v1/rbac/roles"
+			body: "*"
+		};
+	}
+	rpc DeleteRole (DeleteRequest) returns (EmptyReply) {
+		option (google.api.http) = {
+			delete: "/v1/rbac/roles/{assignId}"
+		};
+	}
+	rpc ListIdentityRoles (ListIdentityRolesRequest) returns (ListIdentityRolesReply) {
+		option (google.api.http) = {
+			post: "/v1/rbac/tenant/list"
+			body: "*"
+		};
+	}
+	rpc ListTeamRoles (ListTeamRolesRequest) returns (ListIdentityRolesReply) {
+		option (google.api.http) = {
+			post: "/v1/rbac/team/list"
+			body: "*"
+		};
+	}
+}
+
+message TeamIdentityRoleReply {
+	int64 tenantId = 1;
+	string identityId = 2;
+	Team team = 3;
+	RoleReply role = 4;
+}
+
+message AssignRoleRequest {
+	int64 tenantId = 1;
+	int64 teamId = 2;
+	string identityId = 3;
+	int64 roleId = 4;
+}
+
+message DeleteRequest {
+	int64 assignId = 1;
+}
+
+message ListIdentityRolesRequest {
+	string identityId = 1;
+	int64 tenantId = 2;
+}
+
+message ListIdentityRolesReply {
+	repeated TeamIdentityRoleReply roles = 1;
+}
+
+message ListTeamRolesRequest {
+	int64 teamId = 1;
+	int64 tenantId = 2;
+}

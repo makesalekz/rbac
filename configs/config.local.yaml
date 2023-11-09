@@ -1,12 +1,14 @@
 server:
   http:
-    addr: 0.0.0.0:800X
+    addr: 0.0.0.0:8009
     timeout: 30s
   grpc:
-    addr: 0.0.0.0:900X
+    addr: 0.0.0.0:9009
     timeout: 30s
 db: host=localhost port=54400 user=me dbname=api password=password sslmode=disable
 nats: nats://localhost:4222
 discovery:
   iam: localhost:9000
   iam_timeout: 30s
+  teams: localhost:9010
+  teams_timeout: 30s

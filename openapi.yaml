@@ -3,19 +3,19 @@
 
 openapi: 3.0.3
 info:
-    title: Dummy API
+    title: ""
     version: 0.0.1
 paths:
-    /v1/dummy:
+    /v1/rbac/check-permission:
         post:
             tags:
-                - Dummy
-            operationId: Dummy_CreateDummy
+                - CheckPermissions
+            operationId: CheckPermissions_CheckPermissions
             requestBody:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/api.dummy.v1.DummyRequest'
+                            $ref: '#/components/schemas/api.rbac.v1.CheckPermissionsRequest'
                 required: true
             responses:
                 "200":
@@ -23,14 +23,775 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/api.dummy.v1.DummyReply'
+                                $ref: '#/components/schemas/api.rbac.v1.CheckPermissionsReply'
+    /v1/rbac/permissions:
+        post:
+            tags:
+                - Permissions
+            operationId: Permissions_CreatePermission
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.rbac.v1.CreatePermissionRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.rbac.v1.PermissionReply'
+    /v1/rbac/permissions/list:
+        post:
+            tags:
+                - Permissions
+            operationId: Permissions_ListPermissions
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.rbac.v1.ListPermissionsRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.rbac.v1.ListPermissionsReply'
+    /v1/rbac/permissions/{permissionId}:
+        get:
+            tags:
+                - Permissions
+            operationId: Permissions_GetPermission
+            parameters:
+                - name: permissionId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.rbac.v1.PermissionReply'
+        put:
+            tags:
+                - Permissions
+            operationId: Permissions_UpdatePermission
+            parameters:
+                - name: permissionId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.rbac.v1.UpdatePermissionRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.rbac.v1.PermissionReply'
+        delete:
+            tags:
+                - Permissions
+            operationId: Permissions_DeletePermission
+            parameters:
+                - name: permissionId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.rbac.v1.EmptyReply'
+    /v1/rbac/roles:
+        post:
+            tags:
+                - Roles
+            operationId: Roles_CreateRole
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.rbac.v1.CreateRoleRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.rbac.v1.RoleReply'
+    /v1/rbac/roles/list:
+        post:
+            tags:
+                - Roles
+            operationId: Roles_ListRoles
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.rbac.v1.ListRolesRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.rbac.v1.ListRolesReply'
+    /v1/rbac/roles/{assignId}:
+        delete:
+            tags:
+                - TeamIdentityRole
+            operationId: TeamIdentityRole_DeleteRole
+            parameters:
+                - name: assignId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.rbac.v1.EmptyReply'
+    /v1/rbac/roles/{roleId}:
+        get:
+            tags:
+                - Roles
+            operationId: Roles_GetRole
+            parameters:
+                - name: roleId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.rbac.v1.RoleReply'
+        put:
+            tags:
+                - Roles
+            operationId: Roles_UpdateRole
+            parameters:
+                - name: roleId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.rbac.v1.UpdateRoleRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.rbac.v1.RoleReply'
+        delete:
+            tags:
+                - Roles
+            operationId: Roles_DeleteRole
+            parameters:
+                - name: roleId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.rbac.v1.EmptyReply'
+    /v1/rbac/roles/{roleId}/permissions:
+        post:
+            tags:
+                - Roles
+            operationId: Roles_AddPermissionToRole
+            parameters:
+                - name: roleId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.rbac.v1.AddPermissionToRoleRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.rbac.v1.RolePermissionReply'
+    /v1/rbac/roles/{roleId}/permissions/list:
+        post:
+            tags:
+                - Roles
+            operationId: Roles_ListRolePermissions
+            parameters:
+                - name: roleId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.rbac.v1.RolesPermissionsRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.rbac.v1.RolesPermissionsReply'
+    /v1/rbac/roles/{roleId}/permissions/{permissionId}:
+        delete:
+            tags:
+                - Roles
+            operationId: Roles_RemovePermissionFromRole
+            parameters:
+                - name: roleId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+                - name: permissionId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+                - name: tenantId
+                  in: query
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.rbac.v1.EmptyReply'
+    /v1/rbac/team/list:
+        post:
+            tags:
+                - TeamIdentityRole
+            operationId: TeamIdentityRole_ListTeamRoles
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.rbac.v1.ListTeamRolesRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.rbac.v1.ListIdentityRolesReply'
+    /v1/rbac/tenant/list:
+        post:
+            tags:
+                - TeamIdentityRole
+            operationId: TeamIdentityRole_ListIdentityRoles
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.rbac.v1.ListIdentityRolesRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.rbac.v1.ListIdentityRolesReply'
+    /v1/teams:
+        post:
+            tags:
+                - Teams
+            operationId: Teams_CreateTeam
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.rbac.v1.CreateTeamRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.rbac.v1.TeamReply'
+    /v1/teams/list:
+        post:
+            tags:
+                - Teams
+            operationId: Teams_ListTeams
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.rbac.v1.ListTeamsRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.rbac.v1.ListTeamsReply'
+    /v1/teams/{teamId}:
+        get:
+            tags:
+                - Teams
+            operationId: Teams_GetTeam
+            parameters:
+                - name: teamId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.rbac.v1.TeamReply'
+        put:
+            tags:
+                - Teams
+            operationId: Teams_UpdateTeam
+            parameters:
+                - name: teamId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.rbac.v1.UpdateTeamRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.rbac.v1.TeamReply'
+        delete:
+            tags:
+                - Teams
+            operationId: Teams_DeleteTeam
+            parameters:
+                - name: teamId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.rbac.v1.EmptyReply'
+    /v1/teams/{teamId}/tree:
+        get:
+            tags:
+                - Teams
+            operationId: Teams_GetTeamTree
+            parameters:
+                - name: teamId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.rbac.v1.TeamReply'
 components:
     schemas:
-        api.dummy.v1.DummyReply:
+        api.rbac.v1.AddPermissionToRoleRequest:
+            type: object
+            properties:
+                roleId:
+                    type: string
+                permissionId:
+                    type: string
+                tenantId:
+                    type: string
+                deny:
+                    type: boolean
+                fields:
+                    type: array
+                    items:
+                        type: string
+        api.rbac.v1.AssignRoleRequest:
+            type: object
+            properties:
+                tenantId:
+                    type: string
+                teamId:
+                    type: string
+                identityId:
+                    type: string
+                roleId:
+                    type: string
+        api.rbac.v1.CheckPermissionsReply:
+            type: object
+            properties:
+                permissions:
+                    type: object
+                    additionalProperties:
+                        $ref: '#/components/schemas/api.rbac.v1.ListOfFields'
+        api.rbac.v1.CheckPermissionsRequest:
+            type: object
+            properties:
+                teamId:
+                    type: string
+                permissions:
+                    type: array
+                    items:
+                        type: string
+        api.rbac.v1.CreatePermissionRequest:
+            type: object
+            properties:
+                id:
+                    type: string
+                appId:
+                    type: string
+                name:
+                    type: string
+                description:
+                    type: string
+                fields:
+                    type: array
+                    items:
+                        type: string
+        api.rbac.v1.CreateRoleRequest:
+            type: object
+            properties:
+                name:
+                    type: string
+                description:
+                    type: string
+                tenantId:
+                    type: string
+        api.rbac.v1.CreateTeamRequest:
+            type: object
+            properties:
+                name:
+                    type: string
+                description:
+                    type: string
+                tenantId:
+                    type: string
+                parentId:
+                    type: string
+        api.rbac.v1.EmptyReply:
             type: object
             properties: {}
-        api.dummy.v1.DummyRequest:
+        api.rbac.v1.ListIdentityRolesReply:
             type: object
-            properties: {}
+            properties:
+                roles:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/api.rbac.v1.TeamIdentityRoleReply'
+        api.rbac.v1.ListIdentityRolesRequest:
+            type: object
+            properties:
+                identityId:
+                    type: string
+                tenantId:
+                    type: string
+        api.rbac.v1.ListOfFields:
+            type: object
+            properties:
+                fields:
+                    type: array
+                    items:
+                        type: string
+        api.rbac.v1.ListPermissionsReply:
+            type: object
+            properties:
+                permissions:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/api.rbac.v1.PermissionReply'
+        api.rbac.v1.ListPermissionsRequest:
+            type: object
+            properties:
+                appId:
+                    type: string
+                ids:
+                    type: array
+                    items:
+                        type: string
+        api.rbac.v1.ListRolesReply:
+            type: object
+            properties:
+                roles:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/api.rbac.v1.RoleReply'
+        api.rbac.v1.ListRolesRequest:
+            type: object
+            properties:
+                tenantId:
+                    type: string
+                name:
+                    type: string
+        api.rbac.v1.ListTeamRolesRequest:
+            type: object
+            properties:
+                teamId:
+                    type: string
+                tenantId:
+                    type: string
+        api.rbac.v1.ListTeamsReply:
+            type: object
+            properties:
+                teams:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/api.rbac.v1.Team'
+                paginate:
+                    $ref: '#/components/schemas/api.rbac.v1.PaginateReply'
+        api.rbac.v1.ListTeamsRequest:
+            type: object
+            properties:
+                tenantId:
+                    type: string
+                parentId:
+                    type: string
+                paginate:
+                    $ref: '#/components/schemas/api.rbac.v1.PaginateRequest'
+        api.rbac.v1.PaginateReply:
+            type: object
+            properties:
+                total:
+                    type: integer
+                    format: int32
+                fromId:
+                    type: string
+                toId:
+                    type: string
+                fromDate:
+                    type: string
+                toDate:
+                    type: string
+                fromLabel:
+                    type: string
+        api.rbac.v1.PaginateRequest:
+            type: object
+            properties:
+                limit:
+                    type: integer
+                    format: int32
+                fromId:
+                    type: string
+                toId:
+                    type: string
+                aroundId:
+                    type: string
+                fromDate:
+                    type: string
+                toDate:
+                    type: string
+                aroundDate:
+                    type: string
+                fromLabel:
+                    type: string
+                descending:
+                    type: boolean
+            description: '---------------------------------- Pagination ----------------------------------'
+        api.rbac.v1.PermissionReply:
+            type: object
+            properties:
+                id:
+                    type: string
+                name:
+                    type: string
+                description:
+                    type: string
+                appId:
+                    type: string
+                fields:
+                    type: array
+                    items:
+                        type: string
+        api.rbac.v1.RolePermissionReply:
+            type: object
+            properties:
+                role:
+                    $ref: '#/components/schemas/api.rbac.v1.RoleReply'
+                permission:
+                    $ref: '#/components/schemas/api.rbac.v1.PermissionReply'
+                tenantId:
+                    type: string
+                deny:
+                    type: boolean
+                fields:
+                    type: array
+                    items:
+                        type: string
+        api.rbac.v1.RoleReply:
+            type: object
+            properties:
+                id:
+                    type: string
+                name:
+                    type: string
+                description:
+                    type: string
+                tenantId:
+                    type: string
+                isSystem:
+                    type: boolean
+                createdAt:
+                    type: string
+                updatedAt:
+                    type: string
+                deletedAt:
+                    type: string
+        api.rbac.v1.RolesPermissionsReply:
+            type: object
+            properties:
+                permissions:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/api.rbac.v1.RolePermissionReply'
+        api.rbac.v1.RolesPermissionsRequest:
+            type: object
+            properties:
+                roleId:
+                    type: string
+                tenantId:
+                    type: string
+        api.rbac.v1.Team:
+            type: object
+            properties:
+                id:
+                    type: string
+                ownerId:
+                    type: string
+                parentId:
+                    type: string
+                parentsIds:
+                    type: array
+                    items:
+                        type: string
+                name:
+                    type: string
+                description:
+                    type: string
+                tenantId:
+                    type: string
+                createdAt:
+                    type: string
+                updatedAt:
+                    type: string
+                subs:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/api.rbac.v1.Team'
+        api.rbac.v1.TeamIdentityRoleReply:
+            type: object
+            properties:
+                tenantId:
+                    type: string
+                identityId:
+                    type: string
+                team:
+                    $ref: '#/components/schemas/api.rbac.v1.Team'
+                role:
+                    $ref: '#/components/schemas/api.rbac.v1.RoleReply'
+        api.rbac.v1.TeamReply:
+            type: object
+            properties:
+                team:
+                    $ref: '#/components/schemas/api.rbac.v1.Team'
+                memberId:
+                    type: string
+        api.rbac.v1.UpdatePermissionRequest:
+            type: object
+            properties:
+                permissionId:
+                    type: string
+                name:
+                    type: string
+                description:
+                    type: string
+                fields:
+                    type: array
+                    items:
+                        type: string
+        api.rbac.v1.UpdateRoleRequest:
+            type: object
+            properties:
+                roleId:
+                    type: string
+                name:
+                    type: string
+                description:
+                    type: string
+        api.rbac.v1.UpdateTeamRequest:
+            type: object
+            properties:
+                teamId:
+                    type: string
+                name:
+                    type: string
+                description:
+                    type: string
 tags:
-    - name: Dummy
+    - name: CheckPermissions
+    - name: Permissions
+    - name: Roles
+    - name: TeamIdentityRole
+    - name: Teams

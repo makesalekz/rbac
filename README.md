@@ -1,12 +1,16 @@
-# dummy
+# rbac
 
-## Init project
+# Usage 
 
-1. Change module name in go.mod
-2. Rename cmd/dummy directory
-3. Replace every "dummy" code with your code
-4. Local env: create .env from .example, replace SERVICE_NAME, set unused HTTP_PORT, GRPC_PORT
-5. CI: create .gitlab-ci.yml from .example, replace "DB_PORT: 5440X" with unused port
+Service is used to manage roles and permissions.
+
+1. Create a role
+2. Create permissions
+3. Assign permissions to the role
+4. Assign the role to the TeamIdentity
+5. Check if the user has permission
+
+# Development
 
 ## Proto files
 

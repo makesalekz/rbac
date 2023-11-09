@@ -1,11 +1,11 @@
-module dummy
+module rbac
 
 go 1.19
 
 replace iam => ./third_party/iam
 
 require (
-	entgo.io/ent v0.12.3
+	entgo.io/ent v0.12.4
 	github.com/go-kratos/consul v0.1.5
 	github.com/go-kratos/kratos/contrib/config/consul/v2 v2.0.0-20230830131453-6c026bce56a9
 	github.com/go-kratos/kratos/v2 v2.7.0
@@ -14,6 +14,8 @@ require (
 	github.com/hashicorp/consul/api v1.24.0
 	github.com/hashicorp/vault/api v1.10.0
 	github.com/hashicorp/vault/api/auth/approle v0.5.0
+	github.com/jackc/pgio v1.0.0 // indirect
+	github.com/jackc/pgtype v1.14.0
 	github.com/lib/pq v1.10.9
 	github.com/nats-io/nats.go v1.30.2
 	go.uber.org/automaxprocs v1.5.3
@@ -23,7 +25,7 @@ require (
 )
 
 require (
-	ariga.io/atlas v0.10.2-0.20230427182402-87a07dfb83bf // indirect
+	ariga.io/atlas v0.14.1-0.20230918065911-83ad451a4935 // indirect
 	github.com/agext/levenshtein v1.2.1 // indirect
 	github.com/apparentlymart/go-textseg/v13 v13.0.0 // indirect
 	github.com/armon/go-metrics v0.4.1 // indirect
