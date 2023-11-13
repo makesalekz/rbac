@@ -6,9 +6,10 @@ import (
 
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/google/wire"
-	"rbac/ent" //nolint:typecheck
-	_ "rbac/ent/runtime"
-	"rbac/internal/conf"
+	"gitlab.calendaria.team/services/rbac/ent" //nolint:typecheck
+	"gitlab.calendaria.team/services/rbac/internal/conf"
+
+	_ "gitlab.calendaria.team/services/rbac/ent/runtime"
 )
 
 // ProviderSet is data providers.

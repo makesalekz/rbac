@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"time"
 
-	theent "rbac/ent"
-	"rbac/ent/hook"
-	"rbac/ent/intercept"
+	theent "gitlab.calendaria.team/services/rbac/ent"
+	"gitlab.calendaria.team/services/rbac/ent/hook"
+	"gitlab.calendaria.team/services/rbac/ent/intercept"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"

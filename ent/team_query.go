@@ -7,12 +7,12 @@ import (
 	"database/sql/driver"
 	"fmt"
 	"math"
-	"rbac/ent/predicate"
-	"rbac/ent/team"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"gitlab.calendaria.team/services/rbac/ent/predicate"
+	"gitlab.calendaria.team/services/rbac/ent/team"
 )
 
 // TeamQuery is the builder for querying Team entities.

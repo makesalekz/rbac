@@ -6,15 +6,14 @@
 package main
 
 import (
-	"rbac/internal/biz"
-	"rbac/internal/conf"
-	"rbac/internal/data"
-	"rbac/internal/server"
-	"rbac/internal/service"
-
 	"github.com/go-kratos/kratos/v2"
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/google/wire"
+	"gitlab.calendaria.team/services/rbac/internal/biz"
+	"gitlab.calendaria.team/services/rbac/internal/conf"
+	"gitlab.calendaria.team/services/rbac/internal/data"
+	"gitlab.calendaria.team/services/rbac/internal/server"
+	"gitlab.calendaria.team/services/rbac/internal/service"
 )
 
 // wireApp init kratos application.

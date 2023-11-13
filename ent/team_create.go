@@ -6,13 +6,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"rbac/ent/team"
 	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/jackc/pgtype"
+	"gitlab.calendaria.team/services/rbac/ent/team"
 )
 
 // TeamCreate is the builder for creating a Team entity.

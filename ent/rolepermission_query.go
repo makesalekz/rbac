@@ -6,14 +6,14 @@ import (
 	"context"
 	"fmt"
 	"math"
-	"rbac/ent/permission"
-	"rbac/ent/predicate"
-	"rbac/ent/role"
-	"rbac/ent/rolepermission"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"gitlab.calendaria.team/services/rbac/ent/permission"
+	"gitlab.calendaria.team/services/rbac/ent/predicate"
+	"gitlab.calendaria.team/services/rbac/ent/role"
+	"gitlab.calendaria.team/services/rbac/ent/rolepermission"
 )
 
 // RolePermissionQuery is the builder for querying RolePermission entities.

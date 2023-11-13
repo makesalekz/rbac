@@ -2,13 +2,14 @@ package service
 
 import (
 	"context"
-	pb "rbac/api/rbac/v1"
-	"rbac/internal/biz"
-	"rbac/internal/data"
+
+	v1 "gitlab.calendaria.team/services/rbac/api/rbac/v1"
+	"gitlab.calendaria.team/services/rbac/internal/biz"
+	"gitlab.calendaria.team/services/rbac/internal/data"
 )
 
 type PermissionsService struct {
-	pb.UnimplementedPermissionsServer
+	v1.UnimplementedPermissionsServer
 
 	uc *biz.PermissionsUsecase
 }
@@ -19,7 +20,7 @@ func NewPermissionsService(uc *biz.PermissionsUsecase) *PermissionsService {
 	}
 }
 
-func (s *PermissionsService) CreatePermission(ctx context.Context, req *pb.CreatePermissionRequest) (*pb.PermissionReply, error) {
+func (s *PermissionsService) CreatePermission(ctx context.Context, req *v1.CreatePermissionRequest) (*v1.PermissionReply, error) {
 	permission, err := s.uc.CreatePermission(ctx, data.CreatePermissionDto{
 		Id:          req.Id,
 		AppId:       req.AppId,
@@ -28,9 +29,9 @@ func (s *PermissionsService) CreatePermission(ctx context.Context, req *pb.Creat
 		Fields:      req.Fields,
 	})
 	if err != nil {
-		return nil, pb.ErrorDatabaseQuery(err.Error())
+		return nil, v1.ErrorDatabaseQuery(err.Error())
 	}
-	return &pb.PermissionReply{
+	return &v1.PermissionReply{
 		Id:          permission.ID,
 		AppId:       permission.AppID,
 		Name:        permission.Name,
@@ -38,7 +39,7 @@ func (s *PermissionsService) CreatePermission(ctx context.Context, req *pb.Creat
 		Fields:      permission.Fields,
 	}, nil
 }
-func (s *PermissionsService) UpdatePermission(ctx context.Context, req *pb.UpdatePermissionRequest) (*pb.PermissionReply, error) {
+func (s *PermissionsService) UpdatePermission(ctx context.Context, req *v1.UpdatePermissionRequest) (*v1.PermissionReply, error) {
 	permission, err := s.uc.UpdatePermission(ctx, req.PermissionId, data.UpdatePermissionDto{
 		Name:        req.Name,
 		Description: req.Description,
@@ -47,7 +48,7 @@ func (s *PermissionsService) UpdatePermission(ctx context.Context, req *pb.Updat
 	if err != nil {
 		return nil, err
 	}
-	return &pb.PermissionReply{
+	return &v1.PermissionReply{
 		Id:          permission.ID,
 		AppId:       permission.AppID,
 		Name:        permission.Name,
@@ -55,19 +56,19 @@ func (s *PermissionsService) UpdatePermission(ctx context.Context, req *pb.Updat
 		Fields:      permission.Fields,
 	}, nil
 }
-func (s *PermissionsService) DeletePermission(ctx context.Context, req *pb.DeletePermissionRequest) (*pb.EmptyReply, error) {
+func (s *PermissionsService) DeletePermission(ctx context.Context, req *v1.DeletePermissionRequest) (*v1.EmptyReply, error) {
 	err := s.uc.DeletePermission(ctx, req.PermissionId)
 	if err != nil {
 		return nil, err
 	}
-	return &pb.EmptyReply{}, nil
+	return &v1.EmptyReply{}, nil
 }
-func (s *PermissionsService) GetPermission(ctx context.Context, req *pb.GetPermissionRequest) (*pb.PermissionReply, error) {
+func (s *PermissionsService) GetPermission(ctx context.Context, req *v1.GetPermissionRequest) (*v1.PermissionReply, error) {
 	permission, err := s.uc.GetPermissionById(ctx, req.PermissionId)
 	if err != nil {
 		return nil, err
 	}
-	return &pb.PermissionReply{
+	return &v1.PermissionReply{
 		Id:          permission.ID,
 		AppId:       permission.AppID,
 		Name:        permission.Name,
@@ -75,14 +76,14 @@ func (s *PermissionsService) GetPermission(ctx context.Context, req *pb.GetPermi
 		Fields:      permission.Fields,
 	}, nil
 }
-func (s *PermissionsService) ListPermissions(ctx context.Context, req *pb.ListPermissionsRequest) (*pb.ListPermissionsReply, error) {
+func (s *PermissionsService) ListPermissions(ctx context.Context, req *v1.ListPermissionsRequest) (*v1.ListPermissionsReply, error) {
 	permissions, err := s.uc.GetPermissions(ctx, req.AppId, req.Ids)
 	if err != nil {
 		return nil, err
 	}
-	permissionsReply := make([]*pb.PermissionReply, len(permissions))
+	permissionsReply := make([]*v1.PermissionReply, len(permissions))
 	for i, permission := range permissions {
-		permissionsReply[i] = &pb.PermissionReply{
+		permissionsReply[i] = &v1.PermissionReply{
 			Id:          permission.ID,
 			AppId:       permission.AppID,
 			Name:        permission.Name,
@@ -90,7 +91,7 @@ func (s *PermissionsService) ListPermissions(ctx context.Context, req *pb.ListPe
 			Fields:      permission.Fields,
 		}
 	}
-	return &pb.ListPermissionsReply{
+	return &v1.ListPermissionsReply{
 		Permissions: permissionsReply,
 	}, nil
 }

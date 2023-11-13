@@ -3,12 +3,12 @@
 package ent
 
 import (
-	"rbac/ent/permission"
-	"rbac/ent/predicate"
-	"rbac/ent/role"
-	"rbac/ent/rolepermission"
-	"rbac/ent/team"
-	"rbac/ent/teamidentityrole"
+	"gitlab.calendaria.team/services/rbac/ent/permission"
+	"gitlab.calendaria.team/services/rbac/ent/predicate"
+	"gitlab.calendaria.team/services/rbac/ent/role"
+	"gitlab.calendaria.team/services/rbac/ent/rolepermission"
+	"gitlab.calendaria.team/services/rbac/ent/team"
+	"gitlab.calendaria.team/services/rbac/ent/teamidentityrole"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"

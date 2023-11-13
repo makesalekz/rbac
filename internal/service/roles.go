@@ -2,15 +2,15 @@ package service
 
 import (
 	"context"
-	"rbac/ent"
-	"rbac/internal/biz"
-	"rbac/internal/data"
 
-	pb "rbac/api/rbac/v1"
+	v1 "gitlab.calendaria.team/services/rbac/api/rbac/v1"
+	"gitlab.calendaria.team/services/rbac/ent"
+	"gitlab.calendaria.team/services/rbac/internal/biz"
+	"gitlab.calendaria.team/services/rbac/internal/data"
 )
 
 type RolesService struct {
-	pb.UnimplementedRolesServer
+	v1.UnimplementedRolesServer
 
 	uc *biz.RolesUsecase
 }
@@ -21,8 +21,8 @@ func NewRolesService(uc *biz.RolesUsecase) *RolesService {
 	}
 }
 
-func (s *RolesService) roleReply(role ent.Role) *pb.RoleReply {
-	return &pb.RoleReply{
+func (s *RolesService) roleReply(role ent.Role) *v1.RoleReply {
+	return &v1.RoleReply{
 		Id:          role.ID,
 		TenantId:    *role.TenantID,
 		Name:        role.Name,
@@ -33,18 +33,18 @@ func (s *RolesService) roleReply(role ent.Role) *pb.RoleReply {
 	}
 }
 
-func (s *RolesService) CreateRole(ctx context.Context, req *pb.CreateRoleRequest) (*pb.RoleReply, error) {
+func (s *RolesService) CreateRole(ctx context.Context, req *v1.CreateRoleRequest) (*v1.RoleReply, error) {
 	role, err := s.uc.CreateRole(ctx, data.CreateRoleDto{
 		TenantId:    req.TenantId,
 		Name:        req.Name,
 		Description: req.Description,
 	})
 	if err != nil {
-		return nil, pb.ErrorDatabaseQuery(err.Error())
+		return nil, v1.ErrorDatabaseQuery(err.Error())
 	}
 	return s.roleReply(*role), nil
 }
-func (s *RolesService) UpdateRole(ctx context.Context, req *pb.UpdateRoleRequest) (*pb.RoleReply, error) {
+func (s *RolesService) UpdateRole(ctx context.Context, req *v1.UpdateRoleRequest) (*v1.RoleReply, error) {
 	role, err := s.uc.UpdateRole(ctx, req.RoleId, data.UpdateRoleDto{
 		Name:        req.Name,
 		Description: req.Description,
@@ -54,34 +54,34 @@ func (s *RolesService) UpdateRole(ctx context.Context, req *pb.UpdateRoleRequest
 	}
 	return s.roleReply(*role), nil
 }
-func (s *RolesService) DeleteRole(ctx context.Context, req *pb.DeleteRoleRequest) (*pb.EmptyReply, error) {
+func (s *RolesService) DeleteRole(ctx context.Context, req *v1.DeleteRoleRequest) (*v1.EmptyReply, error) {
 	err := s.uc.DeleteRole(ctx, req.RoleId)
 	if err != nil {
 		return nil, err
 	}
-	return &pb.EmptyReply{}, nil
+	return &v1.EmptyReply{}, nil
 }
-func (s *RolesService) GetRole(ctx context.Context, req *pb.GetRoleRequest) (*pb.RoleReply, error) {
+func (s *RolesService) GetRole(ctx context.Context, req *v1.GetRoleRequest) (*v1.RoleReply, error) {
 	role, err := s.uc.GetRoleById(ctx, req.RoleId)
 	if err != nil {
 		return nil, err
 	}
 	return s.roleReply(*role), nil
 }
-func (s *RolesService) ListRoles(ctx context.Context, req *pb.ListRolesRequest) (*pb.ListRolesReply, error) {
+func (s *RolesService) ListRoles(ctx context.Context, req *v1.ListRolesRequest) (*v1.ListRolesReply, error) {
 	roles, err := s.uc.GetRoles(ctx, req.TenantId, *req.Name)
 	if err != nil {
 		return nil, err
 	}
-	result := make([]*pb.RoleReply, len(roles))
+	result := make([]*v1.RoleReply, len(roles))
 	for i, role := range roles {
 		result[i] = s.roleReply(*role)
 	}
-	return &pb.ListRolesReply{
+	return &v1.ListRolesReply{
 		Roles: result,
 	}, nil
 }
-func (s *RolesService) AddPermissionToRole(ctx context.Context, req *pb.AddPermissionToRoleRequest) (*pb.RolePermissionReply, error) {
+func (s *RolesService) AddPermissionToRole(ctx context.Context, req *v1.AddPermissionToRoleRequest) (*v1.RolePermissionReply, error) {
 	rolePermission, err := s.uc.AddPermissionToRole(ctx, data.CreateRolePermissionDto{
 		RoleId:       req.RoleId,
 		PermissionId: req.PermissionId,
@@ -90,11 +90,11 @@ func (s *RolesService) AddPermissionToRole(ctx context.Context, req *pb.AddPermi
 		Deny:         *req.Deny,
 	})
 	if err != nil {
-		return nil, pb.ErrorDatabaseQuery(err.Error())
+		return nil, v1.ErrorDatabaseQuery(err.Error())
 	}
-	return &pb.RolePermissionReply{
+	return &v1.RolePermissionReply{
 		Role: s.roleReply(*rolePermission.Edges.Role),
-		Permission: &pb.PermissionReply{
+		Permission: &v1.PermissionReply{
 			Id:    rolePermission.Edges.Permission.ID,
 			AppId: rolePermission.Edges.Permission.AppID,
 		},
@@ -103,23 +103,23 @@ func (s *RolesService) AddPermissionToRole(ctx context.Context, req *pb.AddPermi
 		Deny:     &rolePermission.Deny,
 	}, nil
 }
-func (s *RolesService) RemovePermissionFromRole(ctx context.Context, req *pb.RemovePermissionFromRoleRequest) (*pb.EmptyReply, error) {
+func (s *RolesService) RemovePermissionFromRole(ctx context.Context, req *v1.RemovePermissionFromRoleRequest) (*v1.EmptyReply, error) {
 	err := s.uc.RemovePermissionFromRole(ctx, req.RoleId, req.TenantId, req.PermissionId)
 	if err != nil {
 		return nil, err
 	}
-	return &pb.EmptyReply{}, nil
+	return &v1.EmptyReply{}, nil
 }
-func (s *RolesService) ListRolePermissions(ctx context.Context, req *pb.RolesPermissionsRequest) (*pb.RolesPermissionsReply, error) {
+func (s *RolesService) ListRolePermissions(ctx context.Context, req *v1.RolesPermissionsRequest) (*v1.RolesPermissionsReply, error) {
 	rolePermissions, err := s.uc.ListRolePermissions(ctx, req.RoleId, req.TenantId)
 	if err != nil {
 		return nil, err
 	}
-	permissions := make([]*pb.RolePermissionReply, len(rolePermissions))
+	permissions := make([]*v1.RolePermissionReply, len(rolePermissions))
 	for i, rp := range rolePermissions {
-		permissions[i] = &pb.RolePermissionReply{
+		permissions[i] = &v1.RolePermissionReply{
 			Role: s.roleReply(*rp.Edges.Role),
-			Permission: &pb.PermissionReply{
+			Permission: &v1.PermissionReply{
 				Id:    rp.Edges.Permission.ID,
 				AppId: rp.Edges.Permission.AppID,
 			},
@@ -128,7 +128,7 @@ func (s *RolesService) ListRolePermissions(ctx context.Context, req *pb.RolesPer
 			Deny:     &rp.Deny,
 		}
 	}
-	return &pb.RolesPermissionsReply{
+	return &v1.RolesPermissionsReply{
 		Permissions: permissions,
 	}, nil
 }

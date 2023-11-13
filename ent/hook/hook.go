@@ -5,7 +5,8 @@ package hook
 import (
 	"context"
 	"fmt"
-	"rbac/ent"
+
+	"gitlab.calendaria.team/services/rbac/ent"
 )
 
 // The PermissionFunc type is an adapter to allow the use of ordinary

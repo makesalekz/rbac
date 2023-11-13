@@ -6,18 +6,18 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"rbac/ent/permission"
-	"rbac/ent/predicate"
-	"rbac/ent/role"
-	"rbac/ent/rolepermission"
-	"rbac/ent/team"
-	"rbac/ent/teamidentityrole"
 	"sync"
 	"time"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/jackc/pgtype"
+	"gitlab.calendaria.team/services/rbac/ent/permission"
+	"gitlab.calendaria.team/services/rbac/ent/predicate"
+	"gitlab.calendaria.team/services/rbac/ent/role"
+	"gitlab.calendaria.team/services/rbac/ent/rolepermission"
+	"gitlab.calendaria.team/services/rbac/ent/team"
+	"gitlab.calendaria.team/services/rbac/ent/teamidentityrole"
 )
 
 const (

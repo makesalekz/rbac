@@ -6,13 +6,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"rbac/ent/permission"
-	"rbac/ent/role"
-	"rbac/ent/rolepermission"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"gitlab.calendaria.team/services/rbac/ent/permission"
+	"gitlab.calendaria.team/services/rbac/ent/role"
+	"gitlab.calendaria.team/services/rbac/ent/rolepermission"
 )
 
 // RolePermissionCreate is the builder for creating a RolePermission entity.

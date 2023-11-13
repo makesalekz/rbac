@@ -4,10 +4,10 @@ import (
 	"context"
 	"time"
 
-	v1 "rbac/api/rbac/v1"
-	"rbac/ent"
-	"rbac/internal/biz"
-	"rbac/internal/data"
+	v1 "gitlab.calendaria.team/services/rbac/api/rbac/v1"
+	"gitlab.calendaria.team/services/rbac/ent"
+	"gitlab.calendaria.team/services/rbac/internal/biz"
+	"gitlab.calendaria.team/services/rbac/internal/data"
 )
 
 type TeamsService struct {

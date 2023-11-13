@@ -6,12 +6,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"rbac/ent/predicate"
-	"rbac/ent/teamidentityrole"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"gitlab.calendaria.team/services/rbac/ent/predicate"
+	"gitlab.calendaria.team/services/rbac/ent/teamidentityrole"
 )
 
 // TeamIdentityRoleUpdate is the builder for updating TeamIdentityRole entities.

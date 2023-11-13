@@ -2,13 +2,13 @@ package service
 
 import (
 	"context"
-	"rbac/internal/biz"
 
-	pb "rbac/api/rbac/v1"
+	v1 "gitlab.calendaria.team/services/rbac/api/rbac/v1"
+	"gitlab.calendaria.team/services/rbac/internal/biz"
 )
 
 type CheckPermissionsService struct {
-	pb.UnimplementedCheckPermissionsServer
+	v1.UnimplementedCheckPermissionsServer
 
 	uc *biz.TeamIdentityUsecase
 }
@@ -19,12 +19,12 @@ func NewCheckPermissionsService(uc *biz.TeamIdentityUsecase) *CheckPermissionsSe
 	}
 }
 
-func (s *CheckPermissionsService) CheckPermissions(ctx context.Context, req *pb.CheckPermissionsRequest) (*pb.CheckPermissionsReply, error) {
+func (s *CheckPermissionsService) CheckPermissions(ctx context.Context, req *v1.CheckPermissionsRequest) (*v1.CheckPermissionsReply, error) {
 	permissionsMap, err := s.uc.CheckPermissions(ctx, req.TeamId, req.Permissions)
 	if err != nil {
 		return nil, err
 	}
-	return &pb.CheckPermissionsReply{
+	return &v1.CheckPermissionsReply{
 		Permissions: permissionsMap,
 	}, nil
 }

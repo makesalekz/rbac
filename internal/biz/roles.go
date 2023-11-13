@@ -2,12 +2,11 @@ package biz
 
 import (
 	"context"
-	v1 "rbac/api/rbac/v1"
-
-	"rbac/ent"
-	"rbac/internal/data"
 
 	"github.com/go-kratos/kratos/v2/log"
+	v1 "gitlab.calendaria.team/services/rbac/api/rbac/v1"
+	"gitlab.calendaria.team/services/rbac/ent"
+	"gitlab.calendaria.team/services/rbac/internal/data"
 )
 
 // RolesUsecase .

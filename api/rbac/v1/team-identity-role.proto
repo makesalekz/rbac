@@ -1,13 +1,13 @@
 syntax = "proto3";
 
-package api.rbac.v1;
+package rbac.v1;
 
 import "google/api/annotations.proto";
-import "rbac/v1/models.proto";
+import "api/rbac/v1/models.proto";
 
-option go_package = "rbac/api/rbac/v1;rbac_v1";
+option go_package = "gitlab.calendaria.team/services/rbac/api/rbac/v1;rbac_v1";
 option java_multiple_files = true;
-option java_package = "api.rbac.v1";
+option java_package = "rbac.v1";
 
 service TeamIdentityRole {
 	rpc AssignRole (AssignRoleRequest) returns (TeamIdentityRoleReply) {

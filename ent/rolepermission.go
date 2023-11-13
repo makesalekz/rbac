@@ -5,13 +5,13 @@ package ent
 import (
 	"encoding/json"
 	"fmt"
-	"rbac/ent/permission"
-	"rbac/ent/role"
-	"rbac/ent/rolepermission"
 	"strings"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"gitlab.calendaria.team/services/rbac/ent/permission"
+	"gitlab.calendaria.team/services/rbac/ent/role"
+	"gitlab.calendaria.team/services/rbac/ent/rolepermission"
 )
 
 // RolePermission is the model entity for the RolePermission schema.

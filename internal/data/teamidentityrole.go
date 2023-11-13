@@ -2,9 +2,11 @@ package data
 
 import (
 	"context"
+
+	"gitlab.calendaria.team/services/rbac/ent"
+	"gitlab.calendaria.team/services/rbac/ent/teamidentityrole"
+
 	_ "github.com/lib/pq"
-	"rbac/ent"
-	"rbac/ent/teamidentityrole"
 )
 
 type AssignRoleDto struct {

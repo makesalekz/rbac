@@ -4,13 +4,13 @@ package ent
 
 import (
 	"fmt"
-	"rbac/ent/team"
 	"strings"
 	"time"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/jackc/pgtype"
+	"gitlab.calendaria.team/services/rbac/ent/team"
 )
 
 // Team is the model entity for the Team schema.
