@@ -2,8 +2,9 @@ package data
 
 import (
 	"context"
-	"rbac/ent"
-	"rbac/ent/permission"
+
+	"gitlab.calendaria.team/services/rbac/ent"
+	"gitlab.calendaria.team/services/rbac/ent/permission"
 )
 
 type UpdatePermissionDto struct {

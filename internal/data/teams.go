@@ -3,12 +3,12 @@ package data
 import (
 	"context"
 
-	teams_v1 "rbac/api/rbac/v1"
-	"rbac/ent"
-	"rbac/ent/team"
-
 	"entgo.io/ent/dialect/sql"
 	"github.com/jackc/pgtype"
+	teams_v1 "gitlab.calendaria.team/services/rbac/api/rbac/v1"
+	"gitlab.calendaria.team/services/rbac/ent"
+	"gitlab.calendaria.team/services/rbac/ent/team"
+
 	_ "github.com/lib/pq"
 )
 

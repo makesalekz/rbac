@@ -2,10 +2,11 @@ package data
 
 import (
 	"context"
-	"rbac/api/rbac/v1"
-	"rbac/ent"
-	"rbac/ent/role"
-	"rbac/ent/rolepermission"
+
+	v1 "gitlab.calendaria.team/services/rbac/api/rbac/v1"
+	"gitlab.calendaria.team/services/rbac/ent"
+	"gitlab.calendaria.team/services/rbac/ent/role"
+	"gitlab.calendaria.team/services/rbac/ent/rolepermission"
 )
 
 type UpdateRoleDto struct {
@@ -130,7 +131,7 @@ func (r *roleRepo) AddPermissionToRole(ctx context.Context, dto CreateRolePermis
 
 	isValid := validateFields(permission.Fields, dto.Fields)
 	if !isValid {
-		return nil, rbac_v1.ErrorInvalidRequest("Invalid fields")
+		return nil, v1.ErrorInvalidRequest("Invalid fields")
 	}
 
 	rolePermissionSave, err := r.db.RolePermission.Create().

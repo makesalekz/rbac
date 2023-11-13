@@ -4,12 +4,12 @@ package ent
 
 import (
 	"fmt"
-	"rbac/ent/role"
 	"strings"
 	"time"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"gitlab.calendaria.team/services/rbac/ent/role"
 )
 
 // Role is the model entity for the Role schema.

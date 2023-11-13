@@ -6,14 +6,14 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"rbac/ent/permission"
-	"rbac/ent/predicate"
-	"rbac/ent/role"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/dialect/sql/sqljson"
 	"entgo.io/ent/schema/field"
+	"gitlab.calendaria.team/services/rbac/ent/permission"
+	"gitlab.calendaria.team/services/rbac/ent/predicate"
+	"gitlab.calendaria.team/services/rbac/ent/role"
 )
 
 // PermissionUpdate is the builder for updating Permission entities.

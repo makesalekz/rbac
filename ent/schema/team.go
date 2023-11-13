@@ -1,8 +1,9 @@
 package schema
 
 import (
-	"rbac/ent/mixins"
 	"time"
+
+	"gitlab.calendaria.team/services/rbac/ent/mixins"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect"

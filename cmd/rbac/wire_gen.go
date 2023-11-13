@@ -9,11 +9,11 @@ package main
 import (
 	"github.com/go-kratos/kratos/v2"
 	"github.com/go-kratos/kratos/v2/log"
-	"rbac/internal/biz"
-	"rbac/internal/conf"
-	"rbac/internal/data"
-	"rbac/internal/server"
-	"rbac/internal/service"
+	"gitlab.calendaria.team/services/rbac/internal/biz"
+	"gitlab.calendaria.team/services/rbac/internal/conf"
+	"gitlab.calendaria.team/services/rbac/internal/data"
+	"gitlab.calendaria.team/services/rbac/internal/server"
+	"gitlab.calendaria.team/services/rbac/internal/service"
 )
 
 import (

@@ -6,17 +6,17 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"rbac/ent/permission"
-	"rbac/ent/role"
-	"rbac/ent/rolepermission"
-	"rbac/ent/team"
-	"rbac/ent/teamidentityrole"
 	"reflect"
 	"sync"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"gitlab.calendaria.team/services/rbac/ent/permission"
+	"gitlab.calendaria.team/services/rbac/ent/role"
+	"gitlab.calendaria.team/services/rbac/ent/rolepermission"
+	"gitlab.calendaria.team/services/rbac/ent/team"
+	"gitlab.calendaria.team/services/rbac/ent/teamidentityrole"
 )
 
 // ent aliases to avoid import conflicts in user's code.

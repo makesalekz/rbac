@@ -3,13 +3,12 @@ package data
 import (
 	"context"
 
-	"rbac/internal/conf"
-	users_v1 "rbac/third_party/api/users/v1"
-
 	consul "github.com/go-kratos/consul/registry"
 	"github.com/go-kratos/kratos/v2/middleware/auth/jwt"
 	"github.com/go-kratos/kratos/v2/transport/grpc"
 	jwtv4 "github.com/golang-jwt/jwt/v4"
+	iam_v1 "gitlab.calendaria.team/services/iam/api/iam/v1"
+	"gitlab.calendaria.team/services/rbac/internal/conf"
 )
 
 type Dialer struct {
@@ -27,7 +26,7 @@ func NewDialer(c *Config, jwt *JwtProcessor) (*Dialer, error) {
 	}, nil
 }
 
-func (d *Dialer) Users(ctx context.Context) (users_v1.UsersClient, error) {
+func (d *Dialer) Users(ctx context.Context) (iam_v1.UsersClient, error) {
 	conn, err := grpc.DialInsecure(
 		ctx,
 		grpc.WithEndpoint(d.conf.Discovery.Iam),
@@ -44,5 +43,5 @@ func (d *Dialer) Users(ctx context.Context) (users_v1.UsersClient, error) {
 	if err != nil {
 		return nil, err
 	}
-	return users_v1.NewUsersClient(conn), nil
+	return iam_v1.NewUsersClient(conn), nil
 }

@@ -4,13 +4,13 @@ package ent
 
 import (
 	"fmt"
-	"rbac/ent/role"
-	"rbac/ent/team"
-	"rbac/ent/teamidentityrole"
 	"strings"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"gitlab.calendaria.team/services/rbac/ent/role"
+	"gitlab.calendaria.team/services/rbac/ent/team"
+	"gitlab.calendaria.team/services/rbac/ent/teamidentityrole"
 )
 
 // TeamIdentityRole is the model entity for the TeamIdentityRole schema.

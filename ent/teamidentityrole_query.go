@@ -6,14 +6,14 @@ import (
 	"context"
 	"fmt"
 	"math"
-	"rbac/ent/predicate"
-	"rbac/ent/role"
-	"rbac/ent/team"
-	"rbac/ent/teamidentityrole"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"gitlab.calendaria.team/services/rbac/ent/predicate"
+	"gitlab.calendaria.team/services/rbac/ent/role"
+	"gitlab.calendaria.team/services/rbac/ent/team"
+	"gitlab.calendaria.team/services/rbac/ent/teamidentityrole"
 )
 
 // TeamIdentityRoleQuery is the builder for querying TeamIdentityRole entities.

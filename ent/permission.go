@@ -5,11 +5,11 @@ package ent
 import (
 	"encoding/json"
 	"fmt"
-	"rbac/ent/permission"
 	"strings"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"gitlab.calendaria.team/services/rbac/ent/permission"
 )
 
 // Permission is the model entity for the Permission schema.

@@ -1,11 +1,12 @@
 package schema
 
 import (
+	"time"
+
 	"entgo.io/ent"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
-	"rbac/ent/mixins"
-	"time"
+	"gitlab.calendaria.team/services/rbac/ent/mixins"
 )
 
 // Role holds the schema definition for the Role entity.

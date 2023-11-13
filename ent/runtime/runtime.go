@@ -3,13 +3,14 @@
 package runtime
 
 import (
-	"rbac/ent/permission"
-	"rbac/ent/role"
-	"rbac/ent/rolepermission"
-	"rbac/ent/schema"
-	"rbac/ent/team"
-	"rbac/ent/teamidentityrole"
 	"time"
+
+	"gitlab.calendaria.team/services/rbac/ent/permission"
+	"gitlab.calendaria.team/services/rbac/ent/role"
+	"gitlab.calendaria.team/services/rbac/ent/rolepermission"
+	"gitlab.calendaria.team/services/rbac/ent/schema"
+	"gitlab.calendaria.team/services/rbac/ent/team"
+	"gitlab.calendaria.team/services/rbac/ent/teamidentityrole"
 )
 
 // The init function reads all schema descriptors with runtime code

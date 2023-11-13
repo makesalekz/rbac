@@ -4,12 +4,12 @@ package ent
 
 import (
 	"context"
-	"rbac/ent/permission"
-	"rbac/ent/predicate"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"gitlab.calendaria.team/services/rbac/ent/permission"
+	"gitlab.calendaria.team/services/rbac/ent/predicate"
 )
 
 // PermissionDelete is the builder for deleting a Permission entity.
