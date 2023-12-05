@@ -294,10 +294,6 @@ paths:
                   required: true
                   schema:
                     type: string
-                - name: tenantId
-                  in: query
-                  schema:
-                    type: string
             responses:
                 "200":
                     description: OK
@@ -462,8 +458,6 @@ components:
                     type: string
                 permissionId:
                     type: string
-                tenantId:
-                    type: string
                 deny:
                     type: boolean
                 fields:
@@ -518,8 +512,6 @@ components:
                 name:
                     type: string
                 description:
-                    type: string
-                tenantId:
                     type: string
         rbac.v1.CreateTeamRequest:
             type: object
@@ -582,9 +574,7 @@ components:
         rbac.v1.ListRolesRequest:
             type: object
             properties:
-                tenantId:
-                    type: string
-                name:
+                search:
                     type: string
         rbac.v1.ListTeamRolesRequest:
             type: object
@@ -672,8 +662,6 @@ components:
                     $ref: '#/components/schemas/rbac.v1.RoleReply'
                 permission:
                     $ref: '#/components/schemas/rbac.v1.PermissionReply'
-                tenantId:
-                    type: string
                 deny:
                     type: boolean
                 fields:
@@ -688,8 +676,6 @@ components:
                 name:
                     type: string
                 description:
-                    type: string
-                tenantId:
                     type: string
                 isSystem:
                     type: boolean
@@ -710,8 +696,6 @@ components:
             type: object
             properties:
                 roleId:
-                    type: string
-                tenantId:
                     type: string
         rbac.v1.Team:
             type: object

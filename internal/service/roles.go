@@ -7,24 +7,28 @@ import (
 	"gitlab.calendaria.team/services/rbac/ent"
 	"gitlab.calendaria.team/services/rbac/internal/biz"
 	"gitlab.calendaria.team/services/rbac/internal/data"
+	"gitlab.calendaria.team/services/utils/v1/jwt"
 )
 
 type RolesService struct {
 	v1.UnimplementedRolesServer
 
-	uc *biz.RolesUsecase
+	jwt *jwt.JwtProcessor
+	uc  *biz.RolesUsecase
+	pu  *biz.PermissionsUsecase
 }
 
-func NewRolesService(uc *biz.RolesUsecase) *RolesService {
+func NewRolesService(jwt *jwt.JwtProcessor, uc *biz.RolesUsecase, pu *biz.PermissionsUsecase) *RolesService {
 	return &RolesService{
-		uc: uc,
+		jwt: jwt,
+		uc:  uc,
+		pu:  pu,
 	}
 }
 
-func (s *RolesService) roleReply(role ent.Role) *v1.RoleReply {
+func (s *RolesService) roleReply(role *ent.Role) *v1.RoleReply {
 	return &v1.RoleReply{
 		Id:          role.ID,
-		TenantId:    *role.TenantID,
 		Name:        role.Name,
 		Description: role.Description,
 		IsSystem:    role.IsSystem,
@@ -33,100 +37,183 @@ func (s *RolesService) roleReply(role ent.Role) *v1.RoleReply {
 	}
 }
 
+func (s *RolesService) rolePermissionReply(rolePermission *ent.RolePermission) *v1.RolePermissionReply {
+	return &v1.RolePermissionReply{
+		Role: s.roleReply(rolePermission.Edges.Role),
+		Permission: &v1.PermissionReply{
+			Id:    rolePermission.Edges.Permission.ID,
+			AppId: rolePermission.Edges.Permission.AppID,
+		},
+		Fields: rolePermission.Fields,
+		Deny:   &rolePermission.Deny,
+	}
+}
+
 func (s *RolesService) CreateRole(ctx context.Context, req *v1.CreateRoleRequest) (*v1.RoleReply, error) {
+	claims, ok := s.jwt.GetClaimsFromContext(ctx)
+	if !ok || !claims.IsUserTenantRequest() {
+		return nil, v1.ErrorUnauthorized("invalid token")
+	}
+	// todo checkPermissions can create a role
+
 	role, err := s.uc.CreateRole(ctx, data.CreateRoleDto{
-		TenantId:    req.TenantId,
+		TenantId:    claims.GetTenantId(),
 		Name:        req.Name,
 		Description: req.Description,
 	})
 	if err != nil {
 		return nil, v1.ErrorDatabaseQuery(err.Error())
 	}
-	return s.roleReply(*role), nil
+	return s.roleReply(role), nil
 }
+
 func (s *RolesService) UpdateRole(ctx context.Context, req *v1.UpdateRoleRequest) (*v1.RoleReply, error) {
-	role, err := s.uc.UpdateRole(ctx, req.RoleId, data.UpdateRoleDto{
+	claims, ok := s.jwt.GetClaimsFromContext(ctx)
+	if !ok || !claims.IsUserTenantRequest() {
+		return nil, v1.ErrorUnauthorized("invalid token")
+	}
+	// todo checkPermissions can update role
+
+	role, err := s.uc.GetRoleById(ctx, claims.GetTenantId(), req.RoleId)
+	if err != nil {
+		return nil, err
+	}
+
+	updated, err := s.uc.UpdateRole(ctx, role, data.UpdateRoleDto{
 		Name:        req.Name,
 		Description: req.Description,
 	})
 	if err != nil {
 		return nil, err
 	}
-	return s.roleReply(*role), nil
+	return s.roleReply(updated), nil
 }
+
 func (s *RolesService) DeleteRole(ctx context.Context, req *v1.DeleteRoleRequest) (*v1.EmptyReply, error) {
-	err := s.uc.DeleteRole(ctx, req.RoleId)
+	claims, ok := s.jwt.GetClaimsFromContext(ctx)
+	if !ok || !claims.IsUserTenantRequest() {
+		return nil, v1.ErrorUnauthorized("invalid token")
+	}
+	// todo checkPermissions can delete role
+
+	role, err := s.uc.GetRoleById(ctx, claims.GetTenantId(), req.RoleId)
+	if err != nil {
+		return nil, err
+	}
+
+	err = s.uc.DeleteRole(ctx, role)
 	if err != nil {
 		return nil, err
 	}
 	return &v1.EmptyReply{}, nil
 }
+
 func (s *RolesService) GetRole(ctx context.Context, req *v1.GetRoleRequest) (*v1.RoleReply, error) {
-	role, err := s.uc.GetRoleById(ctx, req.RoleId)
+	claims, ok := s.jwt.GetClaimsFromContext(ctx)
+	if !ok || !claims.IsUserTenantRequest() {
+		return nil, v1.ErrorUnauthorized("invalid token")
+	}
+	// todo checkPermissions can view role details
+
+	role, err := s.uc.GetRoleById(ctx, claims.GetTenantId(), req.RoleId)
 	if err != nil {
 		return nil, err
 	}
-	return s.roleReply(*role), nil
+	return s.roleReply(role), nil
 }
+
 func (s *RolesService) ListRoles(ctx context.Context, req *v1.ListRolesRequest) (*v1.ListRolesReply, error) {
-	roles, err := s.uc.GetRoles(ctx, req.TenantId, *req.Name)
+	claims, ok := s.jwt.GetClaimsFromContext(ctx)
+	if !ok || !claims.IsUserTenantRequest() {
+		return nil, v1.ErrorUnauthorized("invalid token")
+	}
+	// todo checkPermissions can view role list
+
+	roles, err := s.uc.GetRoles(ctx, claims.GetTenantId(), req.Search)
 	if err != nil {
 		return nil, err
 	}
+
 	result := make([]*v1.RoleReply, len(roles))
 	for i, role := range roles {
-		result[i] = s.roleReply(*role)
+		result[i] = s.roleReply(role)
 	}
 	return &v1.ListRolesReply{
 		Roles: result,
 	}, nil
 }
+
 func (s *RolesService) AddPermissionToRole(ctx context.Context, req *v1.AddPermissionToRoleRequest) (*v1.RolePermissionReply, error) {
-	rolePermission, err := s.uc.AddPermissionToRole(ctx, data.CreateRolePermissionDto{
-		RoleId:       req.RoleId,
-		PermissionId: req.PermissionId,
-		TenantId:     req.TenantId,
-		Fields:       req.Fields,
-		Deny:         *req.Deny,
+	claims, ok := s.jwt.GetClaimsFromContext(ctx)
+	if !ok || !claims.IsUserTenantRequest() {
+		return nil, v1.ErrorUnauthorized("invalid token")
+	}
+	// todo checkPermissions can add permission to role
+
+	role, err := s.uc.GetRoleById(ctx, claims.GetTenantId(), req.RoleId)
+	if err != nil {
+		return nil, err
+	}
+
+	permission, err := s.pu.GetPermissionById(ctx, req.PermissionId)
+	if err != nil {
+		return nil, err
+	}
+
+	rolePermission, err := s.uc.AddPermissionToRole(ctx, role, permission, data.CreateRolePermissionDto{
+		Fields: req.Fields,
+		Deny:   *req.Deny,
 	})
 	if err != nil {
 		return nil, v1.ErrorDatabaseQuery(err.Error())
 	}
-	return &v1.RolePermissionReply{
-		Role: s.roleReply(*rolePermission.Edges.Role),
-		Permission: &v1.PermissionReply{
-			Id:    rolePermission.Edges.Permission.ID,
-			AppId: rolePermission.Edges.Permission.AppID,
-		},
-		TenantId: *rolePermission.TenantID,
-		Fields:   rolePermission.Fields,
-		Deny:     &rolePermission.Deny,
-	}, nil
+	return s.rolePermissionReply(rolePermission), nil
 }
+
 func (s *RolesService) RemovePermissionFromRole(ctx context.Context, req *v1.RemovePermissionFromRoleRequest) (*v1.EmptyReply, error) {
-	err := s.uc.RemovePermissionFromRole(ctx, req.RoleId, req.TenantId, req.PermissionId)
+	claims, ok := s.jwt.GetClaimsFromContext(ctx)
+	if !ok || !claims.IsUserTenantRequest() {
+		return nil, v1.ErrorUnauthorized("invalid token")
+	}
+	// todo checkPermissions can remove permission from role
+
+	role, err := s.uc.GetRoleById(ctx, claims.GetTenantId(), req.RoleId)
+	if err != nil {
+		return nil, err
+	}
+
+	permission, err := s.pu.GetPermissionById(ctx, req.PermissionId)
+	if err != nil {
+		return nil, err
+	}
+
+	err = s.uc.RemovePermissionFromRole(ctx, role, permission)
 	if err != nil {
 		return nil, err
 	}
 	return &v1.EmptyReply{}, nil
 }
+
 func (s *RolesService) ListRolePermissions(ctx context.Context, req *v1.RolesPermissionsRequest) (*v1.RolesPermissionsReply, error) {
-	rolePermissions, err := s.uc.ListRolePermissions(ctx, req.RoleId, req.TenantId)
+	claims, ok := s.jwt.GetClaimsFromContext(ctx)
+	if !ok || !claims.IsUserTenantRequest() {
+		return nil, v1.ErrorUnauthorized("invalid token")
+	}
+	// todo checkPermissions can remove permission from role
+
+	role, err := s.uc.GetRoleById(ctx, claims.GetTenantId(), req.RoleId)
 	if err != nil {
 		return nil, err
 	}
+
+	rolePermissions, err := s.uc.ListRolePermissions(ctx, role)
+	if err != nil {
+		return nil, err
+	}
+
 	permissions := make([]*v1.RolePermissionReply, len(rolePermissions))
 	for i, rp := range rolePermissions {
-		permissions[i] = &v1.RolePermissionReply{
-			Role: s.roleReply(*rp.Edges.Role),
-			Permission: &v1.PermissionReply{
-				Id:    rp.Edges.Permission.ID,
-				AppId: rp.Edges.Permission.AppID,
-			},
-			TenantId: *rp.TenantID,
-			Fields:   rp.Fields,
-			Deny:     &rp.Deny,
-		}
+		permissions[i] = s.rolePermissionReply(rp)
 	}
 	return &v1.RolesPermissionsReply{
 		Permissions: permissions,

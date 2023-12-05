@@ -3,7 +3,6 @@ package data
 import (
 	"context"
 
-	v1 "gitlab.calendaria.team/services/rbac/api/rbac/v1"
 	"gitlab.calendaria.team/services/rbac/ent"
 	"gitlab.calendaria.team/services/rbac/ent/role"
 	"gitlab.calendaria.team/services/rbac/ent/rolepermission"
@@ -21,24 +20,20 @@ type CreateRoleDto struct {
 }
 
 type CreateRolePermissionDto struct {
-	RoleId       int64
-	PermissionId string
-	TenantId     int64
-	Deny         bool
-	Fields       []string
+	Deny   bool
+	Fields []string
 }
 
 // RoleRepo
 type RoleRepo interface {
 	CreateRole(ctx context.Context, roleDto CreateRoleDto) (*ent.Role, error)
-	UpdateRole(ctx context.Context, roleID int64, roleDto UpdateRoleDto) (*ent.Role, error)
-	DeleteRole(ctx context.Context, roleID int64) error
-	GetRoleById(ctx context.Context, roleID, tenantId int64) (*ent.Role, error)
-	GetRoleByIds(ctx context.Context, ids []int64) ([]*ent.Role, error)
-	GetRolesList(ctx context.Context, teamID int64, name string) ([]*ent.Role, error)
-	AddPermissionToRole(ctx context.Context, dto CreateRolePermissionDto) (*ent.RolePermission, error)
-	RemovePermissionFromRole(ctx context.Context, roleID, tenantId int64, permissionId string) error
-	ListRolePermissions(ctx context.Context, roleId, tenantId int64) ([]*ent.RolePermission, error)
+	UpdateRole(ctx context.Context, role *ent.Role, roleDto UpdateRoleDto) (*ent.Role, error)
+	DeleteRole(ctx context.Context, role *ent.Role) error
+	GetRoleById(ctx context.Context, tenantId, roleId int64) (*ent.Role, error)
+	GetRolesList(ctx context.Context, tenantId int64, search string) ([]*ent.Role, error)
+	AddPermissionToRole(ctx context.Context, role *ent.Role, permission *ent.Permission, dto CreateRolePermissionDto) (*ent.RolePermission, error)
+	RemovePermissionFromRole(ctx context.Context, role *ent.Role, permission *ent.Permission) error
+	ListRolePermissions(ctx context.Context, role *ent.Role) ([]*ent.RolePermission, error)
 	ListRolesPermissions(ctx context.Context, roleId []int64, tenantId int64, permissions []string) ([]*ent.RolePermission, error)
 }
 
@@ -46,125 +41,84 @@ type roleRepo struct {
 	db *ent.Client
 }
 
-func validateFields(sourceFields []string, targetFields []string) bool {
-	if sourceFields == nil {
-		return true
-	}
-	if targetFields == nil {
-		return true
-	}
-	elementMap := make(map[string]bool)
-
-	// Заполняем карту элементами исходного массива
-	for _, element := range sourceFields {
-		elementMap[element] = true
-	}
-
-	// Проверяем каждый элемент второго массива
-	for _, element := range targetFields {
-		if _, exists := elementMap[element]; !exists {
-			return false
-		}
-	}
-
-	return true
-}
-
 func (r *roleRepo) CreateRole(ctx context.Context, roleDto CreateRoleDto) (*ent.Role, error) {
 	return r.db.Role.Create().
 		SetName(roleDto.Name).
 		SetDescription(roleDto.Description).
-		SetTenantID(roleDto.TenantId).Save(ctx)
+		SetTenantID(roleDto.TenantId).
+		Save(ctx)
 }
 
-func (r *roleRepo) UpdateRole(ctx context.Context, roleId int64, roleDto UpdateRoleDto) (*ent.Role, error) {
-	role, err := r.db.Role.Get(ctx, roleId)
-	if err != nil {
-		return nil, err
-	}
-	query := role.Update()
+func (r *roleRepo) UpdateRole(ctx context.Context, role *ent.Role, roleDto UpdateRoleDto) (*ent.Role, error) {
+	query := r.db.Role.UpdateOne(role)
+
 	if roleDto.Name != "" {
 		query.SetName(roleDto.Name)
 	}
 	if roleDto.Description != "" {
-		query.SetName(roleDto.Description)
+		query.SetDescription(roleDto.Description)
 	}
+
 	return query.Save(ctx)
 }
 
-func (r *roleRepo) DeleteRole(ctx context.Context, roleId int64) error {
-	return r.db.Role.DeleteOneID(roleId).Exec(ctx)
+func (r *roleRepo) DeleteRole(ctx context.Context, role *ent.Role) error {
+	return r.db.Role.DeleteOne(role).Exec(ctx)
 }
 
-func (r *roleRepo) GetRoleById(ctx context.Context, roleId, tenantId int64) (*ent.Role, error) {
-	query := r.db.Role.Query()
-	query = query.Where(role.ID(roleId), role.TenantID(tenantId))
-	return query.First(ctx)
+func (r *roleRepo) GetRoleById(ctx context.Context, tenantId, roleId int64) (*ent.Role, error) {
+	return r.db.Role.Query().
+		Where(role.ID(roleId), role.TenantID(tenantId)).
+		First(ctx)
 }
 
-func (r *roleRepo) GetRoleByIds(ctx context.Context, ids []int64) ([]*ent.Role, error) {
-	return r.db.Role.Query().Where(role.IDIn(ids...)).All(ctx)
-}
+func (r *roleRepo) GetRolesList(ctx context.Context, tenantId int64, search string) ([]*ent.Role, error) {
+	query := r.db.Role.Query().Where(role.TenantID(tenantId))
 
-func (r *roleRepo) GetRolesList(ctx context.Context, tenantId int64, name string) ([]*ent.Role, error) {
-	query := r.db.Role.Query()
-	if name != "" {
-		query = query.Where(role.NameContains(name))
+	if search != "" {
+		query = query.Where(role.NameContainsFold(search))
 	}
-	if tenantId != 0 {
-		query = query.Where(role.TenantID(tenantId))
-	}
+
 	return query.All(ctx)
 }
 
-func (r *roleRepo) AddPermissionToRole(ctx context.Context, dto CreateRolePermissionDto) (*ent.RolePermission, error) {
-	// check if role exists
-	role, err := r.db.Role.Get(ctx, dto.RoleId)
-	if err != nil {
-		return nil, err
-	}
-	// check if permission exists
-	permission, err := r.db.Permission.Get(ctx, dto.PermissionId)
-	if err != nil {
-		return nil, err
-	}
-
-	isValid := validateFields(permission.Fields, dto.Fields)
-	if !isValid {
-		return nil, v1.ErrorInvalidRequest("Invalid fields")
-	}
-
-	rolePermissionSave, err := r.db.RolePermission.Create().
-		SetFields(dto.Fields).
+func (r *roleRepo) AddPermissionToRole(ctx context.Context, role *ent.Role, permission *ent.Permission, dto CreateRolePermissionDto) (*ent.RolePermission, error) {
+	query := r.db.RolePermission.Create().
 		SetRole(role).
 		SetPermission(permission).
-		SetTenantID(dto.TenantId).
-		SetDeny(dto.Deny).
-		Save(ctx)
-	if err != nil {
-		return nil, err
+		SetFields(dto.Fields).
+		SetDeny(dto.Deny)
+
+	if role.TenantID != nil {
+		query.SetTenantID(*role.TenantID)
 	}
-	if err != nil {
-		return nil, err
-	}
-	return rolePermissionSave, nil
+
+	return query.Save(ctx)
 }
 
-func (r *roleRepo) RemovePermissionFromRole(ctx context.Context, roleId, tenantId int64, permissionId string) error {
-	return r.db.RolePermission.DeleteOne(&ent.RolePermission{
-		RoleID:       roleId,
-		PermissionID: permissionId,
-		TenantID:     &tenantId,
-	}).Exec(ctx)
-}
-
-func (r *roleRepo) ListRolePermissions(ctx context.Context, roleId, tenantId int64) ([]*ent.RolePermission, error) {
-	query := r.db.RolePermission.
-		Query().
+func (r *roleRepo) RemovePermissionFromRole(ctx context.Context, role *ent.Role, permission *ent.Permission) error {
+	query := r.db.RolePermission.Delete().
 		Where(
-			rolepermission.RoleID(roleId),
-			rolepermission.TenantIDEQ(tenantId),
+			rolepermission.RoleID(role.ID),
+			rolepermission.PermissionID(permission.ID),
 		)
+
+	if role.TenantID != nil {
+		query.Where(rolepermission.TenantID(*role.TenantID))
+	}
+
+	_, err := query.Exec(ctx)
+
+	return err
+}
+
+func (r *roleRepo) ListRolePermissions(ctx context.Context, role *ent.Role) ([]*ent.RolePermission, error) {
+	query := r.db.RolePermission.Query().
+		Where(rolepermission.RoleID(role.ID))
+
+	if role.TenantID != nil {
+		query.Where(rolepermission.TenantID(*role.TenantID))
+	}
 
 	return query.All(ctx)
 }
@@ -176,9 +130,11 @@ func (r *roleRepo) ListRolesPermissions(ctx context.Context, roleIds []int64, te
 			rolepermission.RoleIDIn(roleIds...),
 			rolepermission.TenantIDIn(tenantId, 0),
 		)
+
 	if len(permissions) != 0 {
-		query = query.Where(rolepermission.RoleIDIn(roleIds...))
+		query.Where(rolepermission.PermissionIDIn(permissions...))
 	}
+
 	return query.All(ctx)
 }
 

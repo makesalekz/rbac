@@ -35,11 +35,10 @@ message RoleReply {
 	int64 id = 1;
 	string name = 2;
 	string description = 3;
-	int64 tenantId = 4;
-	bool isSystem = 5;
-	string createdAt = 6;
-	string updatedAt = 7;
-	string deletedAt = 8;
+	bool isSystem = 4;
+	string createdAt = 5;
+	string updatedAt = 6;
+	string deletedAt = 7;
 }
 
 //---------------------------------- Pagination ----------------------------------
