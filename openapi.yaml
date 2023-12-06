@@ -117,7 +117,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/rbac.v1.EmptyReply'
+                                $ref: '#/components/schemas/utils.v1.EmptyReply'
     /v1/rbac/roles:
         post:
             tags:
@@ -171,7 +171,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/rbac.v1.EmptyReply'
+                                $ref: '#/components/schemas/utils.v1.EmptyReply'
     /v1/rbac/roles/{roleId}:
         get:
             tags:
@@ -229,7 +229,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/rbac.v1.EmptyReply'
+                                $ref: '#/components/schemas/utils.v1.EmptyReply'
     /v1/rbac/roles/{roleId}/permissions:
         post:
             tags:
@@ -294,17 +294,13 @@ paths:
                   required: true
                   schema:
                     type: string
-                - name: tenantId
-                  in: query
-                  schema:
-                    type: string
             responses:
                 "200":
                     description: OK
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/rbac.v1.EmptyReply'
+                                $ref: '#/components/schemas/utils.v1.EmptyReply'
     /v1/rbac/team/list:
         post:
             tags:
@@ -434,7 +430,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/rbac.v1.EmptyReply'
+                                $ref: '#/components/schemas/utils.v1.EmptyReply'
     /v1/teams/{teamId}/tree:
         get:
             tags:
@@ -462,8 +458,6 @@ components:
                     type: string
                 permissionId:
                     type: string
-                tenantId:
-                    type: string
                 deny:
                     type: boolean
                 fields:
@@ -473,13 +467,11 @@ components:
         rbac.v1.AssignRoleRequest:
             type: object
             properties:
-                tenantId:
-                    type: string
-                teamId:
-                    type: string
                 identityId:
                     type: string
                 roleId:
+                    type: string
+                teamId:
                     type: string
         rbac.v1.CheckPermissionsReply:
             type: object
@@ -519,8 +511,6 @@ components:
                     type: string
                 description:
                     type: string
-                tenantId:
-                    type: string
         rbac.v1.CreateTeamRequest:
             type: object
             properties:
@@ -528,13 +518,8 @@ components:
                     type: string
                 description:
                     type: string
-                tenantId:
-                    type: string
                 parentId:
                     type: string
-        rbac.v1.EmptyReply:
-            type: object
-            properties: {}
         rbac.v1.ListIdentityRolesReply:
             type: object
             properties:
@@ -546,8 +531,6 @@ components:
             type: object
             properties:
                 identityId:
-                    type: string
-                tenantId:
                     type: string
         rbac.v1.ListOfFields:
             type: object
@@ -582,16 +565,12 @@ components:
         rbac.v1.ListRolesRequest:
             type: object
             properties:
-                tenantId:
-                    type: string
-                name:
+                search:
                     type: string
         rbac.v1.ListTeamRolesRequest:
             type: object
             properties:
                 teamId:
-                    type: string
-                tenantId:
                     type: string
         rbac.v1.ListTeamsReply:
             type: object
@@ -601,55 +580,14 @@ components:
                     items:
                         $ref: '#/components/schemas/rbac.v1.Team'
                 paginate:
-                    $ref: '#/components/schemas/rbac.v1.PaginateReply'
+                    $ref: '#/components/schemas/utils.v1.PaginateReply'
         rbac.v1.ListTeamsRequest:
             type: object
             properties:
-                tenantId:
-                    type: string
                 parentId:
                     type: string
                 paginate:
-                    $ref: '#/components/schemas/rbac.v1.PaginateRequest'
-        rbac.v1.PaginateReply:
-            type: object
-            properties:
-                total:
-                    type: integer
-                    format: int32
-                fromId:
-                    type: string
-                toId:
-                    type: string
-                fromDate:
-                    type: string
-                toDate:
-                    type: string
-                fromLabel:
-                    type: string
-        rbac.v1.PaginateRequest:
-            type: object
-            properties:
-                limit:
-                    type: integer
-                    format: int32
-                fromId:
-                    type: string
-                toId:
-                    type: string
-                aroundId:
-                    type: string
-                fromDate:
-                    type: string
-                toDate:
-                    type: string
-                aroundDate:
-                    type: string
-                fromLabel:
-                    type: string
-                descending:
-                    type: boolean
-            description: '---------------------------------- Pagination ----------------------------------'
+                    $ref: '#/components/schemas/utils.v1.PaginateRequest'
         rbac.v1.PermissionReply:
             type: object
             properties:
@@ -672,8 +610,6 @@ components:
                     $ref: '#/components/schemas/rbac.v1.RoleReply'
                 permission:
                     $ref: '#/components/schemas/rbac.v1.PermissionReply'
-                tenantId:
-                    type: string
                 deny:
                     type: boolean
                 fields:
@@ -688,8 +624,6 @@ components:
                 name:
                     type: string
                 description:
-                    type: string
-                tenantId:
                     type: string
                 isSystem:
                     type: boolean
@@ -711,8 +645,6 @@ components:
             properties:
                 roleId:
                     type: string
-                tenantId:
-                    type: string
         rbac.v1.Team:
             type: object
             properties:
@@ -730,8 +662,6 @@ components:
                     type: string
                 description:
                     type: string
-                tenantId:
-                    type: string
                 createdAt:
                     type: string
                 updatedAt:
@@ -743,14 +673,12 @@ components:
         rbac.v1.TeamIdentityRoleReply:
             type: object
             properties:
-                tenantId:
-                    type: string
                 identityId:
                     type: string
-                team:
-                    $ref: '#/components/schemas/rbac.v1.Team'
                 role:
                     $ref: '#/components/schemas/rbac.v1.RoleReply'
+                team:
+                    $ref: '#/components/schemas/rbac.v1.Team'
         rbac.v1.TeamReply:
             type: object
             properties:
@@ -789,6 +717,50 @@ components:
                     type: string
                 description:
                     type: string
+        utils.v1.EmptyReply:
+            type: object
+            properties: {}
+        utils.v1.PaginateReply:
+            type: object
+            properties:
+                total:
+                    type: integer
+                    format: int32
+                fromId:
+                    type: string
+                toId:
+                    type: string
+                fromDate:
+                    type: string
+                toDate:
+                    type: string
+                fromLabel:
+                    type: string
+        utils.v1.PaginateRequest:
+            type: object
+            properties:
+                limit:
+                    type: integer
+                    format: int32
+                fromId:
+                    type: string
+                toId:
+                    type: string
+                aroundId:
+                    type: string
+                fromDate:
+                    type: string
+                toDate:
+                    type: string
+                aroundDate:
+                    type: string
+                fromLabel:
+                    type: string
+                descending:
+                    type: boolean
+                page:
+                    type: integer
+                    format: int32
 tags:
     - name: CheckPermissions
     - name: Permissions

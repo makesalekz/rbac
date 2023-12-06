@@ -10,6 +10,7 @@ import (
 	context "context"
 	http "github.com/go-kratos/kratos/v2/transport/http"
 	binding "github.com/go-kratos/kratos/v2/transport/http/binding"
+	v1 "gitlab.calendaria.team/services/utils/api/utils/v1"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -26,7 +27,7 @@ const OperationTeamIdentityRoleListTeamRoles = "/rbac.v1.TeamIdentityRole/ListTe
 
 type TeamIdentityRoleHTTPServer interface {
 	AssignRole(context.Context, *AssignRoleRequest) (*TeamIdentityRoleReply, error)
-	DeleteRole(context.Context, *DeleteRequest) (*EmptyReply, error)
+	DeleteRole(context.Context, *DeleteRequest) (*v1.EmptyReply, error)
 	ListIdentityRoles(context.Context, *ListIdentityRolesRequest) (*ListIdentityRolesReply, error)
 	ListTeamRoles(context.Context, *ListTeamRolesRequest) (*ListIdentityRolesReply, error)
 }
@@ -78,7 +79,7 @@ func _TeamIdentityRole_DeleteRole0_HTTP_Handler(srv TeamIdentityRoleHTTPServer) 
 		if err != nil {
 			return err
 		}
-		reply := out.(*EmptyReply)
+		reply := out.(*v1.EmptyReply)
 		return ctx.Result(200, reply)
 	}
 }
@@ -129,7 +130,7 @@ func _TeamIdentityRole_ListTeamRoles0_HTTP_Handler(srv TeamIdentityRoleHTTPServe
 
 type TeamIdentityRoleHTTPClient interface {
 	AssignRole(ctx context.Context, req *AssignRoleRequest, opts ...http.CallOption) (rsp *TeamIdentityRoleReply, err error)
-	DeleteRole(ctx context.Context, req *DeleteRequest, opts ...http.CallOption) (rsp *EmptyReply, err error)
+	DeleteRole(ctx context.Context, req *DeleteRequest, opts ...http.CallOption) (rsp *v1.EmptyReply, err error)
 	ListIdentityRoles(ctx context.Context, req *ListIdentityRolesRequest, opts ...http.CallOption) (rsp *ListIdentityRolesReply, err error)
 	ListTeamRoles(ctx context.Context, req *ListTeamRolesRequest, opts ...http.CallOption) (rsp *ListIdentityRolesReply, err error)
 }
@@ -155,8 +156,8 @@ func (c *TeamIdentityRoleHTTPClientImpl) AssignRole(ctx context.Context, in *Ass
 	return &out, err
 }
 
-func (c *TeamIdentityRoleHTTPClientImpl) DeleteRole(ctx context.Context, in *DeleteRequest, opts ...http.CallOption) (*EmptyReply, error) {
-	var out EmptyReply
+func (c *TeamIdentityRoleHTTPClientImpl) DeleteRole(ctx context.Context, in *DeleteRequest, opts ...http.CallOption) (*v1.EmptyReply, error) {
+	var out v1.EmptyReply
 	pattern := "/v1/rbac/roles/{assignId}"
 	path := binding.EncodeURL(pattern, in, true)
 	opts = append(opts, http.Operation(OperationTeamIdentityRoleDeleteRole))

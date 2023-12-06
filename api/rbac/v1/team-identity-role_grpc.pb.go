@@ -8,6 +8,7 @@ package rbac_v1
 
 import (
 	context "context"
+	v1 "gitlab.calendaria.team/services/utils/api/utils/v1"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -30,7 +31,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type TeamIdentityRoleClient interface {
 	AssignRole(ctx context.Context, in *AssignRoleRequest, opts ...grpc.CallOption) (*TeamIdentityRoleReply, error)
-	DeleteRole(ctx context.Context, in *DeleteRequest, opts ...grpc.CallOption) (*EmptyReply, error)
+	DeleteRole(ctx context.Context, in *DeleteRequest, opts ...grpc.CallOption) (*v1.EmptyReply, error)
 	ListIdentityRoles(ctx context.Context, in *ListIdentityRolesRequest, opts ...grpc.CallOption) (*ListIdentityRolesReply, error)
 	ListTeamRoles(ctx context.Context, in *ListTeamRolesRequest, opts ...grpc.CallOption) (*ListIdentityRolesReply, error)
 }
@@ -52,8 +53,8 @@ func (c *teamIdentityRoleClient) AssignRole(ctx context.Context, in *AssignRoleR
 	return out, nil
 }
 
-func (c *teamIdentityRoleClient) DeleteRole(ctx context.Context, in *DeleteRequest, opts ...grpc.CallOption) (*EmptyReply, error) {
-	out := new(EmptyReply)
+func (c *teamIdentityRoleClient) DeleteRole(ctx context.Context, in *DeleteRequest, opts ...grpc.CallOption) (*v1.EmptyReply, error) {
+	out := new(v1.EmptyReply)
 	err := c.cc.Invoke(ctx, TeamIdentityRole_DeleteRole_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -84,7 +85,7 @@ func (c *teamIdentityRoleClient) ListTeamRoles(ctx context.Context, in *ListTeam
 // for forward compatibility
 type TeamIdentityRoleServer interface {
 	AssignRole(context.Context, *AssignRoleRequest) (*TeamIdentityRoleReply, error)
-	DeleteRole(context.Context, *DeleteRequest) (*EmptyReply, error)
+	DeleteRole(context.Context, *DeleteRequest) (*v1.EmptyReply, error)
 	ListIdentityRoles(context.Context, *ListIdentityRolesRequest) (*ListIdentityRolesReply, error)
 	ListTeamRoles(context.Context, *ListTeamRolesRequest) (*ListIdentityRolesReply, error)
 	mustEmbedUnimplementedTeamIdentityRoleServer()
@@ -97,7 +98,7 @@ type UnimplementedTeamIdentityRoleServer struct {
 func (UnimplementedTeamIdentityRoleServer) AssignRole(context.Context, *AssignRoleRequest) (*TeamIdentityRoleReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AssignRole not implemented")
 }
-func (UnimplementedTeamIdentityRoleServer) DeleteRole(context.Context, *DeleteRequest) (*EmptyReply, error) {
+func (UnimplementedTeamIdentityRoleServer) DeleteRole(context.Context, *DeleteRequest) (*v1.EmptyReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteRole not implemented")
 }
 func (UnimplementedTeamIdentityRoleServer) ListIdentityRoles(context.Context, *ListIdentityRolesRequest) (*ListIdentityRolesReply, error) {

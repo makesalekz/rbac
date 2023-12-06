@@ -14,6 +14,8 @@ import (
 	"gitlab.calendaria.team/services/rbac/internal/data"
 	"gitlab.calendaria.team/services/rbac/internal/server"
 	"gitlab.calendaria.team/services/rbac/internal/service"
+	"gitlab.calendaria.team/services/utils/v1/config"
+	"gitlab.calendaria.team/services/utils/v1/jwt"
 )
 
 import (
@@ -24,11 +26,11 @@ import (
 
 // wireApp init kratos application.
 func wireApp(bootstrap *conf.Bootstrap, logger log.Logger) (*kratos.App, func(), error) {
-	config, err := data.NewConfig(bootstrap)
+	configConfig, err := config.NewConfig()
 	if err != nil {
 		return nil, nil, err
 	}
-	jwtProcessor, err := data.NewJwtProcessor(config)
+	jwtProcessor, err := jwt.NewJwtProcessor(configConfig)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -42,32 +44,32 @@ func wireApp(bootstrap *conf.Bootstrap, logger log.Logger) (*kratos.App, func(),
 		cleanup()
 		return nil, nil, err
 	}
-	rolesService := service.NewRolesService(rolesUsecase)
 	permissionRepo := data.NewPermissionRepo(dataData)
 	permissionsUsecase, err := biz.NewPermissionUsecase(logger, jwtProcessor, permissionRepo)
 	if err != nil {
 		cleanup()
 		return nil, nil, err
 	}
+	rolesService := service.NewRolesService(jwtProcessor, rolesUsecase, permissionsUsecase)
 	permissionsService := service.NewPermissionsService(permissionsUsecase)
 	teamsRepo := data.NewTeamsRepo(dataData)
-	teamsUsecase, err := biz.NewTeamsUsecase(logger, config, jwtProcessor, teamsRepo)
+	teamsUsecase, err := biz.NewTeamsUsecase(bootstrap, logger, configConfig, jwtProcessor, teamsRepo)
 	if err != nil {
 		cleanup()
 		return nil, nil, err
 	}
-	teamsService := service.NewTeamsService(teamsUsecase)
+	teamsService := service.NewTeamsService(jwtProcessor, teamsUsecase)
 	teamIdentityRoleRepo := data.NewTeamIdentityRoleRepo(dataData)
-	teamIdentityUsecase, err := biz.NewTeamIdentityUsecase(logger, config, jwtProcessor, teamIdentityRoleRepo, roleRepo, teamsRepo)
+	teamIdentityUsecase, err := biz.NewTeamIdentityUsecase(bootstrap, logger, configConfig, jwtProcessor, teamIdentityRoleRepo, roleRepo, teamsRepo)
 	if err != nil {
 		cleanup()
 		return nil, nil, err
 	}
-	teamIdentityRoleService := service.NewTeamIdentityRoleService(teamIdentityUsecase)
-	checkPermissionsService := service.NewCheckPermissionsService(teamIdentityUsecase)
+	teamIdentityRoleService := service.NewTeamIdentityRoleService(jwtProcessor, rolesUsecase, teamsUsecase, teamIdentityUsecase)
+	checkPermissionsService := service.NewCheckPermissionsService(jwtProcessor, teamIdentityUsecase)
 	grpcServer := server.NewGRPCServer(bootstrap, logger, jwtProcessor, rolesService, permissionsService, teamsService, teamIdentityRoleService, checkPermissionsService)
 	httpServer := server.NewHTTPServer(bootstrap, logger, jwtProcessor, rolesService, permissionsService, teamsService, teamIdentityRoleService, checkPermissionsService)
-	app := newApp(logger, config, grpcServer, httpServer)
+	app := newApp(logger, configConfig, grpcServer, httpServer)
 	return app, func() {
 		cleanup()
 	}, nil

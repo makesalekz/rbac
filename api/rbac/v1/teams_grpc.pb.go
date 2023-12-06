@@ -8,6 +8,7 @@ package rbac_v1
 
 import (
 	context "context"
+	v1 "gitlab.calendaria.team/services/utils/api/utils/v1"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -33,7 +34,7 @@ const (
 type TeamsClient interface {
 	CreateTeam(ctx context.Context, in *CreateTeamRequest, opts ...grpc.CallOption) (*TeamReply, error)
 	UpdateTeam(ctx context.Context, in *UpdateTeamRequest, opts ...grpc.CallOption) (*TeamReply, error)
-	DeleteTeam(ctx context.Context, in *TeamRequest, opts ...grpc.CallOption) (*EmptyReply, error)
+	DeleteTeam(ctx context.Context, in *TeamRequest, opts ...grpc.CallOption) (*v1.EmptyReply, error)
 	GetTeam(ctx context.Context, in *TeamRequest, opts ...grpc.CallOption) (*TeamReply, error)
 	GetTeamTree(ctx context.Context, in *TeamRequest, opts ...grpc.CallOption) (*TeamReply, error)
 	ListTeams(ctx context.Context, in *ListTeamsRequest, opts ...grpc.CallOption) (*ListTeamsReply, error)
@@ -65,8 +66,8 @@ func (c *teamsClient) UpdateTeam(ctx context.Context, in *UpdateTeamRequest, opt
 	return out, nil
 }
 
-func (c *teamsClient) DeleteTeam(ctx context.Context, in *TeamRequest, opts ...grpc.CallOption) (*EmptyReply, error) {
-	out := new(EmptyReply)
+func (c *teamsClient) DeleteTeam(ctx context.Context, in *TeamRequest, opts ...grpc.CallOption) (*v1.EmptyReply, error) {
+	out := new(v1.EmptyReply)
 	err := c.cc.Invoke(ctx, Teams_DeleteTeam_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -107,7 +108,7 @@ func (c *teamsClient) ListTeams(ctx context.Context, in *ListTeamsRequest, opts 
 type TeamsServer interface {
 	CreateTeam(context.Context, *CreateTeamRequest) (*TeamReply, error)
 	UpdateTeam(context.Context, *UpdateTeamRequest) (*TeamReply, error)
-	DeleteTeam(context.Context, *TeamRequest) (*EmptyReply, error)
+	DeleteTeam(context.Context, *TeamRequest) (*v1.EmptyReply, error)
 	GetTeam(context.Context, *TeamRequest) (*TeamReply, error)
 	GetTeamTree(context.Context, *TeamRequest) (*TeamReply, error)
 	ListTeams(context.Context, *ListTeamsRequest) (*ListTeamsReply, error)
@@ -124,7 +125,7 @@ func (UnimplementedTeamsServer) CreateTeam(context.Context, *CreateTeamRequest) 
 func (UnimplementedTeamsServer) UpdateTeam(context.Context, *UpdateTeamRequest) (*TeamReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateTeam not implemented")
 }
-func (UnimplementedTeamsServer) DeleteTeam(context.Context, *TeamRequest) (*EmptyReply, error) {
+func (UnimplementedTeamsServer) DeleteTeam(context.Context, *TeamRequest) (*v1.EmptyReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteTeam not implemented")
 }
 func (UnimplementedTeamsServer) GetTeam(context.Context, *TeamRequest) (*TeamReply, error) {

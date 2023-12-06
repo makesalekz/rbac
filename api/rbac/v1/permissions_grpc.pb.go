@@ -8,6 +8,7 @@ package rbac_v1
 
 import (
 	context "context"
+	v1 "gitlab.calendaria.team/services/utils/api/utils/v1"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -32,7 +33,7 @@ const (
 type PermissionsClient interface {
 	CreatePermission(ctx context.Context, in *CreatePermissionRequest, opts ...grpc.CallOption) (*PermissionReply, error)
 	UpdatePermission(ctx context.Context, in *UpdatePermissionRequest, opts ...grpc.CallOption) (*PermissionReply, error)
-	DeletePermission(ctx context.Context, in *DeletePermissionRequest, opts ...grpc.CallOption) (*EmptyReply, error)
+	DeletePermission(ctx context.Context, in *DeletePermissionRequest, opts ...grpc.CallOption) (*v1.EmptyReply, error)
 	GetPermission(ctx context.Context, in *GetPermissionRequest, opts ...grpc.CallOption) (*PermissionReply, error)
 	ListPermissions(ctx context.Context, in *ListPermissionsRequest, opts ...grpc.CallOption) (*ListPermissionsReply, error)
 }
@@ -63,8 +64,8 @@ func (c *permissionsClient) UpdatePermission(ctx context.Context, in *UpdatePerm
 	return out, nil
 }
 
-func (c *permissionsClient) DeletePermission(ctx context.Context, in *DeletePermissionRequest, opts ...grpc.CallOption) (*EmptyReply, error) {
-	out := new(EmptyReply)
+func (c *permissionsClient) DeletePermission(ctx context.Context, in *DeletePermissionRequest, opts ...grpc.CallOption) (*v1.EmptyReply, error) {
+	out := new(v1.EmptyReply)
 	err := c.cc.Invoke(ctx, Permissions_DeletePermission_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -96,7 +97,7 @@ func (c *permissionsClient) ListPermissions(ctx context.Context, in *ListPermiss
 type PermissionsServer interface {
 	CreatePermission(context.Context, *CreatePermissionRequest) (*PermissionReply, error)
 	UpdatePermission(context.Context, *UpdatePermissionRequest) (*PermissionReply, error)
-	DeletePermission(context.Context, *DeletePermissionRequest) (*EmptyReply, error)
+	DeletePermission(context.Context, *DeletePermissionRequest) (*v1.EmptyReply, error)
 	GetPermission(context.Context, *GetPermissionRequest) (*PermissionReply, error)
 	ListPermissions(context.Context, *ListPermissionsRequest) (*ListPermissionsReply, error)
 	mustEmbedUnimplementedPermissionsServer()
@@ -112,7 +113,7 @@ func (UnimplementedPermissionsServer) CreatePermission(context.Context, *CreateP
 func (UnimplementedPermissionsServer) UpdatePermission(context.Context, *UpdatePermissionRequest) (*PermissionReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdatePermission not implemented")
 }
-func (UnimplementedPermissionsServer) DeletePermission(context.Context, *DeletePermissionRequest) (*EmptyReply, error) {
+func (UnimplementedPermissionsServer) DeletePermission(context.Context, *DeletePermissionRequest) (*v1.EmptyReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeletePermission not implemented")
 }
 func (UnimplementedPermissionsServer) GetPermission(context.Context, *GetPermissionRequest) (*PermissionReply, error) {
