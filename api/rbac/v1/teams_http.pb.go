@@ -10,6 +10,7 @@ import (
 	context "context"
 	http "github.com/go-kratos/kratos/v2/transport/http"
 	binding "github.com/go-kratos/kratos/v2/transport/http/binding"
+	v1 "gitlab.calendaria.team/services/utils/api/utils/v1"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -28,7 +29,7 @@ const OperationTeamsUpdateTeam = "/rbac.v1.Teams/UpdateTeam"
 
 type TeamsHTTPServer interface {
 	CreateTeam(context.Context, *CreateTeamRequest) (*TeamReply, error)
-	DeleteTeam(context.Context, *TeamRequest) (*EmptyReply, error)
+	DeleteTeam(context.Context, *TeamRequest) (*v1.EmptyReply, error)
 	GetTeam(context.Context, *TeamRequest) (*TeamReply, error)
 	GetTeamTree(context.Context, *TeamRequest) (*TeamReply, error)
 	ListTeams(context.Context, *ListTeamsRequest) (*ListTeamsReply, error)
@@ -109,7 +110,7 @@ func _Teams_DeleteTeam0_HTTP_Handler(srv TeamsHTTPServer) func(ctx http.Context)
 		if err != nil {
 			return err
 		}
-		reply := out.(*EmptyReply)
+		reply := out.(*v1.EmptyReply)
 		return ctx.Result(200, reply)
 	}
 }
@@ -182,7 +183,7 @@ func _Teams_ListTeams0_HTTP_Handler(srv TeamsHTTPServer) func(ctx http.Context) 
 
 type TeamsHTTPClient interface {
 	CreateTeam(ctx context.Context, req *CreateTeamRequest, opts ...http.CallOption) (rsp *TeamReply, err error)
-	DeleteTeam(ctx context.Context, req *TeamRequest, opts ...http.CallOption) (rsp *EmptyReply, err error)
+	DeleteTeam(ctx context.Context, req *TeamRequest, opts ...http.CallOption) (rsp *v1.EmptyReply, err error)
 	GetTeam(ctx context.Context, req *TeamRequest, opts ...http.CallOption) (rsp *TeamReply, err error)
 	GetTeamTree(ctx context.Context, req *TeamRequest, opts ...http.CallOption) (rsp *TeamReply, err error)
 	ListTeams(ctx context.Context, req *ListTeamsRequest, opts ...http.CallOption) (rsp *ListTeamsReply, err error)
@@ -210,8 +211,8 @@ func (c *TeamsHTTPClientImpl) CreateTeam(ctx context.Context, in *CreateTeamRequ
 	return &out, err
 }
 
-func (c *TeamsHTTPClientImpl) DeleteTeam(ctx context.Context, in *TeamRequest, opts ...http.CallOption) (*EmptyReply, error) {
-	var out EmptyReply
+func (c *TeamsHTTPClientImpl) DeleteTeam(ctx context.Context, in *TeamRequest, opts ...http.CallOption) (*v1.EmptyReply, error) {
+	var out v1.EmptyReply
 	pattern := "/v1/teams/{teamId}"
 	path := binding.EncodeURL(pattern, in, true)
 	opts = append(opts, http.Operation(OperationTeamsDeleteTeam))

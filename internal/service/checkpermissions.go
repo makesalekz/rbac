@@ -5,17 +5,20 @@ import (
 
 	v1 "gitlab.calendaria.team/services/rbac/api/rbac/v1"
 	"gitlab.calendaria.team/services/rbac/internal/biz"
+	"gitlab.calendaria.team/services/utils/v1/jwt"
 )
 
 type CheckPermissionsService struct {
 	v1.UnimplementedCheckPermissionsServer
 
-	uc *biz.TeamIdentityUsecase
+	jwt *jwt.JwtProcessor
+	uc  *biz.TeamIdentityUsecase
 }
 
-func NewCheckPermissionsService(uc *biz.TeamIdentityUsecase) *CheckPermissionsService {
+func NewCheckPermissionsService(jwt *jwt.JwtProcessor, uc *biz.TeamIdentityUsecase) *CheckPermissionsService {
 	return &CheckPermissionsService{
-		uc: uc,
+		jwt: jwt,
+		uc:  uc,
 	}
 }
 

@@ -4,120 +4,139 @@ import (
 	"context"
 
 	v1 "gitlab.calendaria.team/services/rbac/api/rbac/v1"
+	"gitlab.calendaria.team/services/rbac/ent"
 	"gitlab.calendaria.team/services/rbac/internal/biz"
 	"gitlab.calendaria.team/services/rbac/internal/data"
+	utils_v1 "gitlab.calendaria.team/services/utils/api/utils/v1"
+	"gitlab.calendaria.team/services/utils/v1/jwt"
 )
 
 type TeamIdentityRoleService struct {
 	v1.UnimplementedTeamIdentityRoleServer
 
-	uc *biz.TeamIdentityUsecase
+	jwt *jwt.JwtProcessor
+	ru  *biz.RolesUsecase
+	tu  *biz.TeamsUsecase
+	uc  *biz.TeamIdentityUsecase
 }
 
-func NewTeamIdentityRoleService(uc *biz.TeamIdentityUsecase) *TeamIdentityRoleService {
+func NewTeamIdentityRoleService(
+	jwt *jwt.JwtProcessor,
+	ru *biz.RolesUsecase,
+	tu *biz.TeamsUsecase,
+	uc *biz.TeamIdentityUsecase,
+) *TeamIdentityRoleService {
 	return &TeamIdentityRoleService{
-		uc: uc,
+		jwt: jwt,
+		ru:  ru,
+		tu:  tu,
+		uc:  uc,
 	}
 }
 
 func (s *TeamIdentityRoleService) AssignRole(ctx context.Context, req *v1.AssignRoleRequest) (*v1.TeamIdentityRoleReply, error) {
-	identityRole, err := s.uc.AssignRole(ctx, data.AssignRoleDto{
+	claims, ok := s.jwt.GetClaimsFromContext(ctx)
+	if !ok || !claims.IsUserTenantRequest() {
+		return nil, v1.ErrorUnauthorized("invalid token")
+	}
+	// todo checkPermissions can assign role to tenant identity
+
+	_, err := s.ru.GetRoleById(ctx, claims.GetTenantId(), req.RoleId)
+	if err != nil {
+		return nil, err
+	}
+
+	if req.TeamId != 0 {
+		_, err = s.tu.GetTeam(ctx, claims.GetTenantId(), req.TeamId, false)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	assignedRole, err := s.uc.AssignRole(ctx, data.AssignRoleDto{
 		RoleId:     req.RoleId,
 		TeamId:     req.TeamId,
 		IdentityId: req.IdentityId,
-		TenantId:   req.TenantId,
+		TenantId:   claims.GetTenantId(),
 	})
 	if err != nil {
 		return nil, err
 	}
+	return assignedRoleReply(assignedRole), nil
+}
+
+func (s *TeamIdentityRoleService) DeleteRole(ctx context.Context, req *v1.DeleteRequest) (*utils_v1.EmptyReply, error) {
+	claims, ok := s.jwt.GetClaimsFromContext(ctx)
+	if !ok || !claims.IsUserTenantRequest() {
+		return nil, v1.ErrorUnauthorized("invalid token")
+	}
+	// todo checkPermissions can delete role
+
+	err := s.uc.DeleteIdentityRole(ctx, claims.GetTenantId(), req.GetAssignId())
+	if err != nil {
+		return nil, err
+	}
+	return &utils_v1.EmptyReply{}, nil
+}
+
+func (s *TeamIdentityRoleService) ListIdentityRoles(ctx context.Context, req *v1.ListIdentityRolesRequest) (*v1.ListIdentityRolesReply, error) {
+	claims, ok := s.jwt.GetClaimsFromContext(ctx)
+	if !ok || !claims.IsUserTenantRequest() {
+		return nil, v1.ErrorUnauthorized("invalid token")
+	}
+	// todo checkPermissions can get identity roles
+
+	assignedRoles, err := s.uc.ListIdentityRoles(ctx, claims.GetTenantId(), req.GetIdentityId())
+	if err != nil {
+		return nil, err
+	}
+
+	return &v1.ListIdentityRolesReply{
+		Roles: assignedRolesReply(assignedRoles),
+	}, nil
+}
+
+func (s *TeamIdentityRoleService) ListTeamRoles(ctx context.Context, req *v1.ListTeamRolesRequest) (*v1.ListIdentityRolesReply, error) {
+	claims, ok := s.jwt.GetClaimsFromContext(ctx)
+	if !ok || !claims.IsUserTenantRequest() {
+		return nil, v1.ErrorUnauthorized("invalid token")
+	}
+	// todo checkPermissions can get assgined roles
+
+	assignedRoles, err := s.uc.ListAssignedRoles(ctx, data.ListRolesDto{
+		TenantId: claims.GetTenantId(),
+		TeamId:   req.GetTeamId(),
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return &v1.ListIdentityRolesReply{
+		Roles: assignedRolesReply(assignedRoles),
+	}, nil
+}
+
+func assignedRoleReply(assignedRole *ent.TeamIdentityRole) *v1.TeamIdentityRoleReply {
 	return &v1.TeamIdentityRoleReply{
-		TenantId:   identityRole.TenantID,
-		IdentityId: identityRole.IdentityID,
+		IdentityId: &assignedRole.IdentityID,
 		Team: &v1.Team{
-			Id:          identityRole.Edges.Team.ID,
-			Name:        identityRole.Edges.Team.Name,
-			Description: identityRole.Edges.Team.Description,
-			TenantId:    identityRole.TenantID,
+			Id:          assignedRole.Edges.Team.ID,
+			Name:        assignedRole.Edges.Team.Name,
+			Description: assignedRole.Edges.Team.Description,
 		},
 		Role: &v1.RoleReply{
-			Id:          identityRole.RoleID,
-			Name:        identityRole.Edges.Role.Name,
-			Description: identityRole.Edges.Role.Description,
-			TenantId:    *identityRole.Edges.Role.TenantID,
-			IsSystem:    identityRole.Edges.Role.IsSystem,
+			Id:          assignedRole.RoleID,
+			Name:        assignedRole.Edges.Role.Name,
+			Description: assignedRole.Edges.Role.Description,
+			IsSystem:    assignedRole.Edges.Role.IsSystem,
 		},
-	}, nil
+	}
 }
-func (s *TeamIdentityRoleService) DeleteRole(ctx context.Context, req *v1.DeleteRequest) (*v1.EmptyReply, error) {
-	err := s.uc.DeleteIdentityRole(ctx, data.DeleteRoleDto{
-		AssignId: req.AssignId,
-	})
-	if err != nil {
-		return nil, err
+
+func assignedRolesReply(assignedRoles []*ent.TeamIdentityRole) []*v1.TeamIdentityRoleReply {
+	result := make([]*v1.TeamIdentityRoleReply, len(assignedRoles))
+	for i, assignedRole := range assignedRoles {
+		result[i] = assignedRoleReply(assignedRole)
 	}
-	return &v1.EmptyReply{}, nil
-}
-func (s *TeamIdentityRoleService) ListIdentityRoles(ctx context.Context, req *v1.ListIdentityRolesRequest) (*v1.ListIdentityRolesReply, error) {
-	identityRoles, err := s.uc.ListIdentityRoles(ctx, data.ListIdentityRolesDto{
-		IdentityId: req.IdentityId,
-		TenantId:   req.TenantId,
-	})
-	if err != nil {
-		return nil, err
-	}
-	result := make([]*v1.TeamIdentityRoleReply, len(identityRoles))
-	for i, identityRole := range identityRoles {
-		result[i] = &v1.TeamIdentityRoleReply{
-			TenantId:   identityRole.TenantID,
-			IdentityId: identityRole.IdentityID,
-			Team: &v1.Team{
-				Id:          identityRole.Edges.Team.ID,
-				Name:        identityRole.Edges.Team.Name,
-				Description: identityRole.Edges.Team.Description,
-				TenantId:    identityRole.TenantID,
-			},
-			Role: &v1.RoleReply{
-				Id:          identityRole.RoleID,
-				Name:        identityRole.Edges.Role.Name,
-				Description: identityRole.Edges.Role.Description,
-				TenantId:    *identityRole.Edges.Role.TenantID,
-				IsSystem:    identityRole.Edges.Role.IsSystem,
-			},
-		}
-	}
-	return &v1.ListIdentityRolesReply{
-		Roles: result,
-	}, nil
-}
-func (s *TeamIdentityRoleService) ListTeamRoles(ctx context.Context, req *v1.ListTeamRolesRequest) (*v1.ListIdentityRolesReply, error) {
-	teamRoles, err := s.uc.ListTeamRoles(ctx, data.ListTeamRolesDto{
-		TeamId:   req.TeamId,
-		TenantId: req.TenantId,
-	})
-	if err != nil {
-		return nil, err
-	}
-	result := make([]*v1.TeamIdentityRoleReply, len(teamRoles))
-	for i, teamRole := range teamRoles {
-		result[i] = &v1.TeamIdentityRoleReply{
-			TenantId:   teamRole.TenantID,
-			IdentityId: teamRole.IdentityID,
-			Team: &v1.Team{
-				Id:          teamRole.Edges.Team.ID,
-				Name:        teamRole.Edges.Team.Name,
-				Description: teamRole.Edges.Team.Description,
-				TenantId:    teamRole.TenantID,
-			},
-			Role: &v1.RoleReply{
-				Id:          teamRole.RoleID,
-				Name:        teamRole.Edges.Role.Name,
-				Description: teamRole.Edges.Role.Description,
-				TenantId:    *teamRole.Edges.Role.TenantID,
-				IsSystem:    teamRole.Edges.Role.IsSystem,
-			},
-		}
-	}
-	return &v1.ListIdentityRolesReply{
-		Roles: result,
-	}, nil
+	return result
 }

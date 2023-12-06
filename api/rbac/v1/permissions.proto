@@ -3,6 +3,7 @@ syntax = "proto3";
 package rbac.v1;
 
 import "google/api/annotations.proto";
+import "utils/v1/models.proto";
 import "api/rbac/v1/models.proto";
 
 option go_package = "gitlab.calendaria.team/services/rbac/api/rbac/v1;rbac_v1";
@@ -22,7 +23,7 @@ service Permissions {
 			body: "*"
 		};
 	};
-	rpc DeletePermission (DeletePermissionRequest) returns (EmptyReply) {
+	rpc DeletePermission (DeletePermissionRequest) returns (utils.v1.EmptyReply) {
 		option (google.api.http) = {
 			delete: "/v1/rbac/permissions/{permissionId}"
 		};

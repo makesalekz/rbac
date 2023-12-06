@@ -2,13 +2,9 @@ syntax = "proto3";
 
 package rbac.v1;
 
-import "errors/errors.proto";
-
 option go_package = "gitlab.calendaria.team/services/rbac/api/rbac/v1;rbac_v1";
 option java_multiple_files = true;
 option java_package = "rbac.v1";
-
-message EmptyReply {}
 
 message Team {
 	int64 id = 1;
@@ -17,10 +13,9 @@ message Team {
 	repeated int64 parentsIds = 4;
 	string name = 5;
 	string description = 6;
-	int64 tenantId = 7;
-	string createdAt = 8;
-	string updatedAt = 9;
-	repeated Team subs = 10;
+	string createdAt = 7;
+	string updatedAt = 8;
+	repeated Team subs = 9;
 }
 
 message PermissionReply {
@@ -39,44 +34,4 @@ message RoleReply {
 	string createdAt = 5;
 	string updatedAt = 6;
 	string deletedAt = 7;
-}
-
-//---------------------------------- Pagination ----------------------------------
-message PaginateRequest {
-	int32 limit = 1;
-	int64 fromId = 2;
-	int64 toId = 3;
-	int64 aroundId = 4;
-	string fromDate = 5;
-	string toDate = 6;
-	string aroundDate = 7;
-	string fromLabel = 8;
-	bool descending = 9;
-}
-
-message PaginateReply {
-	optional int32 total = 1;
-	optional int64 fromId = 2;
-	optional int64 toId = 3;
-	optional string fromDate = 4;
-	optional string toDate = 5;
-	optional string fromLabel = 6;
-}
-
-//---------------------------------- Errors ----------------------------------
-enum ErrorReason {
-	// Set default error code.
-	option (errors.default_code) = 500;
-
-	// Set the error code separately for an enumeration.
-	INTERNAL = 0;
-	GRPC_CONNECTION = 1;
-	SERVICE_FAILED = 2;
-	DATABASE_QUERY = 3;
-	FORBIDDEN = 4 [(errors.code) = 403];
-
-	UNAUTHORIZED = 10 [(errors.code) = 401];
-
-	INVALID_REQUEST = 20 [(errors.code) = 400];
-	NOT_FOUND = 21 [(errors.code) = 404];
 }

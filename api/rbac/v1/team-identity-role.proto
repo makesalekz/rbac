@@ -3,6 +3,7 @@ syntax = "proto3";
 package rbac.v1;
 
 import "google/api/annotations.proto";
+import "utils/v1/models.proto";
 import "api/rbac/v1/models.proto";
 
 option go_package = "gitlab.calendaria.team/services/rbac/api/rbac/v1;rbac_v1";
@@ -16,7 +17,7 @@ service TeamIdentityRole {
 			body: "*"
 		};
 	}
-	rpc DeleteRole (DeleteRequest) returns (EmptyReply) {
+	rpc DeleteRole (DeleteRequest) returns (utils.v1.EmptyReply) {
 		option (google.api.http) = {
 			delete: "/v1/rbac/roles/{assignId}"
 		};
@@ -36,17 +37,15 @@ service TeamIdentityRole {
 }
 
 message TeamIdentityRoleReply {
-	int64 tenantId = 1;
-	string identityId = 2;
-	Team team = 3;
-	RoleReply role = 4;
+	optional string identityId = 1;
+	RoleReply role = 2;
+	optional Team team = 3;
 }
 
 message AssignRoleRequest {
-	int64 tenantId = 1;
-	int64 teamId = 2;
-	string identityId = 3;
-	int64 roleId = 4;
+	string identityId = 1;
+	int64 roleId = 2;
+	int64 teamId = 3;
 }
 
 message DeleteRequest {
@@ -55,7 +54,6 @@ message DeleteRequest {
 
 message ListIdentityRolesRequest {
 	string identityId = 1;
-	int64 tenantId = 2;
 }
 
 message ListIdentityRolesReply {
@@ -64,5 +62,4 @@ message ListIdentityRolesReply {
 
 message ListTeamRolesRequest {
 	int64 teamId = 1;
-	int64 tenantId = 2;
 }

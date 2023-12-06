@@ -5,9 +5,9 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"github.com/jackc/pgtype"
-	teams_v1 "gitlab.calendaria.team/services/rbac/api/rbac/v1"
 	"gitlab.calendaria.team/services/rbac/ent"
 	"gitlab.calendaria.team/services/rbac/ent/team"
+	utils_v1 "gitlab.calendaria.team/services/utils/api/utils/v1"
 
 	_ "github.com/lib/pq"
 )
@@ -28,10 +28,10 @@ type TeamsListFilter struct {
 // TeamsRepo
 type TeamsRepo interface {
 	CreateTeam(ctx context.Context, dto TeamDto) (*ent.Team, error)
-	UpdateTeam(ctx context.Context, teamId int64, dto TeamDto) (*ent.Team, error)
-	DeleteTeam(ctx context.Context, teamId, tenantId int64) error
+	UpdateTeam(ctx context.Context, team *ent.Team, dto TeamDto) (*ent.Team, error)
+	DeleteTeam(ctx context.Context, team *ent.Team) error
 	GetTeam(ctx context.Context, teamId, tenantId int64, getTree bool) (*ent.Team, error)
-	ListTeams(ctx context.Context, filter TeamsListFilter, paginate *teams_v1.PaginateRequest) ([]*ent.Team, error)
+	ListTeams(ctx context.Context, filter TeamsListFilter, paginate *utils_v1.PaginateRequest) ([]*ent.Team, error)
 	CountListTeams(ctx context.Context, filter TeamsListFilter) (int32, error)
 }
 
@@ -64,19 +64,18 @@ func (r *teamsRepo) CreateTeam(ctx context.Context, dto TeamDto) (*ent.Team, err
 	return query.SetParentsIds(parentsIds).Save(ctx)
 }
 
-func (r *teamsRepo) UpdateTeam(ctx context.Context, teamId int64, dto TeamDto) (*ent.Team, error) {
-	return r.db.Team.UpdateOneID(teamId).
-		Where(team.TenantID(dto.TenantId)).
+func (r *teamsRepo) UpdateTeam(ctx context.Context, team *ent.Team, dto TeamDto) (*ent.Team, error) {
+	return r.db.Team.UpdateOne(team).
 		SetName(dto.Name).
 		SetDescription(dto.Description).
 		Save(ctx)
 }
 
-func (r *teamsRepo) DeleteTeam(ctx context.Context, teamId, tenantId int64) error {
-	return r.db.Team.DeleteOneID(teamId).Where(team.TenantID(tenantId)).Exec(ctx)
+func (r *teamsRepo) DeleteTeam(ctx context.Context, team *ent.Team) error {
+	return r.db.Team.DeleteOne(team).Exec(ctx)
 }
 
-func (r *teamsRepo) GetTeam(ctx context.Context, teamId, tenantId int64, getTree bool) (*ent.Team, error) {
+func (r *teamsRepo) GetTeam(ctx context.Context, tenantId, teamId int64, getTree bool) (*ent.Team, error) {
 	team, err := r.db.Team.Query().Where(team.ID(teamId), team.TenantID(tenantId)).Only(ctx)
 	if err != nil {
 		return nil, err
@@ -105,7 +104,7 @@ func findChildren(team *ent.Team, subs []*ent.Team) {
 	}
 }
 
-func (r *teamsRepo) ListTeams(ctx context.Context, filter TeamsListFilter, paginate *teams_v1.PaginateRequest) ([]*ent.Team, error) {
+func (r *teamsRepo) ListTeams(ctx context.Context, filter TeamsListFilter, paginate *utils_v1.PaginateRequest) ([]*ent.Team, error) {
 	query := r.db.Team.Query()
 
 	if filter.TenantId != 0 {

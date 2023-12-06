@@ -7,6 +7,7 @@ import (
 	"gitlab.calendaria.team/services/rbac/ent"
 	"gitlab.calendaria.team/services/rbac/internal/biz"
 	"gitlab.calendaria.team/services/rbac/internal/data"
+	utils_v1 "gitlab.calendaria.team/services/utils/api/utils/v1"
 	"gitlab.calendaria.team/services/utils/v1/jwt"
 )
 
@@ -89,7 +90,7 @@ func (s *RolesService) UpdateRole(ctx context.Context, req *v1.UpdateRoleRequest
 	return s.roleReply(updated), nil
 }
 
-func (s *RolesService) DeleteRole(ctx context.Context, req *v1.DeleteRoleRequest) (*v1.EmptyReply, error) {
+func (s *RolesService) DeleteRole(ctx context.Context, req *v1.DeleteRoleRequest) (*utils_v1.EmptyReply, error) {
 	claims, ok := s.jwt.GetClaimsFromContext(ctx)
 	if !ok || !claims.IsUserTenantRequest() {
 		return nil, v1.ErrorUnauthorized("invalid token")
@@ -105,7 +106,7 @@ func (s *RolesService) DeleteRole(ctx context.Context, req *v1.DeleteRoleRequest
 	if err != nil {
 		return nil, err
 	}
-	return &v1.EmptyReply{}, nil
+	return &utils_v1.EmptyReply{}, nil
 }
 
 func (s *RolesService) GetRole(ctx context.Context, req *v1.GetRoleRequest) (*v1.RoleReply, error) {
@@ -170,7 +171,7 @@ func (s *RolesService) AddPermissionToRole(ctx context.Context, req *v1.AddPermi
 	return s.rolePermissionReply(rolePermission), nil
 }
 
-func (s *RolesService) RemovePermissionFromRole(ctx context.Context, req *v1.RemovePermissionFromRoleRequest) (*v1.EmptyReply, error) {
+func (s *RolesService) RemovePermissionFromRole(ctx context.Context, req *v1.RemovePermissionFromRoleRequest) (*utils_v1.EmptyReply, error) {
 	claims, ok := s.jwt.GetClaimsFromContext(ctx)
 	if !ok || !claims.IsUserTenantRequest() {
 		return nil, v1.ErrorUnauthorized("invalid token")
@@ -191,7 +192,7 @@ func (s *RolesService) RemovePermissionFromRole(ctx context.Context, req *v1.Rem
 	if err != nil {
 		return nil, err
 	}
-	return &v1.EmptyReply{}, nil
+	return &utils_v1.EmptyReply{}, nil
 }
 
 func (s *RolesService) ListRolePermissions(ctx context.Context, req *v1.RolesPermissionsRequest) (*v1.RolesPermissionsReply, error) {
