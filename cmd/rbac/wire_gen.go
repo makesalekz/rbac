@@ -50,21 +50,21 @@ func wireApp(bootstrap *conf.Bootstrap, logger log.Logger) (*kratos.App, func(),
 		cleanup()
 		return nil, nil, err
 	}
-	rolesService := service.NewRolesService(jwtProcessor, rolesUsecase, permissionsUsecase)
-	permissionsService := service.NewPermissionsService(permissionsUsecase)
+	teamIdentityRoleRepo := data.NewTeamIdentityRoleRepo(dataData)
 	teamsRepo := data.NewTeamsRepo(dataData)
+	teamIdentityUsecase, err := biz.NewTeamIdentityUsecase(bootstrap, logger, configConfig, jwtProcessor, teamIdentityRoleRepo, roleRepo, teamsRepo)
+	if err != nil {
+		cleanup()
+		return nil, nil, err
+	}
+	rolesService := service.NewRolesService(jwtProcessor, rolesUsecase, permissionsUsecase, teamIdentityUsecase)
+	permissionsService := service.NewPermissionsService(permissionsUsecase)
 	teamsUsecase, err := biz.NewTeamsUsecase(bootstrap, logger, configConfig, jwtProcessor, teamsRepo)
 	if err != nil {
 		cleanup()
 		return nil, nil, err
 	}
 	teamsService := service.NewTeamsService(jwtProcessor, teamsUsecase)
-	teamIdentityRoleRepo := data.NewTeamIdentityRoleRepo(dataData)
-	teamIdentityUsecase, err := biz.NewTeamIdentityUsecase(bootstrap, logger, configConfig, jwtProcessor, teamIdentityRoleRepo, roleRepo, teamsRepo)
-	if err != nil {
-		cleanup()
-		return nil, nil, err
-	}
 	teamIdentityRoleService := service.NewTeamIdentityRoleService(jwtProcessor, rolesUsecase, teamsUsecase, teamIdentityUsecase)
 	checkPermissionsService := service.NewCheckPermissionsService(jwtProcessor, teamIdentityUsecase)
 	grpcServer := server.NewGRPCServer(bootstrap, logger, jwtProcessor, rolesService, permissionsService, teamsService, teamIdentityRoleService, checkPermissionsService)

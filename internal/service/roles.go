@@ -17,13 +17,15 @@ type RolesService struct {
 	jwt *jwt.JwtProcessor
 	uc  *biz.RolesUsecase
 	pu  *biz.PermissionsUsecase
+	au  *biz.TeamIdentityUsecase
 }
 
-func NewRolesService(jwt *jwt.JwtProcessor, uc *biz.RolesUsecase, pu *biz.PermissionsUsecase) *RolesService {
+func NewRolesService(jwt *jwt.JwtProcessor, uc *biz.RolesUsecase, pu *biz.PermissionsUsecase, au *biz.TeamIdentityUsecase) *RolesService {
 	return &RolesService{
 		jwt: jwt,
 		uc:  uc,
 		pu:  pu,
+		au:  au,
 	}
 }
 
@@ -55,7 +57,14 @@ func (s *RolesService) CreateRole(ctx context.Context, req *v1.CreateRoleRequest
 	if !ok || !claims.IsUserTenantRequest() {
 		return nil, v1.ErrorUnauthorized("invalid token")
 	}
-	// todo checkPermissions can create a role
+
+	fields, err := s.au.HasPermission(ctx, "admin.role.create")
+	if err != nil {
+		return nil, err
+	}
+	if fields == nil {
+		return nil, v1.ErrorForbidden("has no permission")
+	}
 
 	role, err := s.uc.CreateRole(ctx, data.CreateRoleDto{
 		TenantId:    claims.GetTenantId(),
@@ -73,7 +82,14 @@ func (s *RolesService) UpdateRole(ctx context.Context, req *v1.UpdateRoleRequest
 	if !ok || !claims.IsUserTenantRequest() {
 		return nil, v1.ErrorUnauthorized("invalid token")
 	}
-	// todo checkPermissions can update role
+
+	fields, err := s.au.HasPermission(ctx, "admin.role.update")
+	if err != nil {
+		return nil, err
+	}
+	if fields == nil {
+		return nil, v1.ErrorForbidden("has no permission")
+	}
 
 	role, err := s.uc.GetRoleById(ctx, claims.GetTenantId(), req.RoleId)
 	if err != nil {
@@ -95,7 +111,14 @@ func (s *RolesService) DeleteRole(ctx context.Context, req *v1.DeleteRoleRequest
 	if !ok || !claims.IsUserTenantRequest() {
 		return nil, v1.ErrorUnauthorized("invalid token")
 	}
-	// todo checkPermissions can delete role
+
+	fields, err := s.au.HasPermission(ctx, "admin.role.delete")
+	if err != nil {
+		return nil, err
+	}
+	if fields == nil {
+		return nil, v1.ErrorForbidden("has no permission")
+	}
 
 	role, err := s.uc.GetRoleById(ctx, claims.GetTenantId(), req.RoleId)
 	if err != nil {
@@ -114,7 +137,14 @@ func (s *RolesService) GetRole(ctx context.Context, req *v1.GetRoleRequest) (*v1
 	if !ok || !claims.IsUserTenantRequest() {
 		return nil, v1.ErrorUnauthorized("invalid token")
 	}
-	// todo checkPermissions can view role details
+
+	fields, err := s.au.HasPermission(ctx, "admin.role.read")
+	if err != nil {
+		return nil, err
+	}
+	if fields == nil {
+		return nil, v1.ErrorForbidden("has no permission")
+	}
 
 	role, err := s.uc.GetRoleById(ctx, claims.GetTenantId(), req.RoleId)
 	if err != nil {
@@ -128,7 +158,14 @@ func (s *RolesService) ListRoles(ctx context.Context, req *v1.ListRolesRequest) 
 	if !ok || !claims.IsUserTenantRequest() {
 		return nil, v1.ErrorUnauthorized("invalid token")
 	}
-	// todo checkPermissions can view role list
+
+	fields, err := s.au.HasPermission(ctx, "admin.role.read")
+	if err != nil {
+		return nil, err
+	}
+	if fields == nil {
+		return nil, v1.ErrorForbidden("has no permission")
+	}
 
 	roles, err := s.uc.GetRoles(ctx, claims.GetTenantId(), req.Search)
 	if err != nil {
@@ -149,7 +186,14 @@ func (s *RolesService) AddPermissionToRole(ctx context.Context, req *v1.AddPermi
 	if !ok || !claims.IsUserTenantRequest() {
 		return nil, v1.ErrorUnauthorized("invalid token")
 	}
-	// todo checkPermissions can add permission to role
+
+	fields, err := s.au.HasPermission(ctx, "admin.role.update")
+	if err != nil {
+		return nil, err
+	}
+	if fields == nil {
+		return nil, v1.ErrorForbidden("has no permission")
+	}
 
 	role, err := s.uc.GetRoleById(ctx, claims.GetTenantId(), req.RoleId)
 	if err != nil {
@@ -176,7 +220,14 @@ func (s *RolesService) RemovePermissionFromRole(ctx context.Context, req *v1.Rem
 	if !ok || !claims.IsUserTenantRequest() {
 		return nil, v1.ErrorUnauthorized("invalid token")
 	}
-	// todo checkPermissions can remove permission from role
+
+	fields, err := s.au.HasPermission(ctx, "admin.role.update")
+	if err != nil {
+		return nil, err
+	}
+	if fields == nil {
+		return nil, v1.ErrorForbidden("has no permission")
+	}
 
 	role, err := s.uc.GetRoleById(ctx, claims.GetTenantId(), req.RoleId)
 	if err != nil {
@@ -200,7 +251,14 @@ func (s *RolesService) ListRolePermissions(ctx context.Context, req *v1.RolesPer
 	if !ok || !claims.IsUserTenantRequest() {
 		return nil, v1.ErrorUnauthorized("invalid token")
 	}
-	// todo checkPermissions can remove permission from role
+
+	fields, err := s.au.HasPermission(ctx, "admin.role.read")
+	if err != nil {
+		return nil, err
+	}
+	if fields == nil {
+		return nil, v1.ErrorForbidden("has no permission")
+	}
 
 	role, err := s.uc.GetRoleById(ctx, claims.GetTenantId(), req.RoleId)
 	if err != nil {
