@@ -28,7 +28,7 @@ var (
 		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
 		{Name: "name", Type: field.TypeString, Size: 32},
 		{Name: "description", Type: field.TypeString, Nullable: true, Default: ""},
-		{Name: "tenant_id", Type: field.TypeInt64},
+		{Name: "tenant_id", Type: field.TypeInt64, Nullable: true},
 		{Name: "is_system", Type: field.TypeBool, Default: false},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},

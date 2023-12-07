@@ -63,6 +63,14 @@ func (rc *RoleCreate) SetTenantID(i int64) *RoleCreate {
 	return rc
 }
 
+// SetNillableTenantID sets the "tenant_id" field if the given value is not nil.
+func (rc *RoleCreate) SetNillableTenantID(i *int64) *RoleCreate {
+	if i != nil {
+		rc.SetTenantID(*i)
+	}
+	return rc
+}
+
 // SetIsSystem sets the "is_system" field.
 func (rc *RoleCreate) SetIsSystem(b bool) *RoleCreate {
 	rc.mutation.SetIsSystem(b)
@@ -197,9 +205,6 @@ func (rc *RoleCreate) check() error {
 		if err := role.NameValidator(v); err != nil {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Role.name": %w`, err)}
 		}
-	}
-	if _, ok := rc.mutation.TenantID(); !ok {
-		return &ValidationError{Name: "tenant_id", err: errors.New(`ent: missing required field "Role.tenant_id"`)}
 	}
 	if _, ok := rc.mutation.IsSystem(); !ok {
 		return &ValidationError{Name: "is_system", err: errors.New(`ent: missing required field "Role.is_system"`)}
@@ -387,48 +392,6 @@ func (u *RoleUpsert) ClearDescription() *RoleUpsert {
 	return u
 }
 
-// SetTenantID sets the "tenant_id" field.
-func (u *RoleUpsert) SetTenantID(v int64) *RoleUpsert {
-	u.Set(role.FieldTenantID, v)
-	return u
-}
-
-// UpdateTenantID sets the "tenant_id" field to the value that was provided on create.
-func (u *RoleUpsert) UpdateTenantID() *RoleUpsert {
-	u.SetExcluded(role.FieldTenantID)
-	return u
-}
-
-// AddTenantID adds v to the "tenant_id" field.
-func (u *RoleUpsert) AddTenantID(v int64) *RoleUpsert {
-	u.Add(role.FieldTenantID, v)
-	return u
-}
-
-// SetIsSystem sets the "is_system" field.
-func (u *RoleUpsert) SetIsSystem(v bool) *RoleUpsert {
-	u.Set(role.FieldIsSystem, v)
-	return u
-}
-
-// UpdateIsSystem sets the "is_system" field to the value that was provided on create.
-func (u *RoleUpsert) UpdateIsSystem() *RoleUpsert {
-	u.SetExcluded(role.FieldIsSystem)
-	return u
-}
-
-// SetCreatedAt sets the "created_at" field.
-func (u *RoleUpsert) SetCreatedAt(v time.Time) *RoleUpsert {
-	u.Set(role.FieldCreatedAt, v)
-	return u
-}
-
-// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
-func (u *RoleUpsert) UpdateCreatedAt() *RoleUpsert {
-	u.SetExcluded(role.FieldCreatedAt)
-	return u
-}
-
 // SetUpdatedAt sets the "updated_at" field.
 func (u *RoleUpsert) SetUpdatedAt(v time.Time) *RoleUpsert {
 	u.Set(role.FieldUpdatedAt, v)
@@ -457,6 +420,15 @@ func (u *RoleUpsertOne) UpdateNewValues() *RoleUpsertOne {
 	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
 		if _, exists := u.create.mutation.ID(); exists {
 			s.SetIgnore(role.FieldID)
+		}
+		if _, exists := u.create.mutation.TenantID(); exists {
+			s.SetIgnore(role.FieldTenantID)
+		}
+		if _, exists := u.create.mutation.IsSystem(); exists {
+			s.SetIgnore(role.FieldIsSystem)
+		}
+		if _, exists := u.create.mutation.CreatedAt(); exists {
+			s.SetIgnore(role.FieldCreatedAt)
 		}
 	}))
 	return u
@@ -542,55 +514,6 @@ func (u *RoleUpsertOne) UpdateDescription() *RoleUpsertOne {
 func (u *RoleUpsertOne) ClearDescription() *RoleUpsertOne {
 	return u.Update(func(s *RoleUpsert) {
 		s.ClearDescription()
-	})
-}
-
-// SetTenantID sets the "tenant_id" field.
-func (u *RoleUpsertOne) SetTenantID(v int64) *RoleUpsertOne {
-	return u.Update(func(s *RoleUpsert) {
-		s.SetTenantID(v)
-	})
-}
-
-// AddTenantID adds v to the "tenant_id" field.
-func (u *RoleUpsertOne) AddTenantID(v int64) *RoleUpsertOne {
-	return u.Update(func(s *RoleUpsert) {
-		s.AddTenantID(v)
-	})
-}
-
-// UpdateTenantID sets the "tenant_id" field to the value that was provided on create.
-func (u *RoleUpsertOne) UpdateTenantID() *RoleUpsertOne {
-	return u.Update(func(s *RoleUpsert) {
-		s.UpdateTenantID()
-	})
-}
-
-// SetIsSystem sets the "is_system" field.
-func (u *RoleUpsertOne) SetIsSystem(v bool) *RoleUpsertOne {
-	return u.Update(func(s *RoleUpsert) {
-		s.SetIsSystem(v)
-	})
-}
-
-// UpdateIsSystem sets the "is_system" field to the value that was provided on create.
-func (u *RoleUpsertOne) UpdateIsSystem() *RoleUpsertOne {
-	return u.Update(func(s *RoleUpsert) {
-		s.UpdateIsSystem()
-	})
-}
-
-// SetCreatedAt sets the "created_at" field.
-func (u *RoleUpsertOne) SetCreatedAt(v time.Time) *RoleUpsertOne {
-	return u.Update(func(s *RoleUpsert) {
-		s.SetCreatedAt(v)
-	})
-}
-
-// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
-func (u *RoleUpsertOne) UpdateCreatedAt() *RoleUpsertOne {
-	return u.Update(func(s *RoleUpsert) {
-		s.UpdateCreatedAt()
 	})
 }
 
@@ -790,6 +713,15 @@ func (u *RoleUpsertBulk) UpdateNewValues() *RoleUpsertBulk {
 			if _, exists := b.mutation.ID(); exists {
 				s.SetIgnore(role.FieldID)
 			}
+			if _, exists := b.mutation.TenantID(); exists {
+				s.SetIgnore(role.FieldTenantID)
+			}
+			if _, exists := b.mutation.IsSystem(); exists {
+				s.SetIgnore(role.FieldIsSystem)
+			}
+			if _, exists := b.mutation.CreatedAt(); exists {
+				s.SetIgnore(role.FieldCreatedAt)
+			}
 		}
 	}))
 	return u
@@ -875,55 +807,6 @@ func (u *RoleUpsertBulk) UpdateDescription() *RoleUpsertBulk {
 func (u *RoleUpsertBulk) ClearDescription() *RoleUpsertBulk {
 	return u.Update(func(s *RoleUpsert) {
 		s.ClearDescription()
-	})
-}
-
-// SetTenantID sets the "tenant_id" field.
-func (u *RoleUpsertBulk) SetTenantID(v int64) *RoleUpsertBulk {
-	return u.Update(func(s *RoleUpsert) {
-		s.SetTenantID(v)
-	})
-}
-
-// AddTenantID adds v to the "tenant_id" field.
-func (u *RoleUpsertBulk) AddTenantID(v int64) *RoleUpsertBulk {
-	return u.Update(func(s *RoleUpsert) {
-		s.AddTenantID(v)
-	})
-}
-
-// UpdateTenantID sets the "tenant_id" field to the value that was provided on create.
-func (u *RoleUpsertBulk) UpdateTenantID() *RoleUpsertBulk {
-	return u.Update(func(s *RoleUpsert) {
-		s.UpdateTenantID()
-	})
-}
-
-// SetIsSystem sets the "is_system" field.
-func (u *RoleUpsertBulk) SetIsSystem(v bool) *RoleUpsertBulk {
-	return u.Update(func(s *RoleUpsert) {
-		s.SetIsSystem(v)
-	})
-}
-
-// UpdateIsSystem sets the "is_system" field to the value that was provided on create.
-func (u *RoleUpsertBulk) UpdateIsSystem() *RoleUpsertBulk {
-	return u.Update(func(s *RoleUpsert) {
-		s.UpdateIsSystem()
-	})
-}
-
-// SetCreatedAt sets the "created_at" field.
-func (u *RoleUpsertBulk) SetCreatedAt(v time.Time) *RoleUpsertBulk {
-	return u.Update(func(s *RoleUpsert) {
-		s.SetCreatedAt(v)
-	})
-}
-
-// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
-func (u *RoleUpsertBulk) UpdateCreatedAt() *RoleUpsertBulk {
-	return u.Update(func(s *RoleUpsert) {
-		s.UpdateCreatedAt()
 	})
 }
 

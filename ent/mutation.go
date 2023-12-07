@@ -992,10 +992,24 @@ func (m *RoleMutation) AddedTenantID() (r int64, exists bool) {
 	return *v, true
 }
 
+// ClearTenantID clears the value of the "tenant_id" field.
+func (m *RoleMutation) ClearTenantID() {
+	m.tenant_id = nil
+	m.addtenant_id = nil
+	m.clearedFields[role.FieldTenantID] = struct{}{}
+}
+
+// TenantIDCleared returns if the "tenant_id" field was cleared in this mutation.
+func (m *RoleMutation) TenantIDCleared() bool {
+	_, ok := m.clearedFields[role.FieldTenantID]
+	return ok
+}
+
 // ResetTenantID resets all changes to the "tenant_id" field.
 func (m *RoleMutation) ResetTenantID() {
 	m.tenant_id = nil
 	m.addtenant_id = nil
+	delete(m.clearedFields, role.FieldTenantID)
 }
 
 // SetIsSystem sets the "is_system" field.
@@ -1370,6 +1384,9 @@ func (m *RoleMutation) ClearedFields() []string {
 	if m.FieldCleared(role.FieldDescription) {
 		fields = append(fields, role.FieldDescription)
 	}
+	if m.FieldCleared(role.FieldTenantID) {
+		fields = append(fields, role.FieldTenantID)
+	}
 	return fields
 }
 
@@ -1389,6 +1406,9 @@ func (m *RoleMutation) ClearField(name string) error {
 		return nil
 	case role.FieldDescription:
 		m.ClearDescription()
+		return nil
+	case role.FieldTenantID:
+		m.ClearTenantID()
 		return nil
 	}
 	return fmt.Errorf("unknown Role nullable field %s", name)
