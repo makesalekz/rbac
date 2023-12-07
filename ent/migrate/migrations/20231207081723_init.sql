@@ -1,0 +1,2 @@
+-- Modify "roles" table
+ALTER TABLE "roles" ALTER COLUMN "tenant_id" DROP NOT NULL;

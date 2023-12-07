@@ -76,47 +76,6 @@ func (ru *RoleUpdate) ClearDescription() *RoleUpdate {
 	return ru
 }
 
-// SetTenantID sets the "tenant_id" field.
-func (ru *RoleUpdate) SetTenantID(i int64) *RoleUpdate {
-	ru.mutation.ResetTenantID()
-	ru.mutation.SetTenantID(i)
-	return ru
-}
-
-// AddTenantID adds i to the "tenant_id" field.
-func (ru *RoleUpdate) AddTenantID(i int64) *RoleUpdate {
-	ru.mutation.AddTenantID(i)
-	return ru
-}
-
-// SetIsSystem sets the "is_system" field.
-func (ru *RoleUpdate) SetIsSystem(b bool) *RoleUpdate {
-	ru.mutation.SetIsSystem(b)
-	return ru
-}
-
-// SetNillableIsSystem sets the "is_system" field if the given value is not nil.
-func (ru *RoleUpdate) SetNillableIsSystem(b *bool) *RoleUpdate {
-	if b != nil {
-		ru.SetIsSystem(*b)
-	}
-	return ru
-}
-
-// SetCreatedAt sets the "created_at" field.
-func (ru *RoleUpdate) SetCreatedAt(t time.Time) *RoleUpdate {
-	ru.mutation.SetCreatedAt(t)
-	return ru
-}
-
-// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
-func (ru *RoleUpdate) SetNillableCreatedAt(t *time.Time) *RoleUpdate {
-	if t != nil {
-		ru.SetCreatedAt(*t)
-	}
-	return ru
-}
-
 // SetUpdatedAt sets the "updated_at" field.
 func (ru *RoleUpdate) SetUpdatedAt(t time.Time) *RoleUpdate {
 	ru.mutation.SetUpdatedAt(t)
@@ -242,17 +201,8 @@ func (ru *RoleUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if ru.mutation.DescriptionCleared() {
 		_spec.ClearField(role.FieldDescription, field.TypeString)
 	}
-	if value, ok := ru.mutation.TenantID(); ok {
-		_spec.SetField(role.FieldTenantID, field.TypeInt64, value)
-	}
-	if value, ok := ru.mutation.AddedTenantID(); ok {
-		_spec.AddField(role.FieldTenantID, field.TypeInt64, value)
-	}
-	if value, ok := ru.mutation.IsSystem(); ok {
-		_spec.SetField(role.FieldIsSystem, field.TypeBool, value)
-	}
-	if value, ok := ru.mutation.CreatedAt(); ok {
-		_spec.SetField(role.FieldCreatedAt, field.TypeTime, value)
+	if ru.mutation.TenantIDCleared() {
+		_spec.ClearField(role.FieldTenantID, field.TypeInt64)
 	}
 	if value, ok := ru.mutation.UpdatedAt(); ok {
 		_spec.SetField(role.FieldUpdatedAt, field.TypeTime, value)
@@ -367,47 +317,6 @@ func (ruo *RoleUpdateOne) SetNillableDescription(s *string) *RoleUpdateOne {
 // ClearDescription clears the value of the "description" field.
 func (ruo *RoleUpdateOne) ClearDescription() *RoleUpdateOne {
 	ruo.mutation.ClearDescription()
-	return ruo
-}
-
-// SetTenantID sets the "tenant_id" field.
-func (ruo *RoleUpdateOne) SetTenantID(i int64) *RoleUpdateOne {
-	ruo.mutation.ResetTenantID()
-	ruo.mutation.SetTenantID(i)
-	return ruo
-}
-
-// AddTenantID adds i to the "tenant_id" field.
-func (ruo *RoleUpdateOne) AddTenantID(i int64) *RoleUpdateOne {
-	ruo.mutation.AddTenantID(i)
-	return ruo
-}
-
-// SetIsSystem sets the "is_system" field.
-func (ruo *RoleUpdateOne) SetIsSystem(b bool) *RoleUpdateOne {
-	ruo.mutation.SetIsSystem(b)
-	return ruo
-}
-
-// SetNillableIsSystem sets the "is_system" field if the given value is not nil.
-func (ruo *RoleUpdateOne) SetNillableIsSystem(b *bool) *RoleUpdateOne {
-	if b != nil {
-		ruo.SetIsSystem(*b)
-	}
-	return ruo
-}
-
-// SetCreatedAt sets the "created_at" field.
-func (ruo *RoleUpdateOne) SetCreatedAt(t time.Time) *RoleUpdateOne {
-	ruo.mutation.SetCreatedAt(t)
-	return ruo
-}
-
-// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
-func (ruo *RoleUpdateOne) SetNillableCreatedAt(t *time.Time) *RoleUpdateOne {
-	if t != nil {
-		ruo.SetCreatedAt(*t)
-	}
 	return ruo
 }
 
@@ -566,17 +475,8 @@ func (ruo *RoleUpdateOne) sqlSave(ctx context.Context) (_node *Role, err error) 
 	if ruo.mutation.DescriptionCleared() {
 		_spec.ClearField(role.FieldDescription, field.TypeString)
 	}
-	if value, ok := ruo.mutation.TenantID(); ok {
-		_spec.SetField(role.FieldTenantID, field.TypeInt64, value)
-	}
-	if value, ok := ruo.mutation.AddedTenantID(); ok {
-		_spec.AddField(role.FieldTenantID, field.TypeInt64, value)
-	}
-	if value, ok := ruo.mutation.IsSystem(); ok {
-		_spec.SetField(role.FieldIsSystem, field.TypeBool, value)
-	}
-	if value, ok := ruo.mutation.CreatedAt(); ok {
-		_spec.SetField(role.FieldCreatedAt, field.TypeTime, value)
+	if ruo.mutation.TenantIDCleared() {
+		_spec.ClearField(role.FieldTenantID, field.TypeInt64)
 	}
 	if value, ok := ruo.mutation.UpdatedAt(); ok {
 		_spec.SetField(role.FieldUpdatedAt, field.TypeTime, value)
