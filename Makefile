@@ -75,6 +75,11 @@ migrations:
 		--to "ent://ent/schema" \
 		--dev-url "docker://postgres/15/test?search_path=public"
 
+.PHONY: hash
+# rehash migrations
+hash:
+	atlas migrate hash --dir "file://ent/migrate/migrations"
+
 .PHONY: api
 # generate api proto
 api:
