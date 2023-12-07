@@ -189,7 +189,7 @@ func (rpc *RolePermissionCreate) createSpec() (*RolePermission, *sqlgraph.Create
 	if nodes := rpc.mutation.RoleIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: false,
+			Inverse: true,
 			Table:   rolepermission.RoleTable,
 			Columns: []string{rolepermission.RoleColumn},
 			Bidi:    false,
@@ -206,7 +206,7 @@ func (rpc *RolePermissionCreate) createSpec() (*RolePermission, *sqlgraph.Create
 	if nodes := rpc.mutation.PermissionIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: false,
+			Inverse: true,
 			Table:   rolepermission.PermissionTable,
 			Columns: []string{rolepermission.PermissionColumn},
 			Bidi:    false,

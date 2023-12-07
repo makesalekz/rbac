@@ -26,11 +26,13 @@ func (RolePermission) Fields() []ent.Field {
 // Edges of the RolePermission.
 func (RolePermission) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("role", Role.Type).
+		edge.From("role", Role.Type).
+			Ref("permissions").
 			Required().
 			Unique().
 			Field("role_id").Immutable(),
-		edge.To("permission", Permission.Type).
+		edge.From("permission", Permission.Type).
+			Ref("roles").
 			Required().
 			Unique().
 			Field("permission_id").Immutable(),
