@@ -132,6 +132,19 @@ func (u *TeamIdentityUsecase) CheckPermissions(ctx context.Context, teamId int64
 	return result, nil
 }
 
+func (u *TeamIdentityUsecase) HasPermission(ctx context.Context, permission string) (*v1.ListOfFields, error) {
+	permissionsMap, err := u.CheckPermissions(ctx, 0, []string{permission})
+	if err != nil {
+		return nil, err
+	}
+
+	if len(permissionsMap) == 0 {
+		return nil, nil
+	}
+
+	return permissionsMap[permission], nil
+}
+
 // NewTeamIdentityUsecase .
 func NewTeamIdentityUsecase(
 	conf *conf.Bootstrap,
