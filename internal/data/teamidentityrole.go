@@ -17,14 +17,14 @@ type AssignRoleDto struct {
 }
 
 type ListRolesDto struct {
-	TeamId      int64
 	TenantId    int64
 	IdentityIDs []string
+	TeamsIDs    []int64
 }
 
 // TeamIdentityRoleRepo
 type TeamIdentityRoleRepo interface {
-	AssignRole(ctx context.Context, dto AssignRoleDto) (*ent.TeamIdentityRole, error)
+	AssignRole(ctx context.Context, dto AssignRoleDto) error
 	GetAssignedRoleById(ctx context.Context, tenantId, assignId int64) (*ent.TeamIdentityRole, error)
 	DeleteIdentityRole(ctx context.Context, assignedRole *ent.TeamIdentityRole) error
 	ListRoles(ctx context.Context, dto ListRolesDto) ([]*ent.TeamIdentityRole, error)
@@ -34,13 +34,17 @@ type teamIdentityRoleRepo struct {
 	db *ent.Client
 }
 
-func (t *teamIdentityRoleRepo) AssignRole(ctx context.Context, dto AssignRoleDto) (*ent.TeamIdentityRole, error) {
-	return t.db.TeamIdentityRole.Create().
+func (t *teamIdentityRoleRepo) AssignRole(ctx context.Context, dto AssignRoleDto) error {
+	query := t.db.TeamIdentityRole.Create().
 		SetTenantID(dto.TenantId).
-		SetTeamID(dto.TeamId).
 		SetIdentityID(dto.IdentityId).
-		SetRoleID(dto.RoleId).
-		Save(ctx)
+		SetRoleID(dto.RoleId)
+
+	if dto.TeamId != 0 {
+		query.SetTeamID(dto.TeamId)
+	}
+
+	return query.Exec(ctx)
 }
 
 func (t *teamIdentityRoleRepo) GetAssignedRoleById(ctx context.Context, tenantId, assignId int64) (*ent.TeamIdentityRole, error) {
@@ -60,12 +64,18 @@ func (t *teamIdentityRoleRepo) ListRoles(ctx context.Context, dto ListRolesDto) 
 	query := t.db.TeamIdentityRole.Query().
 		Where(teamidentityrole.TenantID(dto.TenantId))
 
-	if dto.TeamId != 0 {
-		query.Where(teamidentityrole.TeamID(dto.TeamId))
+	if len(dto.IdentityIDs) > 0 {
+		identityIDs := append(dto.IdentityIDs, "")
+		query.Where(teamidentityrole.IdentityIDIn(identityIDs...))
 	}
 
-	if len(dto.IdentityIDs) > 0 {
-		query.Where(teamidentityrole.IdentityIDIn(dto.IdentityIDs...))
+	if len(dto.TeamsIDs) > 0 {
+		query.Where(
+			teamidentityrole.Or(
+				teamidentityrole.TeamIDIn(dto.TeamsIDs...),
+				teamidentityrole.TeamIDIsNil(),
+			),
+		)
 	}
 
 	return query.All(ctx)

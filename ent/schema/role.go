@@ -20,7 +20,7 @@ func (Role) Fields() []ent.Field {
 		field.Int64("id").Immutable(),
 		field.String("name").MaxLen(32).NotEmpty(),
 		field.String("description").Optional().Default(""),
-		field.Int64("tenant_id").Immutable().Nillable().Optional(),
+		field.Int64("tenant_id").Immutable().Default(0),
 		field.Bool("is_system").Immutable().Default(false),
 		field.Time("created_at").Immutable().Default(time.Now),
 		field.Time("updated_at").Default(time.Now),

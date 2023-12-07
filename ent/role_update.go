@@ -201,9 +201,6 @@ func (ru *RoleUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if ru.mutation.DescriptionCleared() {
 		_spec.ClearField(role.FieldDescription, field.TypeString)
 	}
-	if ru.mutation.TenantIDCleared() {
-		_spec.ClearField(role.FieldTenantID, field.TypeInt64)
-	}
 	if value, ok := ru.mutation.UpdatedAt(); ok {
 		_spec.SetField(role.FieldUpdatedAt, field.TypeTime, value)
 	}
@@ -474,9 +471,6 @@ func (ruo *RoleUpdateOne) sqlSave(ctx context.Context) (_node *Role, err error) 
 	}
 	if ruo.mutation.DescriptionCleared() {
 		_spec.ClearField(role.FieldDescription, field.TypeString)
-	}
-	if ruo.mutation.TenantIDCleared() {
-		_spec.ClearField(role.FieldTenantID, field.TypeInt64)
 	}
 	if value, ok := ruo.mutation.UpdatedAt(); ok {
 		_spec.SetField(role.FieldUpdatedAt, field.TypeTime, value)

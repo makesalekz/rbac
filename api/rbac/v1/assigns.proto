@@ -1,0 +1,56 @@
+syntax = "proto3";
+
+package rbac.v1;
+
+import "google/api/annotations.proto";
+import "utils/v1/models.proto";
+import "api/rbac/v1/models.proto";
+
+option go_package = "gitlab.calendaria.team/services/rbac/api/rbac/v1;rbac_v1";
+option java_multiple_files = true;
+option java_package = "rbac.v1";
+
+service TeamIdentityRole {
+	rpc AssignRole (AssignRoleRequest) returns (utils.v1.EmptyReply) {
+		option (google.api.http) = {
+			post: "/v1/rbac/assigns"
+			body: "*"
+		};
+	}
+	rpc DeleteAssign (AssignRequest) returns (utils.v1.EmptyReply) {
+		option (google.api.http) = {
+			delete: "/v1/rbac/assigns/{assignId}"
+		};
+	}
+	rpc ListAssigns (ListAssignsRequest) returns (ListAssignsReply) {
+		option (google.api.http) = {
+			post: "/v1/rbac/assigns/list"
+			body: "*"
+		};
+	}
+}
+
+message AssignRoleRequest {
+	string identityId = 1;
+	int64 roleId = 2;
+	int64 teamId = 3;
+}
+
+message AssignRequest {
+	int64 assignId = 1;
+}
+
+message ListAssignsRequest {
+	string identityId = 1;
+	int64 teamId = 2;
+}
+
+message ListAssignsReply {
+	repeated AssignedRole roles = 1;
+}
+
+message AssignedRole {
+	RoleReply role = 1;
+	optional string identityId = 2;
+	optional Team team = 3;
+}

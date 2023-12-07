@@ -108,10 +108,6 @@ func (tirc *TeamIdentityRoleCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (tirc *TeamIdentityRoleCreate) defaults() {
-	if _, ok := tirc.mutation.TeamID(); !ok {
-		v := teamidentityrole.DefaultTeamID
-		tirc.mutation.SetTeamID(v)
-	}
 	if _, ok := tirc.mutation.IdentityID(); !ok {
 		v := teamidentityrole.DefaultIdentityID
 		tirc.mutation.SetIdentityID(v)
@@ -198,7 +194,7 @@ func (tirc *TeamIdentityRoleCreate) createSpec() (*TeamIdentityRole, *sqlgraph.C
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.TeamID = nodes[0]
+		_node.TeamID = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

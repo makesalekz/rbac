@@ -320,16 +320,6 @@ func TenantIDLTE(v int64) predicate.Role {
 	return predicate.Role(sql.FieldLTE(FieldTenantID, v))
 }
 
-// TenantIDIsNil applies the IsNil predicate on the "tenant_id" field.
-func TenantIDIsNil() predicate.Role {
-	return predicate.Role(sql.FieldIsNull(FieldTenantID))
-}
-
-// TenantIDNotNil applies the NotNil predicate on the "tenant_id" field.
-func TenantIDNotNil() predicate.Role {
-	return predicate.Role(sql.FieldNotNull(FieldTenantID))
-}
-
 // IsSystemEQ applies the EQ predicate on the "is_system" field.
 func IsSystemEQ(v bool) predicate.Role {
 	return predicate.Role(sql.FieldEQ(FieldIsSystem, v))

@@ -960,7 +960,7 @@ func (m *RoleMutation) TenantID() (r int64, exists bool) {
 // OldTenantID returns the old "tenant_id" field's value of the Role entity.
 // If the Role object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *RoleMutation) OldTenantID(ctx context.Context) (v *int64, err error) {
+func (m *RoleMutation) OldTenantID(ctx context.Context) (v int64, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldTenantID is only allowed on UpdateOne operations")
 	}
@@ -992,24 +992,10 @@ func (m *RoleMutation) AddedTenantID() (r int64, exists bool) {
 	return *v, true
 }
 
-// ClearTenantID clears the value of the "tenant_id" field.
-func (m *RoleMutation) ClearTenantID() {
-	m.tenant_id = nil
-	m.addtenant_id = nil
-	m.clearedFields[role.FieldTenantID] = struct{}{}
-}
-
-// TenantIDCleared returns if the "tenant_id" field was cleared in this mutation.
-func (m *RoleMutation) TenantIDCleared() bool {
-	_, ok := m.clearedFields[role.FieldTenantID]
-	return ok
-}
-
 // ResetTenantID resets all changes to the "tenant_id" field.
 func (m *RoleMutation) ResetTenantID() {
 	m.tenant_id = nil
 	m.addtenant_id = nil
-	delete(m.clearedFields, role.FieldTenantID)
 }
 
 // SetIsSystem sets the "is_system" field.
@@ -1384,9 +1370,6 @@ func (m *RoleMutation) ClearedFields() []string {
 	if m.FieldCleared(role.FieldDescription) {
 		fields = append(fields, role.FieldDescription)
 	}
-	if m.FieldCleared(role.FieldTenantID) {
-		fields = append(fields, role.FieldTenantID)
-	}
 	return fields
 }
 
@@ -1406,9 +1389,6 @@ func (m *RoleMutation) ClearField(name string) error {
 		return nil
 	case role.FieldDescription:
 		m.ClearDescription()
-		return nil
-	case role.FieldTenantID:
-		m.ClearTenantID()
 		return nil
 	}
 	return fmt.Errorf("unknown Role nullable field %s", name)
@@ -1664,7 +1644,7 @@ func (m *RolePermissionMutation) TenantID() (r int64, exists bool) {
 // OldTenantID returns the old "tenant_id" field's value of the RolePermission entity.
 // If the RolePermission object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *RolePermissionMutation) OldTenantID(ctx context.Context) (v *int64, err error) {
+func (m *RolePermissionMutation) OldTenantID(ctx context.Context) (v int64, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldTenantID is only allowed on UpdateOne operations")
 	}
@@ -3375,7 +3355,7 @@ func (m *TeamIdentityRoleMutation) TeamID() (r int64, exists bool) {
 // OldTeamID returns the old "team_id" field's value of the TeamIdentityRole entity.
 // If the TeamIdentityRole object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *TeamIdentityRoleMutation) OldTeamID(ctx context.Context) (v int64, err error) {
+func (m *TeamIdentityRoleMutation) OldTeamID(ctx context.Context) (v *int64, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldTeamID is only allowed on UpdateOne operations")
 	}

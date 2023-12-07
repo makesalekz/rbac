@@ -175,6 +175,10 @@ func (rc *RoleCreate) defaults() error {
 		v := role.DefaultDescription
 		rc.mutation.SetDescription(v)
 	}
+	if _, ok := rc.mutation.TenantID(); !ok {
+		v := role.DefaultTenantID
+		rc.mutation.SetTenantID(v)
+	}
 	if _, ok := rc.mutation.IsSystem(); !ok {
 		v := role.DefaultIsSystem
 		rc.mutation.SetIsSystem(v)
@@ -205,6 +209,9 @@ func (rc *RoleCreate) check() error {
 		if err := role.NameValidator(v); err != nil {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Role.name": %w`, err)}
 		}
+	}
+	if _, ok := rc.mutation.TenantID(); !ok {
+		return &ValidationError{Name: "tenant_id", err: errors.New(`ent: missing required field "Role.tenant_id"`)}
 	}
 	if _, ok := rc.mutation.IsSystem(); !ok {
 		return &ValidationError{Name: "is_system", err: errors.New(`ent: missing required field "Role.is_system"`)}
@@ -262,7 +269,7 @@ func (rc *RoleCreate) createSpec() (*Role, *sqlgraph.CreateSpec) {
 	}
 	if value, ok := rc.mutation.TenantID(); ok {
 		_spec.SetField(role.FieldTenantID, field.TypeInt64, value)
-		_node.TenantID = &value
+		_node.TenantID = value
 	}
 	if value, ok := rc.mutation.IsSystem(); ok {
 		_spec.SetField(role.FieldIsSystem, field.TypeBool, value)

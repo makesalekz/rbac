@@ -11,7 +11,7 @@ option java_package = "rbac.v1";
 service CheckPermissions {
   rpc CheckPermissions (CheckPermissionsRequest) returns (CheckPermissionsReply) {
     option (google.api.http) = {
-      post: "/v1/rbac/check-permission"
+      post: "/v1/rbac/check"
       body: "*"
     };
   }

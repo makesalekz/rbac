@@ -176,7 +176,7 @@ func (rpc *RolePermissionCreate) createSpec() (*RolePermission, *sqlgraph.Create
 	_spec.OnConflict = rpc.conflict
 	if value, ok := rpc.mutation.TenantID(); ok {
 		_spec.SetField(rolepermission.FieldTenantID, field.TypeInt64, value)
-		_node.TenantID = &value
+		_node.TenantID = value
 	}
 	if value, ok := rpc.mutation.Deny(); ok {
 		_spec.SetField(rolepermission.FieldDeny, field.TypeBool, value)

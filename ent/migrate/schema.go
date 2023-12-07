@@ -3,6 +3,7 @@
 package migrate
 
 import (
+	"entgo.io/ent/dialect/entsql"
 	"entgo.io/ent/dialect/sql/schema"
 	"entgo.io/ent/schema/field"
 )
@@ -28,7 +29,7 @@ var (
 		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
 		{Name: "name", Type: field.TypeString, Size: 32},
 		{Name: "description", Type: field.TypeString, Nullable: true, Default: ""},
-		{Name: "tenant_id", Type: field.TypeInt64, Nullable: true},
+		{Name: "tenant_id", Type: field.TypeInt64, Default: 0},
 		{Name: "is_system", Type: field.TypeBool, Default: false},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
@@ -107,7 +108,7 @@ var (
 		{Name: "tenant_id", Type: field.TypeInt64},
 		{Name: "identity_id", Type: field.TypeString, Default: ""},
 		{Name: "role_id", Type: field.TypeInt64},
-		{Name: "team_id", Type: field.TypeInt64, Nullable: true, Default: 0},
+		{Name: "team_id", Type: field.TypeInt64, Nullable: true},
 	}
 	// TeamIdentityRolesTable holds the schema information for the "team_identity_roles" table.
 	TeamIdentityRolesTable = &schema.Table{
@@ -126,6 +127,24 @@ var (
 				Columns:    []*schema.Column{TeamIdentityRolesColumns[4]},
 				RefColumns: []*schema.Column{TeamsColumns[0]},
 				OnDelete:   schema.SetNull,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "teamidentityrole_tenant_id_role_id_identity_id_team_id",
+				Unique:  true,
+				Columns: []*schema.Column{TeamIdentityRolesColumns[1], TeamIdentityRolesColumns[3], TeamIdentityRolesColumns[2], TeamIdentityRolesColumns[4]},
+				Annotation: &entsql.IndexAnnotation{
+					Where: "team_id IS NOT NULL",
+				},
+			},
+			{
+				Name:    "teamidentityrole_tenant_id_role_id_identity_id",
+				Unique:  true,
+				Columns: []*schema.Column{TeamIdentityRolesColumns[1], TeamIdentityRolesColumns[3], TeamIdentityRolesColumns[2]},
+				Annotation: &entsql.IndexAnnotation{
+					Where: "team_id IS NULL",
+				},
 			},
 		},
 	}

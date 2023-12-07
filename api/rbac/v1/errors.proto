@@ -23,4 +23,5 @@ enum ErrorReason {
 
 	INVALID_REQUEST = 20 [(errors.code) = 400];
 	NOT_FOUND = 21 [(errors.code) = 404];
+	ALREADY_EXISTS = 22 [(errors.code) = 400];
 }
