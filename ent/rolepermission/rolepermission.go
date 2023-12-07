@@ -116,13 +116,13 @@ func newRoleStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(RoleInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, false, RoleTable, RoleColumn),
+		sqlgraph.Edge(sqlgraph.M2O, true, RoleTable, RoleColumn),
 	)
 }
 func newPermissionStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(PermissionInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, false, PermissionTable, PermissionColumn),
+		sqlgraph.Edge(sqlgraph.M2O, true, PermissionTable, PermissionColumn),
 	)
 }

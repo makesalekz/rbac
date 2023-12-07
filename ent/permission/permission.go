@@ -25,12 +25,12 @@ const (
 	// Table holds the table name of the permission in the database.
 	Table = "permissions"
 	// RolesTable is the table that holds the roles relation/edge.
-	RolesTable = "roles"
-	// RolesInverseTable is the table name for the Role entity.
-	// It exists in this package in order to avoid circular dependency with the "role" package.
-	RolesInverseTable = "roles"
+	RolesTable = "role_permissions"
+	// RolesInverseTable is the table name for the RolePermission entity.
+	// It exists in this package in order to avoid circular dependency with the "rolepermission" package.
+	RolesInverseTable = "role_permissions"
 	// RolesColumn is the table column denoting the roles relation/edge.
-	RolesColumn = "permission_roles"
+	RolesColumn = "permission_id"
 )
 
 // Columns holds all SQL columns for permission fields.
@@ -42,21 +42,10 @@ var Columns = []string{
 	FieldFields,
 }
 
-// ForeignKeys holds the SQL foreign-keys that are owned by the "permissions"
-// table and are not defined as standalone fields in the schema.
-var ForeignKeys = []string{
-	"role_permissions",
-}
-
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
 	for i := range Columns {
 		if column == Columns[i] {
-			return true
-		}
-	}
-	for i := range ForeignKeys {
-		if column == ForeignKeys[i] {
 			return true
 		}
 	}

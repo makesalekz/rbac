@@ -15,21 +15,12 @@ var (
 		{Name: "description", Type: field.TypeString, Nullable: true, Default: ""},
 		{Name: "app_id", Type: field.TypeString, Size: 10},
 		{Name: "fields", Type: field.TypeJSON, Nullable: true},
-		{Name: "role_permissions", Type: field.TypeInt64, Nullable: true},
 	}
 	// PermissionsTable holds the schema information for the "permissions" table.
 	PermissionsTable = &schema.Table{
 		Name:       "permissions",
 		Columns:    PermissionsColumns,
 		PrimaryKey: []*schema.Column{PermissionsColumns[0]},
-		ForeignKeys: []*schema.ForeignKey{
-			{
-				Symbol:     "permissions_roles_permissions",
-				Columns:    []*schema.Column{PermissionsColumns[5]},
-				RefColumns: []*schema.Column{RolesColumns[0]},
-				OnDelete:   schema.SetNull,
-			},
-		},
 	}
 	// RolesColumns holds the columns for the "roles" table.
 	RolesColumns = []*schema.Column{
@@ -41,21 +32,12 @@ var (
 		{Name: "is_system", Type: field.TypeBool, Default: false},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
-		{Name: "permission_roles", Type: field.TypeString, Nullable: true},
 	}
 	// RolesTable holds the schema information for the "roles" table.
 	RolesTable = &schema.Table{
 		Name:       "roles",
 		Columns:    RolesColumns,
 		PrimaryKey: []*schema.Column{RolesColumns[0]},
-		ForeignKeys: []*schema.ForeignKey{
-			{
-				Symbol:     "roles_permissions_roles",
-				Columns:    []*schema.Column{RolesColumns[8]},
-				RefColumns: []*schema.Column{PermissionsColumns[0]},
-				OnDelete:   schema.SetNull,
-			},
-		},
 	}
 	// RolePermissionsColumns holds the columns for the "role_permissions" table.
 	RolePermissionsColumns = []*schema.Column{
@@ -63,8 +45,8 @@ var (
 		{Name: "tenant_id", Type: field.TypeInt64, Default: 0},
 		{Name: "deny", Type: field.TypeBool, Default: false},
 		{Name: "fields", Type: field.TypeJSON},
-		{Name: "role_id", Type: field.TypeInt64},
 		{Name: "permission_id", Type: field.TypeString},
+		{Name: "role_id", Type: field.TypeInt64},
 	}
 	// RolePermissionsTable holds the schema information for the "role_permissions" table.
 	RolePermissionsTable = &schema.Table{
@@ -73,15 +55,15 @@ var (
 		PrimaryKey: []*schema.Column{RolePermissionsColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "role_permissions_roles_role",
+				Symbol:     "role_permissions_permissions_roles",
 				Columns:    []*schema.Column{RolePermissionsColumns[4]},
-				RefColumns: []*schema.Column{RolesColumns[0]},
+				RefColumns: []*schema.Column{PermissionsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
-				Symbol:     "role_permissions_permissions_permission",
+				Symbol:     "role_permissions_roles_permissions",
 				Columns:    []*schema.Column{RolePermissionsColumns[5]},
-				RefColumns: []*schema.Column{PermissionsColumns[0]},
+				RefColumns: []*schema.Column{RolesColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 		},
@@ -89,7 +71,7 @@ var (
 			{
 				Name:    "rolepermission_role_id_permission_id",
 				Unique:  true,
-				Columns: []*schema.Column{RolePermissionsColumns[4], RolePermissionsColumns[5]},
+				Columns: []*schema.Column{RolePermissionsColumns[5], RolePermissionsColumns[4]},
 			},
 		},
 	}
@@ -158,10 +140,8 @@ var (
 )
 
 func init() {
-	PermissionsTable.ForeignKeys[0].RefTable = RolesTable
-	RolesTable.ForeignKeys[0].RefTable = PermissionsTable
-	RolePermissionsTable.ForeignKeys[0].RefTable = RolesTable
-	RolePermissionsTable.ForeignKeys[1].RefTable = PermissionsTable
+	RolePermissionsTable.ForeignKeys[0].RefTable = PermissionsTable
+	RolePermissionsTable.ForeignKeys[1].RefTable = RolesTable
 	TeamsTable.ForeignKeys[0].RefTable = TeamsTable
 	TeamIdentityRolesTable.ForeignKeys[0].RefTable = RolesTable
 	TeamIdentityRolesTable.ForeignKeys[1].RefTable = TeamsTable

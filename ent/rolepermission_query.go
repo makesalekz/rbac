@@ -76,7 +76,7 @@ func (rpq *RolePermissionQuery) QueryRole() *RoleQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(rolepermission.Table, rolepermission.FieldID, selector),
 			sqlgraph.To(role.Table, role.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, rolepermission.RoleTable, rolepermission.RoleColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, rolepermission.RoleTable, rolepermission.RoleColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(rpq.driver.Dialect(), step)
 		return fromU, nil
@@ -98,7 +98,7 @@ func (rpq *RolePermissionQuery) QueryPermission() *PermissionQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(rolepermission.Table, rolepermission.FieldID, selector),
 			sqlgraph.To(permission.Table, permission.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, rolepermission.PermissionTable, rolepermission.PermissionColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, rolepermission.PermissionTable, rolepermission.PermissionColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(rpq.driver.Dialect(), step)
 		return fromU, nil

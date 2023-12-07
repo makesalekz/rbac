@@ -13,7 +13,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"gitlab.calendaria.team/services/rbac/ent/permission"
 	"gitlab.calendaria.team/services/rbac/ent/predicate"
-	"gitlab.calendaria.team/services/rbac/ent/role"
+	"gitlab.calendaria.team/services/rbac/ent/rolepermission"
 )
 
 // PermissionUpdate is the builder for updating Permission entities.
@@ -74,14 +74,14 @@ func (pu *PermissionUpdate) ClearFields() *PermissionUpdate {
 	return pu
 }
 
-// AddRoleIDs adds the "roles" edge to the Role entity by IDs.
+// AddRoleIDs adds the "roles" edge to the RolePermission entity by IDs.
 func (pu *PermissionUpdate) AddRoleIDs(ids ...int64) *PermissionUpdate {
 	pu.mutation.AddRoleIDs(ids...)
 	return pu
 }
 
-// AddRoles adds the "roles" edges to the Role entity.
-func (pu *PermissionUpdate) AddRoles(r ...*Role) *PermissionUpdate {
+// AddRoles adds the "roles" edges to the RolePermission entity.
+func (pu *PermissionUpdate) AddRoles(r ...*RolePermission) *PermissionUpdate {
 	ids := make([]int64, len(r))
 	for i := range r {
 		ids[i] = r[i].ID
@@ -94,20 +94,20 @@ func (pu *PermissionUpdate) Mutation() *PermissionMutation {
 	return pu.mutation
 }
 
-// ClearRoles clears all "roles" edges to the Role entity.
+// ClearRoles clears all "roles" edges to the RolePermission entity.
 func (pu *PermissionUpdate) ClearRoles() *PermissionUpdate {
 	pu.mutation.ClearRoles()
 	return pu
 }
 
-// RemoveRoleIDs removes the "roles" edge to Role entities by IDs.
+// RemoveRoleIDs removes the "roles" edge to RolePermission entities by IDs.
 func (pu *PermissionUpdate) RemoveRoleIDs(ids ...int64) *PermissionUpdate {
 	pu.mutation.RemoveRoleIDs(ids...)
 	return pu
 }
 
-// RemoveRoles removes "roles" edges to Role entities.
-func (pu *PermissionUpdate) RemoveRoles(r ...*Role) *PermissionUpdate {
+// RemoveRoles removes "roles" edges to RolePermission entities.
+func (pu *PermissionUpdate) RemoveRoles(r ...*RolePermission) *PermissionUpdate {
 	ids := make([]int64, len(r))
 	for i := range r {
 		ids[i] = r[i].ID
@@ -198,7 +198,7 @@ func (pu *PermissionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{permission.RolesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(role.FieldID, field.TypeInt64),
+				IDSpec: sqlgraph.NewFieldSpec(rolepermission.FieldID, field.TypeInt64),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -211,7 +211,7 @@ func (pu *PermissionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{permission.RolesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(role.FieldID, field.TypeInt64),
+				IDSpec: sqlgraph.NewFieldSpec(rolepermission.FieldID, field.TypeInt64),
 			},
 		}
 		for _, k := range nodes {
@@ -227,7 +227,7 @@ func (pu *PermissionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{permission.RolesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(role.FieldID, field.TypeInt64),
+				IDSpec: sqlgraph.NewFieldSpec(rolepermission.FieldID, field.TypeInt64),
 			},
 		}
 		for _, k := range nodes {
@@ -301,14 +301,14 @@ func (puo *PermissionUpdateOne) ClearFields() *PermissionUpdateOne {
 	return puo
 }
 
-// AddRoleIDs adds the "roles" edge to the Role entity by IDs.
+// AddRoleIDs adds the "roles" edge to the RolePermission entity by IDs.
 func (puo *PermissionUpdateOne) AddRoleIDs(ids ...int64) *PermissionUpdateOne {
 	puo.mutation.AddRoleIDs(ids...)
 	return puo
 }
 
-// AddRoles adds the "roles" edges to the Role entity.
-func (puo *PermissionUpdateOne) AddRoles(r ...*Role) *PermissionUpdateOne {
+// AddRoles adds the "roles" edges to the RolePermission entity.
+func (puo *PermissionUpdateOne) AddRoles(r ...*RolePermission) *PermissionUpdateOne {
 	ids := make([]int64, len(r))
 	for i := range r {
 		ids[i] = r[i].ID
@@ -321,20 +321,20 @@ func (puo *PermissionUpdateOne) Mutation() *PermissionMutation {
 	return puo.mutation
 }
 
-// ClearRoles clears all "roles" edges to the Role entity.
+// ClearRoles clears all "roles" edges to the RolePermission entity.
 func (puo *PermissionUpdateOne) ClearRoles() *PermissionUpdateOne {
 	puo.mutation.ClearRoles()
 	return puo
 }
 
-// RemoveRoleIDs removes the "roles" edge to Role entities by IDs.
+// RemoveRoleIDs removes the "roles" edge to RolePermission entities by IDs.
 func (puo *PermissionUpdateOne) RemoveRoleIDs(ids ...int64) *PermissionUpdateOne {
 	puo.mutation.RemoveRoleIDs(ids...)
 	return puo
 }
 
-// RemoveRoles removes "roles" edges to Role entities.
-func (puo *PermissionUpdateOne) RemoveRoles(r ...*Role) *PermissionUpdateOne {
+// RemoveRoles removes "roles" edges to RolePermission entities.
+func (puo *PermissionUpdateOne) RemoveRoles(r ...*RolePermission) *PermissionUpdateOne {
 	ids := make([]int64, len(r))
 	for i := range r {
 		ids[i] = r[i].ID
@@ -455,7 +455,7 @@ func (puo *PermissionUpdateOne) sqlSave(ctx context.Context) (_node *Permission,
 			Columns: []string{permission.RolesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(role.FieldID, field.TypeInt64),
+				IDSpec: sqlgraph.NewFieldSpec(rolepermission.FieldID, field.TypeInt64),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -468,7 +468,7 @@ func (puo *PermissionUpdateOne) sqlSave(ctx context.Context) (_node *Permission,
 			Columns: []string{permission.RolesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(role.FieldID, field.TypeInt64),
+				IDSpec: sqlgraph.NewFieldSpec(rolepermission.FieldID, field.TypeInt64),
 			},
 		}
 		for _, k := range nodes {
@@ -484,7 +484,7 @@ func (puo *PermissionUpdateOne) sqlSave(ctx context.Context) (_node *Permission,
 			Columns: []string{permission.RolesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(role.FieldID, field.TypeInt64),
+				IDSpec: sqlgraph.NewFieldSpec(rolepermission.FieldID, field.TypeInt64),
 			},
 		}
 		for _, k := range nodes {

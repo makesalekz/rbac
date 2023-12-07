@@ -25,11 +25,13 @@ func (TeamIdentityRole) Fields() []ent.Field {
 func (TeamIdentityRole) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("role", Role.Type).
+			Immutable().
 			Required().
 			Unique().
-			Field("role_id").Immutable(),
+			Field("role_id"),
 		edge.To("team", Team.Type).
+			Immutable().
 			Unique().
-			Field("team_id").Immutable(),
+			Field("team_id"),
 	}
 }

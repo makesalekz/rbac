@@ -346,7 +346,7 @@ func (m *PermissionMutation) ResetFields() {
 	delete(m.clearedFields, permission.FieldFields)
 }
 
-// AddRoleIDs adds the "roles" edge to the Role entity by ids.
+// AddRoleIDs adds the "roles" edge to the RolePermission entity by ids.
 func (m *PermissionMutation) AddRoleIDs(ids ...int64) {
 	if m.roles == nil {
 		m.roles = make(map[int64]struct{})
@@ -356,17 +356,17 @@ func (m *PermissionMutation) AddRoleIDs(ids ...int64) {
 	}
 }
 
-// ClearRoles clears the "roles" edge to the Role entity.
+// ClearRoles clears the "roles" edge to the RolePermission entity.
 func (m *PermissionMutation) ClearRoles() {
 	m.clearedroles = true
 }
 
-// RolesCleared reports if the "roles" edge to the Role entity was cleared.
+// RolesCleared reports if the "roles" edge to the RolePermission entity was cleared.
 func (m *PermissionMutation) RolesCleared() bool {
 	return m.clearedroles
 }
 
-// RemoveRoleIDs removes the "roles" edge to the Role entity by IDs.
+// RemoveRoleIDs removes the "roles" edge to the RolePermission entity by IDs.
 func (m *PermissionMutation) RemoveRoleIDs(ids ...int64) {
 	if m.removedroles == nil {
 		m.removedroles = make(map[int64]struct{})
@@ -377,7 +377,7 @@ func (m *PermissionMutation) RemoveRoleIDs(ids ...int64) {
 	}
 }
 
-// RemovedRoles returns the removed IDs of the "roles" edge to the Role entity.
+// RemovedRoles returns the removed IDs of the "roles" edge to the RolePermission entity.
 func (m *PermissionMutation) RemovedRolesIDs() (ids []int64) {
 	for id := range m.removedroles {
 		ids = append(ids, id)
@@ -696,8 +696,8 @@ type RoleMutation struct {
 	created_at         *time.Time
 	updated_at         *time.Time
 	clearedFields      map[string]struct{}
-	permissions        map[string]struct{}
-	removedpermissions map[string]struct{}
+	permissions        map[int64]struct{}
+	removedpermissions map[int64]struct{}
 	clearedpermissions bool
 	done               bool
 	oldValue           func(context.Context) (*Role, error)
@@ -1106,30 +1106,30 @@ func (m *RoleMutation) ResetUpdatedAt() {
 	m.updated_at = nil
 }
 
-// AddPermissionIDs adds the "permissions" edge to the Permission entity by ids.
-func (m *RoleMutation) AddPermissionIDs(ids ...string) {
+// AddPermissionIDs adds the "permissions" edge to the RolePermission entity by ids.
+func (m *RoleMutation) AddPermissionIDs(ids ...int64) {
 	if m.permissions == nil {
-		m.permissions = make(map[string]struct{})
+		m.permissions = make(map[int64]struct{})
 	}
 	for i := range ids {
 		m.permissions[ids[i]] = struct{}{}
 	}
 }
 
-// ClearPermissions clears the "permissions" edge to the Permission entity.
+// ClearPermissions clears the "permissions" edge to the RolePermission entity.
 func (m *RoleMutation) ClearPermissions() {
 	m.clearedpermissions = true
 }
 
-// PermissionsCleared reports if the "permissions" edge to the Permission entity was cleared.
+// PermissionsCleared reports if the "permissions" edge to the RolePermission entity was cleared.
 func (m *RoleMutation) PermissionsCleared() bool {
 	return m.clearedpermissions
 }
 
-// RemovePermissionIDs removes the "permissions" edge to the Permission entity by IDs.
-func (m *RoleMutation) RemovePermissionIDs(ids ...string) {
+// RemovePermissionIDs removes the "permissions" edge to the RolePermission entity by IDs.
+func (m *RoleMutation) RemovePermissionIDs(ids ...int64) {
 	if m.removedpermissions == nil {
-		m.removedpermissions = make(map[string]struct{})
+		m.removedpermissions = make(map[int64]struct{})
 	}
 	for i := range ids {
 		delete(m.permissions, ids[i])
@@ -1137,8 +1137,8 @@ func (m *RoleMutation) RemovePermissionIDs(ids ...string) {
 	}
 }
 
-// RemovedPermissions returns the removed IDs of the "permissions" edge to the Permission entity.
-func (m *RoleMutation) RemovedPermissionsIDs() (ids []string) {
+// RemovedPermissions returns the removed IDs of the "permissions" edge to the RolePermission entity.
+func (m *RoleMutation) RemovedPermissionsIDs() (ids []int64) {
 	for id := range m.removedpermissions {
 		ids = append(ids, id)
 	}
@@ -1146,7 +1146,7 @@ func (m *RoleMutation) RemovedPermissionsIDs() (ids []string) {
 }
 
 // PermissionsIDs returns the "permissions" edge IDs in the mutation.
-func (m *RoleMutation) PermissionsIDs() (ids []string) {
+func (m *RoleMutation) PermissionsIDs() (ids []int64) {
 	for id := range m.permissions {
 		ids = append(ids, id)
 	}

@@ -12,7 +12,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"gitlab.calendaria.team/services/rbac/ent/permission"
-	"gitlab.calendaria.team/services/rbac/ent/role"
+	"gitlab.calendaria.team/services/rbac/ent/rolepermission"
 )
 
 // PermissionCreate is the builder for creating a Permission entity.
@@ -61,14 +61,14 @@ func (pc *PermissionCreate) SetID(s string) *PermissionCreate {
 	return pc
 }
 
-// AddRoleIDs adds the "roles" edge to the Role entity by IDs.
+// AddRoleIDs adds the "roles" edge to the RolePermission entity by IDs.
 func (pc *PermissionCreate) AddRoleIDs(ids ...int64) *PermissionCreate {
 	pc.mutation.AddRoleIDs(ids...)
 	return pc
 }
 
-// AddRoles adds the "roles" edges to the Role entity.
-func (pc *PermissionCreate) AddRoles(r ...*Role) *PermissionCreate {
+// AddRoles adds the "roles" edges to the RolePermission entity.
+func (pc *PermissionCreate) AddRoles(r ...*RolePermission) *PermissionCreate {
 	ids := make([]int64, len(r))
 	for i := range r {
 		ids[i] = r[i].ID
@@ -199,7 +199,7 @@ func (pc *PermissionCreate) createSpec() (*Permission, *sqlgraph.CreateSpec) {
 			Columns: []string{permission.RolesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(role.FieldID, field.TypeInt64),
+				IDSpec: sqlgraph.NewFieldSpec(rolepermission.FieldID, field.TypeInt64),
 			},
 		}
 		for _, k := range nodes {

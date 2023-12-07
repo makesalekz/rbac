@@ -27,15 +27,14 @@ type Permission struct {
 	Fields []string `json:"fields,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the PermissionQuery when eager-loading is set.
-	Edges            PermissionEdges `json:"edges"`
-	role_permissions *int64
-	selectValues     sql.SelectValues
+	Edges        PermissionEdges `json:"edges"`
+	selectValues sql.SelectValues
 }
 
 // PermissionEdges holds the relations/edges for other nodes in the graph.
 type PermissionEdges struct {
 	// Roles holds the value of the roles edge.
-	Roles []*Role `json:"roles,omitempty"`
+	Roles []*RolePermission `json:"roles,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [1]bool
@@ -43,7 +42,7 @@ type PermissionEdges struct {
 
 // RolesOrErr returns the Roles value or an error if the edge
 // was not loaded in eager-loading.
-func (e PermissionEdges) RolesOrErr() ([]*Role, error) {
+func (e PermissionEdges) RolesOrErr() ([]*RolePermission, error) {
 	if e.loadedTypes[0] {
 		return e.Roles, nil
 	}
@@ -59,8 +58,6 @@ func (*Permission) scanValues(columns []string) ([]any, error) {
 			values[i] = new([]byte)
 		case permission.FieldID, permission.FieldName, permission.FieldDescription, permission.FieldAppID:
 			values[i] = new(sql.NullString)
-		case permission.ForeignKeys[0]: // role_permissions
-			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -108,13 +105,6 @@ func (pe *Permission) assignValues(columns []string, values []any) error {
 					return fmt.Errorf("unmarshal field fields: %w", err)
 				}
 			}
-		case permission.ForeignKeys[0]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field role_permissions", value)
-			} else if value.Valid {
-				pe.role_permissions = new(int64)
-				*pe.role_permissions = int64(value.Int64)
-			}
 		default:
 			pe.selectValues.Set(columns[i], values[i])
 		}
@@ -129,7 +119,7 @@ func (pe *Permission) Value(name string) (ent.Value, error) {
 }
 
 // QueryRoles queries the "roles" edge of the Permission entity.
-func (pe *Permission) QueryRoles() *RoleQuery {
+func (pe *Permission) QueryRoles() *RolePermissionQuery {
 	return NewPermissionClient(pe.config).QueryRoles(pe)
 }
 

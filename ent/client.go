@@ -341,13 +341,13 @@ func (c *PermissionClient) GetX(ctx context.Context, id string) *Permission {
 }
 
 // QueryRoles queries the roles edge of a Permission.
-func (c *PermissionClient) QueryRoles(pe *Permission) *RoleQuery {
-	query := (&RoleClient{config: c.config}).Query()
+func (c *PermissionClient) QueryRoles(pe *Permission) *RolePermissionQuery {
+	query := (&RolePermissionClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := pe.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(permission.Table, permission.FieldID, id),
-			sqlgraph.To(role.Table, role.FieldID),
+			sqlgraph.To(rolepermission.Table, rolepermission.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, permission.RolesTable, permission.RolesColumn),
 		)
 		fromV = sqlgraph.Neighbors(pe.driver.Dialect(), step)
@@ -490,13 +490,13 @@ func (c *RoleClient) GetX(ctx context.Context, id int64) *Role {
 }
 
 // QueryPermissions queries the permissions edge of a Role.
-func (c *RoleClient) QueryPermissions(r *Role) *PermissionQuery {
-	query := (&PermissionClient{config: c.config}).Query()
+func (c *RoleClient) QueryPermissions(r *Role) *RolePermissionQuery {
+	query := (&RolePermissionClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := r.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(role.Table, role.FieldID, id),
-			sqlgraph.To(permission.Table, permission.FieldID),
+			sqlgraph.To(rolepermission.Table, rolepermission.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, role.PermissionsTable, role.PermissionsColumn),
 		)
 		fromV = sqlgraph.Neighbors(r.driver.Dialect(), step)
@@ -648,7 +648,7 @@ func (c *RolePermissionClient) QueryRole(rp *RolePermission) *RoleQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(rolepermission.Table, rolepermission.FieldID, id),
 			sqlgraph.To(role.Table, role.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, rolepermission.RoleTable, rolepermission.RoleColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, rolepermission.RoleTable, rolepermission.RoleColumn),
 		)
 		fromV = sqlgraph.Neighbors(rp.driver.Dialect(), step)
 		return fromV, nil
@@ -664,7 +664,7 @@ func (c *RolePermissionClient) QueryPermission(rp *RolePermission) *PermissionQu
 		step := sqlgraph.NewStep(
 			sqlgraph.From(rolepermission.Table, rolepermission.FieldID, id),
 			sqlgraph.To(permission.Table, permission.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, rolepermission.PermissionTable, rolepermission.PermissionColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, rolepermission.PermissionTable, rolepermission.PermissionColumn),
 		)
 		fromV = sqlgraph.Neighbors(rp.driver.Dialect(), step)
 		return fromV, nil

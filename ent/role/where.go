@@ -422,7 +422,7 @@ func HasPermissions() predicate.Role {
 }
 
 // HasPermissionsWith applies the HasEdge predicate on the "permissions" edge with a given conditions (other predicates).
-func HasPermissionsWith(preds ...predicate.Permission) predicate.Role {
+func HasPermissionsWith(preds ...predicate.RolePermission) predicate.Role {
 	return predicate.Role(func(s *sql.Selector) {
 		step := newPermissionsStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
