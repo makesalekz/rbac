@@ -76,6 +76,8 @@ var (
 	NameValidator func(string) error
 	// DefaultDescription holds the default value on creation for the "description" field.
 	DefaultDescription string
+	// DefaultTenantID holds the default value on creation for the "tenant_id" field.
+	DefaultTenantID int64
 	// DefaultIsSystem holds the default value on creation for the "is_system" field.
 	DefaultIsSystem bool
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.

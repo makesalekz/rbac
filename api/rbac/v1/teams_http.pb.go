@@ -38,12 +38,12 @@ type TeamsHTTPServer interface {
 
 func RegisterTeamsHTTPServer(s *http.Server, srv TeamsHTTPServer) {
 	r := s.Route("/")
-	r.POST("/v1/teams", _Teams_CreateTeam0_HTTP_Handler(srv))
-	r.PUT("/v1/teams/{teamId}", _Teams_UpdateTeam0_HTTP_Handler(srv))
-	r.DELETE("/v1/teams/{teamId}", _Teams_DeleteTeam0_HTTP_Handler(srv))
-	r.GET("/v1/teams/{teamId}", _Teams_GetTeam0_HTTP_Handler(srv))
-	r.GET("/v1/teams/{teamId}/tree", _Teams_GetTeamTree0_HTTP_Handler(srv))
-	r.POST("/v1/teams/list", _Teams_ListTeams0_HTTP_Handler(srv))
+	r.POST("/v1/rbac/teams", _Teams_CreateTeam0_HTTP_Handler(srv))
+	r.PUT("/v1/rbac/teams/{teamId}", _Teams_UpdateTeam0_HTTP_Handler(srv))
+	r.DELETE("/v1/rbac/teams/{teamId}", _Teams_DeleteTeam0_HTTP_Handler(srv))
+	r.GET("/v1/rbac/teams/{teamId}", _Teams_GetTeam0_HTTP_Handler(srv))
+	r.GET("/v1/rbac/teams/{teamId}/tree", _Teams_GetTeamTree0_HTTP_Handler(srv))
+	r.POST("/v1/rbac/teams/list", _Teams_ListTeams0_HTTP_Handler(srv))
 }
 
 func _Teams_CreateTeam0_HTTP_Handler(srv TeamsHTTPServer) func(ctx http.Context) error {
@@ -200,7 +200,7 @@ func NewTeamsHTTPClient(client *http.Client) TeamsHTTPClient {
 
 func (c *TeamsHTTPClientImpl) CreateTeam(ctx context.Context, in *CreateTeamRequest, opts ...http.CallOption) (*TeamReply, error) {
 	var out TeamReply
-	pattern := "/v1/teams"
+	pattern := "/v1/rbac/teams"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationTeamsCreateTeam))
 	opts = append(opts, http.PathTemplate(pattern))
@@ -213,7 +213,7 @@ func (c *TeamsHTTPClientImpl) CreateTeam(ctx context.Context, in *CreateTeamRequ
 
 func (c *TeamsHTTPClientImpl) DeleteTeam(ctx context.Context, in *TeamRequest, opts ...http.CallOption) (*v1.EmptyReply, error) {
 	var out v1.EmptyReply
-	pattern := "/v1/teams/{teamId}"
+	pattern := "/v1/rbac/teams/{teamId}"
 	path := binding.EncodeURL(pattern, in, true)
 	opts = append(opts, http.Operation(OperationTeamsDeleteTeam))
 	opts = append(opts, http.PathTemplate(pattern))
@@ -226,7 +226,7 @@ func (c *TeamsHTTPClientImpl) DeleteTeam(ctx context.Context, in *TeamRequest, o
 
 func (c *TeamsHTTPClientImpl) GetTeam(ctx context.Context, in *TeamRequest, opts ...http.CallOption) (*TeamReply, error) {
 	var out TeamReply
-	pattern := "/v1/teams/{teamId}"
+	pattern := "/v1/rbac/teams/{teamId}"
 	path := binding.EncodeURL(pattern, in, true)
 	opts = append(opts, http.Operation(OperationTeamsGetTeam))
 	opts = append(opts, http.PathTemplate(pattern))
@@ -239,7 +239,7 @@ func (c *TeamsHTTPClientImpl) GetTeam(ctx context.Context, in *TeamRequest, opts
 
 func (c *TeamsHTTPClientImpl) GetTeamTree(ctx context.Context, in *TeamRequest, opts ...http.CallOption) (*TeamReply, error) {
 	var out TeamReply
-	pattern := "/v1/teams/{teamId}/tree"
+	pattern := "/v1/rbac/teams/{teamId}/tree"
 	path := binding.EncodeURL(pattern, in, true)
 	opts = append(opts, http.Operation(OperationTeamsGetTeamTree))
 	opts = append(opts, http.PathTemplate(pattern))
@@ -252,7 +252,7 @@ func (c *TeamsHTTPClientImpl) GetTeamTree(ctx context.Context, in *TeamRequest, 
 
 func (c *TeamsHTTPClientImpl) ListTeams(ctx context.Context, in *ListTeamsRequest, opts ...http.CallOption) (*ListTeamsReply, error) {
 	var out ListTeamsReply
-	pattern := "/v1/teams/list"
+	pattern := "/v1/rbac/teams/list"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationTeamsListTeams))
 	opts = append(opts, http.PathTemplate(pattern))
@@ -265,7 +265,7 @@ func (c *TeamsHTTPClientImpl) ListTeams(ctx context.Context, in *ListTeamsReques
 
 func (c *TeamsHTTPClientImpl) UpdateTeam(ctx context.Context, in *UpdateTeamRequest, opts ...http.CallOption) (*TeamReply, error) {
 	var out TeamReply
-	pattern := "/v1/teams/{teamId}"
+	pattern := "/v1/rbac/teams/{teamId}"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationTeamsUpdateTeam))
 	opts = append(opts, http.PathTemplate(pattern))

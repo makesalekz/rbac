@@ -6,7 +6,61 @@ info:
     title: ""
     version: 0.0.1
 paths:
-    /v1/rbac/check-permission:
+    /v1/rbac/assigns:
+        post:
+            tags:
+                - TeamIdentityRole
+            operationId: TeamIdentityRole_AssignRole
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/rbac.v1.AssignRoleRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/utils.v1.EmptyReply'
+    /v1/rbac/assigns/list:
+        post:
+            tags:
+                - TeamIdentityRole
+            operationId: TeamIdentityRole_ListAssigns
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/rbac.v1.ListAssignsRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/rbac.v1.ListAssignsReply'
+    /v1/rbac/assigns/{assignId}:
+        delete:
+            tags:
+                - TeamIdentityRole
+            operationId: TeamIdentityRole_DeleteAssign
+            parameters:
+                - name: assignId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/utils.v1.EmptyReply'
+    /v1/rbac/check:
         post:
             tags:
                 - CheckPermissions
@@ -154,24 +208,6 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/rbac.v1.ListRolesReply'
-    /v1/rbac/roles/{assignId}:
-        delete:
-            tags:
-                - TeamIdentityRole
-            operationId: TeamIdentityRole_DeleteRole
-            parameters:
-                - name: assignId
-                  in: path
-                  required: true
-                  schema:
-                    type: string
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/utils.v1.EmptyReply'
     /v1/rbac/roles/{roleId}:
         get:
             tags:
@@ -301,43 +337,7 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/utils.v1.EmptyReply'
-    /v1/rbac/team/list:
-        post:
-            tags:
-                - TeamIdentityRole
-            operationId: TeamIdentityRole_ListTeamRoles
-            requestBody:
-                content:
-                    application/json:
-                        schema:
-                            $ref: '#/components/schemas/rbac.v1.ListTeamRolesRequest'
-                required: true
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/rbac.v1.ListIdentityRolesReply'
-    /v1/rbac/tenant/list:
-        post:
-            tags:
-                - TeamIdentityRole
-            operationId: TeamIdentityRole_ListIdentityRoles
-            requestBody:
-                content:
-                    application/json:
-                        schema:
-                            $ref: '#/components/schemas/rbac.v1.ListIdentityRolesRequest'
-                required: true
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/rbac.v1.ListIdentityRolesReply'
-    /v1/teams:
+    /v1/rbac/teams:
         post:
             tags:
                 - Teams
@@ -355,7 +355,7 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/rbac.v1.TeamReply'
-    /v1/teams/list:
+    /v1/rbac/teams/list:
         post:
             tags:
                 - Teams
@@ -373,7 +373,7 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/rbac.v1.ListTeamsReply'
-    /v1/teams/{teamId}:
+    /v1/rbac/teams/{teamId}:
         get:
             tags:
                 - Teams
@@ -431,7 +431,7 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/utils.v1.EmptyReply'
-    /v1/teams/{teamId}/tree:
+    /v1/rbac/teams/{teamId}/tree:
         get:
             tags:
                 - Teams
@@ -473,6 +473,15 @@ components:
                     type: string
                 teamId:
                     type: string
+        rbac.v1.AssignedRole:
+            type: object
+            properties:
+                role:
+                    $ref: '#/components/schemas/rbac.v1.RoleReply'
+                identityId:
+                    type: string
+                team:
+                    $ref: '#/components/schemas/rbac.v1.Team'
         rbac.v1.CheckPermissionsReply:
             type: object
             properties:
@@ -520,17 +529,19 @@ components:
                     type: string
                 parentId:
                     type: string
-        rbac.v1.ListIdentityRolesReply:
+        rbac.v1.ListAssignsReply:
             type: object
             properties:
                 roles:
                     type: array
                     items:
-                        $ref: '#/components/schemas/rbac.v1.TeamIdentityRoleReply'
-        rbac.v1.ListIdentityRolesRequest:
+                        $ref: '#/components/schemas/rbac.v1.AssignedRole'
+        rbac.v1.ListAssignsRequest:
             type: object
             properties:
                 identityId:
+                    type: string
+                teamId:
                     type: string
         rbac.v1.ListOfFields:
             type: object
@@ -566,11 +577,6 @@ components:
             type: object
             properties:
                 search:
-                    type: string
-        rbac.v1.ListTeamRolesRequest:
-            type: object
-            properties:
-                teamId:
                     type: string
         rbac.v1.ListTeamsReply:
             type: object
@@ -670,15 +676,6 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/rbac.v1.Team'
-        rbac.v1.TeamIdentityRoleReply:
-            type: object
-            properties:
-                identityId:
-                    type: string
-                role:
-                    $ref: '#/components/schemas/rbac.v1.RoleReply'
-                team:
-                    $ref: '#/components/schemas/rbac.v1.Team'
         rbac.v1.TeamReply:
             type: object
             properties:

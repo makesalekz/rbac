@@ -27,7 +27,7 @@ type CheckPermissionsHTTPServer interface {
 
 func RegisterCheckPermissionsHTTPServer(s *http.Server, srv CheckPermissionsHTTPServer) {
 	r := s.Route("/")
-	r.POST("/v1/rbac/check-permission", _CheckPermissions_CheckPermissions0_HTTP_Handler(srv))
+	r.POST("/v1/rbac/check", _CheckPermissions_CheckPermissions0_HTTP_Handler(srv))
 }
 
 func _CheckPermissions_CheckPermissions0_HTTP_Handler(srv CheckPermissionsHTTPServer) func(ctx http.Context) error {
@@ -66,7 +66,7 @@ func NewCheckPermissionsHTTPClient(client *http.Client) CheckPermissionsHTTPClie
 
 func (c *CheckPermissionsHTTPClientImpl) CheckPermissions(ctx context.Context, in *CheckPermissionsRequest, opts ...http.CallOption) (*CheckPermissionsReply, error) {
 	var out CheckPermissionsReply
-	pattern := "/v1/rbac/check-permission"
+	pattern := "/v1/rbac/check"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationCheckPermissionsCheckPermissions))
 	opts = append(opts, http.PathTemplate(pattern))

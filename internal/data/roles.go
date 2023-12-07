@@ -68,7 +68,7 @@ func (r *roleRepo) DeleteRole(ctx context.Context, role *ent.Role) error {
 
 func (r *roleRepo) GetRoleById(ctx context.Context, tenantId, roleId int64) (*ent.Role, error) {
 	return r.db.Role.Query().
-		Where(role.ID(roleId), role.TenantID(tenantId)).
+		Where(role.ID(roleId), role.TenantIDIn(tenantId, 0)).
 		First(ctx)
 }
 
@@ -83,44 +83,34 @@ func (r *roleRepo) GetRolesList(ctx context.Context, tenantId int64, search stri
 }
 
 func (r *roleRepo) AddPermissionToRole(ctx context.Context, role *ent.Role, permission *ent.Permission, dto CreateRolePermissionDto) (*ent.RolePermission, error) {
-	query := r.db.RolePermission.Create().
+	return r.db.RolePermission.Create().
+		SetTenantID(role.TenantID).
 		SetRole(role).
 		SetPermission(permission).
 		SetFields(dto.Fields).
-		SetDeny(dto.Deny)
-
-	if role.TenantID != nil {
-		query.SetTenantID(*role.TenantID)
-	}
-
-	return query.Save(ctx)
+		SetDeny(dto.Deny).
+		Save(ctx)
 }
 
 func (r *roleRepo) RemovePermissionFromRole(ctx context.Context, role *ent.Role, permission *ent.Permission) error {
-	query := r.db.RolePermission.Delete().
+	_, err := r.db.RolePermission.Delete().
 		Where(
+			rolepermission.TenantID(role.TenantID),
 			rolepermission.RoleID(role.ID),
 			rolepermission.PermissionID(permission.ID),
-		)
-
-	if role.TenantID != nil {
-		query.Where(rolepermission.TenantID(*role.TenantID))
-	}
-
-	_, err := query.Exec(ctx)
+		).
+		Exec(ctx)
 
 	return err
 }
 
 func (r *roleRepo) ListRolePermissions(ctx context.Context, role *ent.Role) ([]*ent.RolePermission, error) {
-	query := r.db.RolePermission.Query().
-		Where(rolepermission.RoleID(role.ID))
-
-	if role.TenantID != nil {
-		query.Where(rolepermission.TenantID(*role.TenantID))
-	}
-
-	return query.All(ctx)
+	return r.db.RolePermission.Query().
+		Where(
+			rolepermission.TenantID(role.TenantID),
+			rolepermission.RoleID(role.ID),
+		).
+		All(ctx)
 }
 
 func (r *roleRepo) ListRolesPermissions(ctx context.Context, roleIds []int64, tenantId int64, permissions []string) ([]*ent.RolePermission, error) {

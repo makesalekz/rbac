@@ -78,6 +78,10 @@ func init() {
 	roleDescDescription := roleFields[2].Descriptor()
 	// role.DefaultDescription holds the default value on creation for the description field.
 	role.DefaultDescription = roleDescDescription.Default.(string)
+	// roleDescTenantID is the schema descriptor for tenant_id field.
+	roleDescTenantID := roleFields[3].Descriptor()
+	// role.DefaultTenantID holds the default value on creation for the tenant_id field.
+	role.DefaultTenantID = roleDescTenantID.Default.(int64)
 	// roleDescIsSystem is the schema descriptor for is_system field.
 	roleDescIsSystem := roleFields[4].Descriptor()
 	// role.DefaultIsSystem holds the default value on creation for the is_system field.
@@ -121,10 +125,6 @@ func init() {
 	team.DefaultUpdatedAt = teamDescUpdatedAt.Default.(func() time.Time)
 	teamidentityroleFields := schema.TeamIdentityRole{}.Fields()
 	_ = teamidentityroleFields
-	// teamidentityroleDescTeamID is the schema descriptor for team_id field.
-	teamidentityroleDescTeamID := teamidentityroleFields[1].Descriptor()
-	// teamidentityrole.DefaultTeamID holds the default value on creation for the team_id field.
-	teamidentityrole.DefaultTeamID = teamidentityroleDescTeamID.Default.(int64)
 	// teamidentityroleDescIdentityID is the schema descriptor for identity_id field.
 	teamidentityroleDescIdentityID := teamidentityroleFields[2].Descriptor()
 	// teamidentityrole.DefaultIdentityID holds the default value on creation for the identity_id field.

@@ -34,38 +34,27 @@ func NewTeamIdentityRoleService(
 	}
 }
 
-func (s *TeamIdentityRoleService) AssignRole(ctx context.Context, req *v1.AssignRoleRequest) (*v1.TeamIdentityRoleReply, error) {
+func (s *TeamIdentityRoleService) AssignRole(ctx context.Context, req *v1.AssignRoleRequest) (*utils_v1.EmptyReply, error) {
 	claims, ok := s.jwt.GetClaimsFromContext(ctx)
 	if !ok || !claims.IsUserTenantRequest() {
 		return nil, v1.ErrorUnauthorized("invalid token")
 	}
 	// todo checkPermissions can assign role to tenant identity
 
-	_, err := s.ru.GetRoleById(ctx, claims.GetTenantId(), req.RoleId)
-	if err != nil {
-		return nil, err
-	}
-
-	if req.TeamId != 0 {
-		_, err = s.tu.GetTeam(ctx, claims.GetTenantId(), req.TeamId, false)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	assignedRole, err := s.uc.AssignRole(ctx, data.AssignRoleDto{
-		RoleId:     req.RoleId,
-		TeamId:     req.TeamId,
-		IdentityId: req.IdentityId,
+	err := s.uc.AssignRole(ctx, data.AssignRoleDto{
 		TenantId:   claims.GetTenantId(),
+		RoleId:     req.GetRoleId(),
+		TeamId:     req.GetTeamId(),
+		IdentityId: req.GetIdentityId(),
 	})
 	if err != nil {
 		return nil, err
 	}
-	return assignedRoleReply(assignedRole), nil
+
+	return &utils_v1.EmptyReply{}, nil
 }
 
-func (s *TeamIdentityRoleService) DeleteRole(ctx context.Context, req *v1.DeleteRequest) (*utils_v1.EmptyReply, error) {
+func (s *TeamIdentityRoleService) DeleteAssign(ctx context.Context, req *v1.AssignRequest) (*utils_v1.EmptyReply, error) {
 	claims, ok := s.jwt.GetClaimsFromContext(ctx)
 	if !ok || !claims.IsUserTenantRequest() {
 		return nil, v1.ErrorUnauthorized("invalid token")
@@ -79,62 +68,65 @@ func (s *TeamIdentityRoleService) DeleteRole(ctx context.Context, req *v1.Delete
 	return &utils_v1.EmptyReply{}, nil
 }
 
-func (s *TeamIdentityRoleService) ListIdentityRoles(ctx context.Context, req *v1.ListIdentityRolesRequest) (*v1.ListIdentityRolesReply, error) {
-	claims, ok := s.jwt.GetClaimsFromContext(ctx)
-	if !ok || !claims.IsUserTenantRequest() {
-		return nil, v1.ErrorUnauthorized("invalid token")
-	}
-	// todo checkPermissions can get identity roles
-
-	assignedRoles, err := s.uc.ListIdentityRoles(ctx, claims.GetTenantId(), req.GetIdentityId())
-	if err != nil {
-		return nil, err
-	}
-
-	return &v1.ListIdentityRolesReply{
-		Roles: assignedRolesReply(assignedRoles),
-	}, nil
-}
-
-func (s *TeamIdentityRoleService) ListTeamRoles(ctx context.Context, req *v1.ListTeamRolesRequest) (*v1.ListIdentityRolesReply, error) {
+func (s *TeamIdentityRoleService) ListAssigns(ctx context.Context, req *v1.ListAssignsRequest) (*v1.ListAssignsReply, error) {
 	claims, ok := s.jwt.GetClaimsFromContext(ctx)
 	if !ok || !claims.IsUserTenantRequest() {
 		return nil, v1.ErrorUnauthorized("invalid token")
 	}
 	// todo checkPermissions can get assgined roles
 
+	identitiesIDs := []string{}
+	teamsIDs := []int64{}
+
+	if req.GetIdentityId() != "" {
+		identitiesIDs = []string{req.GetIdentityId()}
+	}
+
+	if req.GetTeamId() != 0 {
+		teamsIDs = []int64{req.GetTeamId()}
+	}
+
 	assignedRoles, err := s.uc.ListAssignedRoles(ctx, data.ListRolesDto{
-		TenantId: claims.GetTenantId(),
-		TeamId:   req.GetTeamId(),
+		TenantId:    claims.GetTenantId(),
+		IdentityIDs: identitiesIDs,
+		TeamsIDs:    teamsIDs,
 	})
 	if err != nil {
 		return nil, err
 	}
 
-	return &v1.ListIdentityRolesReply{
+	return &v1.ListAssignsReply{
 		Roles: assignedRolesReply(assignedRoles),
 	}, nil
 }
 
-func assignedRoleReply(assignedRole *ent.TeamIdentityRole) *v1.TeamIdentityRoleReply {
-	return &v1.TeamIdentityRoleReply{
+func assignedRoleReply(assignedRole *ent.TeamIdentityRole) *v1.AssignedRole {
+	result := v1.AssignedRole{
 		IdentityId: &assignedRole.IdentityID,
-		Team: &v1.Team{
+	}
+
+	if assignedRole.Edges.Team != nil {
+		result.Team = &v1.Team{
 			Id:          assignedRole.Edges.Team.ID,
 			Name:        assignedRole.Edges.Team.Name,
 			Description: assignedRole.Edges.Team.Description,
-		},
-		Role: &v1.RoleReply{
-			Id:          assignedRole.RoleID,
+		}
+	}
+
+	if assignedRole.Edges.Role != nil {
+		result.Role = &v1.RoleReply{
+			Id:          assignedRole.Edges.Role.ID,
 			Name:        assignedRole.Edges.Role.Name,
 			Description: assignedRole.Edges.Role.Description,
 			IsSystem:    assignedRole.Edges.Role.IsSystem,
-		},
+		}
 	}
+
+	return &result
 }
 
-func assignedRolesReply(assignedRoles []*ent.TeamIdentityRole) []*v1.TeamIdentityRoleReply {
-	result := make([]*v1.TeamIdentityRoleReply, len(assignedRoles))
+func assignedRolesReply(assignedRoles []*ent.TeamIdentityRole) []*v1.AssignedRole {
+	result := make([]*v1.AssignedRole, len(assignedRoles))
 	for i, assignedRole := range assignedRoles {
 		result[i] = assignedRoleReply(assignedRole)
 	}

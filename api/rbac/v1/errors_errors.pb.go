@@ -108,3 +108,15 @@ func IsNotFound(err error) bool {
 func ErrorNotFound(format string, args ...interface{}) *errors.Error {
 	return errors.New(404, ErrorReason_NOT_FOUND.String(), fmt.Sprintf(format, args...))
 }
+
+func IsAlreadyExists(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == ErrorReason_ALREADY_EXISTS.String() && e.Code == 400
+}
+
+func ErrorAlreadyExists(format string, args ...interface{}) *errors.Error {
+	return errors.New(400, ErrorReason_ALREADY_EXISTS.String(), fmt.Sprintf(format, args...))
+}

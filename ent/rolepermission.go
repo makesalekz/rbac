@@ -20,7 +20,7 @@ type RolePermission struct {
 	// ID of the ent.
 	ID int64 `json:"id,omitempty"`
 	// TenantID holds the value of the "tenant_id" field.
-	TenantID *int64 `json:"tenant_id,omitempty"`
+	TenantID int64 `json:"tenant_id,omitempty"`
 	// RoleID holds the value of the "role_id" field.
 	RoleID int64 `json:"role_id,omitempty"`
 	// PermissionID holds the value of the "permission_id" field.
@@ -110,8 +110,7 @@ func (rp *RolePermission) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field tenant_id", values[i])
 			} else if value.Valid {
-				rp.TenantID = new(int64)
-				*rp.TenantID = value.Int64
+				rp.TenantID = value.Int64
 			}
 		case rolepermission.FieldRoleID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -185,10 +184,8 @@ func (rp *RolePermission) String() string {
 	var builder strings.Builder
 	builder.WriteString("RolePermission(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", rp.ID))
-	if v := rp.TenantID; v != nil {
-		builder.WriteString("tenant_id=")
-		builder.WriteString(fmt.Sprintf("%v", *v))
-	}
+	builder.WriteString("tenant_id=")
+	builder.WriteString(fmt.Sprintf("%v", rp.TenantID))
 	builder.WriteString(", ")
 	builder.WriteString("role_id=")
 	builder.WriteString(fmt.Sprintf("%v", rp.RoleID))

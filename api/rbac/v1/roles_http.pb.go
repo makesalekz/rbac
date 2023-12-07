@@ -44,7 +44,7 @@ func RegisterRolesHTTPServer(s *http.Server, srv RolesHTTPServer) {
 	r := s.Route("/")
 	r.POST("/v1/rbac/roles", _Roles_CreateRole0_HTTP_Handler(srv))
 	r.PUT("/v1/rbac/roles/{roleId}", _Roles_UpdateRole0_HTTP_Handler(srv))
-	r.DELETE("/v1/rbac/roles/{roleId}", _Roles_DeleteRole1_HTTP_Handler(srv))
+	r.DELETE("/v1/rbac/roles/{roleId}", _Roles_DeleteRole0_HTTP_Handler(srv))
 	r.GET("/v1/rbac/roles/{roleId}", _Roles_GetRole0_HTTP_Handler(srv))
 	r.POST("/v1/rbac/roles/list", _Roles_ListRoles0_HTTP_Handler(srv))
 	r.POST("/v1/rbac/roles/{roleId}/permissions", _Roles_AddPermissionToRole0_HTTP_Handler(srv))
@@ -99,7 +99,7 @@ func _Roles_UpdateRole0_HTTP_Handler(srv RolesHTTPServer) func(ctx http.Context)
 	}
 }
 
-func _Roles_DeleteRole1_HTTP_Handler(srv RolesHTTPServer) func(ctx http.Context) error {
+func _Roles_DeleteRole0_HTTP_Handler(srv RolesHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in DeleteRoleRequest
 		if err := ctx.BindQuery(&in); err != nil {

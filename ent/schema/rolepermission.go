@@ -15,7 +15,7 @@ type RolePermission struct {
 // Fields of the RolePermission.
 func (RolePermission) Fields() []ent.Field {
 	return []ent.Field{
-		field.Int64("tenant_id").Immutable().Nillable().Default(0),
+		field.Int64("tenant_id").Immutable().Default(0),
 		field.Int64("role_id").Immutable(),
 		field.String("permission_id").Immutable(),
 		field.Bool("deny").Default(false),

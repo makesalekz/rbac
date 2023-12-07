@@ -24,7 +24,7 @@ type Role struct {
 	// Description holds the value of the "description" field.
 	Description string `json:"description,omitempty"`
 	// TenantID holds the value of the "tenant_id" field.
-	TenantID *int64 `json:"tenant_id,omitempty"`
+	TenantID int64 `json:"tenant_id,omitempty"`
 	// IsSystem holds the value of the "is_system" field.
 	IsSystem bool `json:"is_system,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
@@ -112,8 +112,7 @@ func (r *Role) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field tenant_id", values[i])
 			} else if value.Valid {
-				r.TenantID = new(int64)
-				*r.TenantID = value.Int64
+				r.TenantID = value.Int64
 			}
 		case role.FieldIsSystem:
 			if value, ok := values[i].(*sql.NullBool); !ok {
@@ -185,10 +184,8 @@ func (r *Role) String() string {
 	builder.WriteString("description=")
 	builder.WriteString(r.Description)
 	builder.WriteString(", ")
-	if v := r.TenantID; v != nil {
-		builder.WriteString("tenant_id=")
-		builder.WriteString(fmt.Sprintf("%v", *v))
-	}
+	builder.WriteString("tenant_id=")
+	builder.WriteString(fmt.Sprintf("%v", r.TenantID))
 	builder.WriteString(", ")
 	builder.WriteString("is_system=")
 	builder.WriteString(fmt.Sprintf("%v", r.IsSystem))

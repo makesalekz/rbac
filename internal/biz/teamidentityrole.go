@@ -24,12 +24,34 @@ type TeamIdentityUsecase struct {
 	teamRepo  data.TeamsRepo
 }
 
-func (u *TeamIdentityUsecase) AssignRole(ctx context.Context, dto data.AssignRoleDto) (*ent.TeamIdentityRole, error) {
-	assignedRole, err := u.repo.AssignRole(ctx, dto)
+func (u *TeamIdentityUsecase) AssignRole(ctx context.Context, dto data.AssignRoleDto) error {
+	_, err := u.roleRepo.GetRoleById(ctx, dto.TenantId, dto.RoleId)
 	if err != nil {
-		return nil, v1.ErrorDatabaseQuery("assign role failed: %v", err)
+		if ent.IsNotFound(err) {
+			return v1.ErrorNotFound("role not found")
+		}
+		return v1.ErrorDatabaseQuery("get role failed: %v", err)
 	}
-	return assignedRole, nil
+
+	if dto.TeamId != 0 {
+		_, err = u.teamRepo.GetTeam(ctx, dto.TenantId, dto.TeamId, false)
+		if err != nil {
+			if ent.IsNotFound(err) {
+				return v1.ErrorNotFound("team not found")
+			}
+			return v1.ErrorDatabaseQuery("get team failed: %v", err)
+		}
+	}
+
+	err = u.repo.AssignRole(ctx, dto)
+	if err != nil {
+		if ent.IsConstraintError(err) {
+			return v1.ErrorAlreadyExists("role already assigned")
+		}
+		return v1.ErrorDatabaseQuery("assign role failed: %v", err)
+	}
+
+	return nil
 }
 
 func (u *TeamIdentityUsecase) DeleteIdentityRole(ctx context.Context, tenantId, assignId int64) error {
@@ -61,10 +83,20 @@ func (u *TeamIdentityUsecase) CheckPermissions(ctx context.Context, teamId int64
 		return nil, v1.ErrorUnauthorized("invalid token")
 	}
 
+	var teamsIds []int64
+	if teamId != 0 {
+		team, err := u.teamRepo.GetTeam(ctx, claims.GetTenantId(), teamId, false)
+		if err != nil {
+			return nil, err
+		}
+		team.ParentsIds.AssignTo(&teamsIds)
+		teamsIds = append(teamsIds, team.ID)
+	}
+
 	assignedRoles, err := u.repo.ListRoles(ctx, data.ListRolesDto{
-		TeamId:      teamId,
 		TenantId:    claims.GetTenantId(),
 		IdentityIDs: claims.GetIdentities(),
+		TeamsIDs:    teamsIds,
 	})
 	if err != nil {
 		return nil, err

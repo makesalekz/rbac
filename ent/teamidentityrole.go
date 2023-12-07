@@ -21,7 +21,7 @@ type TeamIdentityRole struct {
 	// TenantID holds the value of the "tenant_id" field.
 	TenantID int64 `json:"tenant_id,omitempty"`
 	// TeamID holds the value of the "team_id" field.
-	TeamID int64 `json:"team_id,omitempty"`
+	TeamID *int64 `json:"team_id,omitempty"`
 	// IdentityID holds the value of the "identity_id" field.
 	IdentityID string `json:"identity_id,omitempty"`
 	// RoleID holds the value of the "role_id" field.
@@ -109,7 +109,8 @@ func (tir *TeamIdentityRole) assignValues(columns []string, values []any) error 
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field team_id", values[i])
 			} else if value.Valid {
-				tir.TeamID = value.Int64
+				tir.TeamID = new(int64)
+				*tir.TeamID = value.Int64
 			}
 		case teamidentityrole.FieldIdentityID:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -172,8 +173,10 @@ func (tir *TeamIdentityRole) String() string {
 	builder.WriteString("tenant_id=")
 	builder.WriteString(fmt.Sprintf("%v", tir.TenantID))
 	builder.WriteString(", ")
-	builder.WriteString("team_id=")
-	builder.WriteString(fmt.Sprintf("%v", tir.TeamID))
+	if v := tir.TeamID; v != nil {
+		builder.WriteString("team_id=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
 	builder.WriteString(", ")
 	builder.WriteString("identity_id=")
 	builder.WriteString(tir.IdentityID)

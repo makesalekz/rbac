@@ -13,34 +13,34 @@ option java_package = "rbac.v1";
 service Teams {
   rpc CreateTeam (CreateTeamRequest) returns (TeamReply) {
     option (google.api.http) = {
-      post: "/v1/teams"
+      post: "/v1/rbac/teams"
       body: "*"
     };
   };
   rpc UpdateTeam (UpdateTeamRequest) returns (TeamReply) {
     option (google.api.http) = {
-      put: "/v1/teams/{teamId}"
+      put: "/v1/rbac/teams/{teamId}"
       body: "*"
     };
   };
   rpc DeleteTeam (TeamRequest) returns (utils.v1.EmptyReply) {
     option (google.api.http) = {
-      delete: "/v1/teams/{teamId}"
+      delete: "/v1/rbac/teams/{teamId}"
     };
   };
   rpc GetTeam (TeamRequest) returns (TeamReply) {
     option (google.api.http) = {
-      get: "/v1/teams/{teamId}"
+      get: "/v1/rbac/teams/{teamId}"
     };
   };
   rpc GetTeamTree (TeamRequest) returns (TeamReply) {
     option (google.api.http) = {
-      get: "/v1/teams/{teamId}/tree"
+      get: "/v1/rbac/teams/{teamId}/tree"
     };
   };
   rpc ListTeams (ListTeamsRequest) returns (ListTeamsReply) {
     option (google.api.http) = {
-      post: "/v1/teams/list"
+      post: "/v1/rbac/teams/list"
       body: "*"
     };
   };

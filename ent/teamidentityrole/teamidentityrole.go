@@ -62,8 +62,6 @@ func ValidColumn(column string) bool {
 }
 
 var (
-	// DefaultTeamID holds the default value on creation for the "team_id" field.
-	DefaultTeamID int64
 	// DefaultIdentityID holds the default value on creation for the "identity_id" field.
 	DefaultIdentityID string
 )
