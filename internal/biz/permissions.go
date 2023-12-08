@@ -98,12 +98,17 @@ func (uc *PermissionsUsecase) GetGroupedPermissions(ctx context.Context, filter 
 			excludePermissions[permission.PermissionID] = true
 		}
 
-		// filter denied permissions
-		for _, group := range groups {
+		// filter denied permissions & empty groups
+		for k := len(groups) - 1; k >= 0; k-- {
+			group := groups[k]
 			for i := len(group.Edges.Permissions) - 1; i >= 0; i-- {
 				if _, ok := excludePermissions[group.Edges.Permissions[i].ID]; ok {
 					group.Edges.Permissions = append(group.Edges.Permissions[:i], group.Edges.Permissions[i+1:]...)
 				}
+			}
+
+			if len(group.Edges.Permissions) == 0 {
+				groups = append(groups[:k], groups[k+1:]...)
 			}
 		}
 	}
