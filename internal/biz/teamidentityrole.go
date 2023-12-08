@@ -83,8 +83,6 @@ func (u *TeamIdentityUsecase) CheckPermissions(ctx context.Context, teamId int64
 		return nil, v1.ErrorUnauthorized("invalid token")
 	}
 
-	u.log.Debugf("check permissions: %+v", claims)
-
 	var teamsIds []int64
 	if teamId != 0 {
 		team, err := u.teamRepo.GetTeam(ctx, claims.GetTenantId(), teamId, false)
@@ -109,7 +107,11 @@ func (u *TeamIdentityUsecase) CheckPermissions(ctx context.Context, teamId int64
 		rolesIds[i] = assignedRole.RoleID
 	}
 
-	rolesPermissions, err := u.roleRepo.ListRolesPermissions(ctx, rolesIds, claims.GetTenantId(), permissions)
+	rolesPermissions, err := u.roleRepo.ListRolesPermissions(ctx, data.FilterRolePermissions{
+		TenantId:    claims.GetTenantId(),
+		RolesIds:    rolesIds,
+		Permissions: permissions,
+	})
 	if err != nil {
 		return nil, err
 	}

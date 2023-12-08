@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/go-kratos/kratos/v2/log"
+	rbac_v1 "gitlab.calendaria.team/services/rbac/api/rbac/v1"
 	"gitlab.calendaria.team/services/rbac/ent"
 	"gitlab.calendaria.team/services/rbac/internal/data"
 	"gitlab.calendaria.team/services/utils/v1/jwt"
@@ -14,14 +15,24 @@ type PermissionsUsecase struct {
 	log            *log.Helper
 	jwt            *jwt.JwtProcessor
 	permissionRepo data.PermissionRepo
+	roleRepo       data.RoleRepo
+	assignedRepo   data.TeamIdentityRoleRepo
 }
 
 // NewPermissionUsecase .
-func NewPermissionUsecase(logger log.Logger, jwt *jwt.JwtProcessor, permissionRepo data.PermissionRepo) (*PermissionsUsecase, error) {
+func NewPermissionUsecase(
+	logger log.Logger,
+	jwt *jwt.JwtProcessor,
+	permissionRepo data.PermissionRepo,
+	roleRepo data.RoleRepo,
+	assignedRepo data.TeamIdentityRoleRepo,
+) (*PermissionsUsecase, error) {
 	return &PermissionsUsecase{
 		log:            log.NewHelper(logger),
 		jwt:            jwt,
 		permissionRepo: permissionRepo,
+		roleRepo:       roleRepo,
+		assignedRepo:   assignedRepo,
 	}, nil
 }
 
@@ -45,6 +56,57 @@ func (uc *PermissionsUsecase) GetPermissions(ctx context.Context, appId string, 
 	return uc.permissionRepo.GetPermissions(ctx, appId, permissionIds)
 }
 
-func (uc *PermissionsUsecase) GetGroupedPermissions(ctx context.Context, appId string) ([]*ent.PermissionGroup, error) {
-	return uc.permissionRepo.GetGroupedPermissions(ctx, appId)
+func (uc *PermissionsUsecase) GetGroupedPermissions(ctx context.Context, filter data.FilterPermissions) ([]*ent.PermissionGroup, error) {
+	groups, err := uc.permissionRepo.GetGroupedPermissions(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+
+	if !filter.WithDenied {
+		// filter permissions, that denied for the user
+		claims, ok := uc.jwt.GetClaimsFromContext(ctx)
+		if !ok || !claims.IsUserTenantRequest() {
+			return nil, rbac_v1.ErrorUnauthorized("invalid token")
+		}
+
+		assignedRoles, err := uc.assignedRepo.ListRoles(ctx, data.ListRolesDto{
+			TenantId:    claims.GetTenantId(),
+			IdentityIDs: claims.GetIdentities(),
+		})
+		if err != nil {
+			return nil, err
+		}
+
+		rolesIds := make([]int64, len(assignedRoles))
+		for i, assignedRole := range assignedRoles {
+			rolesIds[i] = assignedRole.RoleID
+		}
+
+		permissions, err := uc.roleRepo.ListRolesPermissions(ctx, data.FilterRolePermissions{
+			TenantId:   claims.GetTenantId(),
+			RolesIds:   rolesIds,
+			DeniedOnly: true,
+		})
+		if err != nil {
+			return nil, err
+		}
+
+		uc.log.Debugf("denied permissions: %+v", permissions)
+
+		excludePermissions := make(map[string]bool)
+		for _, permission := range permissions {
+			excludePermissions[permission.PermissionID] = true
+		}
+
+		// filter denied permissions
+		for _, group := range groups {
+			for i := len(group.Edges.Permissions) - 1; i >= 0; i-- {
+				if _, ok := excludePermissions[group.Edges.Permissions[i].ID]; ok {
+					group.Edges.Permissions = append(group.Edges.Permissions[:i], group.Edges.Permissions[i+1:]...)
+				}
+			}
+		}
+	}
+
+	return groups, nil
 }

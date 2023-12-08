@@ -24,6 +24,13 @@ type CreateRolePermissionDto struct {
 	Fields []string
 }
 
+type FilterRolePermissions struct {
+	TenantId    int64
+	RolesIds    []int64
+	Permissions []string
+	DeniedOnly  bool
+}
+
 // RoleRepo
 type RoleRepo interface {
 	CreateRole(ctx context.Context, roleDto CreateRoleDto) (*ent.Role, error)
@@ -34,7 +41,7 @@ type RoleRepo interface {
 	AddPermissionToRole(ctx context.Context, role *ent.Role, permission *ent.Permission, dto CreateRolePermissionDto) (*ent.RolePermission, error)
 	RemovePermissionFromRole(ctx context.Context, role *ent.Role, permission *ent.Permission) error
 	ListRolePermissions(ctx context.Context, role *ent.Role) ([]*ent.RolePermission, error)
-	ListRolesPermissions(ctx context.Context, roleId []int64, tenantId int64, permissions []string) ([]*ent.RolePermission, error)
+	ListRolesPermissions(ctx context.Context, filter FilterRolePermissions) ([]*ent.RolePermission, error)
 }
 
 type roleRepo struct {
@@ -113,16 +120,20 @@ func (r *roleRepo) ListRolePermissions(ctx context.Context, role *ent.Role) ([]*
 		All(ctx)
 }
 
-func (r *roleRepo) ListRolesPermissions(ctx context.Context, roleIds []int64, tenantId int64, permissions []string) ([]*ent.RolePermission, error) {
+func (r *roleRepo) ListRolesPermissions(ctx context.Context, filter FilterRolePermissions) ([]*ent.RolePermission, error) {
 	query := r.db.RolePermission.
 		Query().
 		Where(
-			rolepermission.RoleIDIn(roleIds...),
-			rolepermission.TenantIDIn(tenantId, 0),
+			rolepermission.RoleIDIn(filter.RolesIds...),
+			rolepermission.TenantIDIn(filter.TenantId, 0),
 		)
 
-	if len(permissions) != 0 {
-		query.Where(rolepermission.PermissionIDIn(permissions...))
+	if len(filter.Permissions) != 0 {
+		query.Where(rolepermission.PermissionIDIn(filter.Permissions...))
+	}
+
+	if filter.DeniedOnly {
+		query.Where(rolepermission.Deny(true))
 	}
 
 	return query.All(ctx)

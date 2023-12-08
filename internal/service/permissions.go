@@ -113,7 +113,9 @@ func (s *PermissionsService) ListPermissions(ctx context.Context, req *v1.ListPe
 		return nil, v1.ErrorForbidden("has no permission")
 	}
 
-	groups, err := s.uc.GetGroupedPermissions(ctx, req.GetAppId())
+	groups, err := s.uc.GetGroupedPermissions(ctx, data.FilterPermissions{
+		AppsIds: req.AppsIds,
+	})
 	if err != nil {
 		return nil, err
 	}
