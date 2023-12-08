@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"gitlab.calendaria.team/services/rbac/ent/permission"
+	"gitlab.calendaria.team/services/rbac/ent/permissiongroup"
 	"gitlab.calendaria.team/services/rbac/ent/rolepermission"
 )
 
@@ -21,6 +22,12 @@ type PermissionCreate struct {
 	mutation *PermissionMutation
 	hooks    []Hook
 	conflict []sql.ConflictOption
+}
+
+// SetGroupID sets the "group_id" field.
+func (pc *PermissionCreate) SetGroupID(s string) *PermissionCreate {
+	pc.mutation.SetGroupID(s)
+	return pc
 }
 
 // SetName sets the "name" field.
@@ -76,6 +83,11 @@ func (pc *PermissionCreate) AddRoles(r ...*RolePermission) *PermissionCreate {
 	return pc.AddRoleIDs(ids...)
 }
 
+// SetGroup sets the "group" edge to the PermissionGroup entity.
+func (pc *PermissionCreate) SetGroup(p *PermissionGroup) *PermissionCreate {
+	return pc.SetGroupID(p.ID)
+}
+
 // Mutation returns the PermissionMutation object of the builder.
 func (pc *PermissionCreate) Mutation() *PermissionMutation {
 	return pc.mutation
@@ -123,6 +135,9 @@ func (pc *PermissionCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (pc *PermissionCreate) check() error {
+	if _, ok := pc.mutation.GroupID(); !ok {
+		return &ValidationError{Name: "group_id", err: errors.New(`ent: missing required field "Permission.group_id"`)}
+	}
 	if _, ok := pc.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "Permission.name"`)}
 	}
@@ -138,6 +153,9 @@ func (pc *PermissionCreate) check() error {
 		if err := permission.AppIDValidator(v); err != nil {
 			return &ValidationError{Name: "app_id", err: fmt.Errorf(`ent: validator failed for field "Permission.app_id": %w`, err)}
 		}
+	}
+	if _, ok := pc.mutation.GroupID(); !ok {
+		return &ValidationError{Name: "group", err: errors.New(`ent: missing required edge "Permission.group"`)}
 	}
 	return nil
 }
@@ -207,6 +225,23 @@ func (pc *PermissionCreate) createSpec() (*Permission, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
+	if nodes := pc.mutation.GroupIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   permission.GroupTable,
+			Columns: []string{permission.GroupColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(permissiongroup.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.GroupID = nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
 	return _node, _spec
 }
 
@@ -214,7 +249,7 @@ func (pc *PermissionCreate) createSpec() (*Permission, *sqlgraph.CreateSpec) {
 // of the `INSERT` statement. For example:
 //
 //	client.Permission.Create().
-//		SetName(v).
+//		SetGroupID(v).
 //		OnConflict(
 //			// Update the row with the new values
 //			// the was proposed for insertion.
@@ -223,7 +258,7 @@ func (pc *PermissionCreate) createSpec() (*Permission, *sqlgraph.CreateSpec) {
 //		// Override some of the fields with custom
 //		// update values.
 //		Update(func(u *ent.PermissionUpsert) {
-//			SetName(v+v).
+//			SetGroupID(v+v).
 //		}).
 //		Exec(ctx)
 func (pc *PermissionCreate) OnConflict(opts ...sql.ConflictOption) *PermissionUpsertOne {
@@ -323,6 +358,9 @@ func (u *PermissionUpsertOne) UpdateNewValues() *PermissionUpsertOne {
 	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
 		if _, exists := u.create.mutation.ID(); exists {
 			s.SetIgnore(permission.FieldID)
+		}
+		if _, exists := u.create.mutation.GroupID(); exists {
+			s.SetIgnore(permission.FieldGroupID)
 		}
 		if _, exists := u.create.mutation.AppID(); exists {
 			s.SetIgnore(permission.FieldAppID)
@@ -550,7 +588,7 @@ func (pcb *PermissionCreateBulk) ExecX(ctx context.Context) {
 //		// Override some of the fields with custom
 //		// update values.
 //		Update(func(u *ent.PermissionUpsert) {
-//			SetName(v+v).
+//			SetGroupID(v+v).
 //		}).
 //		Exec(ctx)
 func (pcb *PermissionCreateBulk) OnConflict(opts ...sql.ConflictOption) *PermissionUpsertBulk {
@@ -596,6 +634,9 @@ func (u *PermissionUpsertBulk) UpdateNewValues() *PermissionUpsertBulk {
 		for _, b := range u.create.builders {
 			if _, exists := b.mutation.ID(); exists {
 				s.SetIgnore(permission.FieldID)
+			}
+			if _, exists := b.mutation.GroupID(); exists {
+				s.SetIgnore(permission.FieldGroupID)
 			}
 			if _, exists := b.mutation.AppID(); exists {
 				s.SetIgnore(permission.FieldAppID)

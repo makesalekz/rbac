@@ -15,6 +15,7 @@ type Permission struct {
 func (Permission) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("id").Immutable(),
+		field.String("group_id").Immutable(),
 		field.String("name").MaxLen(32).NotEmpty(),
 		field.String("description").Optional().Default(""),
 		field.String("app_id").MaxLen(10).Immutable(),
@@ -26,5 +27,11 @@ func (Permission) Fields() []ent.Field {
 func (Permission) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("roles", RolePermission.Type),
+		edge.From("group", PermissionGroup.Type).
+			Ref("permissions").
+			Immutable().
+			Required().
+			Unique().
+			Field("group_id"),
 	}
 }

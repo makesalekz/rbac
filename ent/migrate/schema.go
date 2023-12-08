@@ -16,12 +16,33 @@ var (
 		{Name: "description", Type: field.TypeString, Nullable: true, Default: ""},
 		{Name: "app_id", Type: field.TypeString, Size: 10},
 		{Name: "fields", Type: field.TypeJSON, Nullable: true},
+		{Name: "group_id", Type: field.TypeString},
 	}
 	// PermissionsTable holds the schema information for the "permissions" table.
 	PermissionsTable = &schema.Table{
 		Name:       "permissions",
 		Columns:    PermissionsColumns,
 		PrimaryKey: []*schema.Column{PermissionsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "permissions_permission_groups_permissions",
+				Columns:    []*schema.Column{PermissionsColumns[5]},
+				RefColumns: []*schema.Column{PermissionGroupsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+	}
+	// PermissionGroupsColumns holds the columns for the "permission_groups" table.
+	PermissionGroupsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString},
+		{Name: "app_id", Type: field.TypeString, Size: 10},
+		{Name: "name", Type: field.TypeString, Size: 16},
+	}
+	// PermissionGroupsTable holds the schema information for the "permission_groups" table.
+	PermissionGroupsTable = &schema.Table{
+		Name:       "permission_groups",
+		Columns:    PermissionGroupsColumns,
+		PrimaryKey: []*schema.Column{PermissionGroupsColumns[0]},
 	}
 	// RolesColumns holds the columns for the "roles" table.
 	RolesColumns = []*schema.Column{
@@ -151,6 +172,7 @@ var (
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		PermissionsTable,
+		PermissionGroupsTable,
 		RolesTable,
 		RolePermissionsTable,
 		TeamsTable,
@@ -159,6 +181,7 @@ var (
 )
 
 func init() {
+	PermissionsTable.ForeignKeys[0].RefTable = PermissionGroupsTable
 	RolePermissionsTable.ForeignKeys[0].RefTable = PermissionsTable
 	RolePermissionsTable.ForeignKeys[1].RefTable = RolesTable
 	TeamsTable.ForeignKeys[0].RefTable = TeamsTable

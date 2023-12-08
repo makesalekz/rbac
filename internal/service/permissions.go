@@ -14,16 +14,24 @@ type PermissionsService struct {
 	v1.UnimplementedPermissionsServer
 
 	uc *biz.PermissionsUsecase
+	au *biz.TeamIdentityUsecase
 }
 
-func NewPermissionsService(uc *biz.PermissionsUsecase) *PermissionsService {
+func NewPermissionsService(uc *biz.PermissionsUsecase, au *biz.TeamIdentityUsecase) *PermissionsService {
 	return &PermissionsService{
 		uc: uc,
+		au: au,
 	}
 }
 
 func (s *PermissionsService) CreatePermission(ctx context.Context, req *v1.CreatePermissionRequest) (*v1.PermissionReply, error) {
-	// TODO check admin permissions
+	fields, err := s.au.HasPermission(ctx, "admin.permission.create")
+	if err != nil {
+		return nil, err
+	}
+	if fields == nil {
+		return nil, v1.ErrorForbidden("has no permission")
+	}
 
 	permission, err := s.uc.CreatePermission(ctx, data.CreatePermissionDto{
 		Id:          req.Id,
@@ -35,11 +43,19 @@ func (s *PermissionsService) CreatePermission(ctx context.Context, req *v1.Creat
 	if err != nil {
 		return nil, v1.ErrorDatabaseQuery(err.Error())
 	}
-	return s.permissionReply(permission), nil
+	return &v1.PermissionReply{
+		Permission: s.permissionReply(permission),
+	}, nil
 }
 
 func (s *PermissionsService) UpdatePermission(ctx context.Context, req *v1.UpdatePermissionRequest) (*v1.PermissionReply, error) {
-	// TODO check admin permissions
+	fields, err := s.au.HasPermission(ctx, "admin.permission.update")
+	if err != nil {
+		return nil, err
+	}
+	if fields == nil {
+		return nil, v1.ErrorForbidden("has no permission")
+	}
 
 	permission, err := s.uc.UpdatePermission(ctx, req.PermissionId, data.UpdatePermissionDto{
 		Name:        req.Name,
@@ -49,13 +65,21 @@ func (s *PermissionsService) UpdatePermission(ctx context.Context, req *v1.Updat
 	if err != nil {
 		return nil, err
 	}
-	return s.permissionReply(permission), nil
+	return &v1.PermissionReply{
+		Permission: s.permissionReply(permission),
+	}, nil
 }
 
 func (s *PermissionsService) DeletePermission(ctx context.Context, req *v1.DeletePermissionRequest) (*utils_v1.EmptyReply, error) {
-	// TODO check admin permissions
+	fields, err := s.au.HasPermission(ctx, "admin.permission.delete")
+	if err != nil {
+		return nil, err
+	}
+	if fields == nil {
+		return nil, v1.ErrorForbidden("has no permission")
+	}
 
-	err := s.uc.DeletePermission(ctx, req.PermissionId)
+	err = s.uc.DeletePermission(ctx, req.PermissionId)
 	if err != nil {
 		return nil, err
 	}
@@ -63,38 +87,67 @@ func (s *PermissionsService) DeletePermission(ctx context.Context, req *v1.Delet
 }
 
 func (s *PermissionsService) GetPermission(ctx context.Context, req *v1.GetPermissionRequest) (*v1.PermissionReply, error) {
-	// TODO check admin permissions
+	fields, err := s.au.HasPermission(ctx, "admin.permission.read")
+	if err != nil {
+		return nil, err
+	}
+	if fields == nil {
+		return nil, v1.ErrorForbidden("has no permission")
+	}
 
 	permission, err := s.uc.GetPermissionById(ctx, req.PermissionId)
 	if err != nil {
 		return nil, err
 	}
-	return s.permissionReply(permission), nil
+	return &v1.PermissionReply{
+		Permission: s.permissionReply(permission),
+	}, nil
 }
 
 func (s *PermissionsService) ListPermissions(ctx context.Context, req *v1.ListPermissionsRequest) (*v1.ListPermissionsReply, error) {
-	// TODO check admin permissions
+	fields, err := s.au.HasPermission(ctx, "admin.permission.read")
+	if err != nil {
+		return nil, err
+	}
+	if fields == nil {
+		return nil, v1.ErrorForbidden("has no permission")
+	}
 
-	permissions, err := s.uc.GetPermissions(ctx, req.AppId, req.Ids)
+	groups, err := s.uc.GetGroupedPermissions(ctx, req.GetAppId())
 	if err != nil {
 		return nil, err
 	}
 
-	permissionsReply := make([]*v1.PermissionReply, len(permissions))
-	for i, permission := range permissions {
-		permissionsReply[i] = s.permissionReply(permission)
+	groupsReply := make([]*v1.Group, len(groups))
+	for i, group := range groups {
+		groupsReply[i] = s.groupReply(group)
 	}
+
 	return &v1.ListPermissionsReply{
-		Permissions: permissionsReply,
+		Groups: groupsReply,
 	}, nil
 }
 
-func (s *PermissionsService) permissionReply(permission *ent.Permission) *v1.PermissionReply {
-	return &v1.PermissionReply{
+func (s *PermissionsService) permissionReply(permission *ent.Permission) *v1.Permission {
+	return &v1.Permission{
 		Id:          permission.ID,
 		AppId:       permission.AppID,
 		Name:        permission.Name,
 		Description: permission.Description,
 		Fields:      permission.Fields,
+	}
+}
+
+func (s *PermissionsService) groupReply(group *ent.PermissionGroup) *v1.Group {
+	permissions := make([]*v1.Permission, len(group.Edges.Permissions))
+	for i, permission := range group.Edges.Permissions {
+		permissions[i] = s.permissionReply(permission)
+	}
+
+	return &v1.Group{
+		Id:          group.ID,
+		AppId:       group.AppID,
+		Name:        group.Name,
+		Permissions: permissions,
 	}
 }

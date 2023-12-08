@@ -5,6 +5,7 @@ import (
 
 	"gitlab.calendaria.team/services/rbac/ent"
 	"gitlab.calendaria.team/services/rbac/ent/permission"
+	"gitlab.calendaria.team/services/rbac/ent/permissiongroup"
 )
 
 type UpdatePermissionDto struct {
@@ -17,6 +18,7 @@ type CreatePermissionDto struct {
 	Id          string
 	Name        string
 	Description string
+	GroupId     string
 	AppId       string
 	Fields      []string
 }
@@ -29,6 +31,7 @@ type PermissionRepo interface {
 	GetPermissionById(ctx context.Context, id string) (*ent.Permission, error)
 	GetPermissionsByIds(ctx context.Context, ids []string) ([]*ent.Permission, error)
 	GetPermissions(ctx context.Context, appId string, ids []string) ([]*ent.Permission, error)
+	GetGroupedPermissions(ctx context.Context, appId string) ([]*ent.PermissionGroup, error)
 }
 
 type permissionRepo struct {
@@ -38,6 +41,7 @@ type permissionRepo struct {
 func (p *permissionRepo) CreatePermission(ctx context.Context, createPermissionDto CreatePermissionDto) (*ent.Permission, error) {
 	return p.db.Permission.Create().
 		SetID(createPermissionDto.Id).
+		SetGroupID(createPermissionDto.GroupId).
 		SetName(createPermissionDto.Name).
 		SetDescription(createPermissionDto.Description).
 		SetAppID(createPermissionDto.AppId).
@@ -51,16 +55,18 @@ func (p *permissionRepo) UpdatePermission(ctx context.Context, id string, data U
 	if err != nil {
 		return nil, err
 	}
+
 	query := permission.Update()
-	if data.Name != "" {
+	if data.Name != permission.Name {
 		query.SetName(data.Name)
 	}
-	if data.Description != "" {
+	if data.Description != permission.Description {
 		query.SetDescription(data.Description)
 	}
-	if data.Fields != nil {
+	if len(data.Fields) > 0 {
 		query.SetFields(data.Fields)
 	}
+
 	return query.Save(ctx)
 }
 
@@ -86,6 +92,13 @@ func (p *permissionRepo) GetPermissions(ctx context.Context, appId string, ids [
 		query.Where(permission.IDIn(ids...))
 	}
 	return query.All(ctx)
+}
+
+func (p *permissionRepo) GetGroupedPermissions(ctx context.Context, appId string) ([]*ent.PermissionGroup, error) {
+	return p.db.PermissionGroup.Query().
+		WithPermissions().
+		Where(permissiongroup.AppID(appId)).
+		All(ctx)
 }
 
 // NewPermissionRepo .

@@ -18,15 +18,23 @@ message Team {
 	repeated Team subs = 9;
 }
 
-message PermissionReply {
+message Group {
+	string id = 1;
+	string name = 2;
+	string appId = 3;
+	repeated Permission permissions = 4;
+}
+
+message Permission {
 	string id = 1;
 	string name = 2;
 	string description = 3;
 	string appId = 4;
-	repeated string fields = 5;
+	string groupId = 5;
+	repeated string fields = 6;
 }
 
-message RoleReply {
+message Role {
 	int64 id = 1;
 	string name = 2;
 	string description = 3;

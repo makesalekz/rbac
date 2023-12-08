@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"gitlab.calendaria.team/services/rbac/ent/permission"
+	"gitlab.calendaria.team/services/rbac/ent/permissiongroup"
 	"gitlab.calendaria.team/services/rbac/ent/role"
 	"gitlab.calendaria.team/services/rbac/ent/rolepermission"
 	"gitlab.calendaria.team/services/rbac/ent/schema"
@@ -20,7 +21,7 @@ func init() {
 	permissionFields := schema.Permission{}.Fields()
 	_ = permissionFields
 	// permissionDescName is the schema descriptor for name field.
-	permissionDescName := permissionFields[1].Descriptor()
+	permissionDescName := permissionFields[2].Descriptor()
 	// permission.NameValidator is a validator for the "name" field. It is called by the builders before save.
 	permission.NameValidator = func() func(string) error {
 		validators := permissionDescName.Validators
@@ -38,17 +39,41 @@ func init() {
 		}
 	}()
 	// permissionDescDescription is the schema descriptor for description field.
-	permissionDescDescription := permissionFields[2].Descriptor()
+	permissionDescDescription := permissionFields[3].Descriptor()
 	// permission.DefaultDescription holds the default value on creation for the description field.
 	permission.DefaultDescription = permissionDescDescription.Default.(string)
 	// permissionDescAppID is the schema descriptor for app_id field.
-	permissionDescAppID := permissionFields[3].Descriptor()
+	permissionDescAppID := permissionFields[4].Descriptor()
 	// permission.AppIDValidator is a validator for the "app_id" field. It is called by the builders before save.
 	permission.AppIDValidator = permissionDescAppID.Validators[0].(func(string) error)
 	// permissionDescFields is the schema descriptor for fields field.
-	permissionDescFields := permissionFields[4].Descriptor()
+	permissionDescFields := permissionFields[5].Descriptor()
 	// permission.DefaultFields holds the default value on creation for the fields field.
 	permission.DefaultFields = permissionDescFields.Default.([]string)
+	permissiongroupFields := schema.PermissionGroup{}.Fields()
+	_ = permissiongroupFields
+	// permissiongroupDescAppID is the schema descriptor for app_id field.
+	permissiongroupDescAppID := permissiongroupFields[1].Descriptor()
+	// permissiongroup.AppIDValidator is a validator for the "app_id" field. It is called by the builders before save.
+	permissiongroup.AppIDValidator = permissiongroupDescAppID.Validators[0].(func(string) error)
+	// permissiongroupDescName is the schema descriptor for name field.
+	permissiongroupDescName := permissiongroupFields[2].Descriptor()
+	// permissiongroup.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	permissiongroup.NameValidator = func() func(string) error {
+		validators := permissiongroupDescName.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(name string) error {
+			for _, fn := range fns {
+				if err := fn(name); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
 	roleMixin := schema.Role{}.Mixin()
 	roleMixinHooks0 := roleMixin[0].Hooks()
 	role.Hooks[0] = roleMixinHooks0[0]

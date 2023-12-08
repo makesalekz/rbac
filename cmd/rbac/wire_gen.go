@@ -58,7 +58,7 @@ func wireApp(bootstrap *conf.Bootstrap, logger log.Logger) (*kratos.App, func(),
 		return nil, nil, err
 	}
 	rolesService := service.NewRolesService(jwtProcessor, rolesUsecase, permissionsUsecase, teamIdentityUsecase)
-	permissionsService := service.NewPermissionsService(permissionsUsecase)
+	permissionsService := service.NewPermissionsService(permissionsUsecase, teamIdentityUsecase)
 	teamsUsecase, err := biz.NewTeamsUsecase(bootstrap, logger, configConfig, jwtProcessor, teamsRepo)
 	if err != nil {
 		cleanup()

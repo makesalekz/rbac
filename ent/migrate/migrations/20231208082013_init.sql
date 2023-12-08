@@ -9,6 +9,7 @@ ALTER SEQUENCE "roles_id_seq" RESTART WITH 1000;
 -- Create permissions for basic roles
 INSERT INTO "role_permissions" ("role_id", "permission_id", "deny", "fields") VALUES
 -- Tenant admin role
+  (1, 'admin.permission.read', FALSE, '[]'),
   (1, 'admin.role.create', FALSE, '[]'),
   (1, 'admin.role.read', FALSE, '[]'),
   (1, 'admin.role.update', FALSE, '[]'),
@@ -32,7 +33,6 @@ INSERT INTO "role_permissions" ("role_id", "permission_id", "deny", "fields") VA
 
 -- Basic plan limitations
   (2, 'admin.permission.create', TRUE, '[]'),
-  (2, 'admin.permission.read', TRUE, '[]'),
   (2, 'admin.permission.update', TRUE, '[]'),
   (2, 'admin.permission.delete', TRUE, '[]'),
   (2, 'admin.role_system.create', TRUE, '[]'),

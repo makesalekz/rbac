@@ -9,6 +9,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"gitlab.calendaria.team/services/rbac/ent"
 	"gitlab.calendaria.team/services/rbac/ent/permission"
+	"gitlab.calendaria.team/services/rbac/ent/permissiongroup"
 	"gitlab.calendaria.team/services/rbac/ent/predicate"
 	"gitlab.calendaria.team/services/rbac/ent/role"
 	"gitlab.calendaria.team/services/rbac/ent/rolepermission"
@@ -97,6 +98,33 @@ func (f TraversePermission) Traverse(ctx context.Context, q ent.Query) error {
 		return f(ctx, q)
 	}
 	return fmt.Errorf("unexpected query type %T. expect *ent.PermissionQuery", q)
+}
+
+// The PermissionGroupFunc type is an adapter to allow the use of ordinary function as a Querier.
+type PermissionGroupFunc func(context.Context, *ent.PermissionGroupQuery) (ent.Value, error)
+
+// Query calls f(ctx, q).
+func (f PermissionGroupFunc) Query(ctx context.Context, q ent.Query) (ent.Value, error) {
+	if q, ok := q.(*ent.PermissionGroupQuery); ok {
+		return f(ctx, q)
+	}
+	return nil, fmt.Errorf("unexpected query type %T. expect *ent.PermissionGroupQuery", q)
+}
+
+// The TraversePermissionGroup type is an adapter to allow the use of ordinary function as Traverser.
+type TraversePermissionGroup func(context.Context, *ent.PermissionGroupQuery) error
+
+// Intercept is a dummy implementation of Intercept that returns the next Querier in the pipeline.
+func (f TraversePermissionGroup) Intercept(next ent.Querier) ent.Querier {
+	return next
+}
+
+// Traverse calls f(ctx, q).
+func (f TraversePermissionGroup) Traverse(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.PermissionGroupQuery); ok {
+		return f(ctx, q)
+	}
+	return fmt.Errorf("unexpected query type %T. expect *ent.PermissionGroupQuery", q)
 }
 
 // The RoleFunc type is an adapter to allow the use of ordinary function as a Querier.
@@ -212,6 +240,8 @@ func NewQuery(q ent.Query) (Query, error) {
 	switch q := q.(type) {
 	case *ent.PermissionQuery:
 		return &query[*ent.PermissionQuery, predicate.Permission, permission.OrderOption]{typ: ent.TypePermission, tq: q}, nil
+	case *ent.PermissionGroupQuery:
+		return &query[*ent.PermissionGroupQuery, predicate.PermissionGroup, permissiongroup.OrderOption]{typ: ent.TypePermissionGroup, tq: q}, nil
 	case *ent.RoleQuery:
 		return &query[*ent.RoleQuery, predicate.Role, role.OrderOption]{typ: ent.TypeRole, tq: q}, nil
 	case *ent.RolePermissionQuery:

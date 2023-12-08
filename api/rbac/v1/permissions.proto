@@ -43,10 +43,15 @@ service Permissions {
 
 message CreatePermissionRequest {
 	string id = 1;
-	string appId = 2;
-	string name = 3;
-	string description = 4;
-	repeated string fields = 5;
+	string groupId = 2;
+	string appId = 3;
+	string name = 4;
+	string description = 5;
+	repeated string fields = 6;
+}
+
+message PermissionReply {
+	Permission permission = 1;
 }
 
 message UpdatePermissionRequest {
@@ -66,9 +71,8 @@ message GetPermissionRequest {
 
 message ListPermissionsRequest {
 	string appId = 1;
-	repeated string ids = 2;
 }
 
 message ListPermissionsReply {
-	repeated PermissionReply permissions = 1;
+	repeated Group groups = 1;
 }

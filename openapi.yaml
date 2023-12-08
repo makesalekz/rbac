@@ -477,7 +477,7 @@ components:
             type: object
             properties:
                 role:
-                    $ref: '#/components/schemas/rbac.v1.RoleReply'
+                    $ref: '#/components/schemas/rbac.v1.Role'
                 identityId:
                     type: string
                 team:
@@ -502,6 +502,8 @@ components:
             type: object
             properties:
                 id:
+                    type: string
+                groupId:
                     type: string
                 appId:
                     type: string
@@ -529,6 +531,19 @@ components:
                     type: string
                 parentId:
                     type: string
+        rbac.v1.Group:
+            type: object
+            properties:
+                id:
+                    type: string
+                name:
+                    type: string
+                appId:
+                    type: string
+                permissions:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/rbac.v1.Permission'
         rbac.v1.ListAssignsReply:
             type: object
             properties:
@@ -553,26 +568,22 @@ components:
         rbac.v1.ListPermissionsReply:
             type: object
             properties:
-                permissions:
+                groups:
                     type: array
                     items:
-                        $ref: '#/components/schemas/rbac.v1.PermissionReply'
+                        $ref: '#/components/schemas/rbac.v1.Group'
         rbac.v1.ListPermissionsRequest:
             type: object
             properties:
                 appId:
                     type: string
-                ids:
-                    type: array
-                    items:
-                        type: string
         rbac.v1.ListRolesReply:
             type: object
             properties:
                 roles:
                     type: array
                     items:
-                        $ref: '#/components/schemas/rbac.v1.RoleReply'
+                        $ref: '#/components/schemas/rbac.v1.Role'
         rbac.v1.ListRolesRequest:
             type: object
             properties:
@@ -594,7 +605,7 @@ components:
                     type: string
                 paginate:
                     $ref: '#/components/schemas/utils.v1.PaginateRequest'
-        rbac.v1.PermissionReply:
+        rbac.v1.Permission:
             type: object
             properties:
                 id:
@@ -605,24 +616,18 @@ components:
                     type: string
                 appId:
                     type: string
+                groupId:
+                    type: string
                 fields:
                     type: array
                     items:
                         type: string
-        rbac.v1.RolePermissionReply:
+        rbac.v1.PermissionReply:
             type: object
             properties:
-                role:
-                    $ref: '#/components/schemas/rbac.v1.RoleReply'
                 permission:
-                    $ref: '#/components/schemas/rbac.v1.PermissionReply'
-                deny:
-                    type: boolean
-                fields:
-                    type: array
-                    items:
-                        type: string
-        rbac.v1.RoleReply:
+                    $ref: '#/components/schemas/rbac.v1.Permission'
+        rbac.v1.Role:
             type: object
             properties:
                 id:
@@ -639,6 +644,24 @@ components:
                     type: string
                 deletedAt:
                     type: string
+        rbac.v1.RolePermissionReply:
+            type: object
+            properties:
+                role:
+                    $ref: '#/components/schemas/rbac.v1.Role'
+                permission:
+                    $ref: '#/components/schemas/rbac.v1.Permission'
+                deny:
+                    type: boolean
+                fields:
+                    type: array
+                    items:
+                        type: string
+        rbac.v1.RoleReply:
+            type: object
+            properties:
+                role:
+                    $ref: '#/components/schemas/rbac.v1.Role'
         rbac.v1.RolesPermissionsReply:
             type: object
             properties:
