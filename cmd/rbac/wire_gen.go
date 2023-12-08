@@ -45,12 +45,12 @@ func wireApp(bootstrap *conf.Bootstrap, logger log.Logger) (*kratos.App, func(),
 		return nil, nil, err
 	}
 	permissionRepo := data.NewPermissionRepo(dataData)
-	permissionsUsecase, err := biz.NewPermissionUsecase(logger, jwtProcessor, permissionRepo)
+	teamIdentityRoleRepo := data.NewTeamIdentityRoleRepo(dataData)
+	permissionsUsecase, err := biz.NewPermissionUsecase(logger, jwtProcessor, permissionRepo, roleRepo, teamIdentityRoleRepo)
 	if err != nil {
 		cleanup()
 		return nil, nil, err
 	}
-	teamIdentityRoleRepo := data.NewTeamIdentityRoleRepo(dataData)
 	teamsRepo := data.NewTeamsRepo(dataData)
 	teamIdentityUsecase, err := biz.NewTeamIdentityUsecase(bootstrap, logger, configConfig, jwtProcessor, teamIdentityRoleRepo, roleRepo, teamsRepo)
 	if err != nil {

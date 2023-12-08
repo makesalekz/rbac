@@ -23,6 +23,11 @@ type CreatePermissionDto struct {
 	Fields      []string
 }
 
+type FilterPermissions struct {
+	AppsIds    []string
+	WithDenied bool
+}
+
 // PermissionRepo
 type PermissionRepo interface {
 	CreatePermission(ctx context.Context, createPermissionDto CreatePermissionDto) (*ent.Permission, error)
@@ -31,7 +36,7 @@ type PermissionRepo interface {
 	GetPermissionById(ctx context.Context, id string) (*ent.Permission, error)
 	GetPermissionsByIds(ctx context.Context, ids []string) ([]*ent.Permission, error)
 	GetPermissions(ctx context.Context, appId string, ids []string) ([]*ent.Permission, error)
-	GetGroupedPermissions(ctx context.Context, appId string) ([]*ent.PermissionGroup, error)
+	GetGroupedPermissions(ctx context.Context, filter FilterPermissions) ([]*ent.PermissionGroup, error)
 }
 
 type permissionRepo struct {
@@ -94,11 +99,14 @@ func (p *permissionRepo) GetPermissions(ctx context.Context, appId string, ids [
 	return query.All(ctx)
 }
 
-func (p *permissionRepo) GetGroupedPermissions(ctx context.Context, appId string) ([]*ent.PermissionGroup, error) {
-	return p.db.PermissionGroup.Query().
-		WithPermissions().
-		Where(permissiongroup.AppID(appId)).
-		All(ctx)
+func (p *permissionRepo) GetGroupedPermissions(ctx context.Context, filter FilterPermissions) ([]*ent.PermissionGroup, error) {
+	query := p.db.PermissionGroup.Query().WithPermissions()
+
+	if len(filter.AppsIds) > 0 {
+		query.Where(permissiongroup.AppIDIn(filter.AppsIds...))
+	}
+
+	return query.All(ctx)
 }
 
 // NewPermissionRepo .

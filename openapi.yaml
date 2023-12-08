@@ -575,8 +575,10 @@ components:
         rbac.v1.ListPermissionsRequest:
             type: object
             properties:
-                appId:
-                    type: string
+                appsIds:
+                    type: array
+                    items:
+                        type: string
         rbac.v1.ListRolesReply:
             type: object
             properties:
