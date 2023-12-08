@@ -83,6 +83,8 @@ func (u *TeamIdentityUsecase) CheckPermissions(ctx context.Context, teamId int64
 		return nil, v1.ErrorUnauthorized("invalid token")
 	}
 
+	u.log.Debugf("check permissions: %+v", claims)
+
 	var teamsIds []int64
 	if teamId != 0 {
 		team, err := u.teamRepo.GetTeam(ctx, claims.GetTenantId(), teamId, false)

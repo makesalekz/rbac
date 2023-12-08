@@ -63,6 +63,11 @@ func IDContainsFold(id string) predicate.Permission {
 	return predicate.Permission(sql.FieldContainsFold(FieldID, id))
 }
 
+// GroupID applies equality check predicate on the "group_id" field. It's identical to GroupIDEQ.
+func GroupID(v string) predicate.Permission {
+	return predicate.Permission(sql.FieldEQ(FieldGroupID, v))
+}
+
 // Name applies equality check predicate on the "name" field. It's identical to NameEQ.
 func Name(v string) predicate.Permission {
 	return predicate.Permission(sql.FieldEQ(FieldName, v))
@@ -76,6 +81,71 @@ func Description(v string) predicate.Permission {
 // AppID applies equality check predicate on the "app_id" field. It's identical to AppIDEQ.
 func AppID(v string) predicate.Permission {
 	return predicate.Permission(sql.FieldEQ(FieldAppID, v))
+}
+
+// GroupIDEQ applies the EQ predicate on the "group_id" field.
+func GroupIDEQ(v string) predicate.Permission {
+	return predicate.Permission(sql.FieldEQ(FieldGroupID, v))
+}
+
+// GroupIDNEQ applies the NEQ predicate on the "group_id" field.
+func GroupIDNEQ(v string) predicate.Permission {
+	return predicate.Permission(sql.FieldNEQ(FieldGroupID, v))
+}
+
+// GroupIDIn applies the In predicate on the "group_id" field.
+func GroupIDIn(vs ...string) predicate.Permission {
+	return predicate.Permission(sql.FieldIn(FieldGroupID, vs...))
+}
+
+// GroupIDNotIn applies the NotIn predicate on the "group_id" field.
+func GroupIDNotIn(vs ...string) predicate.Permission {
+	return predicate.Permission(sql.FieldNotIn(FieldGroupID, vs...))
+}
+
+// GroupIDGT applies the GT predicate on the "group_id" field.
+func GroupIDGT(v string) predicate.Permission {
+	return predicate.Permission(sql.FieldGT(FieldGroupID, v))
+}
+
+// GroupIDGTE applies the GTE predicate on the "group_id" field.
+func GroupIDGTE(v string) predicate.Permission {
+	return predicate.Permission(sql.FieldGTE(FieldGroupID, v))
+}
+
+// GroupIDLT applies the LT predicate on the "group_id" field.
+func GroupIDLT(v string) predicate.Permission {
+	return predicate.Permission(sql.FieldLT(FieldGroupID, v))
+}
+
+// GroupIDLTE applies the LTE predicate on the "group_id" field.
+func GroupIDLTE(v string) predicate.Permission {
+	return predicate.Permission(sql.FieldLTE(FieldGroupID, v))
+}
+
+// GroupIDContains applies the Contains predicate on the "group_id" field.
+func GroupIDContains(v string) predicate.Permission {
+	return predicate.Permission(sql.FieldContains(FieldGroupID, v))
+}
+
+// GroupIDHasPrefix applies the HasPrefix predicate on the "group_id" field.
+func GroupIDHasPrefix(v string) predicate.Permission {
+	return predicate.Permission(sql.FieldHasPrefix(FieldGroupID, v))
+}
+
+// GroupIDHasSuffix applies the HasSuffix predicate on the "group_id" field.
+func GroupIDHasSuffix(v string) predicate.Permission {
+	return predicate.Permission(sql.FieldHasSuffix(FieldGroupID, v))
+}
+
+// GroupIDEqualFold applies the EqualFold predicate on the "group_id" field.
+func GroupIDEqualFold(v string) predicate.Permission {
+	return predicate.Permission(sql.FieldEqualFold(FieldGroupID, v))
+}
+
+// GroupIDContainsFold applies the ContainsFold predicate on the "group_id" field.
+func GroupIDContainsFold(v string) predicate.Permission {
+	return predicate.Permission(sql.FieldContainsFold(FieldGroupID, v))
 }
 
 // NameEQ applies the EQ predicate on the "name" field.
@@ -308,6 +378,29 @@ func HasRoles() predicate.Permission {
 func HasRolesWith(preds ...predicate.RolePermission) predicate.Permission {
 	return predicate.Permission(func(s *sql.Selector) {
 		step := newRolesStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasGroup applies the HasEdge predicate on the "group" edge.
+func HasGroup() predicate.Permission {
+	return predicate.Permission(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, GroupTable, GroupColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasGroupWith applies the HasEdge predicate on the "group" edge with a given conditions (other predicates).
+func HasGroupWith(preds ...predicate.PermissionGroup) predicate.Permission {
+	return predicate.Permission(func(s *sql.Selector) {
+		step := newGroupStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

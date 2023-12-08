@@ -9,6 +9,9 @@ import (
 // Permission is the predicate function for permission builders.
 type Permission func(*sql.Selector)
 
+// PermissionGroup is the predicate function for permissiongroup builders.
+type PermissionGroup func(*sql.Selector)
+
 // Role is the predicate function for role builders.
 type Role func(*sql.Selector)
 

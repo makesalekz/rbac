@@ -10,6 +10,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"gitlab.calendaria.team/services/rbac/ent/permission"
+	"gitlab.calendaria.team/services/rbac/ent/permissiongroup"
 )
 
 // Permission is the model entity for the Permission schema.
@@ -17,6 +18,8 @@ type Permission struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID string `json:"id,omitempty"`
+	// GroupID holds the value of the "group_id" field.
+	GroupID string `json:"group_id,omitempty"`
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
 	// Description holds the value of the "description" field.
@@ -35,9 +38,11 @@ type Permission struct {
 type PermissionEdges struct {
 	// Roles holds the value of the roles edge.
 	Roles []*RolePermission `json:"roles,omitempty"`
+	// Group holds the value of the group edge.
+	Group *PermissionGroup `json:"group,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
+	loadedTypes [2]bool
 }
 
 // RolesOrErr returns the Roles value or an error if the edge
@@ -49,6 +54,19 @@ func (e PermissionEdges) RolesOrErr() ([]*RolePermission, error) {
 	return nil, &NotLoadedError{edge: "roles"}
 }
 
+// GroupOrErr returns the Group value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e PermissionEdges) GroupOrErr() (*PermissionGroup, error) {
+	if e.loadedTypes[1] {
+		if e.Group == nil {
+			// Edge was loaded but was not found.
+			return nil, &NotFoundError{label: permissiongroup.Label}
+		}
+		return e.Group, nil
+	}
+	return nil, &NotLoadedError{edge: "group"}
+}
+
 // scanValues returns the types for scanning values from sql.Rows.
 func (*Permission) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
@@ -56,7 +74,7 @@ func (*Permission) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case permission.FieldFields:
 			values[i] = new([]byte)
-		case permission.FieldID, permission.FieldName, permission.FieldDescription, permission.FieldAppID:
+		case permission.FieldID, permission.FieldGroupID, permission.FieldName, permission.FieldDescription, permission.FieldAppID:
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -78,6 +96,12 @@ func (pe *Permission) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field id", values[i])
 			} else if value.Valid {
 				pe.ID = value.String
+			}
+		case permission.FieldGroupID:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field group_id", values[i])
+			} else if value.Valid {
+				pe.GroupID = value.String
 			}
 		case permission.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -123,6 +147,11 @@ func (pe *Permission) QueryRoles() *RolePermissionQuery {
 	return NewPermissionClient(pe.config).QueryRoles(pe)
 }
 
+// QueryGroup queries the "group" edge of the Permission entity.
+func (pe *Permission) QueryGroup() *PermissionGroupQuery {
+	return NewPermissionClient(pe.config).QueryGroup(pe)
+}
+
 // Update returns a builder for updating this Permission.
 // Note that you need to call Permission.Unwrap() before calling this method if this Permission
 // was returned from a transaction, and the transaction was committed or rolled back.
@@ -146,6 +175,9 @@ func (pe *Permission) String() string {
 	var builder strings.Builder
 	builder.WriteString("Permission(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", pe.ID))
+	builder.WriteString("group_id=")
+	builder.WriteString(pe.GroupID)
+	builder.WriteString(", ")
 	builder.WriteString("name=")
 	builder.WriteString(pe.Name)
 	builder.WriteString(", ")

@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"gitlab.calendaria.team/services/rbac/ent/permission"
+	"gitlab.calendaria.team/services/rbac/ent/permissiongroup"
 	"gitlab.calendaria.team/services/rbac/ent/predicate"
 	"gitlab.calendaria.team/services/rbac/ent/rolepermission"
 )
@@ -24,6 +25,7 @@ type PermissionQuery struct {
 	inters     []Interceptor
 	predicates []predicate.Permission
 	withRoles  *RolePermissionQuery
+	withGroup  *PermissionGroupQuery
 	modifiers  []func(*sql.Selector)
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
@@ -76,6 +78,28 @@ func (pq *PermissionQuery) QueryRoles() *RolePermissionQuery {
 			sqlgraph.From(permission.Table, permission.FieldID, selector),
 			sqlgraph.To(rolepermission.Table, rolepermission.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, permission.RolesTable, permission.RolesColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(pq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryGroup chains the current query on the "group" edge.
+func (pq *PermissionQuery) QueryGroup() *PermissionGroupQuery {
+	query := (&PermissionGroupClient{config: pq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := pq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := pq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(permission.Table, permission.FieldID, selector),
+			sqlgraph.To(permissiongroup.Table, permissiongroup.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, permission.GroupTable, permission.GroupColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(pq.driver.Dialect(), step)
 		return fromU, nil
@@ -276,6 +300,7 @@ func (pq *PermissionQuery) Clone() *PermissionQuery {
 		inters:     append([]Interceptor{}, pq.inters...),
 		predicates: append([]predicate.Permission{}, pq.predicates...),
 		withRoles:  pq.withRoles.Clone(),
+		withGroup:  pq.withGroup.Clone(),
 		// clone intermediate query.
 		sql:  pq.sql.Clone(),
 		path: pq.path,
@@ -293,18 +318,29 @@ func (pq *PermissionQuery) WithRoles(opts ...func(*RolePermissionQuery)) *Permis
 	return pq
 }
 
+// WithGroup tells the query-builder to eager-load the nodes that are connected to
+// the "group" edge. The optional arguments are used to configure the query builder of the edge.
+func (pq *PermissionQuery) WithGroup(opts ...func(*PermissionGroupQuery)) *PermissionQuery {
+	query := (&PermissionGroupClient{config: pq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	pq.withGroup = query
+	return pq
+}
+
 // GroupBy is used to group vertices by one or more fields/columns.
 // It is often used with aggregate functions, like: count, max, mean, min, sum.
 //
 // Example:
 //
 //	var v []struct {
-//		Name string `json:"name,omitempty"`
+//		GroupID string `json:"group_id,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.Permission.Query().
-//		GroupBy(permission.FieldName).
+//		GroupBy(permission.FieldGroupID).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (pq *PermissionQuery) GroupBy(field string, fields ...string) *PermissionGroupBy {
@@ -322,11 +358,11 @@ func (pq *PermissionQuery) GroupBy(field string, fields ...string) *PermissionGr
 // Example:
 //
 //	var v []struct {
-//		Name string `json:"name,omitempty"`
+//		GroupID string `json:"group_id,omitempty"`
 //	}
 //
 //	client.Permission.Query().
-//		Select(permission.FieldName).
+//		Select(permission.FieldGroupID).
 //		Scan(ctx, &v)
 func (pq *PermissionQuery) Select(fields ...string) *PermissionSelect {
 	pq.ctx.Fields = append(pq.ctx.Fields, fields...)
@@ -371,8 +407,9 @@ func (pq *PermissionQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*P
 	var (
 		nodes       = []*Permission{}
 		_spec       = pq.querySpec()
-		loadedTypes = [1]bool{
+		loadedTypes = [2]bool{
 			pq.withRoles != nil,
+			pq.withGroup != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -400,6 +437,12 @@ func (pq *PermissionQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*P
 		if err := pq.loadRoles(ctx, query, nodes,
 			func(n *Permission) { n.Edges.Roles = []*RolePermission{} },
 			func(n *Permission, e *RolePermission) { n.Edges.Roles = append(n.Edges.Roles, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := pq.withGroup; query != nil {
+		if err := pq.loadGroup(ctx, query, nodes, nil,
+			func(n *Permission, e *PermissionGroup) { n.Edges.Group = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -436,6 +479,35 @@ func (pq *PermissionQuery) loadRoles(ctx context.Context, query *RolePermissionQ
 	}
 	return nil
 }
+func (pq *PermissionQuery) loadGroup(ctx context.Context, query *PermissionGroupQuery, nodes []*Permission, init func(*Permission), assign func(*Permission, *PermissionGroup)) error {
+	ids := make([]string, 0, len(nodes))
+	nodeids := make(map[string][]*Permission)
+	for i := range nodes {
+		fk := nodes[i].GroupID
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(permissiongroup.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "group_id" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
+}
 
 func (pq *PermissionQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := pq.querySpec()
@@ -464,6 +536,9 @@ func (pq *PermissionQuery) querySpec() *sqlgraph.QuerySpec {
 			if fields[i] != permission.FieldID {
 				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 			}
+		}
+		if pq.withGroup != nil {
+			_spec.Node.AddColumnOnce(permission.FieldGroupID)
 		}
 	}
 	if ps := pq.predicates; len(ps) > 0 {

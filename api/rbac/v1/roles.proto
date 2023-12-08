@@ -64,6 +64,10 @@ message CreateRoleRequest {
   string description = 2;
 }
 
+message RoleReply {
+  Role role = 1;
+}
+
 message UpdateRoleRequest {
   int64 roleId = 1;
   string name = 2;
@@ -83,7 +87,7 @@ message ListRolesRequest {
 }
 
 message ListRolesReply {
-  repeated RoleReply roles = 1;
+  repeated Role roles = 1;
 }
 
 message AddPermissionToRoleRequest {
@@ -94,8 +98,8 @@ message AddPermissionToRoleRequest {
 }
 
 message RolePermissionReply {
-  RoleReply role = 1;
-  PermissionReply permission = 2;
+  Role role = 1;
+  Permission permission = 2;
   optional bool deny = 3;
   repeated string fields = 4;
 }

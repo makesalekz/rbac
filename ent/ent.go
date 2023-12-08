@@ -13,6 +13,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"gitlab.calendaria.team/services/rbac/ent/permission"
+	"gitlab.calendaria.team/services/rbac/ent/permissiongroup"
 	"gitlab.calendaria.team/services/rbac/ent/role"
 	"gitlab.calendaria.team/services/rbac/ent/rolepermission"
 	"gitlab.calendaria.team/services/rbac/ent/team"
@@ -78,6 +79,7 @@ func checkColumn(table, column string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
 			permission.Table:       permission.ValidColumn,
+			permissiongroup.Table:  permissiongroup.ValidColumn,
 			role.Table:             role.ValidColumn,
 			rolepermission.Table:   rolepermission.ValidColumn,
 			team.Table:             team.ValidColumn,

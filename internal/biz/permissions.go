@@ -44,3 +44,7 @@ func (uc *PermissionsUsecase) DeletePermission(ctx context.Context, permissionId
 func (uc *PermissionsUsecase) GetPermissions(ctx context.Context, appId string, permissionIds []string) ([]*ent.Permission, error) {
 	return uc.permissionRepo.GetPermissions(ctx, appId, permissionIds)
 }
+
+func (uc *PermissionsUsecase) GetGroupedPermissions(ctx context.Context, appId string) ([]*ent.PermissionGroup, error) {
+	return uc.permissionRepo.GetGroupedPermissions(ctx, appId)
+}

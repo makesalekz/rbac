@@ -50,7 +50,7 @@ message ListAssignsReply {
 }
 
 message AssignedRole {
-	RoleReply role = 1;
+	Role role = 1;
 	optional string identityId = 2;
 	optional Team team = 3;
 }

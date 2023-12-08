@@ -114,7 +114,7 @@ func assignedRoleReply(assignedRole *ent.TeamIdentityRole) *v1.AssignedRole {
 	}
 
 	if assignedRole.Edges.Role != nil {
-		result.Role = &v1.RoleReply{
+		result.Role = &v1.Role{
 			Id:          assignedRole.Edges.Role.ID,
 			Name:        assignedRole.Edges.Role.Name,
 			Description: assignedRole.Edges.Role.Description,

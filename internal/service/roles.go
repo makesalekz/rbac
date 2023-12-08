@@ -29,8 +29,8 @@ func NewRolesService(jwt *jwt.JwtProcessor, uc *biz.RolesUsecase, pu *biz.Permis
 	}
 }
 
-func (s *RolesService) roleReply(role *ent.Role) *v1.RoleReply {
-	return &v1.RoleReply{
+func (s *RolesService) roleReply(role *ent.Role) *v1.Role {
+	return &v1.Role{
 		Id:          role.ID,
 		Name:        role.Name,
 		Description: role.Description,
@@ -43,7 +43,7 @@ func (s *RolesService) roleReply(role *ent.Role) *v1.RoleReply {
 func (s *RolesService) rolePermissionReply(rolePermission *ent.RolePermission) *v1.RolePermissionReply {
 	return &v1.RolePermissionReply{
 		Role: s.roleReply(rolePermission.Edges.Role),
-		Permission: &v1.PermissionReply{
+		Permission: &v1.Permission{
 			Id:    rolePermission.Edges.Permission.ID,
 			AppId: rolePermission.Edges.Permission.AppID,
 		},
@@ -74,7 +74,9 @@ func (s *RolesService) CreateRole(ctx context.Context, req *v1.CreateRoleRequest
 	if err != nil {
 		return nil, v1.ErrorDatabaseQuery(err.Error())
 	}
-	return s.roleReply(role), nil
+	return &v1.RoleReply{
+		Role: s.roleReply(role),
+	}, nil
 }
 
 func (s *RolesService) UpdateRole(ctx context.Context, req *v1.UpdateRoleRequest) (*v1.RoleReply, error) {
@@ -103,7 +105,10 @@ func (s *RolesService) UpdateRole(ctx context.Context, req *v1.UpdateRoleRequest
 	if err != nil {
 		return nil, err
 	}
-	return s.roleReply(updated), nil
+
+	return &v1.RoleReply{
+		Role: s.roleReply(updated),
+	}, nil
 }
 
 func (s *RolesService) DeleteRole(ctx context.Context, req *v1.DeleteRoleRequest) (*utils_v1.EmptyReply, error) {
@@ -150,7 +155,9 @@ func (s *RolesService) GetRole(ctx context.Context, req *v1.GetRoleRequest) (*v1
 	if err != nil {
 		return nil, err
 	}
-	return s.roleReply(role), nil
+	return &v1.RoleReply{
+		Role: s.roleReply(role),
+	}, nil
 }
 
 func (s *RolesService) ListRoles(ctx context.Context, req *v1.ListRolesRequest) (*v1.ListRolesReply, error) {
@@ -172,7 +179,7 @@ func (s *RolesService) ListRoles(ctx context.Context, req *v1.ListRolesRequest) 
 		return nil, err
 	}
 
-	result := make([]*v1.RoleReply, len(roles))
+	result := make([]*v1.Role, len(roles))
 	for i, role := range roles {
 		result[i] = s.roleReply(role)
 	}

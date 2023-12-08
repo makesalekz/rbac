@@ -12,6 +12,8 @@ const (
 	Label = "permission"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
+	// FieldGroupID holds the string denoting the group_id field in the database.
+	FieldGroupID = "group_id"
 	// FieldName holds the string denoting the name field in the database.
 	FieldName = "name"
 	// FieldDescription holds the string denoting the description field in the database.
@@ -22,6 +24,8 @@ const (
 	FieldFields = "fields"
 	// EdgeRoles holds the string denoting the roles edge name in mutations.
 	EdgeRoles = "roles"
+	// EdgeGroup holds the string denoting the group edge name in mutations.
+	EdgeGroup = "group"
 	// Table holds the table name of the permission in the database.
 	Table = "permissions"
 	// RolesTable is the table that holds the roles relation/edge.
@@ -31,11 +35,19 @@ const (
 	RolesInverseTable = "role_permissions"
 	// RolesColumn is the table column denoting the roles relation/edge.
 	RolesColumn = "permission_id"
+	// GroupTable is the table that holds the group relation/edge.
+	GroupTable = "permissions"
+	// GroupInverseTable is the table name for the PermissionGroup entity.
+	// It exists in this package in order to avoid circular dependency with the "permissiongroup" package.
+	GroupInverseTable = "permission_groups"
+	// GroupColumn is the table column denoting the group relation/edge.
+	GroupColumn = "group_id"
 )
 
 // Columns holds all SQL columns for permission fields.
 var Columns = []string{
 	FieldID,
+	FieldGroupID,
 	FieldName,
 	FieldDescription,
 	FieldAppID,
@@ -71,6 +83,11 @@ func ByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldID, opts...).ToFunc()
 }
 
+// ByGroupID orders the results by the group_id field.
+func ByGroupID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldGroupID, opts...).ToFunc()
+}
+
 // ByName orders the results by the name field.
 func ByName(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldName, opts...).ToFunc()
@@ -99,10 +116,24 @@ func ByRoles(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newRolesStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
+
+// ByGroupField orders the results by group field.
+func ByGroupField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newGroupStep(), sql.OrderByField(field, opts...))
+	}
+}
 func newRolesStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(RolesInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, RolesTable, RolesColumn),
+	)
+}
+func newGroupStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(GroupInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, GroupTable, GroupColumn),
 	)
 }
