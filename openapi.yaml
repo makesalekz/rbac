@@ -509,6 +509,8 @@ components:
                     type: string
                 description:
                     type: string
+                isSystem:
+                    type: boolean
                 allow:
                     type: array
                     items:
@@ -736,6 +738,14 @@ components:
                     type: string
                 description:
                     type: string
+                allow:
+                    type: array
+                    items:
+                        type: string
+                deny:
+                    type: array
+                    items:
+                        type: string
         rbac.v1.UpdateTeamRequest:
             type: object
             properties:

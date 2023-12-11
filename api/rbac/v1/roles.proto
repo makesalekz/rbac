@@ -62,8 +62,9 @@ service Roles {
 message CreateRoleRequest {
   string name = 1;
   string description = 2;
-  repeated string allow = 3;
-  repeated string deny = 4;
+  bool isSystem = 3;
+  repeated string allow = 4;
+  repeated string deny = 5;
 }
 
 message RoleReply {
@@ -74,6 +75,8 @@ message UpdateRoleRequest {
   int64 roleId = 1;
   string name = 2;
   string description = 3;
+  repeated string allow = 4;
+  repeated string deny = 5;
 }
 
 message DeleteRoleRequest {

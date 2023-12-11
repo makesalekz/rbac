@@ -35,7 +35,12 @@ func (s *RolesService) CreateRole(ctx context.Context, req *v1.CreateRoleRequest
 		return nil, v1.ErrorUnauthorized("invalid token")
 	}
 
-	fields, err := s.au.HasPermission(ctx, "admin.role.create")
+	permissionToCheck := "admin.role.create"
+	if req.IsSystem {
+		permissionToCheck = "admin.role_system.create"
+	}
+
+	fields, err := s.au.HasPermission(ctx, permissionToCheck)
 	if err != nil {
 		return nil, err
 	}
@@ -47,6 +52,7 @@ func (s *RolesService) CreateRole(ctx context.Context, req *v1.CreateRoleRequest
 		TenantId:    claims.GetTenantId(),
 		Name:        req.Name,
 		Description: req.Description,
+		IsSystem:    req.IsSystem,
 		Allow:       req.Allow,
 		Deny:        req.Deny,
 	})
@@ -64,7 +70,17 @@ func (s *RolesService) UpdateRole(ctx context.Context, req *v1.UpdateRoleRequest
 		return nil, v1.ErrorUnauthorized("invalid token")
 	}
 
-	fields, err := s.au.HasPermission(ctx, "admin.role.update")
+	role, err := s.uc.GetRoleById(ctx, claims.GetTenantId(), req.RoleId)
+	if err != nil {
+		return nil, err
+	}
+
+	permissionToCheck := "admin.role.update"
+	if role.IsSystem {
+		permissionToCheck = "admin.role_system.update"
+	}
+
+	fields, err := s.au.HasPermission(ctx, permissionToCheck)
 	if err != nil {
 		return nil, err
 	}
@@ -72,14 +88,11 @@ func (s *RolesService) UpdateRole(ctx context.Context, req *v1.UpdateRoleRequest
 		return nil, v1.ErrorForbidden("has no permission")
 	}
 
-	role, err := s.uc.GetRoleById(ctx, claims.GetTenantId(), req.RoleId)
-	if err != nil {
-		return nil, err
-	}
-
 	updated, err := s.uc.UpdateRole(ctx, role, data.UpdateRoleDto{
 		Name:        req.Name,
 		Description: req.Description,
+		Allow:       req.Allow,
+		Deny:        req.Deny,
 	})
 	if err != nil {
 		return nil, err
@@ -96,17 +109,22 @@ func (s *RolesService) DeleteRole(ctx context.Context, req *v1.DeleteRoleRequest
 		return nil, v1.ErrorUnauthorized("invalid token")
 	}
 
-	fields, err := s.au.HasPermission(ctx, "admin.role.delete")
+	role, err := s.uc.GetRoleById(ctx, claims.GetTenantId(), req.RoleId)
+	if err != nil {
+		return nil, err
+	}
+
+	permissionToCheck := "admin.role.delete"
+	if role.IsSystem {
+		permissionToCheck = "admin.role_system.delete"
+	}
+
+	fields, err := s.au.HasPermission(ctx, permissionToCheck)
 	if err != nil {
 		return nil, err
 	}
 	if fields == nil {
 		return nil, v1.ErrorForbidden("has no permission")
-	}
-
-	role, err := s.uc.GetRoleById(ctx, claims.GetTenantId(), req.RoleId)
-	if err != nil {
-		return nil, err
 	}
 
 	err = s.uc.DeleteRole(ctx, role)
@@ -201,7 +219,7 @@ func (s *RolesService) SetRolePermission(ctx context.Context, req *v1.SetRolePer
 	return &utils_v1.EmptyReply{}, nil
 }
 
-func (s *RolesService) RemovePermissionFromRole(ctx context.Context, req *v1.DeleteRolePermissionRequest) (*utils_v1.EmptyReply, error) {
+func (s *RolesService) DeleteRolePermission(ctx context.Context, req *v1.DeleteRolePermissionRequest) (*utils_v1.EmptyReply, error) {
 	claims, ok := s.jwt.GetClaimsFromContext(ctx)
 	if !ok || !claims.IsUserTenantRequest() {
 		return nil, v1.ErrorUnauthorized("invalid token")
