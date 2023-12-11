@@ -116,7 +116,7 @@ message RolePermissionsReply {
 }
 
 message RolePermission {
-  Permission permission = 1;
-  optional bool deny = 2;
+  string id = 1;
+  bool deny = 2;
   repeated string fields = 3;
 }
