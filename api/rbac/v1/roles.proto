@@ -40,18 +40,18 @@ service Roles {
       body: "*"
     };
   };
-  rpc AddPermissionToRole (AddPermissionToRoleRequest) returns (RolePermissionReply){
+  rpc SetRolePermission (SetRolePermissionRequest) returns (utils.v1.EmptyReply){
     option (google.api.http) = {
       post: "/v1/rbac/roles/{roleId}/permissions"
       body: "*"
     };
   };
-  rpc RemovePermissionFromRole (RemovePermissionFromRoleRequest) returns (utils.v1.EmptyReply){
+  rpc DeleteRolePermission (DeleteRolePermissionRequest) returns (utils.v1.EmptyReply){
     option (google.api.http) = {
       delete: "/v1/rbac/roles/{roleId}/permissions/{permissionId}"
     };
   };
-  rpc ListRolePermissions (RolesPermissionsRequest) returns (RolesPermissionsReply){
+  rpc ListRolePermissions (ListRolePermissionsRequest) returns (RolePermissionsReply){
     option (google.api.http) = {
       post: "/v1/rbac/roles/{roleId}/permissions/list"
       body: "*"
@@ -62,8 +62,9 @@ service Roles {
 message CreateRoleRequest {
   string name = 1;
   string description = 2;
-  repeated string allow = 3;
-  repeated string deny = 4;
+  bool isSystem = 3;
+  repeated string allow = 4;
+  repeated string deny = 5;
 }
 
 message RoleReply {
@@ -74,6 +75,8 @@ message UpdateRoleRequest {
   int64 roleId = 1;
   string name = 2;
   string description = 3;
+  repeated string allow = 4;
+  repeated string deny = 5;
 }
 
 message DeleteRoleRequest {
@@ -92,29 +95,28 @@ message ListRolesReply {
   repeated Role roles = 1;
 }
 
-message AddPermissionToRoleRequest {
+message SetRolePermissionRequest {
   int64 roleId = 1;
   string permissionId = 2;
   optional bool deny = 3;
   repeated string fields = 4;
 }
 
-message RolePermissionReply {
-  Role role = 1;
-  Permission permission = 2;
-  optional bool deny = 3;
-  repeated string fields = 4;
-}
-
-message RemovePermissionFromRoleRequest {
+message DeleteRolePermissionRequest {
   int64 roleId = 1;
   string permissionId = 2;
 }
 
-message RolesPermissionsRequest {
+message ListRolePermissionsRequest {
   int64 roleId = 1;
 }
 
-message RolesPermissionsReply {
-  repeated RolePermissionReply permissions = 1;
+message RolePermissionsReply {
+  repeated RolePermission permissions = 1;
+}
+
+message RolePermission {
+  Permission permission = 1;
+  optional bool deny = 2;
+  repeated string fields = 3;
 }

@@ -270,7 +270,7 @@ paths:
         post:
             tags:
                 - Roles
-            operationId: Roles_AddPermissionToRole
+            operationId: Roles_SetRolePermission
             parameters:
                 - name: roleId
                   in: path
@@ -281,7 +281,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/rbac.v1.AddPermissionToRoleRequest'
+                            $ref: '#/components/schemas/rbac.v1.SetRolePermissionRequest'
                 required: true
             responses:
                 "200":
@@ -289,7 +289,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/rbac.v1.RolePermissionReply'
+                                $ref: '#/components/schemas/utils.v1.EmptyReply'
     /v1/rbac/roles/{roleId}/permissions/list:
         post:
             tags:
@@ -305,7 +305,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/rbac.v1.RolesPermissionsRequest'
+                            $ref: '#/components/schemas/rbac.v1.ListRolePermissionsRequest'
                 required: true
             responses:
                 "200":
@@ -313,12 +313,12 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/rbac.v1.RolesPermissionsReply'
+                                $ref: '#/components/schemas/rbac.v1.RolePermissionsReply'
     /v1/rbac/roles/{roleId}/permissions/{permissionId}:
         delete:
             tags:
                 - Roles
-            operationId: Roles_RemovePermissionFromRole
+            operationId: Roles_DeleteRolePermission
             parameters:
                 - name: roleId
                   in: path
@@ -451,19 +451,6 @@ paths:
                                 $ref: '#/components/schemas/rbac.v1.TeamReply'
 components:
     schemas:
-        rbac.v1.AddPermissionToRoleRequest:
-            type: object
-            properties:
-                roleId:
-                    type: string
-                permissionId:
-                    type: string
-                deny:
-                    type: boolean
-                fields:
-                    type: array
-                    items:
-                        type: string
         rbac.v1.AssignRoleRequest:
             type: object
             properties:
@@ -522,6 +509,8 @@ components:
                     type: string
                 description:
                     type: string
+                isSystem:
+                    type: boolean
                 allow:
                     type: array
                     items:
@@ -587,6 +576,11 @@ components:
                     type: array
                     items:
                         type: string
+        rbac.v1.ListRolePermissionsRequest:
+            type: object
+            properties:
+                roleId:
+                    type: string
         rbac.v1.ListRolesReply:
             type: object
             properties:
@@ -654,11 +648,9 @@ components:
                     type: string
                 deletedAt:
                     type: string
-        rbac.v1.RolePermissionReply:
+        rbac.v1.RolePermission:
             type: object
             properties:
-                role:
-                    $ref: '#/components/schemas/rbac.v1.Role'
                 permission:
                     $ref: '#/components/schemas/rbac.v1.Permission'
                 deny:
@@ -667,23 +659,31 @@ components:
                     type: array
                     items:
                         type: string
-        rbac.v1.RoleReply:
-            type: object
-            properties:
-                role:
-                    $ref: '#/components/schemas/rbac.v1.Role'
-        rbac.v1.RolesPermissionsReply:
+        rbac.v1.RolePermissionsReply:
             type: object
             properties:
                 permissions:
                     type: array
                     items:
-                        $ref: '#/components/schemas/rbac.v1.RolePermissionReply'
-        rbac.v1.RolesPermissionsRequest:
+                        $ref: '#/components/schemas/rbac.v1.RolePermission'
+        rbac.v1.RoleReply:
+            type: object
+            properties:
+                role:
+                    $ref: '#/components/schemas/rbac.v1.Role'
+        rbac.v1.SetRolePermissionRequest:
             type: object
             properties:
                 roleId:
                     type: string
+                permissionId:
+                    type: string
+                deny:
+                    type: boolean
+                fields:
+                    type: array
+                    items:
+                        type: string
         rbac.v1.Team:
             type: object
             properties:
@@ -738,6 +738,14 @@ components:
                     type: string
                 description:
                     type: string
+                allow:
+                    type: array
+                    items:
+                        type: string
+                deny:
+                    type: array
+                    items:
+                        type: string
         rbac.v1.UpdateTeamRequest:
             type: object
             properties:
