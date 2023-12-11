@@ -62,16 +62,16 @@ func (uc *RolesUsecase) CreateRole(ctx context.Context, createRoleDto data.Creat
 	return uc.roleRepo.CreateRole(ctx, createRoleDto)
 }
 
-func (uc *RolesUsecase) AddPermissionToRole(ctx context.Context, role *ent.Role, permission *ent.Permission, dto data.CreateRolePermissionDto) (*ent.RolePermission, error) {
+func (uc *RolesUsecase) SetRolePermission(ctx context.Context, role *ent.Role, permission *ent.Permission, dto data.CreateRolePermissionDto) error {
 	if role.IsSystem {
-		return nil, v1.ErrorForbidden("unable to edit system role")
+		return v1.ErrorForbidden("unable to edit system role")
 	}
 
 	if !validateFields(permission.Fields, dto.Fields) {
-		return nil, v1.ErrorInvalidRequest("invalid fields")
+		return v1.ErrorInvalidRequest("invalid fields")
 	}
 
-	return uc.roleRepo.AddPermissionToRole(ctx, role, permission, dto)
+	return uc.roleRepo.SetRolePermission(ctx, role, permission, dto)
 }
 
 func (uc *RolesUsecase) RemovePermissionFromRole(ctx context.Context, role *ent.Role, permission *ent.Permission) error {

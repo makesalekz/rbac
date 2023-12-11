@@ -20,23 +20,23 @@ var _ = binding.EncodeURL
 
 const _ = http.SupportPackageIsVersion1
 
-const OperationRolesAddPermissionToRole = "/rbac.v1.Roles/AddPermissionToRole"
 const OperationRolesCreateRole = "/rbac.v1.Roles/CreateRole"
 const OperationRolesDeleteRole = "/rbac.v1.Roles/DeleteRole"
+const OperationRolesDeleteRolePermission = "/rbac.v1.Roles/DeleteRolePermission"
 const OperationRolesGetRole = "/rbac.v1.Roles/GetRole"
 const OperationRolesListRolePermissions = "/rbac.v1.Roles/ListRolePermissions"
 const OperationRolesListRoles = "/rbac.v1.Roles/ListRoles"
-const OperationRolesRemovePermissionFromRole = "/rbac.v1.Roles/RemovePermissionFromRole"
+const OperationRolesSetRolePermission = "/rbac.v1.Roles/SetRolePermission"
 const OperationRolesUpdateRole = "/rbac.v1.Roles/UpdateRole"
 
 type RolesHTTPServer interface {
-	AddPermissionToRole(context.Context, *AddPermissionToRoleRequest) (*RolePermissionReply, error)
 	CreateRole(context.Context, *CreateRoleRequest) (*RoleReply, error)
 	DeleteRole(context.Context, *DeleteRoleRequest) (*v1.EmptyReply, error)
+	DeleteRolePermission(context.Context, *DeleteRolePermissionRequest) (*v1.EmptyReply, error)
 	GetRole(context.Context, *GetRoleRequest) (*RoleReply, error)
-	ListRolePermissions(context.Context, *RolesPermissionsRequest) (*RolesPermissionsReply, error)
+	ListRolePermissions(context.Context, *ListRolePermissionsRequest) (*RolePermissionsReply, error)
 	ListRoles(context.Context, *ListRolesRequest) (*ListRolesReply, error)
-	RemovePermissionFromRole(context.Context, *RemovePermissionFromRoleRequest) (*v1.EmptyReply, error)
+	SetRolePermission(context.Context, *SetRolePermissionRequest) (*v1.EmptyReply, error)
 	UpdateRole(context.Context, *UpdateRoleRequest) (*RoleReply, error)
 }
 
@@ -47,8 +47,8 @@ func RegisterRolesHTTPServer(s *http.Server, srv RolesHTTPServer) {
 	r.DELETE("/v1/rbac/roles/{roleId}", _Roles_DeleteRole0_HTTP_Handler(srv))
 	r.GET("/v1/rbac/roles/{roleId}", _Roles_GetRole0_HTTP_Handler(srv))
 	r.POST("/v1/rbac/roles/list", _Roles_ListRoles0_HTTP_Handler(srv))
-	r.POST("/v1/rbac/roles/{roleId}/permissions", _Roles_AddPermissionToRole0_HTTP_Handler(srv))
-	r.DELETE("/v1/rbac/roles/{roleId}/permissions/{permissionId}", _Roles_RemovePermissionFromRole0_HTTP_Handler(srv))
+	r.POST("/v1/rbac/roles/{roleId}/permissions", _Roles_SetRolePermission0_HTTP_Handler(srv))
+	r.DELETE("/v1/rbac/roles/{roleId}/permissions/{permissionId}", _Roles_DeleteRolePermission0_HTTP_Handler(srv))
 	r.POST("/v1/rbac/roles/{roleId}/permissions/list", _Roles_ListRolePermissions0_HTTP_Handler(srv))
 }
 
@@ -165,9 +165,9 @@ func _Roles_ListRoles0_HTTP_Handler(srv RolesHTTPServer) func(ctx http.Context) 
 	}
 }
 
-func _Roles_AddPermissionToRole0_HTTP_Handler(srv RolesHTTPServer) func(ctx http.Context) error {
+func _Roles_SetRolePermission0_HTTP_Handler(srv RolesHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
-		var in AddPermissionToRoleRequest
+		var in SetRolePermissionRequest
 		if err := ctx.Bind(&in); err != nil {
 			return err
 		}
@@ -177,31 +177,31 @@ func _Roles_AddPermissionToRole0_HTTP_Handler(srv RolesHTTPServer) func(ctx http
 		if err := ctx.BindVars(&in); err != nil {
 			return err
 		}
-		http.SetOperation(ctx, OperationRolesAddPermissionToRole)
+		http.SetOperation(ctx, OperationRolesSetRolePermission)
 		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
-			return srv.AddPermissionToRole(ctx, req.(*AddPermissionToRoleRequest))
+			return srv.SetRolePermission(ctx, req.(*SetRolePermissionRequest))
 		})
 		out, err := h(ctx, &in)
 		if err != nil {
 			return err
 		}
-		reply := out.(*RolePermissionReply)
+		reply := out.(*v1.EmptyReply)
 		return ctx.Result(200, reply)
 	}
 }
 
-func _Roles_RemovePermissionFromRole0_HTTP_Handler(srv RolesHTTPServer) func(ctx http.Context) error {
+func _Roles_DeleteRolePermission0_HTTP_Handler(srv RolesHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
-		var in RemovePermissionFromRoleRequest
+		var in DeleteRolePermissionRequest
 		if err := ctx.BindQuery(&in); err != nil {
 			return err
 		}
 		if err := ctx.BindVars(&in); err != nil {
 			return err
 		}
-		http.SetOperation(ctx, OperationRolesRemovePermissionFromRole)
+		http.SetOperation(ctx, OperationRolesDeleteRolePermission)
 		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
-			return srv.RemovePermissionFromRole(ctx, req.(*RemovePermissionFromRoleRequest))
+			return srv.DeleteRolePermission(ctx, req.(*DeleteRolePermissionRequest))
 		})
 		out, err := h(ctx, &in)
 		if err != nil {
@@ -214,7 +214,7 @@ func _Roles_RemovePermissionFromRole0_HTTP_Handler(srv RolesHTTPServer) func(ctx
 
 func _Roles_ListRolePermissions0_HTTP_Handler(srv RolesHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
-		var in RolesPermissionsRequest
+		var in ListRolePermissionsRequest
 		if err := ctx.Bind(&in); err != nil {
 			return err
 		}
@@ -226,25 +226,25 @@ func _Roles_ListRolePermissions0_HTTP_Handler(srv RolesHTTPServer) func(ctx http
 		}
 		http.SetOperation(ctx, OperationRolesListRolePermissions)
 		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
-			return srv.ListRolePermissions(ctx, req.(*RolesPermissionsRequest))
+			return srv.ListRolePermissions(ctx, req.(*ListRolePermissionsRequest))
 		})
 		out, err := h(ctx, &in)
 		if err != nil {
 			return err
 		}
-		reply := out.(*RolesPermissionsReply)
+		reply := out.(*RolePermissionsReply)
 		return ctx.Result(200, reply)
 	}
 }
 
 type RolesHTTPClient interface {
-	AddPermissionToRole(ctx context.Context, req *AddPermissionToRoleRequest, opts ...http.CallOption) (rsp *RolePermissionReply, err error)
 	CreateRole(ctx context.Context, req *CreateRoleRequest, opts ...http.CallOption) (rsp *RoleReply, err error)
 	DeleteRole(ctx context.Context, req *DeleteRoleRequest, opts ...http.CallOption) (rsp *v1.EmptyReply, err error)
+	DeleteRolePermission(ctx context.Context, req *DeleteRolePermissionRequest, opts ...http.CallOption) (rsp *v1.EmptyReply, err error)
 	GetRole(ctx context.Context, req *GetRoleRequest, opts ...http.CallOption) (rsp *RoleReply, err error)
-	ListRolePermissions(ctx context.Context, req *RolesPermissionsRequest, opts ...http.CallOption) (rsp *RolesPermissionsReply, err error)
+	ListRolePermissions(ctx context.Context, req *ListRolePermissionsRequest, opts ...http.CallOption) (rsp *RolePermissionsReply, err error)
 	ListRoles(ctx context.Context, req *ListRolesRequest, opts ...http.CallOption) (rsp *ListRolesReply, err error)
-	RemovePermissionFromRole(ctx context.Context, req *RemovePermissionFromRoleRequest, opts ...http.CallOption) (rsp *v1.EmptyReply, err error)
+	SetRolePermission(ctx context.Context, req *SetRolePermissionRequest, opts ...http.CallOption) (rsp *v1.EmptyReply, err error)
 	UpdateRole(ctx context.Context, req *UpdateRoleRequest, opts ...http.CallOption) (rsp *RoleReply, err error)
 }
 
@@ -254,19 +254,6 @@ type RolesHTTPClientImpl struct {
 
 func NewRolesHTTPClient(client *http.Client) RolesHTTPClient {
 	return &RolesHTTPClientImpl{client}
-}
-
-func (c *RolesHTTPClientImpl) AddPermissionToRole(ctx context.Context, in *AddPermissionToRoleRequest, opts ...http.CallOption) (*RolePermissionReply, error) {
-	var out RolePermissionReply
-	pattern := "/v1/rbac/roles/{roleId}/permissions"
-	path := binding.EncodeURL(pattern, in, false)
-	opts = append(opts, http.Operation(OperationRolesAddPermissionToRole))
-	opts = append(opts, http.PathTemplate(pattern))
-	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return &out, err
 }
 
 func (c *RolesHTTPClientImpl) CreateRole(ctx context.Context, in *CreateRoleRequest, opts ...http.CallOption) (*RoleReply, error) {
@@ -295,6 +282,19 @@ func (c *RolesHTTPClientImpl) DeleteRole(ctx context.Context, in *DeleteRoleRequ
 	return &out, err
 }
 
+func (c *RolesHTTPClientImpl) DeleteRolePermission(ctx context.Context, in *DeleteRolePermissionRequest, opts ...http.CallOption) (*v1.EmptyReply, error) {
+	var out v1.EmptyReply
+	pattern := "/v1/rbac/roles/{roleId}/permissions/{permissionId}"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationRolesDeleteRolePermission))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "DELETE", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, err
+}
+
 func (c *RolesHTTPClientImpl) GetRole(ctx context.Context, in *GetRoleRequest, opts ...http.CallOption) (*RoleReply, error) {
 	var out RoleReply
 	pattern := "/v1/rbac/roles/{roleId}"
@@ -308,8 +308,8 @@ func (c *RolesHTTPClientImpl) GetRole(ctx context.Context, in *GetRoleRequest, o
 	return &out, err
 }
 
-func (c *RolesHTTPClientImpl) ListRolePermissions(ctx context.Context, in *RolesPermissionsRequest, opts ...http.CallOption) (*RolesPermissionsReply, error) {
-	var out RolesPermissionsReply
+func (c *RolesHTTPClientImpl) ListRolePermissions(ctx context.Context, in *ListRolePermissionsRequest, opts ...http.CallOption) (*RolePermissionsReply, error) {
+	var out RolePermissionsReply
 	pattern := "/v1/rbac/roles/{roleId}/permissions/list"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationRolesListRolePermissions))
@@ -334,13 +334,13 @@ func (c *RolesHTTPClientImpl) ListRoles(ctx context.Context, in *ListRolesReques
 	return &out, err
 }
 
-func (c *RolesHTTPClientImpl) RemovePermissionFromRole(ctx context.Context, in *RemovePermissionFromRoleRequest, opts ...http.CallOption) (*v1.EmptyReply, error) {
+func (c *RolesHTTPClientImpl) SetRolePermission(ctx context.Context, in *SetRolePermissionRequest, opts ...http.CallOption) (*v1.EmptyReply, error) {
 	var out v1.EmptyReply
-	pattern := "/v1/rbac/roles/{roleId}/permissions/{permissionId}"
-	path := binding.EncodeURL(pattern, in, true)
-	opts = append(opts, http.Operation(OperationRolesRemovePermissionFromRole))
+	pattern := "/v1/rbac/roles/{roleId}/permissions"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationRolesSetRolePermission))
 	opts = append(opts, http.PathTemplate(pattern))
-	err := c.cc.Invoke(ctx, "DELETE", path, nil, &out, opts...)
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
 	if err != nil {
 		return nil, err
 	}

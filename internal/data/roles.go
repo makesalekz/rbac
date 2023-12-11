@@ -40,7 +40,7 @@ type RoleRepo interface {
 	DeleteRole(ctx context.Context, role *ent.Role) error
 	GetRoleById(ctx context.Context, tenantId, roleId int64) (*ent.Role, error)
 	GetRolesList(ctx context.Context, tenantId int64, search string) ([]*ent.Role, error)
-	AddPermissionToRole(ctx context.Context, role *ent.Role, permission *ent.Permission, dto CreateRolePermissionDto) (*ent.RolePermission, error)
+	SetRolePermission(ctx context.Context, role *ent.Role, permission *ent.Permission, dto CreateRolePermissionDto) error
 	RemovePermissionFromRole(ctx context.Context, role *ent.Role, permission *ent.Permission) error
 	ListRolePermissions(ctx context.Context, role *ent.Role) ([]*ent.RolePermission, error)
 	ListRolesPermissions(ctx context.Context, filter FilterRolePermissions) ([]*ent.RolePermission, error)
@@ -145,14 +145,16 @@ func (r *roleRepo) GetRolesList(ctx context.Context, tenantId int64, search stri
 	return query.All(ctx)
 }
 
-func (r *roleRepo) AddPermissionToRole(ctx context.Context, role *ent.Role, permission *ent.Permission, dto CreateRolePermissionDto) (*ent.RolePermission, error) {
+func (r *roleRepo) SetRolePermission(ctx context.Context, role *ent.Role, permission *ent.Permission, dto CreateRolePermissionDto) error {
 	return r.db.RolePermission.Create().
 		SetTenantID(role.TenantID).
 		SetRole(role).
 		SetPermission(permission).
 		SetFields(dto.Fields).
 		SetDeny(dto.Deny).
-		Save(ctx)
+		OnConflictColumns(rolepermission.FieldRoleID, rolepermission.FieldPermissionID).
+		UpdateNewValues().
+		Exec(ctx)
 }
 
 func (r *roleRepo) RemovePermissionFromRole(ctx context.Context, role *ent.Role, permission *ent.Permission) error {

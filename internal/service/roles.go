@@ -29,29 +29,6 @@ func NewRolesService(jwt *jwt.JwtProcessor, uc *biz.RolesUsecase, pu *biz.Permis
 	}
 }
 
-func (s *RolesService) roleReply(role *ent.Role) *v1.Role {
-	return &v1.Role{
-		Id:          role.ID,
-		Name:        role.Name,
-		Description: role.Description,
-		IsSystem:    role.IsSystem,
-		CreatedAt:   role.CreatedAt.String(),
-		UpdatedAt:   role.UpdatedAt.String(),
-	}
-}
-
-func (s *RolesService) rolePermissionReply(rolePermission *ent.RolePermission) *v1.RolePermissionReply {
-	return &v1.RolePermissionReply{
-		Role: s.roleReply(rolePermission.Edges.Role),
-		Permission: &v1.Permission{
-			Id:    rolePermission.Edges.Permission.ID,
-			AppId: rolePermission.Edges.Permission.AppID,
-		},
-		Fields: rolePermission.Fields,
-		Deny:   &rolePermission.Deny,
-	}
-}
-
 func (s *RolesService) CreateRole(ctx context.Context, req *v1.CreateRoleRequest) (*v1.RoleReply, error) {
 	claims, ok := s.jwt.GetClaimsFromContext(ctx)
 	if !ok || !claims.IsUserTenantRequest() {
@@ -190,7 +167,7 @@ func (s *RolesService) ListRoles(ctx context.Context, req *v1.ListRolesRequest) 
 	}, nil
 }
 
-func (s *RolesService) AddPermissionToRole(ctx context.Context, req *v1.AddPermissionToRoleRequest) (*v1.RolePermissionReply, error) {
+func (s *RolesService) SetRolePermission(ctx context.Context, req *v1.SetRolePermissionRequest) (*utils_v1.EmptyReply, error) {
 	claims, ok := s.jwt.GetClaimsFromContext(ctx)
 	if !ok || !claims.IsUserTenantRequest() {
 		return nil, v1.ErrorUnauthorized("invalid token")
@@ -214,17 +191,17 @@ func (s *RolesService) AddPermissionToRole(ctx context.Context, req *v1.AddPermi
 		return nil, err
 	}
 
-	rolePermission, err := s.uc.AddPermissionToRole(ctx, role, permission, data.CreateRolePermissionDto{
+	err = s.uc.SetRolePermission(ctx, role, permission, data.CreateRolePermissionDto{
 		Fields: req.Fields,
 		Deny:   *req.Deny,
 	})
 	if err != nil {
 		return nil, v1.ErrorDatabaseQuery(err.Error())
 	}
-	return s.rolePermissionReply(rolePermission), nil
+	return &utils_v1.EmptyReply{}, nil
 }
 
-func (s *RolesService) RemovePermissionFromRole(ctx context.Context, req *v1.RemovePermissionFromRoleRequest) (*utils_v1.EmptyReply, error) {
+func (s *RolesService) RemovePermissionFromRole(ctx context.Context, req *v1.DeleteRolePermissionRequest) (*utils_v1.EmptyReply, error) {
 	claims, ok := s.jwt.GetClaimsFromContext(ctx)
 	if !ok || !claims.IsUserTenantRequest() {
 		return nil, v1.ErrorUnauthorized("invalid token")
@@ -255,7 +232,7 @@ func (s *RolesService) RemovePermissionFromRole(ctx context.Context, req *v1.Rem
 	return &utils_v1.EmptyReply{}, nil
 }
 
-func (s *RolesService) ListRolePermissions(ctx context.Context, req *v1.RolesPermissionsRequest) (*v1.RolesPermissionsReply, error) {
+func (s *RolesService) ListRolePermissions(ctx context.Context, req *v1.ListRolePermissionsRequest) (*v1.RolePermissionsReply, error) {
 	claims, ok := s.jwt.GetClaimsFromContext(ctx)
 	if !ok || !claims.IsUserTenantRequest() {
 		return nil, v1.ErrorUnauthorized("invalid token")
@@ -279,11 +256,33 @@ func (s *RolesService) ListRolePermissions(ctx context.Context, req *v1.RolesPer
 		return nil, err
 	}
 
-	permissions := make([]*v1.RolePermissionReply, len(rolePermissions))
+	permissions := make([]*v1.RolePermission, len(rolePermissions))
 	for i, rp := range rolePermissions {
 		permissions[i] = s.rolePermissionReply(rp)
 	}
-	return &v1.RolesPermissionsReply{
+	return &v1.RolePermissionsReply{
 		Permissions: permissions,
 	}, nil
+}
+
+func (s *RolesService) roleReply(role *ent.Role) *v1.Role {
+	return &v1.Role{
+		Id:          role.ID,
+		Name:        role.Name,
+		Description: role.Description,
+		IsSystem:    role.IsSystem,
+		CreatedAt:   role.CreatedAt.String(),
+		UpdatedAt:   role.UpdatedAt.String(),
+	}
+}
+
+func (s *RolesService) rolePermissionReply(rolePermission *ent.RolePermission) *v1.RolePermission {
+	return &v1.RolePermission{
+		Permission: &v1.Permission{
+			Id:    rolePermission.Edges.Permission.ID,
+			AppId: rolePermission.Edges.Permission.AppID,
+		},
+		Fields: rolePermission.Fields,
+		Deny:   &rolePermission.Deny,
+	}
 }
