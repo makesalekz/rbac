@@ -522,6 +522,14 @@ components:
                     type: string
                 description:
                     type: string
+                allow:
+                    type: array
+                    items:
+                        type: string
+                deny:
+                    type: array
+                    items:
+                        type: string
         rbac.v1.CreateTeamRequest:
             type: object
             properties:

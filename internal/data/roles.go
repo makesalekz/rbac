@@ -17,6 +17,8 @@ type CreateRoleDto struct {
 	Name        string
 	Description string
 	TenantId    int64
+	Allow       []string
+	Deny        []string
 }
 
 type CreateRolePermissionDto struct {
@@ -49,11 +51,65 @@ type roleRepo struct {
 }
 
 func (r *roleRepo) CreateRole(ctx context.Context, roleDto CreateRoleDto) (*ent.Role, error) {
-	return r.db.Role.Create().
+	tx, err := r.db.Tx(ctx)
+	if err != nil {
+		return nil, err
+	}
+	defer func() {
+		if err != nil {
+			tx.Rollback()
+		}
+	}()
+
+	role, err := tx.Role.Create().
 		SetName(roleDto.Name).
 		SetDescription(roleDto.Description).
 		SetTenantID(roleDto.TenantId).
 		Save(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	var rpCreate []*ent.RolePermissionCreate
+
+	if len(roleDto.Allow) > 0 {
+		for _, rp := range roleDto.Allow {
+			query := tx.RolePermission.Create().
+				SetTenantID(roleDto.TenantId).
+				SetRole(role).
+				SetPermissionID(rp).
+				SetFields([]string{}).
+				SetDeny(false)
+
+			rpCreate = append(rpCreate, query)
+		}
+	}
+
+	if len(roleDto.Deny) > 0 {
+		for _, rp := range roleDto.Deny {
+			query := tx.RolePermission.Create().
+				SetTenantID(roleDto.TenantId).
+				SetRole(role).
+				SetPermissionID(rp).
+				SetFields([]string{}).
+				SetDeny(true)
+
+			rpCreate = append(rpCreate, query)
+		}
+	}
+
+	if len(rpCreate) > 0 {
+		permissions, err := tx.RolePermission.CreateBulk(rpCreate...).Save(ctx)
+		if err != nil {
+			return nil, err
+		}
+
+		role.Edges.Permissions = permissions
+	}
+
+	tx.Commit()
+
+	return role, nil
 }
 
 func (r *roleRepo) UpdateRole(ctx context.Context, role *ent.Role, roleDto UpdateRoleDto) (*ent.Role, error) {

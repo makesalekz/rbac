@@ -70,6 +70,8 @@ func (s *RolesService) CreateRole(ctx context.Context, req *v1.CreateRoleRequest
 		TenantId:    claims.GetTenantId(),
 		Name:        req.Name,
 		Description: req.Description,
+		Allow:       req.Allow,
+		Deny:        req.Deny,
 	})
 	if err != nil {
 		return nil, v1.ErrorDatabaseQuery(err.Error())

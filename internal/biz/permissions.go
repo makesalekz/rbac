@@ -91,8 +91,6 @@ func (uc *PermissionsUsecase) GetGroupedPermissions(ctx context.Context, filter 
 			return nil, err
 		}
 
-		uc.log.Debugf("denied permissions: %+v", permissions)
-
 		excludePermissions := make(map[string]bool)
 		for _, permission := range permissions {
 			excludePermissions[permission.PermissionID] = true
