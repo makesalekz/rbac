@@ -651,8 +651,8 @@ components:
         rbac.v1.RolePermission:
             type: object
             properties:
-                permission:
-                    $ref: '#/components/schemas/rbac.v1.Permission'
+                id:
+                    type: string
                 deny:
                     type: boolean
                 fields:

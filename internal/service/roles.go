@@ -296,11 +296,8 @@ func (s *RolesService) roleReply(role *ent.Role) *v1.Role {
 
 func (s *RolesService) rolePermissionReply(rolePermission *ent.RolePermission) *v1.RolePermission {
 	return &v1.RolePermission{
-		Permission: &v1.Permission{
-			Id:    rolePermission.Edges.Permission.ID,
-			AppId: rolePermission.Edges.Permission.AppID,
-		},
+		Id:     rolePermission.PermissionID,
 		Fields: rolePermission.Fields,
-		Deny:   &rolePermission.Deny,
+		Deny:   rolePermission.Deny,
 	}
 }
