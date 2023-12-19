@@ -65,10 +65,10 @@ func wireApp(bootstrap *conf.Bootstrap, logger log.Logger) (*kratos.App, func(),
 		return nil, nil, err
 	}
 	teamsService := service.NewTeamsService(jwtProcessor, teamsUsecase)
-	teamIdentityRoleService := service.NewTeamIdentityRoleService(jwtProcessor, rolesUsecase, teamsUsecase, teamIdentityUsecase)
+	assignsService := service.NewAssignsService(jwtProcessor, rolesUsecase, teamsUsecase, teamIdentityUsecase)
 	checkPermissionsService := service.NewCheckPermissionsService(jwtProcessor, teamIdentityUsecase)
-	grpcServer := server.NewGRPCServer(bootstrap, logger, jwtProcessor, rolesService, permissionsService, teamsService, teamIdentityRoleService, checkPermissionsService)
-	httpServer := server.NewHTTPServer(bootstrap, logger, jwtProcessor, rolesService, permissionsService, teamsService, teamIdentityRoleService, checkPermissionsService)
+	grpcServer := server.NewGRPCServer(bootstrap, jwtProcessor, rolesService, permissionsService, teamsService, assignsService, checkPermissionsService)
+	httpServer := server.NewHTTPServer(bootstrap, jwtProcessor, rolesService, permissionsService, teamsService, assignsService, checkPermissionsService)
 	app := newApp(logger, configConfig, grpcServer, httpServer)
 	return app, func() {
 		cleanup()

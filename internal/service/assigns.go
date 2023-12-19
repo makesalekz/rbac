@@ -11,8 +11,8 @@ import (
 	"gitlab.calendaria.team/services/utils/v1/jwt"
 )
 
-type TeamIdentityRoleService struct {
-	v1.UnimplementedTeamIdentityRoleServer
+type AssignsService struct {
+	v1.UnimplementedAssignsServer
 
 	jwt *jwt.JwtProcessor
 	ru  *biz.RolesUsecase
@@ -20,13 +20,13 @@ type TeamIdentityRoleService struct {
 	uc  *biz.TeamIdentityUsecase
 }
 
-func NewTeamIdentityRoleService(
+func NewAssignsService(
 	jwt *jwt.JwtProcessor,
 	ru *biz.RolesUsecase,
 	tu *biz.TeamsUsecase,
 	uc *biz.TeamIdentityUsecase,
-) *TeamIdentityRoleService {
-	return &TeamIdentityRoleService{
+) *AssignsService {
+	return &AssignsService{
 		jwt: jwt,
 		ru:  ru,
 		tu:  tu,
@@ -34,7 +34,7 @@ func NewTeamIdentityRoleService(
 	}
 }
 
-func (s *TeamIdentityRoleService) AssignRole(ctx context.Context, req *v1.AssignRoleRequest) (*utils_v1.EmptyReply, error) {
+func (s *AssignsService) AssignRole(ctx context.Context, req *v1.AssignRoleRequest) (*utils_v1.EmptyReply, error) {
 	claims, ok := s.jwt.GetClaimsFromContext(ctx)
 	if !ok || !claims.IsUserTenantRequest() {
 		return nil, v1.ErrorUnauthorized("invalid token")
@@ -54,7 +54,7 @@ func (s *TeamIdentityRoleService) AssignRole(ctx context.Context, req *v1.Assign
 	return &utils_v1.EmptyReply{}, nil
 }
 
-func (s *TeamIdentityRoleService) DeleteAssign(ctx context.Context, req *v1.AssignRequest) (*utils_v1.EmptyReply, error) {
+func (s *AssignsService) DeleteAssign(ctx context.Context, req *v1.AssignRequest) (*utils_v1.EmptyReply, error) {
 	claims, ok := s.jwt.GetClaimsFromContext(ctx)
 	if !ok || !claims.IsUserTenantRequest() {
 		return nil, v1.ErrorUnauthorized("invalid token")
@@ -68,7 +68,7 @@ func (s *TeamIdentityRoleService) DeleteAssign(ctx context.Context, req *v1.Assi
 	return &utils_v1.EmptyReply{}, nil
 }
 
-func (s *TeamIdentityRoleService) ListAssigns(ctx context.Context, req *v1.ListAssignsRequest) (*v1.ListAssignsReply, error) {
+func (s *AssignsService) ListAssigns(ctx context.Context, req *v1.ListAssignsRequest) (*v1.ListAssignsReply, error) {
 	claims, ok := s.jwt.GetClaimsFromContext(ctx)
 	if !ok || !claims.IsUserTenantRequest() {
 		return nil, v1.ErrorUnauthorized("invalid token")

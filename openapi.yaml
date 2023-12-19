@@ -9,8 +9,8 @@ paths:
     /v1/rbac/assigns:
         post:
             tags:
-                - TeamIdentityRole
-            operationId: TeamIdentityRole_AssignRole
+                - Assigns
+            operationId: Assigns_AssignRole
             requestBody:
                 content:
                     application/json:
@@ -27,8 +27,8 @@ paths:
     /v1/rbac/assigns/list:
         post:
             tags:
-                - TeamIdentityRole
-            operationId: TeamIdentityRole_ListAssigns
+                - Assigns
+            operationId: Assigns_ListAssigns
             requestBody:
                 content:
                     application/json:
@@ -45,8 +45,8 @@ paths:
     /v1/rbac/assigns/{assignId}:
         delete:
             tags:
-                - TeamIdentityRole
-            operationId: TeamIdentityRole_DeleteAssign
+                - Assigns
+            operationId: Assigns_DeleteAssign
             parameters:
                 - name: assignId
                   in: path
@@ -800,8 +800,8 @@ components:
                     type: integer
                     format: int32
 tags:
+    - name: Assigns
     - name: CheckPermissions
     - name: Permissions
     - name: Roles
-    - name: TeamIdentityRole
     - name: Teams
