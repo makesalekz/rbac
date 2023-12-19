@@ -20,163 +20,163 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	TeamIdentityRole_AssignRole_FullMethodName   = "/rbac.v1.TeamIdentityRole/AssignRole"
-	TeamIdentityRole_DeleteAssign_FullMethodName = "/rbac.v1.TeamIdentityRole/DeleteAssign"
-	TeamIdentityRole_ListAssigns_FullMethodName  = "/rbac.v1.TeamIdentityRole/ListAssigns"
+	Assigns_AssignRole_FullMethodName   = "/rbac.v1.Assigns/AssignRole"
+	Assigns_DeleteAssign_FullMethodName = "/rbac.v1.Assigns/DeleteAssign"
+	Assigns_ListAssigns_FullMethodName  = "/rbac.v1.Assigns/ListAssigns"
 )
 
-// TeamIdentityRoleClient is the client API for TeamIdentityRole service.
+// AssignsClient is the client API for Assigns service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type TeamIdentityRoleClient interface {
+type AssignsClient interface {
 	AssignRole(ctx context.Context, in *AssignRoleRequest, opts ...grpc.CallOption) (*v1.EmptyReply, error)
 	DeleteAssign(ctx context.Context, in *AssignRequest, opts ...grpc.CallOption) (*v1.EmptyReply, error)
 	ListAssigns(ctx context.Context, in *ListAssignsRequest, opts ...grpc.CallOption) (*ListAssignsReply, error)
 }
 
-type teamIdentityRoleClient struct {
+type assignsClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewTeamIdentityRoleClient(cc grpc.ClientConnInterface) TeamIdentityRoleClient {
-	return &teamIdentityRoleClient{cc}
+func NewAssignsClient(cc grpc.ClientConnInterface) AssignsClient {
+	return &assignsClient{cc}
 }
 
-func (c *teamIdentityRoleClient) AssignRole(ctx context.Context, in *AssignRoleRequest, opts ...grpc.CallOption) (*v1.EmptyReply, error) {
+func (c *assignsClient) AssignRole(ctx context.Context, in *AssignRoleRequest, opts ...grpc.CallOption) (*v1.EmptyReply, error) {
 	out := new(v1.EmptyReply)
-	err := c.cc.Invoke(ctx, TeamIdentityRole_AssignRole_FullMethodName, in, out, opts...)
+	err := c.cc.Invoke(ctx, Assigns_AssignRole_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *teamIdentityRoleClient) DeleteAssign(ctx context.Context, in *AssignRequest, opts ...grpc.CallOption) (*v1.EmptyReply, error) {
+func (c *assignsClient) DeleteAssign(ctx context.Context, in *AssignRequest, opts ...grpc.CallOption) (*v1.EmptyReply, error) {
 	out := new(v1.EmptyReply)
-	err := c.cc.Invoke(ctx, TeamIdentityRole_DeleteAssign_FullMethodName, in, out, opts...)
+	err := c.cc.Invoke(ctx, Assigns_DeleteAssign_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *teamIdentityRoleClient) ListAssigns(ctx context.Context, in *ListAssignsRequest, opts ...grpc.CallOption) (*ListAssignsReply, error) {
+func (c *assignsClient) ListAssigns(ctx context.Context, in *ListAssignsRequest, opts ...grpc.CallOption) (*ListAssignsReply, error) {
 	out := new(ListAssignsReply)
-	err := c.cc.Invoke(ctx, TeamIdentityRole_ListAssigns_FullMethodName, in, out, opts...)
+	err := c.cc.Invoke(ctx, Assigns_ListAssigns_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// TeamIdentityRoleServer is the server API for TeamIdentityRole service.
-// All implementations must embed UnimplementedTeamIdentityRoleServer
+// AssignsServer is the server API for Assigns service.
+// All implementations must embed UnimplementedAssignsServer
 // for forward compatibility
-type TeamIdentityRoleServer interface {
+type AssignsServer interface {
 	AssignRole(context.Context, *AssignRoleRequest) (*v1.EmptyReply, error)
 	DeleteAssign(context.Context, *AssignRequest) (*v1.EmptyReply, error)
 	ListAssigns(context.Context, *ListAssignsRequest) (*ListAssignsReply, error)
-	mustEmbedUnimplementedTeamIdentityRoleServer()
+	mustEmbedUnimplementedAssignsServer()
 }
 
-// UnimplementedTeamIdentityRoleServer must be embedded to have forward compatible implementations.
-type UnimplementedTeamIdentityRoleServer struct {
+// UnimplementedAssignsServer must be embedded to have forward compatible implementations.
+type UnimplementedAssignsServer struct {
 }
 
-func (UnimplementedTeamIdentityRoleServer) AssignRole(context.Context, *AssignRoleRequest) (*v1.EmptyReply, error) {
+func (UnimplementedAssignsServer) AssignRole(context.Context, *AssignRoleRequest) (*v1.EmptyReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AssignRole not implemented")
 }
-func (UnimplementedTeamIdentityRoleServer) DeleteAssign(context.Context, *AssignRequest) (*v1.EmptyReply, error) {
+func (UnimplementedAssignsServer) DeleteAssign(context.Context, *AssignRequest) (*v1.EmptyReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteAssign not implemented")
 }
-func (UnimplementedTeamIdentityRoleServer) ListAssigns(context.Context, *ListAssignsRequest) (*ListAssignsReply, error) {
+func (UnimplementedAssignsServer) ListAssigns(context.Context, *ListAssignsRequest) (*ListAssignsReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListAssigns not implemented")
 }
-func (UnimplementedTeamIdentityRoleServer) mustEmbedUnimplementedTeamIdentityRoleServer() {}
+func (UnimplementedAssignsServer) mustEmbedUnimplementedAssignsServer() {}
 
-// UnsafeTeamIdentityRoleServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to TeamIdentityRoleServer will
+// UnsafeAssignsServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to AssignsServer will
 // result in compilation errors.
-type UnsafeTeamIdentityRoleServer interface {
-	mustEmbedUnimplementedTeamIdentityRoleServer()
+type UnsafeAssignsServer interface {
+	mustEmbedUnimplementedAssignsServer()
 }
 
-func RegisterTeamIdentityRoleServer(s grpc.ServiceRegistrar, srv TeamIdentityRoleServer) {
-	s.RegisterService(&TeamIdentityRole_ServiceDesc, srv)
+func RegisterAssignsServer(s grpc.ServiceRegistrar, srv AssignsServer) {
+	s.RegisterService(&Assigns_ServiceDesc, srv)
 }
 
-func _TeamIdentityRole_AssignRole_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Assigns_AssignRole_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(AssignRoleRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(TeamIdentityRoleServer).AssignRole(ctx, in)
+		return srv.(AssignsServer).AssignRole(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: TeamIdentityRole_AssignRole_FullMethodName,
+		FullMethod: Assigns_AssignRole_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(TeamIdentityRoleServer).AssignRole(ctx, req.(*AssignRoleRequest))
+		return srv.(AssignsServer).AssignRole(ctx, req.(*AssignRoleRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _TeamIdentityRole_DeleteAssign_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Assigns_DeleteAssign_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(AssignRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(TeamIdentityRoleServer).DeleteAssign(ctx, in)
+		return srv.(AssignsServer).DeleteAssign(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: TeamIdentityRole_DeleteAssign_FullMethodName,
+		FullMethod: Assigns_DeleteAssign_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(TeamIdentityRoleServer).DeleteAssign(ctx, req.(*AssignRequest))
+		return srv.(AssignsServer).DeleteAssign(ctx, req.(*AssignRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _TeamIdentityRole_ListAssigns_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Assigns_ListAssigns_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ListAssignsRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(TeamIdentityRoleServer).ListAssigns(ctx, in)
+		return srv.(AssignsServer).ListAssigns(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: TeamIdentityRole_ListAssigns_FullMethodName,
+		FullMethod: Assigns_ListAssigns_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(TeamIdentityRoleServer).ListAssigns(ctx, req.(*ListAssignsRequest))
+		return srv.(AssignsServer).ListAssigns(ctx, req.(*ListAssignsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-// TeamIdentityRole_ServiceDesc is the grpc.ServiceDesc for TeamIdentityRole service.
+// Assigns_ServiceDesc is the grpc.ServiceDesc for Assigns service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
-var TeamIdentityRole_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "rbac.v1.TeamIdentityRole",
-	HandlerType: (*TeamIdentityRoleServer)(nil),
+var Assigns_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "rbac.v1.Assigns",
+	HandlerType: (*AssignsServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
 			MethodName: "AssignRole",
-			Handler:    _TeamIdentityRole_AssignRole_Handler,
+			Handler:    _Assigns_AssignRole_Handler,
 		},
 		{
 			MethodName: "DeleteAssign",
-			Handler:    _TeamIdentityRole_DeleteAssign_Handler,
+			Handler:    _Assigns_DeleteAssign_Handler,
 		},
 		{
 			MethodName: "ListAssigns",
-			Handler:    _TeamIdentityRole_ListAssigns_Handler,
+			Handler:    _Assigns_ListAssigns_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -10,5 +10,5 @@ var ProviderSet = wire.NewSet(
 	NewPermissionsService,
 	NewTeamsService,
 	NewCheckPermissionsService,
-	NewTeamIdentityRoleService,
+	NewAssignsService,
 )

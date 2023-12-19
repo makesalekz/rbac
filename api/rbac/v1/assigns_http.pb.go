@@ -20,24 +20,24 @@ var _ = binding.EncodeURL
 
 const _ = http.SupportPackageIsVersion1
 
-const OperationTeamIdentityRoleAssignRole = "/rbac.v1.TeamIdentityRole/AssignRole"
-const OperationTeamIdentityRoleDeleteAssign = "/rbac.v1.TeamIdentityRole/DeleteAssign"
-const OperationTeamIdentityRoleListAssigns = "/rbac.v1.TeamIdentityRole/ListAssigns"
+const OperationAssignsAssignRole = "/rbac.v1.Assigns/AssignRole"
+const OperationAssignsDeleteAssign = "/rbac.v1.Assigns/DeleteAssign"
+const OperationAssignsListAssigns = "/rbac.v1.Assigns/ListAssigns"
 
-type TeamIdentityRoleHTTPServer interface {
+type AssignsHTTPServer interface {
 	AssignRole(context.Context, *AssignRoleRequest) (*v1.EmptyReply, error)
 	DeleteAssign(context.Context, *AssignRequest) (*v1.EmptyReply, error)
 	ListAssigns(context.Context, *ListAssignsRequest) (*ListAssignsReply, error)
 }
 
-func RegisterTeamIdentityRoleHTTPServer(s *http.Server, srv TeamIdentityRoleHTTPServer) {
+func RegisterAssignsHTTPServer(s *http.Server, srv AssignsHTTPServer) {
 	r := s.Route("/")
-	r.POST("/v1/rbac/assigns", _TeamIdentityRole_AssignRole0_HTTP_Handler(srv))
-	r.DELETE("/v1/rbac/assigns/{assignId}", _TeamIdentityRole_DeleteAssign0_HTTP_Handler(srv))
-	r.POST("/v1/rbac/assigns/list", _TeamIdentityRole_ListAssigns0_HTTP_Handler(srv))
+	r.POST("/v1/rbac/assigns", _Assigns_AssignRole0_HTTP_Handler(srv))
+	r.DELETE("/v1/rbac/assigns/{assignId}", _Assigns_DeleteAssign0_HTTP_Handler(srv))
+	r.POST("/v1/rbac/assigns/list", _Assigns_ListAssigns0_HTTP_Handler(srv))
 }
 
-func _TeamIdentityRole_AssignRole0_HTTP_Handler(srv TeamIdentityRoleHTTPServer) func(ctx http.Context) error {
+func _Assigns_AssignRole0_HTTP_Handler(srv AssignsHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in AssignRoleRequest
 		if err := ctx.Bind(&in); err != nil {
@@ -46,7 +46,7 @@ func _TeamIdentityRole_AssignRole0_HTTP_Handler(srv TeamIdentityRoleHTTPServer) 
 		if err := ctx.BindQuery(&in); err != nil {
 			return err
 		}
-		http.SetOperation(ctx, OperationTeamIdentityRoleAssignRole)
+		http.SetOperation(ctx, OperationAssignsAssignRole)
 		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
 			return srv.AssignRole(ctx, req.(*AssignRoleRequest))
 		})
@@ -59,7 +59,7 @@ func _TeamIdentityRole_AssignRole0_HTTP_Handler(srv TeamIdentityRoleHTTPServer) 
 	}
 }
 
-func _TeamIdentityRole_DeleteAssign0_HTTP_Handler(srv TeamIdentityRoleHTTPServer) func(ctx http.Context) error {
+func _Assigns_DeleteAssign0_HTTP_Handler(srv AssignsHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in AssignRequest
 		if err := ctx.BindQuery(&in); err != nil {
@@ -68,7 +68,7 @@ func _TeamIdentityRole_DeleteAssign0_HTTP_Handler(srv TeamIdentityRoleHTTPServer
 		if err := ctx.BindVars(&in); err != nil {
 			return err
 		}
-		http.SetOperation(ctx, OperationTeamIdentityRoleDeleteAssign)
+		http.SetOperation(ctx, OperationAssignsDeleteAssign)
 		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
 			return srv.DeleteAssign(ctx, req.(*AssignRequest))
 		})
@@ -81,7 +81,7 @@ func _TeamIdentityRole_DeleteAssign0_HTTP_Handler(srv TeamIdentityRoleHTTPServer
 	}
 }
 
-func _TeamIdentityRole_ListAssigns0_HTTP_Handler(srv TeamIdentityRoleHTTPServer) func(ctx http.Context) error {
+func _Assigns_ListAssigns0_HTTP_Handler(srv AssignsHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in ListAssignsRequest
 		if err := ctx.Bind(&in); err != nil {
@@ -90,7 +90,7 @@ func _TeamIdentityRole_ListAssigns0_HTTP_Handler(srv TeamIdentityRoleHTTPServer)
 		if err := ctx.BindQuery(&in); err != nil {
 			return err
 		}
-		http.SetOperation(ctx, OperationTeamIdentityRoleListAssigns)
+		http.SetOperation(ctx, OperationAssignsListAssigns)
 		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
 			return srv.ListAssigns(ctx, req.(*ListAssignsRequest))
 		})
@@ -103,25 +103,25 @@ func _TeamIdentityRole_ListAssigns0_HTTP_Handler(srv TeamIdentityRoleHTTPServer)
 	}
 }
 
-type TeamIdentityRoleHTTPClient interface {
+type AssignsHTTPClient interface {
 	AssignRole(ctx context.Context, req *AssignRoleRequest, opts ...http.CallOption) (rsp *v1.EmptyReply, err error)
 	DeleteAssign(ctx context.Context, req *AssignRequest, opts ...http.CallOption) (rsp *v1.EmptyReply, err error)
 	ListAssigns(ctx context.Context, req *ListAssignsRequest, opts ...http.CallOption) (rsp *ListAssignsReply, err error)
 }
 
-type TeamIdentityRoleHTTPClientImpl struct {
+type AssignsHTTPClientImpl struct {
 	cc *http.Client
 }
 
-func NewTeamIdentityRoleHTTPClient(client *http.Client) TeamIdentityRoleHTTPClient {
-	return &TeamIdentityRoleHTTPClientImpl{client}
+func NewAssignsHTTPClient(client *http.Client) AssignsHTTPClient {
+	return &AssignsHTTPClientImpl{client}
 }
 
-func (c *TeamIdentityRoleHTTPClientImpl) AssignRole(ctx context.Context, in *AssignRoleRequest, opts ...http.CallOption) (*v1.EmptyReply, error) {
+func (c *AssignsHTTPClientImpl) AssignRole(ctx context.Context, in *AssignRoleRequest, opts ...http.CallOption) (*v1.EmptyReply, error) {
 	var out v1.EmptyReply
 	pattern := "/v1/rbac/assigns"
 	path := binding.EncodeURL(pattern, in, false)
-	opts = append(opts, http.Operation(OperationTeamIdentityRoleAssignRole))
+	opts = append(opts, http.Operation(OperationAssignsAssignRole))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
 	if err != nil {
@@ -130,11 +130,11 @@ func (c *TeamIdentityRoleHTTPClientImpl) AssignRole(ctx context.Context, in *Ass
 	return &out, err
 }
 
-func (c *TeamIdentityRoleHTTPClientImpl) DeleteAssign(ctx context.Context, in *AssignRequest, opts ...http.CallOption) (*v1.EmptyReply, error) {
+func (c *AssignsHTTPClientImpl) DeleteAssign(ctx context.Context, in *AssignRequest, opts ...http.CallOption) (*v1.EmptyReply, error) {
 	var out v1.EmptyReply
 	pattern := "/v1/rbac/assigns/{assignId}"
 	path := binding.EncodeURL(pattern, in, true)
-	opts = append(opts, http.Operation(OperationTeamIdentityRoleDeleteAssign))
+	opts = append(opts, http.Operation(OperationAssignsDeleteAssign))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "DELETE", path, nil, &out, opts...)
 	if err != nil {
@@ -143,11 +143,11 @@ func (c *TeamIdentityRoleHTTPClientImpl) DeleteAssign(ctx context.Context, in *A
 	return &out, err
 }
 
-func (c *TeamIdentityRoleHTTPClientImpl) ListAssigns(ctx context.Context, in *ListAssignsRequest, opts ...http.CallOption) (*ListAssignsReply, error) {
+func (c *AssignsHTTPClientImpl) ListAssigns(ctx context.Context, in *ListAssignsRequest, opts ...http.CallOption) (*ListAssignsReply, error) {
 	var out ListAssignsReply
 	pattern := "/v1/rbac/assigns/list"
 	path := binding.EncodeURL(pattern, in, false)
-	opts = append(opts, http.Operation(OperationTeamIdentityRoleListAssigns))
+	opts = append(opts, http.Operation(OperationAssignsListAssigns))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
 	if err != nil {
