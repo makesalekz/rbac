@@ -9,19 +9,19 @@ option java_multiple_files = true;
 option java_package = "rbac.v1";
 
 enum ErrorReason {
-	// Set default error code.
-	option (errors.default_code) = 500;
+  // Set default error code.
+  option (errors.default_code) = 500;
 
-	// Set the error code separately for an enumeration.
-	INTERNAL = 0;
-	GRPC_CONNECTION = 1;
-	SERVICE_FAILED = 2;
-	DATABASE_QUERY = 3;
-	FORBIDDEN = 4 [(errors.code) = 403];
+  // Set the error code separately for an enumeration.
+  INTERNAL = 0;
+  GRPC_CONNECTION = 1;
+  SERVICE_FAILED = 2;
+  DATABASE_QUERY = 3;
+  FORBIDDEN = 4 [(errors.code) = 403];
 
-	UNAUTHORIZED = 10 [(errors.code) = 401];
+  UNAUTHORIZED = 10 [(errors.code) = 401];
 
-	INVALID_REQUEST = 20 [(errors.code) = 400];
-	NOT_FOUND = 21 [(errors.code) = 404];
-	ALREADY_EXISTS = 22 [(errors.code) = 400];
+  INVALID_REQUEST = 20 [(errors.code) = 400];
+  NOT_FOUND = 21 [(errors.code) = 404];
+  ALREADY_EXISTS = 22 [(errors.code) = 400];
 }

@@ -9,7 +9,8 @@ option java_multiple_files = true;
 option java_package = "rbac.v1";
 
 service CheckPermissions {
-  rpc CheckPermissions (CheckPermissionsRequest) returns (CheckPermissionsReply) {
+  rpc CheckPermissions(CheckPermissionsRequest)
+      returns (CheckPermissionsReply) {
     option (google.api.http) = {
       post: "/v1/rbac/check"
       body: "*"

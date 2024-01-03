@@ -3,7 +3,7 @@ syntax = "proto3";
 package rbac.v1;
 
 import "google/api/annotations.proto";
-import "utils/v1/models.proto";
+import "api/utils/v1/models.proto";
 import "api/rbac/v1/models.proto";
 
 option go_package = "gitlab.calendaria.team/services/rbac/api/rbac/v1;rbac_v1";
@@ -11,68 +11,68 @@ option java_multiple_files = true;
 option java_package = "rbac.v1";
 
 service Permissions {
-	rpc CreatePermission (CreatePermissionRequest) returns (PermissionReply) {
-		option (google.api.http) = {
-			post: "/v1/rbac/permissions"
-			body: "*"
-		};
-	};
-	rpc UpdatePermission (UpdatePermissionRequest) returns (PermissionReply) {
-		option (google.api.http) = {
-			put: "/v1/rbac/permissions/{permissionId}"
-			body: "*"
-		};
-	};
-	rpc DeletePermission (DeletePermissionRequest) returns (utils.v1.EmptyReply) {
-		option (google.api.http) = {
-			delete: "/v1/rbac/permissions/{permissionId}"
-		};
-	};
-	rpc GetPermission (GetPermissionRequest) returns (PermissionReply) {
-		option (google.api.http) = {
-			get: "/v1/rbac/permissions/{permissionId}"
-		};
-	};
-	rpc ListPermissions (ListPermissionsRequest) returns (ListPermissionsReply){
-		option (google.api.http) = {
-			post: "/v1/rbac/permissions/list"
-			body: "*"
-		};
-	};
+  rpc CreatePermission(CreatePermissionRequest) returns (PermissionReply) {
+    option (google.api.http) = {
+      post: "/v1/rbac/permissions"
+      body: "*"
+    };
+  };
+  rpc UpdatePermission(UpdatePermissionRequest) returns (PermissionReply) {
+    option (google.api.http) = {
+      put: "/v1/rbac/permissions/{permissionId}"
+      body: "*"
+    };
+  };
+  rpc DeletePermission(DeletePermissionRequest) returns (utils.v1.EmptyReply) {
+    option (google.api.http) = {
+      delete: "/v1/rbac/permissions/{permissionId}"
+    };
+  };
+  rpc GetPermission(GetPermissionRequest) returns (PermissionReply) {
+    option (google.api.http) = {
+      get: "/v1/rbac/permissions/{permissionId}"
+    };
+  };
+  rpc ListPermissions(ListPermissionsRequest) returns (ListPermissionsReply) {
+    option (google.api.http) = {
+      post: "/v1/rbac/permissions/list"
+      body: "*"
+    };
+  };
 }
 
 message CreatePermissionRequest {
-	string id = 1;
-	string groupId = 2;
-	string appId = 3;
-	string name = 4;
-	string description = 5;
-	repeated string fields = 6;
+  string id = 1;
+  string groupId = 2;
+  string appId = 3;
+  string name = 4;
+  string description = 5;
+  repeated string fields = 6;
 }
 
 message PermissionReply {
-	Permission permission = 1;
+  Permission permission = 1;
 }
 
 message UpdatePermissionRequest {
-	string permissionId = 1;
-	string name = 2;
-	string description = 3;
-	repeated string fields = 4;
+  string permissionId = 1;
+  string name = 2;
+  string description = 3;
+  repeated string fields = 4;
 }
 
 message DeletePermissionRequest {
-	string permissionId = 1;
+  string permissionId = 1;
 }
 
 message GetPermissionRequest {
-	string permissionId = 1;
+  string permissionId = 1;
 }
 
 message ListPermissionsRequest {
-	repeated string appsIds = 1;
+  repeated string appsIds = 1;
 }
 
 message ListPermissionsReply {
-	repeated Group groups = 1;
+  repeated Group groups = 1;
 }
