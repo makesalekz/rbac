@@ -3,55 +3,57 @@ syntax = "proto3";
 package rbac.v1;
 
 import "google/api/annotations.proto";
-import "utils/v1/models.proto";
+import "api/utils/v1/models.proto";
 import "api/rbac/v1/models.proto";
 
 option go_package = "gitlab.calendaria.team/services/rbac/api/rbac/v1;rbac_v1";
 option java_multiple_files = true;
 option java_package = "rbac.v1";
 
-
 service Roles {
-  rpc CreateRole (CreateRoleRequest) returns (RoleReply) {
+  rpc CreateRole(CreateRoleRequest) returns (RoleReply) {
     option (google.api.http) = {
       post: "/v1/rbac/roles"
       body: "*"
     };
   };
-  rpc UpdateRole (UpdateRoleRequest) returns (RoleReply) {
+  rpc UpdateRole(UpdateRoleRequest) returns (RoleReply) {
     option (google.api.http) = {
       put: "/v1/rbac/roles/{roleId}"
       body: "*"
     };
   };
-  rpc DeleteRole (DeleteRoleRequest) returns (utils.v1.EmptyReply) {
+  rpc DeleteRole(DeleteRoleRequest) returns (utils.v1.EmptyReply) {
     option (google.api.http) = {
       delete: "/v1/rbac/roles/{roleId}"
     };
   };
-  rpc GetRole (GetRoleRequest) returns (RoleReply) {
+  rpc GetRole(GetRoleRequest) returns (RoleReply) {
     option (google.api.http) = {
       get: "/v1/rbac/roles/{roleId}"
     };
   };
-  rpc ListRoles (ListRolesRequest) returns (ListRolesReply){
+  rpc ListRoles(ListRolesRequest) returns (ListRolesReply) {
     option (google.api.http) = {
       post: "/v1/rbac/roles/list"
       body: "*"
     };
   };
-  rpc SetRolePermission (SetRolePermissionRequest) returns (utils.v1.EmptyReply){
+  rpc SetRolePermission(SetRolePermissionRequest)
+      returns (utils.v1.EmptyReply) {
     option (google.api.http) = {
       post: "/v1/rbac/roles/{roleId}/permissions"
       body: "*"
     };
   };
-  rpc DeleteRolePermission (DeleteRolePermissionRequest) returns (utils.v1.EmptyReply){
+  rpc DeleteRolePermission(DeleteRolePermissionRequest)
+      returns (utils.v1.EmptyReply) {
     option (google.api.http) = {
       delete: "/v1/rbac/roles/{roleId}/permissions/{permissionId}"
     };
   };
-  rpc ListRolePermissions (ListRolePermissionsRequest) returns (RolePermissionsReply){
+  rpc ListRolePermissions(ListRolePermissionsRequest)
+      returns (RolePermissionsReply) {
     option (google.api.http) = {
       post: "/v1/rbac/roles/{roleId}/permissions/list"
       body: "*"
