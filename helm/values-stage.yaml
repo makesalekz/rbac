@@ -1,0 +1,100 @@
+image:
+  # image config
+  repository: 
+  tag: 
+  pullPolicy: IfNotPresent
+  imagePullSecrets:
+
+fullnameOverride: rbac
+nameOverride: rbac
+namespaceOverride: stage-backend
+configmap:
+  private:
+    enabled: false
+    path: /data/conf/config.yaml
+    name: goconfig
+  data:
+    DEBUG: "1"
+    SERVICE_NAME: "iam"
+    AUTOMIGRATE: "true"
+    CONSUL_ADDRESS: "http://10.2.5.6:8500"
+    VAULT_ADDRESS: "http://10.2.4.5:8200"
+    VAULT_ROLE_ID: "6ff9fd7f-6980-21f4-9a17-fa48ff9b1002"
+    VAULT_SECRET_ID: "a7c77216-f87d-e635-b4d4-e707d98ab85c"
+
+
+server:
+  replicaCount: 1
+  command: ["./rbac", "-conf", "./config.yaml"]
+  podSecurityContext: {}
+  securityContext: {}
+  serviceAccount:
+  
+  # livenessProbe:
+  #   failureThreshold: 2
+  #   initialDelaySeconds: 120
+  #   periodSeconds: 60
+  #   successThreshold: 1
+  #   tcpSocket:
+  #     port: 8000
+  #   timeoutSeconds: 10
+
+  # readinessProbe:
+  #   failureThreshold: 2
+  #   httpGet:
+  #     path: /health-check/
+  #     port: http
+  #     scheme: HTTP
+  #   initialDelaySeconds: 120
+  #   periodSeconds: 10
+  #   successThreshold: 1
+  #   timeoutSeconds: 10
+
+  # startupProbe:
+  #   failureThreshold: 2
+  #   periodSeconds: 10
+  #   successThreshold: 1
+  #   initialDelaySeconds: 120
+  #   tcpSocket:
+  #     port: 8000
+  #   timeoutSeconds: 10
+
+  resources:
+    limits:
+      cpu: 1
+      memory: 1Gi
+    requests:
+      cpu: 0.5
+      memory: 0.5Gi
+
+  service:
+    type: ClusterIP
+    port: 80
+    targetPort: 8000
+    
+  env: { }
+  envSecrets: { }
+  vaultSecret:
+    enabled: false
+    project: stage-calendaria
+
+
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    annotations:
+      nginx.ingress.kubernetes.io/proxy-body-size: 512m
+      nginx.ingress.kubernetes.io/rewrite-target: /$1
+    path: /rbac/?(.*)
+    hosts:
+      - stage.calendaria.net
+    tls:
+    - secretName: calendaria-tls
+      hosts:
+        - stage.calendaria.net
+
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+
+
