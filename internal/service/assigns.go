@@ -8,41 +8,40 @@ import (
 	"gitlab.calendaria.team/services/rbac/internal/biz"
 	"gitlab.calendaria.team/services/rbac/internal/data"
 	utils_v1 "gitlab.calendaria.team/services/utils/api/utils/v1"
-	"gitlab.calendaria.team/services/utils/v1/jwt"
 )
 
 type AssignsService struct {
 	v1.UnimplementedAssignsServer
 
-	jwt *jwt.JwtProcessor
-	ru  *biz.RolesUsecase
-	tu  *biz.TeamsUsecase
-	uc  *biz.TeamIdentityUsecase
+	sh *ServiceHelper
+	ru *biz.RolesUsecase
+	tu *biz.TeamsUsecase
+	uc *biz.TeamIdentityUsecase
 }
 
 func NewAssignsService(
-	jwt *jwt.JwtProcessor,
+	sh *ServiceHelper,
 	ru *biz.RolesUsecase,
 	tu *biz.TeamsUsecase,
 	uc *biz.TeamIdentityUsecase,
 ) *AssignsService {
 	return &AssignsService{
-		jwt: jwt,
-		ru:  ru,
-		tu:  tu,
-		uc:  uc,
+		sh: sh,
+		ru: ru,
+		tu: tu,
+		uc: uc,
 	}
 }
 
 func (s *AssignsService) AssignRole(ctx context.Context, req *v1.AssignRoleRequest) (*utils_v1.EmptyReply, error) {
-	claims, ok := s.jwt.GetClaimsFromContext(ctx)
-	if !ok || !claims.IsUserTenantRequest() {
+	tenantId, err := s.sh.GetTenantId(ctx, req.TenantId)
+	if err != nil {
 		return nil, v1.ErrorUnauthorized("invalid token")
 	}
 	// todo checkPermissions can assign role to tenant identity
 
-	err := s.uc.AssignRole(ctx, data.AssignRoleDto{
-		TenantId:   claims.GetTenantId(),
+	err = s.uc.AssignRole(ctx, data.AssignRoleDto{
+		TenantId:   tenantId,
 		RoleId:     req.GetRoleId(),
 		TeamId:     req.GetTeamId(),
 		IdentityId: req.GetIdentityId(),
@@ -55,13 +54,13 @@ func (s *AssignsService) AssignRole(ctx context.Context, req *v1.AssignRoleReque
 }
 
 func (s *AssignsService) DeleteAssign(ctx context.Context, req *v1.AssignRequest) (*utils_v1.EmptyReply, error) {
-	claims, ok := s.jwt.GetClaimsFromContext(ctx)
-	if !ok || !claims.IsUserTenantRequest() {
+	tenantId, err := s.sh.GetTenantId(ctx, req.TenantId)
+	if err != nil {
 		return nil, v1.ErrorUnauthorized("invalid token")
 	}
 	// todo checkPermissions can delete role
 
-	err := s.uc.DeleteIdentityRole(ctx, claims.GetTenantId(), req.GetAssignId())
+	err = s.uc.DeleteIdentityRole(ctx, tenantId, req.GetAssignId())
 	if err != nil {
 		return nil, err
 	}
@@ -69,8 +68,8 @@ func (s *AssignsService) DeleteAssign(ctx context.Context, req *v1.AssignRequest
 }
 
 func (s *AssignsService) ListAssigns(ctx context.Context, req *v1.ListAssignsRequest) (*v1.ListAssignsReply, error) {
-	claims, ok := s.jwt.GetClaimsFromContext(ctx)
-	if !ok || !claims.IsUserTenantRequest() {
+	tenantId, err := s.sh.GetTenantId(ctx, req.TenantId)
+	if err != nil {
 		return nil, v1.ErrorUnauthorized("invalid token")
 	}
 	// todo checkPermissions can get assgined roles
@@ -87,7 +86,7 @@ func (s *AssignsService) ListAssigns(ctx context.Context, req *v1.ListAssignsReq
 	}
 
 	assignedRoles, err := s.uc.ListAssignedRoles(ctx, data.ListRolesDto{
-		TenantId:    claims.GetTenantId(),
+		TenantId:    tenantId,
 		IdentityIDs: identitiesIDs,
 		TeamsIDs:    teamsIDs,
 	})

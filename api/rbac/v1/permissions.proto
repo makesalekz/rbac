@@ -42,6 +42,8 @@ service Permissions {
 }
 
 message CreatePermissionRequest {
+  int64 tenantId = 7;
+  repeated string identities = 8;
   string id = 1;
   string groupId = 2;
   string appId = 3;
@@ -55,6 +57,8 @@ message PermissionReply {
 }
 
 message UpdatePermissionRequest {
+  int64 tenantId = 5;
+  repeated string identities = 6;
   string permissionId = 1;
   string name = 2;
   string description = 3;
@@ -62,14 +66,20 @@ message UpdatePermissionRequest {
 }
 
 message DeletePermissionRequest {
+  int64 tenantId = 2;
+  repeated string identities = 3;
   string permissionId = 1;
 }
 
 message GetPermissionRequest {
+  int64 tenantId = 2;
+  repeated string identities = 3;
   string permissionId = 1;
 }
 
 message ListPermissionsRequest {
+  int64 tenantId = 2;
+  repeated string identities = 3;
   repeated string appsIds = 1;
 }
 

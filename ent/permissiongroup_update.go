@@ -35,6 +35,14 @@ func (pgu *PermissionGroupUpdate) SetName(s string) *PermissionGroupUpdate {
 	return pgu
 }
 
+// SetNillableName sets the "name" field if the given value is not nil.
+func (pgu *PermissionGroupUpdate) SetNillableName(s *string) *PermissionGroupUpdate {
+	if s != nil {
+		pgu.SetName(*s)
+	}
+	return pgu
+}
+
 // AddPermissionIDs adds the "permissions" edge to the Permission entity by IDs.
 func (pgu *PermissionGroupUpdate) AddPermissionIDs(ids ...string) *PermissionGroupUpdate {
 	pgu.mutation.AddPermissionIDs(ids...)
@@ -204,6 +212,14 @@ type PermissionGroupUpdateOne struct {
 // SetName sets the "name" field.
 func (pguo *PermissionGroupUpdateOne) SetName(s string) *PermissionGroupUpdateOne {
 	pguo.mutation.SetName(s)
+	return pguo
+}
+
+// SetNillableName sets the "name" field if the given value is not nil.
+func (pguo *PermissionGroupUpdateOne) SetNillableName(s *string) *PermissionGroupUpdateOne {
+	if s != nil {
+		pguo.SetName(*s)
+	}
 	return pguo
 }
 

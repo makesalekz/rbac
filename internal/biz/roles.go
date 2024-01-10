@@ -7,21 +7,19 @@ import (
 	v1 "gitlab.calendaria.team/services/rbac/api/rbac/v1"
 	"gitlab.calendaria.team/services/rbac/ent"
 	"gitlab.calendaria.team/services/rbac/internal/data"
-	"gitlab.calendaria.team/services/utils/v1/jwt"
 )
 
 // RolesUsecase .
 type RolesUsecase struct {
-	log      *log.Helper
-	jwt      *jwt.JwtProcessor
 	roleRepo data.RoleRepo
 }
 
 // NewRolesUsecase .
-func NewRolesUsecase(logger log.Logger, jwt *jwt.JwtProcessor, usersRepo data.RoleRepo) (*RolesUsecase, error) {
+func NewRolesUsecase(
+	logger log.Logger,
+	usersRepo data.RoleRepo,
+) (*RolesUsecase, error) {
 	return &RolesUsecase{
-		log:      log.NewHelper(logger),
-		jwt:      jwt,
 		roleRepo: usersRepo,
 	}, nil
 }

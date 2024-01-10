@@ -19,6 +19,8 @@ service CheckPermissions {
 }
 
 message CheckPermissionsRequest {
+  int64 tenantId = 1;
+  repeated string identities = 4;
   int64 teamId = 2;
   repeated string permissions = 3;
 }
