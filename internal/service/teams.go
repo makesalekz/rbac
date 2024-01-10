@@ -9,20 +9,22 @@ import (
 	"gitlab.calendaria.team/services/rbac/internal/biz"
 	"gitlab.calendaria.team/services/rbac/internal/data"
 	utils_v1 "gitlab.calendaria.team/services/utils/api/utils/v1"
-	"gitlab.calendaria.team/services/utils/v1/jwt"
 )
 
 type TeamsService struct {
 	v1.UnimplementedTeamsServer
 
-	jwt *jwt.JwtProcessor
-	tu  *biz.TeamsUsecase
+	sh *ServiceHelper
+	tu *biz.TeamsUsecase
 }
 
-func NewTeamsService(jwt *jwt.JwtProcessor, tu *biz.TeamsUsecase) *TeamsService {
+func NewTeamsService(
+	sh *ServiceHelper,
+	tu *biz.TeamsUsecase,
+) *TeamsService {
 	return &TeamsService{
-		jwt: jwt,
-		tu:  tu,
+		sh: sh,
+		tu: tu,
 	}
 }
 
@@ -57,10 +59,6 @@ func replyTeams(teams []*ent.Team) []*v1.Team {
 }
 
 func (s *TeamsService) CreateTeam(ctx context.Context, req *v1.CreateTeamRequest) (*v1.TeamReply, error) {
-	claims, ok := s.jwt.GetClaimsFromContext(ctx)
-	if !ok || !claims.IsUserTenantRequest() {
-		return nil, v1.ErrorUnauthorized("invalid token")
-	}
 	// todo checkPermissions for create team
 
 	team, err := s.tu.CreateTeam(ctx, data.TeamDto{
@@ -77,13 +75,13 @@ func (s *TeamsService) CreateTeam(ctx context.Context, req *v1.CreateTeamRequest
 }
 
 func (s *TeamsService) UpdateTeam(ctx context.Context, req *v1.UpdateTeamRequest) (*v1.TeamReply, error) {
-	claims, ok := s.jwt.GetClaimsFromContext(ctx)
-	if !ok || !claims.IsUserTenantRequest() {
+	tenantId, err := s.sh.GetTenantId(ctx, req.TenantId)
+	if err != nil {
 		return nil, v1.ErrorUnauthorized("invalid token")
 	}
 	// todo checkPermissions for update team
 
-	team, err := s.tu.GetTeam(ctx, claims.GetTenantId(), req.GetTeamId(), false)
+	team, err := s.tu.GetTeam(ctx, tenantId, req.GetTeamId(), false)
 	if err != nil {
 		return nil, err
 	}
@@ -101,13 +99,13 @@ func (s *TeamsService) UpdateTeam(ctx context.Context, req *v1.UpdateTeamRequest
 }
 
 func (s *TeamsService) DeleteTeam(ctx context.Context, req *v1.TeamRequest) (*utils_v1.EmptyReply, error) {
-	claims, ok := s.jwt.GetClaimsFromContext(ctx)
-	if !ok || !claims.IsUserTenantRequest() {
+	tenantId, err := s.sh.GetTenantId(ctx, req.TenantId)
+	if err != nil {
 		return nil, v1.ErrorUnauthorized("invalid token")
 	}
 	// todo checkPermissions for delete team
 
-	team, err := s.tu.GetTeam(ctx, claims.GetTenantId(), req.GetTeamId(), false)
+	team, err := s.tu.GetTeam(ctx, tenantId, req.GetTeamId(), false)
 	if err != nil {
 		return nil, err
 	}
@@ -120,13 +118,13 @@ func (s *TeamsService) DeleteTeam(ctx context.Context, req *v1.TeamRequest) (*ut
 }
 
 func (s *TeamsService) GetTeam(ctx context.Context, req *v1.TeamRequest) (*v1.TeamReply, error) {
-	claims, ok := s.jwt.GetClaimsFromContext(ctx)
-	if !ok || !claims.IsUserTenantRequest() {
+	tenantId, err := s.sh.GetTenantId(ctx, req.TenantId)
+	if err != nil {
 		return nil, v1.ErrorUnauthorized("invalid token")
 	}
 	// todo checkPermissions for get team
 
-	team, err := s.tu.GetTeam(ctx, claims.GetTenantId(), req.GetTeamId(), false)
+	team, err := s.tu.GetTeam(ctx, tenantId, req.GetTeamId(), false)
 	if err != nil {
 		return nil, err
 	}
@@ -137,13 +135,13 @@ func (s *TeamsService) GetTeam(ctx context.Context, req *v1.TeamRequest) (*v1.Te
 }
 
 func (s *TeamsService) GetTeamTree(ctx context.Context, req *v1.TeamRequest) (*v1.TeamReply, error) {
-	claims, ok := s.jwt.GetClaimsFromContext(ctx)
-	if !ok || !claims.IsUserTenantRequest() {
+	tenantId, err := s.sh.GetTenantId(ctx, req.TenantId)
+	if err != nil {
 		return nil, v1.ErrorUnauthorized("invalid token")
 	}
 	// todo checkPermissions for get team
 
-	team, err := s.tu.GetTeam(ctx, claims.GetTenantId(), req.GetTeamId(), true)
+	team, err := s.tu.GetTeam(ctx, tenantId, req.GetTeamId(), true)
 	if err != nil {
 		return nil, err
 	}
@@ -154,14 +152,14 @@ func (s *TeamsService) GetTeamTree(ctx context.Context, req *v1.TeamRequest) (*v
 }
 
 func (s *TeamsService) ListTeams(ctx context.Context, req *v1.ListTeamsRequest) (*v1.ListTeamsReply, error) {
-	claims, ok := s.jwt.GetClaimsFromContext(ctx)
-	if !ok || !claims.IsUserTenantRequest() {
+	tenantId, err := s.sh.GetTenantId(ctx, req.TenantId)
+	if err != nil {
 		return nil, v1.ErrorUnauthorized("invalid token")
 	}
 	// todo checkPermissions for list teams
 
 	list, err := s.tu.ListTeams(ctx, data.TeamsListFilter{
-		TenantId: claims.GetTenantId(),
+		TenantId: tenantId,
 		ParentId: req.GetParentId(),
 	}, req.GetPaginate())
 	if err != nil {

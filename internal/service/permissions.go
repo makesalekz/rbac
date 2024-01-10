@@ -13,19 +13,35 @@ import (
 type PermissionsService struct {
 	v1.UnimplementedPermissionsServer
 
+	sh *ServiceHelper
 	uc *biz.PermissionsUsecase
 	au *biz.TeamIdentityUsecase
 }
 
-func NewPermissionsService(uc *biz.PermissionsUsecase, au *biz.TeamIdentityUsecase) *PermissionsService {
+func NewPermissionsService(
+	sh *ServiceHelper,
+	uc *biz.PermissionsUsecase,
+	au *biz.TeamIdentityUsecase,
+) *PermissionsService {
 	return &PermissionsService{
+		sh: sh,
 		uc: uc,
 		au: au,
 	}
 }
 
 func (s *PermissionsService) CreatePermission(ctx context.Context, req *v1.CreatePermissionRequest) (*v1.PermissionReply, error) {
-	fields, err := s.au.HasPermission(ctx, "admin.permission.create")
+	tenantId, err := s.sh.GetTenantId(ctx, req.TenantId)
+	if err != nil {
+		return nil, v1.ErrorUnauthorized("invalid token")
+	}
+
+	identities, err := s.sh.GetIdentities(ctx, req.Identities)
+	if err != nil {
+		return nil, v1.ErrorUnauthorized("invalid token")
+	}
+
+	fields, err := s.au.HasPermission(ctx, tenantId, identities, "admin.permission.create")
 	if err != nil {
 		return nil, err
 	}
@@ -49,7 +65,17 @@ func (s *PermissionsService) CreatePermission(ctx context.Context, req *v1.Creat
 }
 
 func (s *PermissionsService) UpdatePermission(ctx context.Context, req *v1.UpdatePermissionRequest) (*v1.PermissionReply, error) {
-	fields, err := s.au.HasPermission(ctx, "admin.permission.update")
+	tenantId, err := s.sh.GetTenantId(ctx, req.TenantId)
+	if err != nil {
+		return nil, v1.ErrorUnauthorized("invalid token")
+	}
+
+	identities, err := s.sh.GetIdentities(ctx, req.Identities)
+	if err != nil {
+		return nil, v1.ErrorUnauthorized("invalid token")
+	}
+
+	fields, err := s.au.HasPermission(ctx, tenantId, identities, "admin.permission.update")
 	if err != nil {
 		return nil, err
 	}
@@ -71,7 +97,17 @@ func (s *PermissionsService) UpdatePermission(ctx context.Context, req *v1.Updat
 }
 
 func (s *PermissionsService) DeletePermission(ctx context.Context, req *v1.DeletePermissionRequest) (*utils_v1.EmptyReply, error) {
-	fields, err := s.au.HasPermission(ctx, "admin.permission.delete")
+	tenantId, err := s.sh.GetTenantId(ctx, req.TenantId)
+	if err != nil {
+		return nil, v1.ErrorUnauthorized("invalid token")
+	}
+
+	identities, err := s.sh.GetIdentities(ctx, req.Identities)
+	if err != nil {
+		return nil, v1.ErrorUnauthorized("invalid token")
+	}
+
+	fields, err := s.au.HasPermission(ctx, tenantId, identities, "admin.permission.delete")
 	if err != nil {
 		return nil, err
 	}
@@ -87,7 +123,17 @@ func (s *PermissionsService) DeletePermission(ctx context.Context, req *v1.Delet
 }
 
 func (s *PermissionsService) GetPermission(ctx context.Context, req *v1.GetPermissionRequest) (*v1.PermissionReply, error) {
-	fields, err := s.au.HasPermission(ctx, "admin.permission.read")
+	tenantId, err := s.sh.GetTenantId(ctx, req.TenantId)
+	if err != nil {
+		return nil, v1.ErrorUnauthorized("invalid token")
+	}
+
+	identities, err := s.sh.GetIdentities(ctx, req.Identities)
+	if err != nil {
+		return nil, v1.ErrorUnauthorized("invalid token")
+	}
+
+	fields, err := s.au.HasPermission(ctx, tenantId, identities, "admin.permission.read")
 	if err != nil {
 		return nil, err
 	}
@@ -105,7 +151,17 @@ func (s *PermissionsService) GetPermission(ctx context.Context, req *v1.GetPermi
 }
 
 func (s *PermissionsService) ListPermissions(ctx context.Context, req *v1.ListPermissionsRequest) (*v1.ListPermissionsReply, error) {
-	fields, err := s.au.HasPermission(ctx, "admin.permission.read")
+	tenantId, err := s.sh.GetTenantId(ctx, req.TenantId)
+	if err != nil {
+		return nil, v1.ErrorUnauthorized("invalid token")
+	}
+
+	identities, err := s.sh.GetIdentities(ctx, req.Identities)
+	if err != nil {
+		return nil, v1.ErrorUnauthorized("invalid token")
+	}
+
+	fields, err := s.au.HasPermission(ctx, tenantId, identities, "admin.permission.read")
 	if err != nil {
 		return nil, err
 	}
@@ -113,9 +169,13 @@ func (s *PermissionsService) ListPermissions(ctx context.Context, req *v1.ListPe
 		return nil, v1.ErrorForbidden("has no permission")
 	}
 
-	groups, err := s.uc.GetGroupedPermissions(ctx, data.FilterPermissions{
-		AppsIds: req.AppsIds,
-	})
+	groups, err := s.uc.GetGroupedPermissions(
+		ctx,
+		tenantId,
+		identities,
+		data.FilterPermissions{
+			AppsIds: req.AppsIds,
+		})
 	if err != nil {
 		return nil, err
 	}

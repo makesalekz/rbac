@@ -22,7 +22,7 @@ var (
 	// Name is the name of the compiled software.
 	Name string = "rbac"
 	// Version is the version of the compiled software.
-	Version string = "0.1.2"
+	Version string = "0.2.0"
 	// flagconf is the config flag.
 	flagconf string
 

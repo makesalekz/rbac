@@ -36,6 +36,14 @@ func (pu *PermissionUpdate) SetName(s string) *PermissionUpdate {
 	return pu
 }
 
+// SetNillableName sets the "name" field if the given value is not nil.
+func (pu *PermissionUpdate) SetNillableName(s *string) *PermissionUpdate {
+	if s != nil {
+		pu.SetName(*s)
+	}
+	return pu
+}
+
 // SetDescription sets the "description" field.
 func (pu *PermissionUpdate) SetDescription(s string) *PermissionUpdate {
 	pu.mutation.SetDescription(s)
@@ -263,6 +271,14 @@ type PermissionUpdateOne struct {
 // SetName sets the "name" field.
 func (puo *PermissionUpdateOne) SetName(s string) *PermissionUpdateOne {
 	puo.mutation.SetName(s)
+	return puo
+}
+
+// SetNillableName sets the "name" field if the given value is not nil.
+func (puo *PermissionUpdateOne) SetNillableName(s *string) *PermissionUpdateOne {
+	if s != nil {
+		puo.SetName(*s)
+	}
 	return puo
 }
 
