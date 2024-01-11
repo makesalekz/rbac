@@ -60,6 +60,6 @@ server:
   tolerations: []
   affinity: {}
 
-  migrateJob:
+migrateJob:
   enabled: true
   command: ["/atlas", "migrate", "apply", "--url", "postgres://rbac:eheeph4ahngoh-J@10.2.8.175:5432/rbac?search_path=public", "--allow-dirty"]
