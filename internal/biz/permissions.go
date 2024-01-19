@@ -4,16 +4,12 @@ import (
 	"context"
 
 	"github.com/go-kratos/kratos/v2/log"
-	rbac_v1 "gitlab.calendaria.team/services/rbac/api/rbac/v1"
 	"gitlab.calendaria.team/services/rbac/ent"
 	"gitlab.calendaria.team/services/rbac/internal/data"
-	"gitlab.calendaria.team/services/utils/v1/jwt"
 )
 
 // PermissionsUsecase .
 type PermissionsUsecase struct {
-	log            *log.Helper
-	jwt            *jwt.JwtProcessor
 	permissionRepo data.PermissionRepo
 	roleRepo       data.RoleRepo
 	assignedRepo   data.TeamIdentityRoleRepo
@@ -22,14 +18,11 @@ type PermissionsUsecase struct {
 // NewPermissionUsecase .
 func NewPermissionUsecase(
 	logger log.Logger,
-	jwt *jwt.JwtProcessor,
 	permissionRepo data.PermissionRepo,
 	roleRepo data.RoleRepo,
 	assignedRepo data.TeamIdentityRoleRepo,
 ) (*PermissionsUsecase, error) {
 	return &PermissionsUsecase{
-		log:            log.NewHelper(logger),
-		jwt:            jwt,
 		permissionRepo: permissionRepo,
 		roleRepo:       roleRepo,
 		assignedRepo:   assignedRepo,
@@ -56,22 +49,16 @@ func (uc *PermissionsUsecase) GetPermissions(ctx context.Context, appId string, 
 	return uc.permissionRepo.GetPermissions(ctx, appId, permissionIds)
 }
 
-func (uc *PermissionsUsecase) GetGroupedPermissions(ctx context.Context, filter data.FilterPermissions) ([]*ent.PermissionGroup, error) {
+func (uc *PermissionsUsecase) GetGroupedPermissions(ctx context.Context, tenantId int64, identities []string, filter data.FilterPermissions) ([]*ent.PermissionGroup, error) {
 	groups, err := uc.permissionRepo.GetGroupedPermissions(ctx, filter)
 	if err != nil {
 		return nil, err
 	}
 
 	if !filter.WithDenied {
-		// filter permissions, that denied for the user
-		claims, ok := uc.jwt.GetClaimsFromContext(ctx)
-		if !ok || !claims.IsUserTenantRequest() {
-			return nil, rbac_v1.ErrorUnauthorized("invalid token")
-		}
-
 		assignedRoles, err := uc.assignedRepo.ListRoles(ctx, data.ListRolesDto{
-			TenantId:    claims.GetTenantId(),
-			IdentityIDs: claims.GetIdentities(),
+			TenantId:    tenantId,
+			IdentityIDs: identities,
 		})
 		if err != nil {
 			return nil, err
@@ -83,7 +70,7 @@ func (uc *PermissionsUsecase) GetGroupedPermissions(ctx context.Context, filter 
 		}
 
 		permissions, err := uc.roleRepo.ListRolesPermissions(ctx, data.FilterRolePermissions{
-			TenantId:   claims.GetTenantId(),
+			TenantId:   tenantId,
 			RolesIds:   rolesIds,
 			DeniedOnly: true,
 		})

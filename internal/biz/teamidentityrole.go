@@ -3,25 +3,29 @@ package biz
 import (
 	"context"
 
-	consul "github.com/go-kratos/consul/registry"
-	"github.com/go-kratos/kratos/v2/log"
 	v1 "gitlab.calendaria.team/services/rbac/api/rbac/v1"
 	"gitlab.calendaria.team/services/rbac/ent"
-	"gitlab.calendaria.team/services/rbac/internal/conf"
 	"gitlab.calendaria.team/services/rbac/internal/data"
-	"gitlab.calendaria.team/services/utils/v1/config"
-	"gitlab.calendaria.team/services/utils/v1/jwt"
 )
 
 // TeamIdentityUsecase .
 type TeamIdentityUsecase struct {
-	conf      *conf.Bootstrap
-	log       *log.Helper
-	discovery *consul.Registry
-	jwt       *jwt.JwtProcessor
-	repo      data.TeamIdentityRoleRepo
-	roleRepo  data.RoleRepo
-	teamRepo  data.TeamsRepo
+	repo     data.TeamIdentityRoleRepo
+	roleRepo data.RoleRepo
+	teamRepo data.TeamsRepo
+}
+
+// NewTeamIdentityUsecase .
+func NewTeamIdentityUsecase(
+	repo data.TeamIdentityRoleRepo,
+	roleRepo data.RoleRepo,
+	teamRepo data.TeamsRepo,
+) (*TeamIdentityUsecase, error) {
+	return &TeamIdentityUsecase{
+		repo:     repo,
+		roleRepo: roleRepo,
+		teamRepo: teamRepo,
+	}, nil
 }
 
 func (u *TeamIdentityUsecase) AssignRole(ctx context.Context, dto data.AssignRoleDto) error {
@@ -77,15 +81,10 @@ func (u *TeamIdentityUsecase) ListAssignedRoles(ctx context.Context, dto data.Li
 	return u.repo.ListRoles(ctx, dto)
 }
 
-func (u *TeamIdentityUsecase) CheckPermissions(ctx context.Context, teamId int64, permissions []string) (map[string]*v1.ListOfFields, error) {
-	claims, ok := u.jwt.GetClaimsFromContext(ctx)
-	if !ok || !claims.IsUserTenantRequest() {
-		return nil, v1.ErrorUnauthorized("invalid token")
-	}
-
+func (u *TeamIdentityUsecase) CheckPermissions(ctx context.Context, tenantId int64, identities []string, teamId int64, permissions []string) (map[string]*v1.ListOfFields, error) {
 	var teamsIds []int64
 	if teamId != 0 {
-		team, err := u.teamRepo.GetTeam(ctx, claims.GetTenantId(), teamId, false)
+		team, err := u.teamRepo.GetTeam(ctx, tenantId, teamId, false)
 		if err != nil {
 			return nil, err
 		}
@@ -94,8 +93,8 @@ func (u *TeamIdentityUsecase) CheckPermissions(ctx context.Context, teamId int64
 	}
 
 	assignedRoles, err := u.repo.ListRoles(ctx, data.ListRolesDto{
-		TenantId:    claims.GetTenantId(),
-		IdentityIDs: claims.GetIdentities(),
+		TenantId:    tenantId,
+		IdentityIDs: identities,
 		TeamsIDs:    teamsIds,
 	})
 	if err != nil {
@@ -108,7 +107,7 @@ func (u *TeamIdentityUsecase) CheckPermissions(ctx context.Context, teamId int64
 	}
 
 	rolesPermissions, err := u.roleRepo.ListRolesPermissions(ctx, data.FilterRolePermissions{
-		TenantId:    claims.GetTenantId(),
+		TenantId:    tenantId,
 		RolesIds:    rolesIds,
 		Permissions: permissions,
 	})
@@ -136,8 +135,8 @@ func (u *TeamIdentityUsecase) CheckPermissions(ctx context.Context, teamId int64
 	return result, nil
 }
 
-func (u *TeamIdentityUsecase) HasPermission(ctx context.Context, permission string) (*v1.ListOfFields, error) {
-	permissionsMap, err := u.CheckPermissions(ctx, 0, []string{permission})
+func (u *TeamIdentityUsecase) HasPermission(ctx context.Context, tenantId int64, identities []string, permission string) (*v1.ListOfFields, error) {
+	permissionsMap, err := u.CheckPermissions(ctx, tenantId, identities, 0, []string{permission})
 	if err != nil {
 		return nil, err
 	}
@@ -147,27 +146,6 @@ func (u *TeamIdentityUsecase) HasPermission(ctx context.Context, permission stri
 	}
 
 	return permissionsMap[permission], nil
-}
-
-// NewTeamIdentityUsecase .
-func NewTeamIdentityUsecase(
-	conf *conf.Bootstrap,
-	logger log.Logger,
-	c *config.Config,
-	jwt *jwt.JwtProcessor,
-	repo data.TeamIdentityRoleRepo,
-	roleRepo data.RoleRepo,
-	teamRepo data.TeamsRepo,
-) (*TeamIdentityUsecase, error) {
-	return &TeamIdentityUsecase{
-		conf:      conf,
-		log:       log.NewHelper(logger),
-		discovery: c.GetRegistry(),
-		jwt:       jwt,
-		repo:      repo,
-		roleRepo:  roleRepo,
-		teamRepo:  teamRepo,
-	}, nil
 }
 
 func mergeFields(fields1 []string, fields2 []string) []string {

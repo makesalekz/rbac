@@ -3,15 +3,10 @@ package biz
 import (
 	"context"
 
-	consul "github.com/go-kratos/consul/registry"
-	"github.com/go-kratos/kratos/v2/log"
 	v1 "gitlab.calendaria.team/services/rbac/api/rbac/v1"
 	"gitlab.calendaria.team/services/rbac/ent"
-	"gitlab.calendaria.team/services/rbac/internal/conf"
 	"gitlab.calendaria.team/services/rbac/internal/data"
 	utils_v1 "gitlab.calendaria.team/services/utils/api/utils/v1"
-	"gitlab.calendaria.team/services/utils/v1/config"
-	"gitlab.calendaria.team/services/utils/v1/jwt"
 )
 
 type TeamsList struct {
@@ -21,21 +16,13 @@ type TeamsList struct {
 
 // TeamsUsecase is a Greeter usecase.
 type TeamsUsecase struct {
-	conf      *conf.Bootstrap
-	log       *log.Helper
-	discovery *consul.Registry
-	jwt       *jwt.JwtProcessor
-	repo      data.TeamsRepo
+	repo data.TeamsRepo
 }
 
 // NewGreeterUsecase new a Greeter usecase.
-func NewTeamsUsecase(conf *conf.Bootstrap, logger log.Logger, c *config.Config, jwt *jwt.JwtProcessor, repo data.TeamsRepo) (*TeamsUsecase, error) {
+func NewTeamsUsecase(repo data.TeamsRepo) (*TeamsUsecase, error) {
 	return &TeamsUsecase{
-		conf:      conf,
-		log:       log.NewHelper(logger),
-		discovery: c.GetRegistry(),
-		jwt:       jwt,
-		repo:      repo,
+		repo: repo,
 	}, nil
 }
 

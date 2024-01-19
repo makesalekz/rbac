@@ -53,12 +53,14 @@ message CreateTeamRequest {
 }
 
 message UpdateTeamRequest {
+  int64 tenantId = 4;
   int64 teamId = 1;
   string name = 2;
   string description = 3;
 }
 
 message TeamRequest {
+  int64 tenantId = 2;
   int64 teamId = 1;
 }
 
@@ -68,6 +70,7 @@ message TeamReply {
 }
 
 message ListTeamsRequest {
+  int64 tenantId = 3;
   int64 parentId = 1;
   utils.v1.PaginateRequest paginate = 2;
 }
