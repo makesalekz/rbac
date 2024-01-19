@@ -14,13 +14,12 @@ configmap:
   data:
     DEBUG: "1"
     SERVICE_NAME: "rbac"
-    AUTOMIGRATE: "true"
     CONSUL_ADDRESS: "http://10.2.5.6:8500"
     VAULT_ADDRESS: "http://10.2.4.5:8200"
 
 server:
   replicaCount: 1
-  command: ["./rbac", "-conf", "./config.yaml"]
+  command: ["./rbac", "-conf", "./config.stage.yaml"]
   podSecurityContext: {}
   securityContext: {}
   serviceAccount:
@@ -35,31 +34,13 @@ server:
 
   service:
     type: ClusterIP
-    port: 8000
+    port: 80
     targetPort: 8000
 
   vaultSecret:
     enabled: true
     project: stage-calendaria
 
-  ingress:
-    enabled: false
-    ingressClassName: nginx
-    annotations:
-      nginx.ingress.kubernetes.io/proxy-body-size: 512m
-      nginx.ingress.kubernetes.io/rewrite-target: /$1
-    path: /rbac/?(.*)
-    hosts:
-      - stage.calendaria.net
-    tls:
-    - secretName: calendaria-tls
-      hosts:
-        - stage.calendaria.net
-
   nodeSelector: {}
   tolerations: []
   affinity: {}
-
-migrateJob:
-  enabled: true
-  command: ["/atlas", "migrate", "apply", "--url", "postgres://rbac:eheeph4ahngoh-J@10.2.8.175:5432/rbac?search_path=public", "--allow-dirty"]

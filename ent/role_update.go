@@ -56,6 +56,14 @@ func (ru *RoleUpdate) SetName(s string) *RoleUpdate {
 	return ru
 }
 
+// SetNillableName sets the "name" field if the given value is not nil.
+func (ru *RoleUpdate) SetNillableName(s *string) *RoleUpdate {
+	if s != nil {
+		ru.SetName(*s)
+	}
+	return ru
+}
+
 // SetDescription sets the "description" field.
 func (ru *RoleUpdate) SetDescription(s string) *RoleUpdate {
 	ru.mutation.SetDescription(s)
@@ -294,6 +302,14 @@ func (ruo *RoleUpdateOne) ClearDeletedAt() *RoleUpdateOne {
 // SetName sets the "name" field.
 func (ruo *RoleUpdateOne) SetName(s string) *RoleUpdateOne {
 	ruo.mutation.SetName(s)
+	return ruo
+}
+
+// SetNillableName sets the "name" field if the given value is not nil.
+func (ruo *RoleUpdateOne) SetNillableName(s *string) *RoleUpdateOne {
+	if s != nil {
+		ruo.SetName(*s)
+	}
 	return ruo
 }
 

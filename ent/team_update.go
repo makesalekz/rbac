@@ -57,6 +57,14 @@ func (tu *TeamUpdate) SetTenantID(i int64) *TeamUpdate {
 	return tu
 }
 
+// SetNillableTenantID sets the "tenant_id" field if the given value is not nil.
+func (tu *TeamUpdate) SetNillableTenantID(i *int64) *TeamUpdate {
+	if i != nil {
+		tu.SetTenantID(*i)
+	}
+	return tu
+}
+
 // AddTenantID adds i to the "tenant_id" field.
 func (tu *TeamUpdate) AddTenantID(i int64) *TeamUpdate {
 	tu.mutation.AddTenantID(i)
@@ -98,6 +106,14 @@ func (tu *TeamUpdate) ClearParentsIds() *TeamUpdate {
 // SetName sets the "name" field.
 func (tu *TeamUpdate) SetName(s string) *TeamUpdate {
 	tu.mutation.SetName(s)
+	return tu
+}
+
+// SetNillableName sets the "name" field if the given value is not nil.
+func (tu *TeamUpdate) SetNillableName(s *string) *TeamUpdate {
+	if s != nil {
+		tu.SetName(*s)
+	}
 	return tu
 }
 
@@ -399,6 +415,14 @@ func (tuo *TeamUpdateOne) SetTenantID(i int64) *TeamUpdateOne {
 	return tuo
 }
 
+// SetNillableTenantID sets the "tenant_id" field if the given value is not nil.
+func (tuo *TeamUpdateOne) SetNillableTenantID(i *int64) *TeamUpdateOne {
+	if i != nil {
+		tuo.SetTenantID(*i)
+	}
+	return tuo
+}
+
 // AddTenantID adds i to the "tenant_id" field.
 func (tuo *TeamUpdateOne) AddTenantID(i int64) *TeamUpdateOne {
 	tuo.mutation.AddTenantID(i)
@@ -440,6 +464,14 @@ func (tuo *TeamUpdateOne) ClearParentsIds() *TeamUpdateOne {
 // SetName sets the "name" field.
 func (tuo *TeamUpdateOne) SetName(s string) *TeamUpdateOne {
 	tuo.mutation.SetName(s)
+	return tuo
+}
+
+// SetNillableName sets the "name" field if the given value is not nil.
+func (tuo *TeamUpdateOne) SetNillableName(s *string) *TeamUpdateOne {
+	if s != nil {
+		tuo.SetName(*s)
+	}
 	return tuo
 }
 
