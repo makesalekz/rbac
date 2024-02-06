@@ -83,7 +83,7 @@ func (u *TeamIdentityUsecase) ListAssignedRoles(ctx context.Context, dto data.Li
 
 func (u *TeamIdentityUsecase) CheckPermissions(ctx context.Context, tenantId int64, identities []string, teamId int64, permissions []string) (map[string]*v1.ListOfFields, error) {
 	var teamsIds []int64
-	if teamId != 0 {
+	if tenantId != 0 && teamId != 0 {
 		team, err := u.teamRepo.GetTeam(ctx, tenantId, teamId, false)
 		if err != nil {
 			return nil, err

@@ -23,12 +23,12 @@ service Permissions {
       body: "*"
     };
   };
-  rpc DeletePermission(DeletePermissionRequest) returns (utils.v1.EmptyReply) {
+  rpc DeletePermission(PermissionRequest) returns (utils.v1.EmptyReply) {
     option (google.api.http) = {
       delete: "/v1/rbac/permissions/{permissionId}"
     };
   };
-  rpc GetPermission(GetPermissionRequest) returns (PermissionReply) {
+  rpc GetPermission(PermissionRequest) returns (PermissionReply) {
     option (google.api.http) = {
       get: "/v1/rbac/permissions/{permissionId}"
     };
@@ -42,8 +42,6 @@ service Permissions {
 }
 
 message CreatePermissionRequest {
-  int64 tenantId = 7;
-  repeated string identities = 8;
   string id = 1;
   string groupId = 2;
   string appId = 3;
@@ -57,29 +55,17 @@ message PermissionReply {
 }
 
 message UpdatePermissionRequest {
-  int64 tenantId = 5;
-  repeated string identities = 6;
   string permissionId = 1;
   string name = 2;
   string description = 3;
   repeated string fields = 4;
 }
 
-message DeletePermissionRequest {
-  int64 tenantId = 2;
-  repeated string identities = 3;
-  string permissionId = 1;
-}
-
-message GetPermissionRequest {
-  int64 tenantId = 2;
-  repeated string identities = 3;
+message PermissionRequest {
   string permissionId = 1;
 }
 
 message ListPermissionsRequest {
-  int64 tenantId = 2;
-  repeated string identities = 3;
   repeated string appsIds = 1;
 }
 
