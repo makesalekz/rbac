@@ -22,19 +22,19 @@ type ListRolesDto struct {
 	TeamsIDs    []int64
 }
 
-// TeamIdentityRoleRepo
-type TeamIdentityRoleRepo interface {
+// AssignedRolesRepo
+type AssignedRolesRepo interface {
 	AssignRole(ctx context.Context, dto AssignRoleDto) error
+	UnassignRole(ctx context.Context, assignedRole *ent.TeamIdentityRole) error
 	GetAssignedRoleById(ctx context.Context, tenantId, assignId int64) (*ent.TeamIdentityRole, error)
-	DeleteIdentityRole(ctx context.Context, assignedRole *ent.TeamIdentityRole) error
-	ListRoles(ctx context.Context, dto ListRolesDto) ([]*ent.TeamIdentityRole, error)
+	ListAssignedRoles(ctx context.Context, dto ListRolesDto) ([]*ent.TeamIdentityRole, error)
 }
 
-type teamIdentityRoleRepo struct {
+type assignedRolesRepo struct {
 	db *ent.Client
 }
 
-func (t *teamIdentityRoleRepo) AssignRole(ctx context.Context, dto AssignRoleDto) error {
+func (t *assignedRolesRepo) AssignRole(ctx context.Context, dto AssignRoleDto) error {
 	query := t.db.TeamIdentityRole.Create().
 		SetTenantID(dto.TenantId).
 		SetIdentityID(dto.IdentityId).
@@ -47,7 +47,7 @@ func (t *teamIdentityRoleRepo) AssignRole(ctx context.Context, dto AssignRoleDto
 	return query.Exec(ctx)
 }
 
-func (t *teamIdentityRoleRepo) GetAssignedRoleById(ctx context.Context, tenantId, assignId int64) (*ent.TeamIdentityRole, error) {
+func (t *assignedRolesRepo) GetAssignedRoleById(ctx context.Context, tenantId, assignId int64) (*ent.TeamIdentityRole, error) {
 	return t.db.TeamIdentityRole.Query().
 		Where(
 			teamidentityrole.TenantID(tenantId),
@@ -56,11 +56,11 @@ func (t *teamIdentityRoleRepo) GetAssignedRoleById(ctx context.Context, tenantId
 		Only(ctx)
 }
 
-func (t *teamIdentityRoleRepo) DeleteIdentityRole(ctx context.Context, assignedRole *ent.TeamIdentityRole) error {
+func (t *assignedRolesRepo) UnassignRole(ctx context.Context, assignedRole *ent.TeamIdentityRole) error {
 	return t.db.TeamIdentityRole.DeleteOne(assignedRole).Exec(ctx)
 }
 
-func (t *teamIdentityRoleRepo) ListRoles(ctx context.Context, dto ListRolesDto) ([]*ent.TeamIdentityRole, error) {
+func (t *assignedRolesRepo) ListAssignedRoles(ctx context.Context, dto ListRolesDto) ([]*ent.TeamIdentityRole, error) {
 	query := t.db.TeamIdentityRole.Query().
 		Where(teamidentityrole.TenantID(dto.TenantId))
 
@@ -81,9 +81,9 @@ func (t *teamIdentityRoleRepo) ListRoles(ctx context.Context, dto ListRolesDto) 
 	return query.All(ctx)
 }
 
-// NewTeamIdentityRoleRepo .
-func NewTeamIdentityRoleRepo(d *Data) TeamIdentityRoleRepo {
-	return &teamIdentityRoleRepo{
+// NewAssignedRolesRepo .
+func NewAssignedRolesRepo(d *Data) AssignedRolesRepo {
+	return &assignedRolesRepo{
 		db: d.db,
 	}
 }

@@ -33,8 +33,8 @@ const (
 type PermissionsClient interface {
 	CreatePermission(ctx context.Context, in *CreatePermissionRequest, opts ...grpc.CallOption) (*PermissionReply, error)
 	UpdatePermission(ctx context.Context, in *UpdatePermissionRequest, opts ...grpc.CallOption) (*PermissionReply, error)
-	DeletePermission(ctx context.Context, in *DeletePermissionRequest, opts ...grpc.CallOption) (*v1.EmptyReply, error)
-	GetPermission(ctx context.Context, in *GetPermissionRequest, opts ...grpc.CallOption) (*PermissionReply, error)
+	DeletePermission(ctx context.Context, in *PermissionRequest, opts ...grpc.CallOption) (*v1.EmptyReply, error)
+	GetPermission(ctx context.Context, in *PermissionRequest, opts ...grpc.CallOption) (*PermissionReply, error)
 	ListPermissions(ctx context.Context, in *ListPermissionsRequest, opts ...grpc.CallOption) (*ListPermissionsReply, error)
 }
 
@@ -64,7 +64,7 @@ func (c *permissionsClient) UpdatePermission(ctx context.Context, in *UpdatePerm
 	return out, nil
 }
 
-func (c *permissionsClient) DeletePermission(ctx context.Context, in *DeletePermissionRequest, opts ...grpc.CallOption) (*v1.EmptyReply, error) {
+func (c *permissionsClient) DeletePermission(ctx context.Context, in *PermissionRequest, opts ...grpc.CallOption) (*v1.EmptyReply, error) {
 	out := new(v1.EmptyReply)
 	err := c.cc.Invoke(ctx, Permissions_DeletePermission_FullMethodName, in, out, opts...)
 	if err != nil {
@@ -73,7 +73,7 @@ func (c *permissionsClient) DeletePermission(ctx context.Context, in *DeletePerm
 	return out, nil
 }
 
-func (c *permissionsClient) GetPermission(ctx context.Context, in *GetPermissionRequest, opts ...grpc.CallOption) (*PermissionReply, error) {
+func (c *permissionsClient) GetPermission(ctx context.Context, in *PermissionRequest, opts ...grpc.CallOption) (*PermissionReply, error) {
 	out := new(PermissionReply)
 	err := c.cc.Invoke(ctx, Permissions_GetPermission_FullMethodName, in, out, opts...)
 	if err != nil {
@@ -97,8 +97,8 @@ func (c *permissionsClient) ListPermissions(ctx context.Context, in *ListPermiss
 type PermissionsServer interface {
 	CreatePermission(context.Context, *CreatePermissionRequest) (*PermissionReply, error)
 	UpdatePermission(context.Context, *UpdatePermissionRequest) (*PermissionReply, error)
-	DeletePermission(context.Context, *DeletePermissionRequest) (*v1.EmptyReply, error)
-	GetPermission(context.Context, *GetPermissionRequest) (*PermissionReply, error)
+	DeletePermission(context.Context, *PermissionRequest) (*v1.EmptyReply, error)
+	GetPermission(context.Context, *PermissionRequest) (*PermissionReply, error)
 	ListPermissions(context.Context, *ListPermissionsRequest) (*ListPermissionsReply, error)
 	mustEmbedUnimplementedPermissionsServer()
 }
@@ -113,10 +113,10 @@ func (UnimplementedPermissionsServer) CreatePermission(context.Context, *CreateP
 func (UnimplementedPermissionsServer) UpdatePermission(context.Context, *UpdatePermissionRequest) (*PermissionReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdatePermission not implemented")
 }
-func (UnimplementedPermissionsServer) DeletePermission(context.Context, *DeletePermissionRequest) (*v1.EmptyReply, error) {
+func (UnimplementedPermissionsServer) DeletePermission(context.Context, *PermissionRequest) (*v1.EmptyReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeletePermission not implemented")
 }
-func (UnimplementedPermissionsServer) GetPermission(context.Context, *GetPermissionRequest) (*PermissionReply, error) {
+func (UnimplementedPermissionsServer) GetPermission(context.Context, *PermissionRequest) (*PermissionReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetPermission not implemented")
 }
 func (UnimplementedPermissionsServer) ListPermissions(context.Context, *ListPermissionsRequest) (*ListPermissionsReply, error) {
@@ -172,7 +172,7 @@ func _Permissions_UpdatePermission_Handler(srv interface{}, ctx context.Context,
 }
 
 func _Permissions_DeletePermission_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(DeletePermissionRequest)
+	in := new(PermissionRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -184,13 +184,13 @@ func _Permissions_DeletePermission_Handler(srv interface{}, ctx context.Context,
 		FullMethod: Permissions_DeletePermission_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PermissionsServer).DeletePermission(ctx, req.(*DeletePermissionRequest))
+		return srv.(PermissionsServer).DeletePermission(ctx, req.(*PermissionRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _Permissions_GetPermission_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetPermissionRequest)
+	in := new(PermissionRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -202,7 +202,7 @@ func _Permissions_GetPermission_Handler(srv interface{}, ctx context.Context, de
 		FullMethod: Permissions_GetPermission_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PermissionsServer).GetPermission(ctx, req.(*GetPermissionRequest))
+		return srv.(PermissionsServer).GetPermission(ctx, req.(*PermissionRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }

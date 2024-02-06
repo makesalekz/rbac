@@ -12,7 +12,7 @@ import (
 type PermissionsUsecase struct {
 	permissionRepo data.PermissionRepo
 	roleRepo       data.RoleRepo
-	assignedRepo   data.TeamIdentityRoleRepo
+	assignedRepo   data.AssignedRolesRepo
 }
 
 // NewPermissionUsecase .
@@ -20,7 +20,7 @@ func NewPermissionUsecase(
 	logger log.Logger,
 	permissionRepo data.PermissionRepo,
 	roleRepo data.RoleRepo,
-	assignedRepo data.TeamIdentityRoleRepo,
+	assignedRepo data.AssignedRolesRepo,
 ) (*PermissionsUsecase, error) {
 	return &PermissionsUsecase{
 		permissionRepo: permissionRepo,
@@ -56,7 +56,7 @@ func (uc *PermissionsUsecase) GetGroupedPermissions(ctx context.Context, tenantI
 	}
 
 	if !filter.WithDenied {
-		assignedRoles, err := uc.assignedRepo.ListRoles(ctx, data.ListRolesDto{
+		assignedRoles, err := uc.assignedRepo.ListAssignedRoles(ctx, data.ListRolesDto{
 			TenantId:    tenantId,
 			IdentityIDs: identities,
 		})

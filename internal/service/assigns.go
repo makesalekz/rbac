@@ -13,35 +13,34 @@ import (
 type AssignsService struct {
 	v1.UnimplementedAssignsServer
 
-	sh *ServiceHelper
 	ru *biz.RolesUsecase
 	tu *biz.TeamsUsecase
-	uc *biz.TeamIdentityUsecase
+	uc *biz.AssignedRolesUsecase
+	sh *ServiceHelper
 }
 
 func NewAssignsService(
-	sh *ServiceHelper,
 	ru *biz.RolesUsecase,
 	tu *biz.TeamsUsecase,
-	uc *biz.TeamIdentityUsecase,
+	uc *biz.AssignedRolesUsecase,
+	sh *ServiceHelper,
 ) *AssignsService {
 	return &AssignsService{
-		sh: sh,
 		ru: ru,
 		tu: tu,
 		uc: uc,
+		sh: sh,
 	}
 }
 
 func (s *AssignsService) AssignRole(ctx context.Context, req *v1.AssignRoleRequest) (*utils_v1.EmptyReply, error) {
-	tenantId, err := s.sh.GetTenantId(ctx, req.TenantId)
+	claims, _, err := s.sh.HasPermission(ctx, "admin.role.assign")
 	if err != nil {
-		return nil, v1.ErrorUnauthorized("invalid token")
+		return nil, err
 	}
-	// todo checkPermissions can assign role to tenant identity
 
 	err = s.uc.AssignRole(ctx, data.AssignRoleDto{
-		TenantId:   tenantId,
+		TenantId:   claims.GetTenantId(),
 		RoleId:     req.GetRoleId(),
 		TeamId:     req.GetTeamId(),
 		IdentityId: req.GetIdentityId(),
@@ -54,13 +53,12 @@ func (s *AssignsService) AssignRole(ctx context.Context, req *v1.AssignRoleReque
 }
 
 func (s *AssignsService) DeleteAssign(ctx context.Context, req *v1.AssignRequest) (*utils_v1.EmptyReply, error) {
-	tenantId, err := s.sh.GetTenantId(ctx, req.TenantId)
+	claims, _, err := s.sh.HasPermission(ctx, "admin.role.assign")
 	if err != nil {
-		return nil, v1.ErrorUnauthorized("invalid token")
+		return nil, err
 	}
-	// todo checkPermissions can delete role
 
-	err = s.uc.DeleteIdentityRole(ctx, tenantId, req.GetAssignId())
+	err = s.uc.DeleteIdentityRole(ctx, claims.GetTenantId(), req.GetAssignId())
 	if err != nil {
 		return nil, err
 	}
@@ -68,11 +66,10 @@ func (s *AssignsService) DeleteAssign(ctx context.Context, req *v1.AssignRequest
 }
 
 func (s *AssignsService) ListAssigns(ctx context.Context, req *v1.ListAssignsRequest) (*v1.ListAssignsReply, error) {
-	tenantId, err := s.sh.GetTenantId(ctx, req.TenantId)
+	claims, _, err := s.sh.HasPermission(ctx, "admin.role.assign")
 	if err != nil {
-		return nil, v1.ErrorUnauthorized("invalid token")
+		return nil, err
 	}
-	// todo checkPermissions can get assgined roles
 
 	identitiesIDs := []string{}
 	teamsIDs := []int64{}
@@ -86,7 +83,7 @@ func (s *AssignsService) ListAssigns(ctx context.Context, req *v1.ListAssignsReq
 	}
 
 	assignedRoles, err := s.uc.ListAssignedRoles(ctx, data.ListRolesDto{
-		TenantId:    tenantId,
+		TenantId:    claims.GetTenantId(),
 		IdentityIDs: identitiesIDs,
 		TeamsIDs:    teamsIDs,
 	})

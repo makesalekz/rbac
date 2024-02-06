@@ -28,8 +28,8 @@ const OperationPermissionsUpdatePermission = "/rbac.v1.Permissions/UpdatePermiss
 
 type PermissionsHTTPServer interface {
 	CreatePermission(context.Context, *CreatePermissionRequest) (*PermissionReply, error)
-	DeletePermission(context.Context, *DeletePermissionRequest) (*v1.EmptyReply, error)
-	GetPermission(context.Context, *GetPermissionRequest) (*PermissionReply, error)
+	DeletePermission(context.Context, *PermissionRequest) (*v1.EmptyReply, error)
+	GetPermission(context.Context, *PermissionRequest) (*PermissionReply, error)
 	ListPermissions(context.Context, *ListPermissionsRequest) (*ListPermissionsReply, error)
 	UpdatePermission(context.Context, *UpdatePermissionRequest) (*PermissionReply, error)
 }
@@ -92,7 +92,7 @@ func _Permissions_UpdatePermission0_HTTP_Handler(srv PermissionsHTTPServer) func
 
 func _Permissions_DeletePermission0_HTTP_Handler(srv PermissionsHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
-		var in DeletePermissionRequest
+		var in PermissionRequest
 		if err := ctx.BindQuery(&in); err != nil {
 			return err
 		}
@@ -101,7 +101,7 @@ func _Permissions_DeletePermission0_HTTP_Handler(srv PermissionsHTTPServer) func
 		}
 		http.SetOperation(ctx, OperationPermissionsDeletePermission)
 		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
-			return srv.DeletePermission(ctx, req.(*DeletePermissionRequest))
+			return srv.DeletePermission(ctx, req.(*PermissionRequest))
 		})
 		out, err := h(ctx, &in)
 		if err != nil {
@@ -114,7 +114,7 @@ func _Permissions_DeletePermission0_HTTP_Handler(srv PermissionsHTTPServer) func
 
 func _Permissions_GetPermission0_HTTP_Handler(srv PermissionsHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
-		var in GetPermissionRequest
+		var in PermissionRequest
 		if err := ctx.BindQuery(&in); err != nil {
 			return err
 		}
@@ -123,7 +123,7 @@ func _Permissions_GetPermission0_HTTP_Handler(srv PermissionsHTTPServer) func(ct
 		}
 		http.SetOperation(ctx, OperationPermissionsGetPermission)
 		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
-			return srv.GetPermission(ctx, req.(*GetPermissionRequest))
+			return srv.GetPermission(ctx, req.(*PermissionRequest))
 		})
 		out, err := h(ctx, &in)
 		if err != nil {
@@ -158,8 +158,8 @@ func _Permissions_ListPermissions0_HTTP_Handler(srv PermissionsHTTPServer) func(
 
 type PermissionsHTTPClient interface {
 	CreatePermission(ctx context.Context, req *CreatePermissionRequest, opts ...http.CallOption) (rsp *PermissionReply, err error)
-	DeletePermission(ctx context.Context, req *DeletePermissionRequest, opts ...http.CallOption) (rsp *v1.EmptyReply, err error)
-	GetPermission(ctx context.Context, req *GetPermissionRequest, opts ...http.CallOption) (rsp *PermissionReply, err error)
+	DeletePermission(ctx context.Context, req *PermissionRequest, opts ...http.CallOption) (rsp *v1.EmptyReply, err error)
+	GetPermission(ctx context.Context, req *PermissionRequest, opts ...http.CallOption) (rsp *PermissionReply, err error)
 	ListPermissions(ctx context.Context, req *ListPermissionsRequest, opts ...http.CallOption) (rsp *ListPermissionsReply, err error)
 	UpdatePermission(ctx context.Context, req *UpdatePermissionRequest, opts ...http.CallOption) (rsp *PermissionReply, err error)
 }
@@ -185,7 +185,7 @@ func (c *PermissionsHTTPClientImpl) CreatePermission(ctx context.Context, in *Cr
 	return &out, err
 }
 
-func (c *PermissionsHTTPClientImpl) DeletePermission(ctx context.Context, in *DeletePermissionRequest, opts ...http.CallOption) (*v1.EmptyReply, error) {
+func (c *PermissionsHTTPClientImpl) DeletePermission(ctx context.Context, in *PermissionRequest, opts ...http.CallOption) (*v1.EmptyReply, error) {
 	var out v1.EmptyReply
 	pattern := "/v1/rbac/permissions/{permissionId}"
 	path := binding.EncodeURL(pattern, in, true)
@@ -198,7 +198,7 @@ func (c *PermissionsHTTPClientImpl) DeletePermission(ctx context.Context, in *De
 	return &out, err
 }
 
-func (c *PermissionsHTTPClientImpl) GetPermission(ctx context.Context, in *GetPermissionRequest, opts ...http.CallOption) (*PermissionReply, error) {
+func (c *PermissionsHTTPClientImpl) GetPermission(ctx context.Context, in *PermissionRequest, opts ...http.CallOption) (*PermissionReply, error) {
 	var out PermissionReply
 	pattern := "/v1/rbac/permissions/{permissionId}"
 	path := binding.EncodeURL(pattern, in, true)

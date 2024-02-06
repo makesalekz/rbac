@@ -23,7 +23,7 @@ var ProviderSet = wire.NewSet(
 	NewRoleRepo,
 	NewTeamsRepo,
 	NewPermissionRepo,
-	NewTeamIdentityRoleRepo,
+	NewAssignedRolesRepo,
 )
 
 // Data .

@@ -53,10 +53,6 @@ paths:
                   required: true
                   schema:
                     type: string
-                - name: tenantId
-                  in: query
-                  schema:
-                    type: string
             responses:
                 "200":
                     description: OK
@@ -129,16 +125,6 @@ paths:
                   required: true
                   schema:
                     type: string
-                - name: tenantId
-                  in: query
-                  schema:
-                    type: string
-                - name: identities
-                  in: query
-                  schema:
-                    type: array
-                    items:
-                        type: string
             responses:
                 "200":
                     description: OK
@@ -179,16 +165,6 @@ paths:
                   required: true
                   schema:
                     type: string
-                - name: tenantId
-                  in: query
-                  schema:
-                    type: string
-                - name: identities
-                  in: query
-                  schema:
-                    type: array
-                    items:
-                        type: string
             responses:
                 "200":
                     description: OK
@@ -520,8 +496,6 @@ components:
         rbac.v1.AssignRoleRequest:
             type: object
             properties:
-                tenantId:
-                    type: string
                 identityId:
                     type: string
                 roleId:
@@ -549,25 +523,19 @@ components:
             properties:
                 tenantId:
                     type: string
-                identities:
-                    type: array
-                    items:
-                        type: string
                 teamId:
                     type: string
                 permissions:
                     type: array
                     items:
                         type: string
-        rbac.v1.CreatePermissionRequest:
-            type: object
-            properties:
-                tenantId:
-                    type: string
                 identities:
                     type: array
                     items:
                         type: string
+        rbac.v1.CreatePermissionRequest:
+            type: object
+            properties:
                 id:
                     type: string
                 groupId:
@@ -637,8 +605,6 @@ components:
         rbac.v1.ListAssignsRequest:
             type: object
             properties:
-                tenantId:
-                    type: string
                 identityId:
                     type: string
                 teamId:
@@ -660,12 +626,6 @@ components:
         rbac.v1.ListPermissionsRequest:
             type: object
             properties:
-                tenantId:
-                    type: string
-                identities:
-                    type: array
-                    items:
-                        type: string
                 appsIds:
                     type: array
                     items:
@@ -833,12 +793,6 @@ components:
         rbac.v1.UpdatePermissionRequest:
             type: object
             properties:
-                tenantId:
-                    type: string
-                identities:
-                    type: array
-                    items:
-                        type: string
                 permissionId:
                     type: string
                 name:

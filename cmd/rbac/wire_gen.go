@@ -34,40 +34,45 @@ func wireApp(bootstrap *conf.Bootstrap, logger log.Logger) (*kratos.App, func(),
 	if err != nil {
 		return nil, nil, err
 	}
-	serviceHelper := service.NewServiceHelper(jwtProcessor)
 	dataData, cleanup, err := data.NewData(bootstrap, configConfig, logger)
 	if err != nil {
 		return nil, nil, err
 	}
+	assignedRolesRepo := data.NewAssignedRolesRepo(dataData)
 	roleRepo := data.NewRoleRepo(dataData)
+	teamsRepo := data.NewTeamsRepo(dataData)
+	checkPermissionsUsecase, err := biz.NewCheckPermissionsUsecase(assignedRolesRepo, roleRepo, teamsRepo)
+	if err != nil {
+		cleanup()
+		return nil, nil, err
+	}
+	serviceHelper := service.NewServiceHelper(jwtProcessor, checkPermissionsUsecase)
 	rolesUsecase, err := biz.NewRolesUsecase(logger, roleRepo)
 	if err != nil {
 		cleanup()
 		return nil, nil, err
 	}
 	permissionRepo := data.NewPermissionRepo(dataData)
-	teamIdentityRoleRepo := data.NewTeamIdentityRoleRepo(dataData)
-	permissionsUsecase, err := biz.NewPermissionUsecase(logger, permissionRepo, roleRepo, teamIdentityRoleRepo)
+	permissionsUsecase, err := biz.NewPermissionUsecase(logger, permissionRepo, roleRepo, assignedRolesRepo)
 	if err != nil {
 		cleanup()
 		return nil, nil, err
 	}
-	teamsRepo := data.NewTeamsRepo(dataData)
-	teamIdentityUsecase, err := biz.NewTeamIdentityUsecase(teamIdentityRoleRepo, roleRepo, teamsRepo)
+	assignedRolesUsecase, err := biz.NewAssignedRolesUsecase(assignedRolesRepo, roleRepo, teamsRepo)
 	if err != nil {
 		cleanup()
 		return nil, nil, err
 	}
-	rolesService := service.NewRolesService(serviceHelper, rolesUsecase, permissionsUsecase, teamIdentityUsecase)
-	permissionsService := service.NewPermissionsService(serviceHelper, permissionsUsecase, teamIdentityUsecase)
+	rolesService := service.NewRolesService(serviceHelper, rolesUsecase, permissionsUsecase, assignedRolesUsecase)
+	permissionsService := service.NewPermissionsService(serviceHelper, permissionsUsecase)
 	teamsUsecase, err := biz.NewTeamsUsecase(teamsRepo)
 	if err != nil {
 		cleanup()
 		return nil, nil, err
 	}
 	teamsService := service.NewTeamsService(serviceHelper, teamsUsecase)
-	assignsService := service.NewAssignsService(serviceHelper, rolesUsecase, teamsUsecase, teamIdentityUsecase)
-	checkPermissionsService := service.NewCheckPermissionsService(serviceHelper, teamIdentityUsecase)
+	assignsService := service.NewAssignsService(rolesUsecase, teamsUsecase, assignedRolesUsecase, serviceHelper)
+	checkPermissionsService := service.NewCheckPermissionsService(checkPermissionsUsecase)
 	grpcServer := server.NewGRPCServer(bootstrap, jwtProcessor, rolesService, permissionsService, teamsService, assignsService, checkPermissionsService)
 	httpServer := server.NewHTTPServer(bootstrap, jwtProcessor, rolesService, permissionsService, teamsService, assignsService, checkPermissionsService)
 	app := newApp(logger, configConfig, grpcServer, httpServer)

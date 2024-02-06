@@ -31,19 +31,16 @@ service Assigns {
 }
 
 message AssignRoleRequest {
-  int64 tenantId = 4;
   string identityId = 1;
   int64 roleId = 2;
   int64 teamId = 3;
 }
 
 message AssignRequest {
-  int64 tenantId = 2;
   int64 assignId = 1;
 }
 
 message ListAssignsRequest {
-  int64 tenantId = 3;
   string identityId = 1;
   int64 teamId = 2;
 }

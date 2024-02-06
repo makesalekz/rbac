@@ -28,6 +28,118 @@ func NewTeamsService(
 	}
 }
 
+func (s *TeamsService) CreateTeam(ctx context.Context, req *v1.CreateTeamRequest) (*v1.TeamReply, error) {
+	_, _, err := s.sh.HasPermission(ctx, "admin.team.create")
+	if err != nil {
+		return nil, err
+	}
+
+	team, err := s.tu.CreateTeam(ctx, data.TeamDto{
+		Name:        req.Name,
+		Description: req.Description,
+		ParentId:    req.ParentId,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &v1.TeamReply{
+		Team: replyTeam(team),
+	}, nil
+}
+
+func (s *TeamsService) UpdateTeam(ctx context.Context, req *v1.UpdateTeamRequest) (*v1.TeamReply, error) {
+	claims, _, err := s.sh.HasPermission(ctx, "admin.team.update")
+	if err != nil {
+		return nil, err
+	}
+
+	team, err := s.tu.GetTeam(ctx, claims.GetTenantId(), req.GetTeamId(), false)
+	if err != nil {
+		return nil, err
+	}
+
+	updated, err := s.tu.UpdateTeam(ctx, team, data.TeamDto{
+		Name:        req.Name,
+		Description: req.Description,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &v1.TeamReply{
+		Team: replyTeam(updated),
+	}, nil
+}
+
+func (s *TeamsService) DeleteTeam(ctx context.Context, req *v1.TeamRequest) (*utils_v1.EmptyReply, error) {
+	claims, _, err := s.sh.HasPermission(ctx, "admin.team.delete")
+	if err != nil {
+		return nil, err
+	}
+
+	team, err := s.tu.GetTeam(ctx, claims.GetTenantId(), req.GetTeamId(), false)
+	if err != nil {
+		return nil, err
+	}
+
+	err = s.tu.DeleteTeam(ctx, team)
+	if err != nil {
+		return nil, err
+	}
+	return &utils_v1.EmptyReply{}, nil
+}
+
+func (s *TeamsService) GetTeam(ctx context.Context, req *v1.TeamRequest) (*v1.TeamReply, error) {
+	claims, _, err := s.sh.HasPermission(ctx, "admin.team.read")
+	if err != nil {
+		return nil, err
+	}
+
+	team, err := s.tu.GetTeam(ctx, claims.GetTenantId(), req.GetTeamId(), false)
+	if err != nil {
+		return nil, err
+	}
+
+	return &v1.TeamReply{
+		Team: replyTeam(team),
+	}, nil
+}
+
+func (s *TeamsService) GetTeamTree(ctx context.Context, req *v1.TeamRequest) (*v1.TeamReply, error) {
+	claims, _, err := s.sh.HasPermission(ctx, "admin.team.read")
+	if err != nil {
+		return nil, err
+	}
+
+	team, err := s.tu.GetTeam(ctx, claims.GetTenantId(), req.GetTeamId(), true)
+	if err != nil {
+		return nil, err
+	}
+
+	return &v1.TeamReply{
+		Team: replyTeam(team),
+	}, nil
+}
+
+func (s *TeamsService) ListTeams(ctx context.Context, req *v1.ListTeamsRequest) (*v1.ListTeamsReply, error) {
+	claims, _, err := s.sh.HasPermission(ctx, "admin.team.read")
+	if err != nil {
+		return nil, err
+	}
+
+	list, err := s.tu.ListTeams(ctx, data.TeamsListFilter{
+		TenantId: claims.GetTenantId(),
+		ParentId: req.GetParentId(),
+	}, req.GetPaginate())
+	if err != nil {
+		return nil, err
+	}
+
+	return &v1.ListTeamsReply{
+		Teams:    replyTeams(list.Teams),
+		Paginate: list.Paginate,
+	}, nil
+}
+
 func replyTeam(team *ent.Team) *v1.Team {
 	result := v1.Team{
 		Id:          team.ID,
@@ -56,118 +168,4 @@ func replyTeams(teams []*ent.Team) []*v1.Team {
 		result[i] = replyTeam(team)
 	}
 	return result
-}
-
-func (s *TeamsService) CreateTeam(ctx context.Context, req *v1.CreateTeamRequest) (*v1.TeamReply, error) {
-	// todo checkPermissions for create team
-
-	team, err := s.tu.CreateTeam(ctx, data.TeamDto{
-		Name:        req.Name,
-		Description: req.Description,
-		ParentId:    req.ParentId,
-	})
-	if err != nil {
-		return nil, err
-	}
-	return &v1.TeamReply{
-		Team: replyTeam(team),
-	}, nil
-}
-
-func (s *TeamsService) UpdateTeam(ctx context.Context, req *v1.UpdateTeamRequest) (*v1.TeamReply, error) {
-	tenantId, err := s.sh.GetTenantId(ctx, req.TenantId)
-	if err != nil {
-		return nil, v1.ErrorUnauthorized("invalid token")
-	}
-	// todo checkPermissions for update team
-
-	team, err := s.tu.GetTeam(ctx, tenantId, req.GetTeamId(), false)
-	if err != nil {
-		return nil, err
-	}
-
-	updated, err := s.tu.UpdateTeam(ctx, team, data.TeamDto{
-		Name:        req.Name,
-		Description: req.Description,
-	})
-	if err != nil {
-		return nil, err
-	}
-	return &v1.TeamReply{
-		Team: replyTeam(updated),
-	}, nil
-}
-
-func (s *TeamsService) DeleteTeam(ctx context.Context, req *v1.TeamRequest) (*utils_v1.EmptyReply, error) {
-	tenantId, err := s.sh.GetTenantId(ctx, req.TenantId)
-	if err != nil {
-		return nil, v1.ErrorUnauthorized("invalid token")
-	}
-	// todo checkPermissions for delete team
-
-	team, err := s.tu.GetTeam(ctx, tenantId, req.GetTeamId(), false)
-	if err != nil {
-		return nil, err
-	}
-
-	err = s.tu.DeleteTeam(ctx, team)
-	if err != nil {
-		return nil, err
-	}
-	return &utils_v1.EmptyReply{}, nil
-}
-
-func (s *TeamsService) GetTeam(ctx context.Context, req *v1.TeamRequest) (*v1.TeamReply, error) {
-	tenantId, err := s.sh.GetTenantId(ctx, req.TenantId)
-	if err != nil {
-		return nil, v1.ErrorUnauthorized("invalid token")
-	}
-	// todo checkPermissions for get team
-
-	team, err := s.tu.GetTeam(ctx, tenantId, req.GetTeamId(), false)
-	if err != nil {
-		return nil, err
-	}
-
-	return &v1.TeamReply{
-		Team: replyTeam(team),
-	}, nil
-}
-
-func (s *TeamsService) GetTeamTree(ctx context.Context, req *v1.TeamRequest) (*v1.TeamReply, error) {
-	tenantId, err := s.sh.GetTenantId(ctx, req.TenantId)
-	if err != nil {
-		return nil, v1.ErrorUnauthorized("invalid token")
-	}
-	// todo checkPermissions for get team
-
-	team, err := s.tu.GetTeam(ctx, tenantId, req.GetTeamId(), true)
-	if err != nil {
-		return nil, err
-	}
-
-	return &v1.TeamReply{
-		Team: replyTeam(team),
-	}, nil
-}
-
-func (s *TeamsService) ListTeams(ctx context.Context, req *v1.ListTeamsRequest) (*v1.ListTeamsReply, error) {
-	tenantId, err := s.sh.GetTenantId(ctx, req.TenantId)
-	if err != nil {
-		return nil, v1.ErrorUnauthorized("invalid token")
-	}
-	// todo checkPermissions for list teams
-
-	list, err := s.tu.ListTeams(ctx, data.TeamsListFilter{
-		TenantId: tenantId,
-		ParentId: req.GetParentId(),
-	}, req.GetPaginate())
-	if err != nil {
-		return nil, err
-	}
-
-	return &v1.ListTeamsReply{
-		Teams:    replyTeams(list.Teams),
-		Paginate: list.Paginate,
-	}, nil
 }

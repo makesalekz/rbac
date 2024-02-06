@@ -7,6 +7,7 @@ var ProviderSet = wire.NewSet(
 	NewQueueManager,
 	NewPermissionUsecase,
 	NewRolesUsecase,
-	NewTeamIdentityUsecase,
+	NewAssignedRolesUsecase,
+	NewCheckPermissionsUsecase,
 	NewTeamsUsecase,
 )
