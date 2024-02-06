@@ -16,14 +16,14 @@ type RolesService struct {
 	sh *ServiceHelper
 	uc *biz.RolesUsecase
 	pu *biz.PermissionsUsecase
-	au *biz.TeamIdentityUsecase
+	au *biz.AssignedRolesUsecase
 }
 
 func NewRolesService(
 	sh *ServiceHelper,
 	uc *biz.RolesUsecase,
 	pu *biz.PermissionsUsecase,
-	au *biz.TeamIdentityUsecase,
+	au *biz.AssignedRolesUsecase,
 ) *RolesService {
 	return &RolesService{
 		sh: sh,

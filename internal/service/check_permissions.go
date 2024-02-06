@@ -10,11 +10,11 @@ import (
 type CheckPermissionsService struct {
 	v1.UnimplementedCheckPermissionsServer
 
-	uc *biz.TeamIdentityUsecase
+	uc *biz.CheckPermissionsUsecase
 }
 
 func NewCheckPermissionsService(
-	uc *biz.TeamIdentityUsecase,
+	uc *biz.CheckPermissionsUsecase,
 ) *CheckPermissionsService {
 	return &CheckPermissionsService{
 		uc: uc,

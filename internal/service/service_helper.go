@@ -10,16 +10,16 @@ import (
 
 type ServiceHelper struct {
 	jwt *jwt.JwtProcessor
-	au  *biz.TeamIdentityUsecase
+	uc  *biz.CheckPermissionsUsecase
 }
 
 func NewServiceHelper(
 	jwt *jwt.JwtProcessor,
-	au *biz.TeamIdentityUsecase,
+	uc *biz.CheckPermissionsUsecase,
 ) *ServiceHelper {
 	return &ServiceHelper{
 		jwt: jwt,
-		au:  au,
+		uc:  uc,
 	}
 }
 
@@ -38,7 +38,7 @@ func (s *ServiceHelper) HasPermission(ctx context.Context, permission string) (*
 		return nil, nil, err
 	}
 
-	fields, err := s.au.HasPermission(ctx, claims.GetTenantId(), claims.GetIdentities(), permission)
+	fields, err := s.uc.HasPermission(ctx, claims.GetTenantId(), claims.GetIdentities(), permission)
 	if err != nil {
 		return nil, nil, err
 	}

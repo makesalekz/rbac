@@ -15,14 +15,14 @@ type AssignsService struct {
 
 	ru *biz.RolesUsecase
 	tu *biz.TeamsUsecase
-	uc *biz.TeamIdentityUsecase
+	uc *biz.AssignedRolesUsecase
 	sh *ServiceHelper
 }
 
 func NewAssignsService(
 	ru *biz.RolesUsecase,
 	tu *biz.TeamsUsecase,
-	uc *biz.TeamIdentityUsecase,
+	uc *biz.AssignedRolesUsecase,
 	sh *ServiceHelper,
 ) *AssignsService {
 	return &AssignsService{
