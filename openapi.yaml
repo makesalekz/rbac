@@ -318,7 +318,7 @@ paths:
         delete:
             tags:
                 - Roles
-            operationId: Roles_DeleteRolePermission
+            operationId: Roles_RemovePermissionFromRole
             parameters:
                 - name: roleId
                   in: path

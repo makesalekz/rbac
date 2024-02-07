@@ -185,7 +185,7 @@ func (s *RolesService) AddPermissionToRole(ctx context.Context, req *v1.AddPermi
 	return &utils_v1.EmptyReply{}, nil
 }
 
-func (s *RolesService) DeleteRolePermission(ctx context.Context, req *v1.RemovePermissionFromRoleRequest) (*utils_v1.EmptyReply, error) {
+func (s *RolesService) RemovePermissionFromRole(ctx context.Context, req *v1.RemovePermissionFromRoleRequest) (*utils_v1.EmptyReply, error) {
 	claims, _, err := s.sh.HasPermission(ctx, "admin.role.update")
 	if err != nil {
 		return nil, err

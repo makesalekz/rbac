@@ -46,7 +46,7 @@ service Roles {
       body: "*"
     };
   };
-  rpc DeleteRolePermission(RemovePermissionFromRoleRequest)
+  rpc RemovePermissionFromRole(RemovePermissionFromRoleRequest)
       returns (utils.v1.EmptyReply) {
     option (google.api.http) = {
       delete: "/v1/rbac/roles/{roleId}/permissions/{permissionId}"
