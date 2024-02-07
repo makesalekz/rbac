@@ -20,12 +20,11 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	Teams_CreateTeam_FullMethodName  = "/rbac.v1.Teams/CreateTeam"
-	Teams_UpdateTeam_FullMethodName  = "/rbac.v1.Teams/UpdateTeam"
-	Teams_DeleteTeam_FullMethodName  = "/rbac.v1.Teams/DeleteTeam"
-	Teams_GetTeam_FullMethodName     = "/rbac.v1.Teams/GetTeam"
-	Teams_GetTeamTree_FullMethodName = "/rbac.v1.Teams/GetTeamTree"
-	Teams_ListTeams_FullMethodName   = "/rbac.v1.Teams/ListTeams"
+	Teams_CreateTeam_FullMethodName = "/rbac.v1.Teams/CreateTeam"
+	Teams_UpdateTeam_FullMethodName = "/rbac.v1.Teams/UpdateTeam"
+	Teams_DeleteTeam_FullMethodName = "/rbac.v1.Teams/DeleteTeam"
+	Teams_GetTeam_FullMethodName    = "/rbac.v1.Teams/GetTeam"
+	Teams_ListTeams_FullMethodName  = "/rbac.v1.Teams/ListTeams"
 )
 
 // TeamsClient is the client API for Teams service.
@@ -36,7 +35,6 @@ type TeamsClient interface {
 	UpdateTeam(ctx context.Context, in *UpdateTeamRequest, opts ...grpc.CallOption) (*TeamReply, error)
 	DeleteTeam(ctx context.Context, in *TeamRequest, opts ...grpc.CallOption) (*v1.EmptyReply, error)
 	GetTeam(ctx context.Context, in *TeamRequest, opts ...grpc.CallOption) (*TeamReply, error)
-	GetTeamTree(ctx context.Context, in *TeamRequest, opts ...grpc.CallOption) (*TeamReply, error)
 	ListTeams(ctx context.Context, in *ListTeamsRequest, opts ...grpc.CallOption) (*ListTeamsReply, error)
 }
 
@@ -84,15 +82,6 @@ func (c *teamsClient) GetTeam(ctx context.Context, in *TeamRequest, opts ...grpc
 	return out, nil
 }
 
-func (c *teamsClient) GetTeamTree(ctx context.Context, in *TeamRequest, opts ...grpc.CallOption) (*TeamReply, error) {
-	out := new(TeamReply)
-	err := c.cc.Invoke(ctx, Teams_GetTeamTree_FullMethodName, in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 func (c *teamsClient) ListTeams(ctx context.Context, in *ListTeamsRequest, opts ...grpc.CallOption) (*ListTeamsReply, error) {
 	out := new(ListTeamsReply)
 	err := c.cc.Invoke(ctx, Teams_ListTeams_FullMethodName, in, out, opts...)
@@ -110,7 +99,6 @@ type TeamsServer interface {
 	UpdateTeam(context.Context, *UpdateTeamRequest) (*TeamReply, error)
 	DeleteTeam(context.Context, *TeamRequest) (*v1.EmptyReply, error)
 	GetTeam(context.Context, *TeamRequest) (*TeamReply, error)
-	GetTeamTree(context.Context, *TeamRequest) (*TeamReply, error)
 	ListTeams(context.Context, *ListTeamsRequest) (*ListTeamsReply, error)
 	mustEmbedUnimplementedTeamsServer()
 }
@@ -130,9 +118,6 @@ func (UnimplementedTeamsServer) DeleteTeam(context.Context, *TeamRequest) (*v1.E
 }
 func (UnimplementedTeamsServer) GetTeam(context.Context, *TeamRequest) (*TeamReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetTeam not implemented")
-}
-func (UnimplementedTeamsServer) GetTeamTree(context.Context, *TeamRequest) (*TeamReply, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetTeamTree not implemented")
 }
 func (UnimplementedTeamsServer) ListTeams(context.Context, *ListTeamsRequest) (*ListTeamsReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListTeams not implemented")
@@ -222,24 +207,6 @@ func _Teams_GetTeam_Handler(srv interface{}, ctx context.Context, dec func(inter
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Teams_GetTeamTree_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(TeamRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(TeamsServer).GetTeamTree(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: Teams_GetTeamTree_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(TeamsServer).GetTeamTree(ctx, req.(*TeamRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 func _Teams_ListTeams_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ListTeamsRequest)
 	if err := dec(in); err != nil {
@@ -280,10 +247,6 @@ var Teams_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetTeam",
 			Handler:    _Teams_GetTeam_Handler,
-		},
-		{
-			MethodName: "GetTeamTree",
-			Handler:    _Teams_GetTeamTree_Handler,
 		},
 		{
 			MethodName: "ListTeams",

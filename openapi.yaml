@@ -384,10 +384,10 @@ paths:
                   required: true
                   schema:
                     type: string
-                - name: tenantId
+                - name: withTree
                   in: query
                   schema:
-                    type: string
+                    type: boolean
             responses:
                 "200":
                     description: OK
@@ -428,10 +428,10 @@ paths:
                   required: true
                   schema:
                     type: string
-                - name: tenantId
+                - name: withTree
                   in: query
                   schema:
-                    type: string
+                    type: boolean
             responses:
                 "200":
                     description: OK
@@ -439,28 +439,6 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/utils.v1.EmptyReply'
-    /v1/rbac/teams/{teamId}/tree:
-        get:
-            tags:
-                - Teams
-            operationId: Teams_GetTeamTree
-            parameters:
-                - name: teamId
-                  in: path
-                  required: true
-                  schema:
-                    type: string
-                - name: tenantId
-                  in: query
-                  schema:
-                    type: string
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/rbac.v1.TeamReply'
 components:
     schemas:
         rbac.v1.AddPermissionToRoleRequest:
@@ -631,8 +609,6 @@ components:
         rbac.v1.ListTeamsRequest:
             type: object
             properties:
-                tenantId:
-                    type: string
                 parentId:
                     type: string
                 paginate:
@@ -769,8 +745,6 @@ components:
         rbac.v1.UpdateTeamRequest:
             type: object
             properties:
-                tenantId:
-                    type: string
                 teamId:
                     type: string
                 name:

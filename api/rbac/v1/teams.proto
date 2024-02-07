@@ -33,11 +33,6 @@ service Teams {
       get: "/v1/rbac/teams/{teamId}"
     };
   };
-  rpc GetTeamTree(TeamRequest) returns (TeamReply) {
-    option (google.api.http) = {
-      get: "/v1/rbac/teams/{teamId}/tree"
-    };
-  };
   rpc ListTeams(ListTeamsRequest) returns (ListTeamsReply) {
     option (google.api.http) = {
       post: "/v1/rbac/teams/list"
@@ -53,15 +48,14 @@ message CreateTeamRequest {
 }
 
 message UpdateTeamRequest {
-  int64 tenantId = 4;
   int64 teamId = 1;
   string name = 2;
   string description = 3;
 }
 
 message TeamRequest {
-  int64 tenantId = 2;
   int64 teamId = 1;
+  bool withTree = 2;
 }
 
 message TeamReply {
@@ -70,7 +64,6 @@ message TeamReply {
 }
 
 message ListTeamsRequest {
-  int64 tenantId = 3;
   int64 parentId = 1;
   utils.v1.PaginateRequest paginate = 2;
 }
