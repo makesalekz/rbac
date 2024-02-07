@@ -23,12 +23,12 @@ service Roles {
       body: "*"
     };
   };
-  rpc DeleteRole(DeleteRoleRequest) returns (utils.v1.EmptyReply) {
+  rpc DeleteRole(RoleRequest) returns (utils.v1.EmptyReply) {
     option (google.api.http) = {
       delete: "/v1/rbac/roles/{roleId}"
     };
   };
-  rpc GetRole(GetRoleRequest) returns (RoleReply) {
+  rpc GetRole(RoleRequest) returns (RoleReply) {
     option (google.api.http) = {
       get: "/v1/rbac/roles/{roleId}"
     };
@@ -39,21 +39,20 @@ service Roles {
       body: "*"
     };
   };
-  rpc SetRolePermission(SetRolePermissionRequest)
+  rpc AddPermissionToRole(AddPermissionToRoleRequest)
       returns (utils.v1.EmptyReply) {
     option (google.api.http) = {
       post: "/v1/rbac/roles/{roleId}/permissions"
       body: "*"
     };
   };
-  rpc DeleteRolePermission(DeleteRolePermissionRequest)
+  rpc DeleteRolePermission(RemovePermissionFromRoleRequest)
       returns (utils.v1.EmptyReply) {
     option (google.api.http) = {
       delete: "/v1/rbac/roles/{roleId}/permissions/{permissionId}"
     };
   };
-  rpc ListRolePermissions(ListRolePermissionsRequest)
-      returns (RolePermissionsReply) {
+  rpc ListRolePermissions(RoleRequest) returns (RolePermissionsReply) {
     option (google.api.http) = {
       post: "/v1/rbac/roles/{roleId}/permissions/list"
       body: "*"
@@ -62,8 +61,6 @@ service Roles {
 }
 
 message CreateRoleRequest {
-  int64 tenantId = 6;
-  repeated string identities = 7;
   string name = 1;
   string description = 2;
   bool isSystem = 3;
@@ -76,8 +73,6 @@ message RoleReply {
 }
 
 message UpdateRoleRequest {
-  int64 tenantId = 6;
-  repeated string identities = 7;
   int64 roleId = 1;
   string name = 2;
   string description = 3;
@@ -85,21 +80,11 @@ message UpdateRoleRequest {
   repeated string deny = 5;
 }
 
-message DeleteRoleRequest {
-  int64 tenantId = 2;
-  repeated string identities = 3;
-  int64 roleId = 1;
-}
-
-message GetRoleRequest {
-  int64 tenantId = 2;
-  repeated string identities = 3;
-  int64 roleId = 1;
+message RoleRequest {
+  int64 roleId = 3;
 }
 
 message ListRolesRequest {
-  int64 tenantId = 2;
-  repeated string identities = 3;
   string search = 1;
 }
 
@@ -107,26 +92,16 @@ message ListRolesReply {
   repeated Role roles = 1;
 }
 
-message SetRolePermissionRequest {
-  int64 tenantId = 5;
-  repeated string identities = 6;
+message AddPermissionToRoleRequest {
   int64 roleId = 1;
   string permissionId = 2;
   optional bool deny = 3;
   repeated string fields = 4;
 }
 
-message DeleteRolePermissionRequest {
-  int64 tenantId = 3;
-  repeated string identities = 4;
+message RemovePermissionFromRoleRequest {
   int64 roleId = 1;
   string permissionId = 2;
-}
-
-message ListRolePermissionsRequest {
-  int64 tenantId = 2;
-  repeated string identities = 3;
-  int64 roleId = 1;
 }
 
 message RolePermissionsReply {

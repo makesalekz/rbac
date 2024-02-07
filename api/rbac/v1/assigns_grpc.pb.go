@@ -21,7 +21,7 @@ const _ = grpc.SupportPackageIsVersion7
 
 const (
 	Assigns_AssignRole_FullMethodName   = "/rbac.v1.Assigns/AssignRole"
-	Assigns_DeleteAssign_FullMethodName = "/rbac.v1.Assigns/DeleteAssign"
+	Assigns_UnassignRole_FullMethodName = "/rbac.v1.Assigns/UnassignRole"
 	Assigns_ListAssigns_FullMethodName  = "/rbac.v1.Assigns/ListAssigns"
 )
 
@@ -30,7 +30,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type AssignsClient interface {
 	AssignRole(ctx context.Context, in *AssignRoleRequest, opts ...grpc.CallOption) (*v1.EmptyReply, error)
-	DeleteAssign(ctx context.Context, in *AssignRequest, opts ...grpc.CallOption) (*v1.EmptyReply, error)
+	UnassignRole(ctx context.Context, in *AssignRequest, opts ...grpc.CallOption) (*v1.EmptyReply, error)
 	ListAssigns(ctx context.Context, in *ListAssignsRequest, opts ...grpc.CallOption) (*ListAssignsReply, error)
 }
 
@@ -51,9 +51,9 @@ func (c *assignsClient) AssignRole(ctx context.Context, in *AssignRoleRequest, o
 	return out, nil
 }
 
-func (c *assignsClient) DeleteAssign(ctx context.Context, in *AssignRequest, opts ...grpc.CallOption) (*v1.EmptyReply, error) {
+func (c *assignsClient) UnassignRole(ctx context.Context, in *AssignRequest, opts ...grpc.CallOption) (*v1.EmptyReply, error) {
 	out := new(v1.EmptyReply)
-	err := c.cc.Invoke(ctx, Assigns_DeleteAssign_FullMethodName, in, out, opts...)
+	err := c.cc.Invoke(ctx, Assigns_UnassignRole_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -74,7 +74,7 @@ func (c *assignsClient) ListAssigns(ctx context.Context, in *ListAssignsRequest,
 // for forward compatibility
 type AssignsServer interface {
 	AssignRole(context.Context, *AssignRoleRequest) (*v1.EmptyReply, error)
-	DeleteAssign(context.Context, *AssignRequest) (*v1.EmptyReply, error)
+	UnassignRole(context.Context, *AssignRequest) (*v1.EmptyReply, error)
 	ListAssigns(context.Context, *ListAssignsRequest) (*ListAssignsReply, error)
 	mustEmbedUnimplementedAssignsServer()
 }
@@ -86,8 +86,8 @@ type UnimplementedAssignsServer struct {
 func (UnimplementedAssignsServer) AssignRole(context.Context, *AssignRoleRequest) (*v1.EmptyReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AssignRole not implemented")
 }
-func (UnimplementedAssignsServer) DeleteAssign(context.Context, *AssignRequest) (*v1.EmptyReply, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method DeleteAssign not implemented")
+func (UnimplementedAssignsServer) UnassignRole(context.Context, *AssignRequest) (*v1.EmptyReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UnassignRole not implemented")
 }
 func (UnimplementedAssignsServer) ListAssigns(context.Context, *ListAssignsRequest) (*ListAssignsReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListAssigns not implemented")
@@ -123,20 +123,20 @@ func _Assigns_AssignRole_Handler(srv interface{}, ctx context.Context, dec func(
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Assigns_DeleteAssign_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Assigns_UnassignRole_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(AssignRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AssignsServer).DeleteAssign(ctx, in)
+		return srv.(AssignsServer).UnassignRole(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: Assigns_DeleteAssign_FullMethodName,
+		FullMethod: Assigns_UnassignRole_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AssignsServer).DeleteAssign(ctx, req.(*AssignRequest))
+		return srv.(AssignsServer).UnassignRole(ctx, req.(*AssignRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -171,8 +171,8 @@ var Assigns_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Assigns_AssignRole_Handler,
 		},
 		{
-			MethodName: "DeleteAssign",
-			Handler:    _Assigns_DeleteAssign_Handler,
+			MethodName: "UnassignRole",
+			Handler:    _Assigns_UnassignRole_Handler,
 		},
 		{
 			MethodName: "ListAssigns",
