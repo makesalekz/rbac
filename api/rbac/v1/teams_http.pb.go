@@ -23,7 +23,6 @@ const _ = http.SupportPackageIsVersion1
 const OperationTeamsCreateTeam = "/rbac.v1.Teams/CreateTeam"
 const OperationTeamsDeleteTeam = "/rbac.v1.Teams/DeleteTeam"
 const OperationTeamsGetTeam = "/rbac.v1.Teams/GetTeam"
-const OperationTeamsGetTeamTree = "/rbac.v1.Teams/GetTeamTree"
 const OperationTeamsListTeams = "/rbac.v1.Teams/ListTeams"
 const OperationTeamsUpdateTeam = "/rbac.v1.Teams/UpdateTeam"
 
@@ -31,7 +30,6 @@ type TeamsHTTPServer interface {
 	CreateTeam(context.Context, *CreateTeamRequest) (*TeamReply, error)
 	DeleteTeam(context.Context, *TeamRequest) (*v1.EmptyReply, error)
 	GetTeam(context.Context, *TeamRequest) (*TeamReply, error)
-	GetTeamTree(context.Context, *TeamRequest) (*TeamReply, error)
 	ListTeams(context.Context, *ListTeamsRequest) (*ListTeamsReply, error)
 	UpdateTeam(context.Context, *UpdateTeamRequest) (*TeamReply, error)
 }
@@ -42,7 +40,6 @@ func RegisterTeamsHTTPServer(s *http.Server, srv TeamsHTTPServer) {
 	r.PUT("/v1/rbac/teams/{teamId}", _Teams_UpdateTeam0_HTTP_Handler(srv))
 	r.DELETE("/v1/rbac/teams/{teamId}", _Teams_DeleteTeam0_HTTP_Handler(srv))
 	r.GET("/v1/rbac/teams/{teamId}", _Teams_GetTeam0_HTTP_Handler(srv))
-	r.GET("/v1/rbac/teams/{teamId}/tree", _Teams_GetTeamTree0_HTTP_Handler(srv))
 	r.POST("/v1/rbac/teams/list", _Teams_ListTeams0_HTTP_Handler(srv))
 }
 
@@ -137,28 +134,6 @@ func _Teams_GetTeam0_HTTP_Handler(srv TeamsHTTPServer) func(ctx http.Context) er
 	}
 }
 
-func _Teams_GetTeamTree0_HTTP_Handler(srv TeamsHTTPServer) func(ctx http.Context) error {
-	return func(ctx http.Context) error {
-		var in TeamRequest
-		if err := ctx.BindQuery(&in); err != nil {
-			return err
-		}
-		if err := ctx.BindVars(&in); err != nil {
-			return err
-		}
-		http.SetOperation(ctx, OperationTeamsGetTeamTree)
-		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
-			return srv.GetTeamTree(ctx, req.(*TeamRequest))
-		})
-		out, err := h(ctx, &in)
-		if err != nil {
-			return err
-		}
-		reply := out.(*TeamReply)
-		return ctx.Result(200, reply)
-	}
-}
-
 func _Teams_ListTeams0_HTTP_Handler(srv TeamsHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in ListTeamsRequest
@@ -185,7 +160,6 @@ type TeamsHTTPClient interface {
 	CreateTeam(ctx context.Context, req *CreateTeamRequest, opts ...http.CallOption) (rsp *TeamReply, err error)
 	DeleteTeam(ctx context.Context, req *TeamRequest, opts ...http.CallOption) (rsp *v1.EmptyReply, err error)
 	GetTeam(ctx context.Context, req *TeamRequest, opts ...http.CallOption) (rsp *TeamReply, err error)
-	GetTeamTree(ctx context.Context, req *TeamRequest, opts ...http.CallOption) (rsp *TeamReply, err error)
 	ListTeams(ctx context.Context, req *ListTeamsRequest, opts ...http.CallOption) (rsp *ListTeamsReply, err error)
 	UpdateTeam(ctx context.Context, req *UpdateTeamRequest, opts ...http.CallOption) (rsp *TeamReply, err error)
 }
@@ -229,19 +203,6 @@ func (c *TeamsHTTPClientImpl) GetTeam(ctx context.Context, in *TeamRequest, opts
 	pattern := "/v1/rbac/teams/{teamId}"
 	path := binding.EncodeURL(pattern, in, true)
 	opts = append(opts, http.Operation(OperationTeamsGetTeam))
-	opts = append(opts, http.PathTemplate(pattern))
-	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return &out, err
-}
-
-func (c *TeamsHTTPClientImpl) GetTeamTree(ctx context.Context, in *TeamRequest, opts ...http.CallOption) (*TeamReply, error) {
-	var out TeamReply
-	pattern := "/v1/rbac/teams/{teamId}/tree"
-	path := binding.EncodeURL(pattern, in, true)
-	opts = append(opts, http.Operation(OperationTeamsGetTeamTree))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
 	if err != nil {

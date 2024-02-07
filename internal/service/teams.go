@@ -29,12 +29,13 @@ func NewTeamsService(
 }
 
 func (s *TeamsService) CreateTeam(ctx context.Context, req *v1.CreateTeamRequest) (*v1.TeamReply, error) {
-	_, _, err := s.sh.HasPermission(ctx, "admin.team.create")
+	claims, _, err := s.sh.HasPermission(ctx, "admin.team.create")
 	if err != nil {
 		return nil, err
 	}
 
 	team, err := s.tu.CreateTeam(ctx, data.TeamDto{
+		TenantId:    claims.GetTenantId(),
 		Name:        req.Name,
 		Description: req.Description,
 		ParentId:    req.ParentId,
@@ -94,23 +95,7 @@ func (s *TeamsService) GetTeam(ctx context.Context, req *v1.TeamRequest) (*v1.Te
 		return nil, err
 	}
 
-	team, err := s.tu.GetTeam(ctx, claims.GetTenantId(), req.GetTeamId(), false)
-	if err != nil {
-		return nil, err
-	}
-
-	return &v1.TeamReply{
-		Team: replyTeam(team),
-	}, nil
-}
-
-func (s *TeamsService) GetTeamTree(ctx context.Context, req *v1.TeamRequest) (*v1.TeamReply, error) {
-	claims, _, err := s.sh.HasPermission(ctx, "admin.team.read")
-	if err != nil {
-		return nil, err
-	}
-
-	team, err := s.tu.GetTeam(ctx, claims.GetTenantId(), req.GetTeamId(), true)
+	team, err := s.tu.GetTeam(ctx, claims.GetTenantId(), req.GetTeamId(), req.GetWithTree())
 	if err != nil {
 		return nil, err
 	}
