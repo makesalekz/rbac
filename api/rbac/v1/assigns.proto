@@ -17,7 +17,7 @@ service Assigns {
       body: "*"
     };
   }
-  rpc DeleteAssign(AssignRequest) returns (utils.v1.EmptyReply) {
+  rpc UnassignRole(AssignRequest) returns (utils.v1.EmptyReply) {
     option (google.api.http) = {
       delete: "/v1/rbac/assigns/{assignId}"
     };

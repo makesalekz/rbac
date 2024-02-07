@@ -96,7 +96,7 @@ func (s *RolesService) UpdateRole(ctx context.Context, req *v1.UpdateRoleRequest
 	}, nil
 }
 
-func (s *RolesService) DeleteRole(ctx context.Context, req *v1.DeleteRoleRequest) (*utils_v1.EmptyReply, error) {
+func (s *RolesService) DeleteRole(ctx context.Context, req *v1.RoleRequest) (*utils_v1.EmptyReply, error) {
 	claims, err := s.sh.GetClaims(ctx)
 	if err != nil {
 		return nil, err
@@ -124,7 +124,7 @@ func (s *RolesService) DeleteRole(ctx context.Context, req *v1.DeleteRoleRequest
 	return &utils_v1.EmptyReply{}, nil
 }
 
-func (s *RolesService) GetRole(ctx context.Context, req *v1.GetRoleRequest) (*v1.RoleReply, error) {
+func (s *RolesService) GetRole(ctx context.Context, req *v1.RoleRequest) (*v1.RoleReply, error) {
 	claims, _, err := s.sh.HasPermission(ctx, "admin.role.read")
 	if err != nil {
 		return nil, err
@@ -159,7 +159,7 @@ func (s *RolesService) ListRoles(ctx context.Context, req *v1.ListRolesRequest) 
 	}, nil
 }
 
-func (s *RolesService) SetRolePermission(ctx context.Context, req *v1.SetRolePermissionRequest) (*utils_v1.EmptyReply, error) {
+func (s *RolesService) AddPermissionToRole(ctx context.Context, req *v1.AddPermissionToRoleRequest) (*utils_v1.EmptyReply, error) {
 	claims, _, err := s.sh.HasPermission(ctx, "admin.role.update")
 	if err != nil {
 		return nil, err
@@ -185,7 +185,7 @@ func (s *RolesService) SetRolePermission(ctx context.Context, req *v1.SetRolePer
 	return &utils_v1.EmptyReply{}, nil
 }
 
-func (s *RolesService) DeleteRolePermission(ctx context.Context, req *v1.DeleteRolePermissionRequest) (*utils_v1.EmptyReply, error) {
+func (s *RolesService) DeleteRolePermission(ctx context.Context, req *v1.RemovePermissionFromRoleRequest) (*utils_v1.EmptyReply, error) {
 	claims, _, err := s.sh.HasPermission(ctx, "admin.role.update")
 	if err != nil {
 		return nil, err
@@ -208,7 +208,7 @@ func (s *RolesService) DeleteRolePermission(ctx context.Context, req *v1.DeleteR
 	return &utils_v1.EmptyReply{}, nil
 }
 
-func (s *RolesService) ListRolePermissions(ctx context.Context, req *v1.ListRolePermissionsRequest) (*v1.RolePermissionsReply, error) {
+func (s *RolesService) ListRolePermissions(ctx context.Context, req *v1.RoleRequest) (*v1.RolePermissionsReply, error) {
 	claims, _, err := s.sh.HasPermission(ctx, "admin.role.read")
 	if err != nil {
 		return nil, err

@@ -46,7 +46,7 @@ paths:
         delete:
             tags:
                 - Assigns
-            operationId: Assigns_DeleteAssign
+            operationId: Assigns_UnassignRole
             parameters:
                 - name: assignId
                   in: path
@@ -219,16 +219,6 @@ paths:
                   required: true
                   schema:
                     type: string
-                - name: tenantId
-                  in: query
-                  schema:
-                    type: string
-                - name: identities
-                  in: query
-                  schema:
-                    type: array
-                    items:
-                        type: string
             responses:
                 "200":
                     description: OK
@@ -269,16 +259,6 @@ paths:
                   required: true
                   schema:
                     type: string
-                - name: tenantId
-                  in: query
-                  schema:
-                    type: string
-                - name: identities
-                  in: query
-                  schema:
-                    type: array
-                    items:
-                        type: string
             responses:
                 "200":
                     description: OK
@@ -290,7 +270,7 @@ paths:
         post:
             tags:
                 - Roles
-            operationId: Roles_SetRolePermission
+            operationId: Roles_AddPermissionToRole
             parameters:
                 - name: roleId
                   in: path
@@ -301,7 +281,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/rbac.v1.SetRolePermissionRequest'
+                            $ref: '#/components/schemas/rbac.v1.AddPermissionToRoleRequest'
                 required: true
             responses:
                 "200":
@@ -325,7 +305,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/rbac.v1.ListRolePermissionsRequest'
+                            $ref: '#/components/schemas/rbac.v1.RoleRequest'
                 required: true
             responses:
                 "200":
@@ -350,16 +330,6 @@ paths:
                   required: true
                   schema:
                     type: string
-                - name: tenantId
-                  in: query
-                  schema:
-                    type: string
-                - name: identities
-                  in: query
-                  schema:
-                    type: array
-                    items:
-                        type: string
             responses:
                 "200":
                     description: OK
@@ -493,6 +463,19 @@ paths:
                                 $ref: '#/components/schemas/rbac.v1.TeamReply'
 components:
     schemas:
+        rbac.v1.AddPermissionToRoleRequest:
+            type: object
+            properties:
+                roleId:
+                    type: string
+                permissionId:
+                    type: string
+                deny:
+                    type: boolean
+                fields:
+                    type: array
+                    items:
+                        type: string
         rbac.v1.AssignRoleRequest:
             type: object
             properties:
@@ -553,12 +536,6 @@ components:
         rbac.v1.CreateRoleRequest:
             type: object
             properties:
-                tenantId:
-                    type: string
-                identities:
-                    type: array
-                    items:
-                        type: string
                 name:
                     type: string
                 description:
@@ -630,17 +607,6 @@ components:
                     type: array
                     items:
                         type: string
-        rbac.v1.ListRolePermissionsRequest:
-            type: object
-            properties:
-                tenantId:
-                    type: string
-                identities:
-                    type: array
-                    items:
-                        type: string
-                roleId:
-                    type: string
         rbac.v1.ListRolesReply:
             type: object
             properties:
@@ -651,12 +617,6 @@ components:
         rbac.v1.ListRolesRequest:
             type: object
             properties:
-                tenantId:
-                    type: string
-                identities:
-                    type: array
-                    items:
-                        type: string
                 search:
                     type: string
         rbac.v1.ListTeamsReply:
@@ -739,25 +699,11 @@ components:
             properties:
                 role:
                     $ref: '#/components/schemas/rbac.v1.Role'
-        rbac.v1.SetRolePermissionRequest:
+        rbac.v1.RoleRequest:
             type: object
             properties:
-                tenantId:
-                    type: string
-                identities:
-                    type: array
-                    items:
-                        type: string
                 roleId:
                     type: string
-                permissionId:
-                    type: string
-                deny:
-                    type: boolean
-                fields:
-                    type: array
-                    items:
-                        type: string
         rbac.v1.Team:
             type: object
             properties:
@@ -806,12 +752,6 @@ components:
         rbac.v1.UpdateRoleRequest:
             type: object
             properties:
-                tenantId:
-                    type: string
-                identities:
-                    type: array
-                    items:
-                        type: string
                 roleId:
                     type: string
                 name:

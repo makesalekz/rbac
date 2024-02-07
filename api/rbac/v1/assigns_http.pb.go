@@ -21,19 +21,19 @@ var _ = binding.EncodeURL
 const _ = http.SupportPackageIsVersion1
 
 const OperationAssignsAssignRole = "/rbac.v1.Assigns/AssignRole"
-const OperationAssignsDeleteAssign = "/rbac.v1.Assigns/DeleteAssign"
 const OperationAssignsListAssigns = "/rbac.v1.Assigns/ListAssigns"
+const OperationAssignsUnassignRole = "/rbac.v1.Assigns/UnassignRole"
 
 type AssignsHTTPServer interface {
 	AssignRole(context.Context, *AssignRoleRequest) (*v1.EmptyReply, error)
-	DeleteAssign(context.Context, *AssignRequest) (*v1.EmptyReply, error)
 	ListAssigns(context.Context, *ListAssignsRequest) (*ListAssignsReply, error)
+	UnassignRole(context.Context, *AssignRequest) (*v1.EmptyReply, error)
 }
 
 func RegisterAssignsHTTPServer(s *http.Server, srv AssignsHTTPServer) {
 	r := s.Route("/")
 	r.POST("/v1/rbac/assigns", _Assigns_AssignRole0_HTTP_Handler(srv))
-	r.DELETE("/v1/rbac/assigns/{assignId}", _Assigns_DeleteAssign0_HTTP_Handler(srv))
+	r.DELETE("/v1/rbac/assigns/{assignId}", _Assigns_UnassignRole0_HTTP_Handler(srv))
 	r.POST("/v1/rbac/assigns/list", _Assigns_ListAssigns0_HTTP_Handler(srv))
 }
 
@@ -59,7 +59,7 @@ func _Assigns_AssignRole0_HTTP_Handler(srv AssignsHTTPServer) func(ctx http.Cont
 	}
 }
 
-func _Assigns_DeleteAssign0_HTTP_Handler(srv AssignsHTTPServer) func(ctx http.Context) error {
+func _Assigns_UnassignRole0_HTTP_Handler(srv AssignsHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in AssignRequest
 		if err := ctx.BindQuery(&in); err != nil {
@@ -68,9 +68,9 @@ func _Assigns_DeleteAssign0_HTTP_Handler(srv AssignsHTTPServer) func(ctx http.Co
 		if err := ctx.BindVars(&in); err != nil {
 			return err
 		}
-		http.SetOperation(ctx, OperationAssignsDeleteAssign)
+		http.SetOperation(ctx, OperationAssignsUnassignRole)
 		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
-			return srv.DeleteAssign(ctx, req.(*AssignRequest))
+			return srv.UnassignRole(ctx, req.(*AssignRequest))
 		})
 		out, err := h(ctx, &in)
 		if err != nil {
@@ -105,8 +105,8 @@ func _Assigns_ListAssigns0_HTTP_Handler(srv AssignsHTTPServer) func(ctx http.Con
 
 type AssignsHTTPClient interface {
 	AssignRole(ctx context.Context, req *AssignRoleRequest, opts ...http.CallOption) (rsp *v1.EmptyReply, err error)
-	DeleteAssign(ctx context.Context, req *AssignRequest, opts ...http.CallOption) (rsp *v1.EmptyReply, err error)
 	ListAssigns(ctx context.Context, req *ListAssignsRequest, opts ...http.CallOption) (rsp *ListAssignsReply, err error)
+	UnassignRole(ctx context.Context, req *AssignRequest, opts ...http.CallOption) (rsp *v1.EmptyReply, err error)
 }
 
 type AssignsHTTPClientImpl struct {
@@ -130,19 +130,6 @@ func (c *AssignsHTTPClientImpl) AssignRole(ctx context.Context, in *AssignRoleRe
 	return &out, err
 }
 
-func (c *AssignsHTTPClientImpl) DeleteAssign(ctx context.Context, in *AssignRequest, opts ...http.CallOption) (*v1.EmptyReply, error) {
-	var out v1.EmptyReply
-	pattern := "/v1/rbac/assigns/{assignId}"
-	path := binding.EncodeURL(pattern, in, true)
-	opts = append(opts, http.Operation(OperationAssignsDeleteAssign))
-	opts = append(opts, http.PathTemplate(pattern))
-	err := c.cc.Invoke(ctx, "DELETE", path, nil, &out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return &out, err
-}
-
 func (c *AssignsHTTPClientImpl) ListAssigns(ctx context.Context, in *ListAssignsRequest, opts ...http.CallOption) (*ListAssignsReply, error) {
 	var out ListAssignsReply
 	pattern := "/v1/rbac/assigns/list"
@@ -150,6 +137,19 @@ func (c *AssignsHTTPClientImpl) ListAssigns(ctx context.Context, in *ListAssigns
 	opts = append(opts, http.Operation(OperationAssignsListAssigns))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, err
+}
+
+func (c *AssignsHTTPClientImpl) UnassignRole(ctx context.Context, in *AssignRequest, opts ...http.CallOption) (*v1.EmptyReply, error) {
+	var out v1.EmptyReply
+	pattern := "/v1/rbac/assigns/{assignId}"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationAssignsUnassignRole))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "DELETE", path, nil, &out, opts...)
 	if err != nil {
 		return nil, err
 	}

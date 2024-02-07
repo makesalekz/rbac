@@ -52,7 +52,7 @@ func (s *AssignsService) AssignRole(ctx context.Context, req *v1.AssignRoleReque
 	return &utils_v1.EmptyReply{}, nil
 }
 
-func (s *AssignsService) DeleteAssign(ctx context.Context, req *v1.AssignRequest) (*utils_v1.EmptyReply, error) {
+func (s *AssignsService) UnassignRole(ctx context.Context, req *v1.AssignRequest) (*utils_v1.EmptyReply, error) {
 	claims, _, err := s.sh.HasPermission(ctx, "admin.role.assign")
 	if err != nil {
 		return nil, err
