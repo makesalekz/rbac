@@ -18,8 +18,8 @@
 # Source code
 go.sum binary
 openapi.yaml binary
-wire_gen.go binary
-*.pb.go binary
-third_party/** binary
 doc/** binary
-mock/** binary
+third_party/** binary
+*wire_gen.go binary
+*.pb.go binary
+*mock/** binary
