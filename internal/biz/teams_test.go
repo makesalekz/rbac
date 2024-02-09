@@ -1,0 +1,203 @@
+package biz_test
+
+import (
+	"context"
+	"testing"
+
+	v1 "gitlab.calendaria.team/services/rbac/api/rbac/v1"
+	"gitlab.calendaria.team/services/rbac/ent"
+	"gitlab.calendaria.team/services/rbac/internal/biz"
+	"gitlab.calendaria.team/services/rbac/internal/data"
+	"gitlab.calendaria.team/services/rbac/internal/data/mock"
+	utils_v1 "gitlab.calendaria.team/services/utils/api/utils/v1"
+
+	"github.com/golang/mock/gomock"
+	"github.com/jackc/pgtype"
+	"github.com/stretchr/testify/require"
+)
+
+func TestTeamsUsecase_CreateTeam(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	repo := mock.NewMockTeamsRepo(ctrl)
+	uc, err := biz.NewTeamsUsecase(repo)
+	require.NoError(t, err)
+
+	ctx := context.Background()
+	dto := data.TeamDto{
+		TenantId: 1,
+	}
+	team := &ent.Team{
+		ID: 1,
+	}
+	repo.EXPECT().CreateTeam(ctx, dto).Return(team, nil)
+
+	team1, err := uc.CreateTeam(ctx, dto)
+	require.NoError(t, err)
+	require.Equal(t, team, team1)
+}
+
+func TestTeamsUsecase_CreateChildTeam(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	repo := mock.NewMockTeamsRepo(ctrl)
+	uc, err := biz.NewTeamsUsecase(repo)
+	require.NoError(t, err)
+
+	ctx := context.Background()
+	parentId := int64(1)
+	tenantId := int64(1)
+	dto := data.TeamDto{
+		ParentId:   parentId,
+		TenantId:   tenantId,
+		ParentsIds: []int64{parentId},
+	}
+	dto2 := data.TeamDto{
+		ParentId: 2,
+		TenantId: tenantId,
+	}
+	dto3 := data.TeamDto{
+		ParentId: parentId,
+		TenantId: 2,
+	}
+	parentTeam := &ent.Team{
+		ID:         parentId,
+		TenantID:   tenantId,
+		ParentsIds: &pgtype.Int8Array{},
+	}
+	team := &ent.Team{
+		ID:       2,
+		ParentID: &parentId,
+		TenantID: tenantId,
+	}
+
+	repo.EXPECT().CreateTeam(ctx, dto).Return(team, nil)
+	repo.EXPECT().GetTeam(ctx, parentId, tenantId, false).Return(parentTeam, nil)
+	repo.EXPECT().GetTeam(ctx, gomock.Not(parentId), tenantId, false).Return(nil, &ent.NotFoundError{})
+	repo.EXPECT().GetTeam(ctx, parentId, gomock.Not(tenantId), false).Return(nil, &ent.NotFoundError{})
+
+	team1, err := uc.CreateTeam(ctx, dto)
+	require.NoError(t, err)
+	require.Equal(t, team, team1)
+
+	team2, err := uc.CreateTeam(ctx, dto2)
+	require.Error(t, err)
+	require.Equal(t, v1.ErrorNotFound("parent team not found"), err)
+	require.Nil(t, team2)
+
+	team3, err := uc.CreateTeam(ctx, dto3)
+	require.Error(t, err)
+	require.Equal(t, v1.ErrorNotFound("parent team not found"), err)
+	require.Nil(t, team3)
+}
+
+func TestTeamsUsecase_UpdateTeam(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	repo := mock.NewMockTeamsRepo(ctrl)
+	uc, err := biz.NewTeamsUsecase(repo)
+	require.NoError(t, err)
+
+	ctx := context.Background()
+	team := &ent.Team{
+		ID: 1,
+	}
+	dto := data.TeamDto{
+		TenantId: 1,
+	}
+	repo.EXPECT().UpdateTeam(ctx, team, dto).Return(team, nil)
+
+	team1, err := uc.UpdateTeam(ctx, team, dto)
+	require.NoError(t, err)
+	require.Equal(t, team, team1)
+}
+
+func TestTeamsUsecase_DeleteTeam(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	repo := mock.NewMockTeamsRepo(ctrl)
+	uc, err := biz.NewTeamsUsecase(repo)
+	require.NoError(t, err)
+
+	ctx := context.Background()
+	team := &ent.Team{
+		ID: 1,
+	}
+	repo.EXPECT().DeleteTeam(ctx, team).Return(nil)
+
+	err = uc.DeleteTeam(ctx, team)
+	require.NoError(t, err)
+}
+
+func TestTeamsUsecase_GetTeam(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	repo := mock.NewMockTeamsRepo(ctrl)
+	uc, err := biz.NewTeamsUsecase(repo)
+	require.NoError(t, err)
+
+	ctx := context.Background()
+	tenantId := int64(1)
+	teamId := int64(1)
+	team := &ent.Team{
+		ID: 1,
+	}
+	repo.EXPECT().GetTeam(ctx, tenantId, teamId, false).Return(team, nil)
+	repo.EXPECT().GetTeam(ctx, tenantId, gomock.Not(int64(teamId)), false).Return(nil, &ent.NotFoundError{})
+	repo.EXPECT().GetTeam(ctx, gomock.Not(int64(tenantId)), teamId, false).Return(nil, &ent.NotFoundError{})
+
+	team1, err := uc.GetTeam(ctx, tenantId, teamId, false)
+	require.NoError(t, err)
+	require.Equal(t, team, team1)
+
+	team2, err := uc.GetTeam(ctx, tenantId, 2, false)
+	require.Error(t, err)
+	require.Equal(t, v1.ErrorNotFound("team not found"), err)
+	require.Nil(t, team2)
+
+	team3, err := uc.GetTeam(ctx, 2, teamId, false)
+	require.Error(t, err)
+	require.Equal(t, v1.ErrorNotFound("team not found"), err)
+	require.Nil(t, team3)
+}
+
+func TestTeamsUsecase_ListTeams(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	repo := mock.NewMockTeamsRepo(ctrl)
+	uc, err := biz.NewTeamsUsecase(repo)
+	require.NoError(t, err)
+
+	ctx := context.Background()
+	filter := data.TeamsListFilter{}
+	paginate := &utils_v1.PaginateRequest{}
+	total := int32(2)
+	teams := []*ent.Team{
+		{
+			ID:   1,
+			Name: "team1",
+		},
+		{
+			ID:   2,
+			Name: "team2",
+		},
+	}
+	teamsList := &biz.TeamsList{
+		Teams: teams,
+		Paginate: &utils_v1.PaginateReply{
+			Total: &total,
+		},
+	}
+	repo.EXPECT().ListTeams(ctx, filter, paginate).Return(teams, nil)
+	repo.EXPECT().CountListTeams(ctx, filter).Return(int32(2), nil)
+
+	teams1, err := uc.ListTeams(ctx, filter, nil)
+	require.NoError(t, err)
+	require.Equal(t, teamsList, teams1)
+}

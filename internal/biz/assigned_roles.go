@@ -58,13 +58,13 @@ func (u *AssignedRolesUsecase) AssignRole(ctx context.Context, dto data.AssignRo
 	return nil
 }
 
-func (u *AssignedRolesUsecase) DeleteIdentityRole(ctx context.Context, tenantId, assignId int64) error {
+func (u *AssignedRolesUsecase) UnassignRole(ctx context.Context, tenantId, assignId int64) error {
 	assignedRole, err := u.repo.GetAssignedRoleById(ctx, tenantId, assignId)
 	if err != nil {
 		if ent.IsNotFound(err) {
-			return v1.ErrorNotFound("assgined role not found")
+			return v1.ErrorNotFound("assigned role not found")
 		}
-		return v1.ErrorDatabaseQuery("get assgined role failed: %v", err)
+		return v1.ErrorDatabaseQuery("get assigned role failed: %v", err)
 	}
 
 	return u.repo.UnassignRole(ctx, assignedRole)

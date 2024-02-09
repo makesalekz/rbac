@@ -24,6 +24,7 @@ init:
 	go install github.com/go-kratos/kratos/cmd/protoc-gen-go-http/v2@latest
 	go install github.com/google/gnostic/cmd/protoc-gen-openapi@latest
 	go install github.com/google/wire/cmd/wire@latest
+	go install github.com/golang/mock/mockgen@v1.6.0
 	npm install widdershins -g
 
 .PHONY: run
@@ -116,6 +117,23 @@ all:
 	make api;
 	make config;
 	make generate;
+
+test:
+	go test -v -count=1 ./...
+
+race:
+	go test -v -race -count=1 ./...
+
+.PHONY: cover
+cover:
+	go test -short -count=1 -race -coverprofile=coverage.out ./...
+	go tool cover -html=coverage.out
+	rm coverage.out
+
+.PHONY: mock
+# generate mock - it is just an example
+mock:
+	mockgen -source internal/data/teams.go -destination internal/data/mock/teams.go -package mock
 
 # show help
 help:

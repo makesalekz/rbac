@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/go-kratos/kratos/v2/log"
+	v1 "gitlab.calendaria.team/services/rbac/api/rbac/v1"
 	"gitlab.calendaria.team/services/rbac/ent"
 	"gitlab.calendaria.team/services/rbac/internal/data"
 )
@@ -15,8 +16,8 @@ type PermissionsUsecase struct {
 	assignedRepo   data.AssignedRolesRepo
 }
 
-// NewPermissionUsecase .
-func NewPermissionUsecase(
+// NewPermissionsUsecase .
+func NewPermissionsUsecase(
 	logger log.Logger,
 	permissionRepo data.PermissionRepo,
 	roleRepo data.RoleRepo,
@@ -30,7 +31,15 @@ func NewPermissionUsecase(
 }
 
 func (uc *PermissionsUsecase) GetPermissionById(ctx context.Context, permissionId string) (*ent.Permission, error) {
-	return uc.permissionRepo.GetPermissionById(ctx, permissionId)
+	permission, err := uc.permissionRepo.GetPermissionById(ctx, permissionId)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return nil, v1.ErrorNotFound("permission not found")
+		}
+		return nil, err
+	}
+
+	return permission, nil
 }
 
 func (uc *PermissionsUsecase) CreatePermission(ctx context.Context, data data.CreatePermissionDto) (*ent.Permission, error) {

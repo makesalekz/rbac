@@ -46,7 +46,7 @@ func (uc *RolesUsecase) UpdateRole(ctx context.Context, role *ent.Role, dto data
 
 func (uc *RolesUsecase) DeleteRole(ctx context.Context, role *ent.Role) error {
 	if role.IsSystem {
-		return v1.ErrorForbidden("unable to edit system role")
+		return v1.ErrorForbidden("unable to delete system role")
 	}
 
 	return uc.roleRepo.DeleteRole(ctx, role)
@@ -56,8 +56,12 @@ func (uc *RolesUsecase) GetRoles(ctx context.Context, tenantId int64, search str
 	return uc.roleRepo.GetRolesList(ctx, tenantId, search)
 }
 
-func (uc *RolesUsecase) CreateRole(ctx context.Context, createRoleDto data.CreateRoleDto) (*ent.Role, error) {
-	return uc.roleRepo.CreateRole(ctx, createRoleDto)
+func (uc *RolesUsecase) CreateRole(ctx context.Context, dto data.CreateRoleDto) (*ent.Role, error) {
+	if dto.IsSystem {
+		return nil, v1.ErrorForbidden("unable to create system role")
+	}
+
+	return uc.roleRepo.CreateRole(ctx, dto)
 }
 
 func (uc *RolesUsecase) SetRolePermission(ctx context.Context, role *ent.Role, permission *ent.Permission, dto data.CreateRolePermissionDto) error {
@@ -66,7 +70,7 @@ func (uc *RolesUsecase) SetRolePermission(ctx context.Context, role *ent.Role, p
 	}
 
 	if !validateFields(permission.Fields, dto.Fields) {
-		return v1.ErrorInvalidRequest("invalid fields")
+		return v1.ErrorBadRequest("fields not valid")
 	}
 
 	return uc.roleRepo.SetRolePermission(ctx, role, permission, dto)

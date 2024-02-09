@@ -22,7 +22,7 @@ enum ErrorReason {
 
   UNAUTHORIZED = 10 [(errors.code) = 401];
 
-  INVALID_REQUEST = 20 [(errors.code) = 400];
+  BAD_REQUEST = 20 [(errors.code) = 400];
   NOT_FOUND = 21 [(errors.code) = 404];
   ALREADY_EXISTS = 22 [(errors.code) = 400];
 }
