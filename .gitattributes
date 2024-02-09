@@ -21,5 +21,3 @@ openapi.yaml binary
 doc/** binary
 third_party/** binary
 *.pb.go binary
-*/mock/** binary
-*/wire_gen.go binary
