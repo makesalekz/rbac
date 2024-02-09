@@ -20,6 +20,6 @@ go.sum binary
 openapi.yaml binary
 doc/** binary
 third_party/** binary
-*wire_gen.go binary
 *.pb.go binary
-*mock/** binary
+*/mock/** binary
+*/wire_gen.go binary
