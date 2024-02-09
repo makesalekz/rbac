@@ -58,7 +58,7 @@ func (s *AssignsService) UnassignRole(ctx context.Context, req *v1.AssignRequest
 		return nil, err
 	}
 
-	err = s.uc.DeleteIdentityRole(ctx, claims.GetTenantId(), req.GetAssignId())
+	err = s.uc.UnassignRole(ctx, claims.GetTenantId(), req.GetAssignId())
 	if err != nil {
 		return nil, err
 	}

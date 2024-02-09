@@ -97,16 +97,16 @@ func ErrorUnauthorized(format string, args ...interface{}) *errors.Error {
 	return errors.New(401, ErrorReason_UNAUTHORIZED.String(), fmt.Sprintf(format, args...))
 }
 
-func IsInvalidRequest(err error) bool {
+func IsBadRequest(err error) bool {
 	if err == nil {
 		return false
 	}
 	e := errors.FromError(err)
-	return e.Reason == ErrorReason_INVALID_REQUEST.String() && e.Code == 400
+	return e.Reason == ErrorReason_BAD_REQUEST.String() && e.Code == 400
 }
 
-func ErrorInvalidRequest(format string, args ...interface{}) *errors.Error {
-	return errors.New(400, ErrorReason_INVALID_REQUEST.String(), fmt.Sprintf(format, args...))
+func ErrorBadRequest(format string, args ...interface{}) *errors.Error {
+	return errors.New(400, ErrorReason_BAD_REQUEST.String(), fmt.Sprintf(format, args...))
 }
 
 func IsNotFound(err error) bool {

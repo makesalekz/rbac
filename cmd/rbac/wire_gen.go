@@ -53,7 +53,7 @@ func wireApp(bootstrap *conf.Bootstrap, logger log.Logger) (*kratos.App, func(),
 		return nil, nil, err
 	}
 	permissionRepo := data.NewPermissionRepo(dataData)
-	permissionsUsecase, err := biz.NewPermissionUsecase(logger, permissionRepo, roleRepo, assignedRolesRepo)
+	permissionsUsecase, err := biz.NewPermissionsUsecase(logger, permissionRepo, roleRepo, assignedRolesRepo)
 	if err != nil {
 		cleanup()
 		return nil, nil, err

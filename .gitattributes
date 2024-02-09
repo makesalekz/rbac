@@ -18,6 +18,6 @@
 # Source code
 go.sum binary
 openapi.yaml binary
-*.pb.go binary
-third_party/** binary
 doc/** binary
+third_party/** binary
+*.pb.go binary
