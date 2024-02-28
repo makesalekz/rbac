@@ -60,6 +60,7 @@ services:
       - CONSUL_ADDRESS=http://consul:8500
       - VAULT_ADDRESS=http://vault:8200
       - VAULT_TOKEN=myroot
+    command: ["./app"]
 
 volumes:
   dbvol:
