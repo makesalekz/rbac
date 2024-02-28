@@ -3,6 +3,9 @@ include:
     file: '/go-app.yml'
     ref: 'main'
   
+lint dev:
+  extends: .lint-dev
+
 test dev:
   extends: .test-dev
 
