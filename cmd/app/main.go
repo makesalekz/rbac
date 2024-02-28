@@ -23,7 +23,7 @@ var (
 	// Name is the name of the compiled software.
 	Name string = "rbac"
 	// Version is the version of the compiled software.
-	Version string = "0.3.2"
+	Version string = "0.0.1"
 	// flagconf is the config flag.
 	flagconf string
 
@@ -31,7 +31,7 @@ var (
 )
 
 func init() {
-	flag.StringVar(&flagconf, "conf", "../../configs/config.local.yaml", "config path, eg: -conf config.yaml")
+	flag.StringVar(&flagconf, "conf", "config.yaml", "config path, eg: -conf config.yaml")
 }
 
 func newApp(logger log.Logger, c *config.Config, gs *grpc.Server, hs *http.Server) *kratos.App {

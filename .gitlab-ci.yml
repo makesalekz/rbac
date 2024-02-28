@@ -1,8 +1,11 @@
 include:
   - project: 'deploy/dev'
-    file: '/go-microservice.yml'
+    file: '/go-app.yml'
     ref: 'main'
   
+test dev:
+  extends: .test-dev
+
 build dev:
   extends: .build-dev
 

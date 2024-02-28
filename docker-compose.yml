@@ -21,36 +21,47 @@ services:
     container_name: ${SERVICE_NAME}_service
     networks:
       - backend
-    volumes:
-      - ./configs:/data/conf
     restart: unless-stopped
     depends_on:
       - db
     profiles:
-      - stage
+      - dev
     environment:
+      - TOKEN=${TOKEN}
+      - ENV=dev
       - SERVICE_NAME=${SERVICE_NAME}
       - CONSUL_ADDRESS=${CONSUL_ADDRESS}
       - VAULT_ADDRESS=${VAULT_ADDRESS}
       - VAULT_ROLE_ID=${VAULT_ROLE_ID}
       - VAULT_SECRET_ID_PATH=/run/secrets/vault_secret_id
+    command: ["./app"]
     secrets:
       - vault_secret_id
-  dev-service:
+  test:
+    build:
+      context: ./ci/test/
+      dockerfile: Dockerfile
+    container_name: ${SERVICE_NAME}_test
+    profiles:
+      - dev
+    environment:
+      - SERVICE_NAME=${SERVICE_NAME}
+  local-service:
     build:
       context: ./
       dockerfile: Dockerfile
+      args:
+        - TOKEN=${TOKEN}
+        - ENV=dev
     container_name: ${SERVICE_NAME}_service
     ports:
       - '${HTTP_PORT}:8000'
       - '${GRPC_PORT}:9000'
     networks:
       - backend
-    volumes:
-      - ./configs:/data/conf
     restart: unless-stopped
     profiles:
-      - dev
+      - local
     environment:
       - AUTOMIGRATE=true
       - SERVICE_NAME=${SERVICE_NAME}
