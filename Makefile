@@ -39,18 +39,18 @@ run:
 .PHONY: db
 # run docker db container
 db:
-	docker compose up -d
+	docker compose up -d db
 
 .PHONY: start
 # start docker container locally
 start:
 	docker compose build local-service && \
-	docker compose --profile=local up -d
+	docker compose up -d local-service
 
 .PHONY: stop
 # stop docker container locally
 stop:
-	docker compose --profile=local down
+	docker compose down local-service
 
 .PHONY: config
 # generate internal proto

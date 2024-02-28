@@ -24,8 +24,6 @@ services:
     restart: unless-stopped
     depends_on:
       - db
-    profiles:
-      - dev
     environment:
       - SERVICE_NAME=${SERVICE_NAME}
       - CONSUL_ADDRESS=${CONSUL_ADDRESS}
@@ -40,8 +38,6 @@ services:
       context: ./ci/test/
       dockerfile: Dockerfile
     container_name: ${SERVICE_NAME}_test
-    profiles:
-      - dev
     environment:
       - SERVICE_NAME=${SERVICE_NAME}
   local-service:
@@ -58,8 +54,6 @@ services:
     networks:
       - backend
     restart: unless-stopped
-    profiles:
-      - local
     environment:
       - AUTOMIGRATE=true
       - SERVICE_NAME=${SERVICE_NAME}
