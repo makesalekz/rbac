@@ -27,8 +27,6 @@ services:
     profiles:
       - dev
     environment:
-      - TOKEN=${TOKEN}
-      - ENV=dev
       - SERVICE_NAME=${SERVICE_NAME}
       - CONSUL_ADDRESS=${CONSUL_ADDRESS}
       - VAULT_ADDRESS=${VAULT_ADDRESS}
