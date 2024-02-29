@@ -33,13 +33,6 @@ services:
     command: ["./app"]
     secrets:
       - vault_secret_id
-  test:
-    build:
-      context: ./ci/test/
-      dockerfile: Dockerfile
-    container_name: ${SERVICE_NAME}_test
-    environment:
-      - SERVICE_NAME=${SERVICE_NAME}
   local-service:
     build:
       context: ./
