@@ -59,7 +59,10 @@ func (r *teamsRepo) CreateTeam(ctx context.Context, dto TeamDto) (*ent.Team, err
 	parentsIds := &pgtype.Int8Array{Status: pgtype.Present}
 
 	if len(dto.ParentsIds) > 0 {
-		parentsIds.Set(dto.ParentsIds)
+		err := parentsIds.Set(dto.ParentsIds)
+		if err != nil {
+			return nil, err
+		}
 	}
 	return query.SetParentsIds(parentsIds).Save(ctx)
 }
