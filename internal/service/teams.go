@@ -141,7 +141,7 @@ func replyTeam(team *ent.Team) *v1.Team {
 	}
 
 	if len(team.ParentsIds.Elements) > 0 {
-		team.ParentsIds.AssignTo(&result.ParentsIds)
+		_ = team.ParentsIds.AssignTo(&result.ParentsIds)
 	}
 
 	return &result

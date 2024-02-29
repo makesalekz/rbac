@@ -60,7 +60,7 @@ func (r *roleRepo) CreateRole(ctx context.Context, roleDto CreateRoleDto) (*ent.
 	}
 	defer func() {
 		if err != nil {
-			tx.Rollback()
+			_ = tx.Rollback()
 		}
 	}()
 
@@ -111,7 +111,10 @@ func (r *roleRepo) CreateRole(ctx context.Context, roleDto CreateRoleDto) (*ent.
 		role.Edges.Permissions = permissions
 	}
 
-	tx.Commit()
+	err = tx.Commit()
+	if err != nil {
+		return nil, err
+	}
 
 	return role, nil
 }
@@ -123,7 +126,7 @@ func (r *roleRepo) UpdateRole(ctx context.Context, role *ent.Role, roleDto Updat
 	}
 	defer func() {
 		if err != nil {
-			tx.Rollback()
+			_ = tx.Rollback()
 		}
 	}()
 
@@ -239,7 +242,10 @@ func (r *roleRepo) UpdateRole(ctx context.Context, role *ent.Role, roleDto Updat
 		}
 	}
 
-	tx.Commit()
+	err = tx.Commit()
+	if err != nil {
+		return nil, err
+	}
 
 	return role, nil
 }
