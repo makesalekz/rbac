@@ -11,7 +11,6 @@ import (
 	"gitlab.calendaria.team/services/rbac/internal/data/mock"
 
 	"github.com/golang/mock/gomock"
-	"github.com/jackc/pgtype"
 	"github.com/stretchr/testify/require"
 )
 
@@ -35,7 +34,7 @@ func TestCheckPermissionsUsecase_CheckPermissions(t *testing.T) {
 		ID:         teamId,
 		TenantID:   tenantId,
 		Name:       "testName",
-		ParentsIds: &pgtype.Int8Array{},
+		ParentsIds: nil,
 	}
 	teamRepo.EXPECT().GetTeam(ctx, tenantId, teamId, false).Return(team, nil)
 
