@@ -37,9 +37,11 @@ func (uc *TeamsUsecase) CreateTeam(ctx context.Context, dto data.TeamDto) (*ent.
 		}
 
 		var parentsIds []int64
-		err = parentTeam.ParentsIds.AssignTo(&parentsIds)
-		if err != nil {
-			return nil, err
+		if parentTeam.ParentsIds != nil {
+			err = parentTeam.ParentsIds.AssignTo(&parentsIds)
+			if err != nil {
+				return nil, err
+			}
 		}
 		dto.ParentsIds = append(parentsIds, parentTeam.ID)
 	}

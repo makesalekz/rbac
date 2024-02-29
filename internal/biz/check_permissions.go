@@ -35,9 +35,11 @@ func (u *CheckPermissionsUsecase) CheckPermissions(ctx context.Context, tenantId
 			return nil, err
 		}
 
-		err = team.ParentsIds.AssignTo(&teamsIds)
-		if err != nil {
-			return nil, err
+		if team.ParentsIds != nil {
+			err = team.ParentsIds.AssignTo(&teamsIds)
+			if err != nil {
+				return nil, err
+			}
 		}
 
 		teamsIds = append(teamsIds, team.ID)

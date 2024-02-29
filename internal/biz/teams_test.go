@@ -12,7 +12,6 @@ import (
 	utils_v1 "gitlab.calendaria.team/services/utils/api/utils/v1"
 
 	"github.com/golang/mock/gomock"
-	"github.com/jackc/pgtype"
 	"github.com/stretchr/testify/require"
 )
 
@@ -65,7 +64,7 @@ func TestTeamsUsecase_CreateChildTeam(t *testing.T) {
 	parentTeam := &ent.Team{
 		ID:         parentId,
 		TenantID:   tenantId,
-		ParentsIds: &pgtype.Int8Array{},
+		ParentsIds: nil,
 	}
 	team := &ent.Team{
 		ID:       2,
