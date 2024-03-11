@@ -8,15 +8,17 @@ import (
 	"gitlab.calendaria.team/services/rbac/internal/biz"
 	"gitlab.calendaria.team/services/rbac/internal/data"
 	utils_v1 "gitlab.calendaria.team/services/utils/api/utils/v1"
+	"gitlab.calendaria.team/services/utils/v2/auth"
 )
 
 type RolesService struct {
 	v1.UnimplementedRolesServer
 
-	sh *ServiceHelper
-	uc *biz.RolesUsecase
-	pu *biz.PermissionsUsecase
-	au *biz.AssignedRolesUsecase
+	sh    *ServiceHelper
+	uc    *biz.RolesUsecase
+	pu    *biz.PermissionsUsecase
+	au    *biz.AssignedRolesUsecase
+	check *biz.CheckPermissionsUsecase
 }
 
 func NewRolesService(
@@ -24,12 +26,14 @@ func NewRolesService(
 	uc *biz.RolesUsecase,
 	pu *biz.PermissionsUsecase,
 	au *biz.AssignedRolesUsecase,
+	check *biz.CheckPermissionsUsecase,
 ) *RolesService {
 	return &RolesService{
-		sh: sh,
-		uc: uc,
-		pu: pu,
-		au: au,
+		sh:    sh,
+		uc:    uc,
+		pu:    pu,
+		au:    au,
+		check: check,
 	}
 }
 
@@ -39,13 +43,13 @@ func (s *RolesService) CreateRole(ctx context.Context, req *v1.CreateRoleRequest
 		permissionToCheck = "admin.role_system.create"
 	}
 
-	claims, _, err := s.sh.HasPermission(ctx, permissionToCheck)
+	tenantId, _, err := s.sh.HasPermission(ctx, permissionToCheck)
 	if err != nil {
 		return nil, err
 	}
 
 	role, err := s.uc.CreateRole(ctx, data.CreateRoleDto{
-		TenantId:    claims.GetTenantId(),
+		TenantId:    tenantId,
 		Name:        req.Name,
 		Description: req.Description,
 		IsSystem:    req.IsSystem,
@@ -61,12 +65,12 @@ func (s *RolesService) CreateRole(ctx context.Context, req *v1.CreateRoleRequest
 }
 
 func (s *RolesService) UpdateRole(ctx context.Context, req *v1.UpdateRoleRequest) (*v1.RoleReply, error) {
-	claims, err := s.sh.GetClaims(ctx)
-	if err != nil {
-		return nil, err
+	tenantId := auth.GetTenantIdFromContext(ctx)
+	if tenantId == 0 {
+		return nil, v1.ErrorEmptyActorId("empty tenant id")
 	}
 
-	role, err := s.uc.GetRoleById(ctx, claims.GetTenantId(), req.RoleId)
+	role, err := s.uc.GetRoleById(ctx, tenantId, req.RoleId)
 	if err != nil {
 		return nil, err
 	}
@@ -76,9 +80,17 @@ func (s *RolesService) UpdateRole(ctx context.Context, req *v1.UpdateRoleRequest
 		permissionToCheck = "admin.role_system.update"
 	}
 
-	_, _, err = s.sh.HasPermission(ctx, permissionToCheck)
+	identities := auth.GetIdentitiesFromContext(ctx)
+	if len(identities) == 0 {
+		return nil, v1.ErrorEmptyActorId("empty identities")
+	}
+
+	fields, err := s.check.HasPermission(ctx, tenantId, identities, permissionToCheck)
 	if err != nil {
 		return nil, err
+	}
+	if fields == nil {
+		return nil, v1.ErrorForbidden("has no permission")
 	}
 
 	updated, err := s.uc.UpdateRole(ctx, role, data.UpdateRoleDto{
@@ -97,12 +109,12 @@ func (s *RolesService) UpdateRole(ctx context.Context, req *v1.UpdateRoleRequest
 }
 
 func (s *RolesService) DeleteRole(ctx context.Context, req *v1.RoleRequest) (*utils_v1.EmptyReply, error) {
-	claims, err := s.sh.GetClaims(ctx)
-	if err != nil {
-		return nil, err
+	tenantId := auth.GetTenantIdFromContext(ctx)
+	if tenantId == 0 {
+		return nil, v1.ErrorEmptyActorId("empty tenant id")
 	}
 
-	role, err := s.uc.GetRoleById(ctx, claims.GetTenantId(), req.RoleId)
+	role, err := s.uc.GetRoleById(ctx, tenantId, req.RoleId)
 	if err != nil {
 		return nil, err
 	}
@@ -112,9 +124,17 @@ func (s *RolesService) DeleteRole(ctx context.Context, req *v1.RoleRequest) (*ut
 		permissionToCheck = "admin.role_system.delete"
 	}
 
-	_, _, err = s.sh.HasPermission(ctx, permissionToCheck)
+	identities := auth.GetIdentitiesFromContext(ctx)
+	if len(identities) == 0 {
+		return nil, v1.ErrorEmptyActorId("empty identities")
+	}
+
+	fields, err := s.check.HasPermission(ctx, tenantId, identities, permissionToCheck)
 	if err != nil {
 		return nil, err
+	}
+	if fields == nil {
+		return nil, v1.ErrorForbidden("has no permission")
 	}
 
 	err = s.uc.DeleteRole(ctx, role)
@@ -125,12 +145,12 @@ func (s *RolesService) DeleteRole(ctx context.Context, req *v1.RoleRequest) (*ut
 }
 
 func (s *RolesService) GetRole(ctx context.Context, req *v1.RoleRequest) (*v1.RoleReply, error) {
-	claims, _, err := s.sh.HasPermission(ctx, "admin.role.read")
+	tenantId, _, err := s.sh.HasPermission(ctx, "admin.role.read")
 	if err != nil {
 		return nil, err
 	}
 
-	role, err := s.uc.GetRoleById(ctx, claims.GetTenantId(), req.RoleId)
+	role, err := s.uc.GetRoleById(ctx, tenantId, req.RoleId)
 	if err != nil {
 		return nil, err
 	}
@@ -140,12 +160,12 @@ func (s *RolesService) GetRole(ctx context.Context, req *v1.RoleRequest) (*v1.Ro
 }
 
 func (s *RolesService) ListRoles(ctx context.Context, req *v1.ListRolesRequest) (*v1.ListRolesReply, error) {
-	claims, _, err := s.sh.HasPermission(ctx, "admin.role.read")
+	tenantId, _, err := s.sh.HasPermission(ctx, "admin.role.read")
 	if err != nil {
 		return nil, err
 	}
 
-	roles, err := s.uc.GetRoles(ctx, claims.GetTenantId(), req.Search)
+	roles, err := s.uc.GetRoles(ctx, tenantId, req.Search)
 	if err != nil {
 		return nil, err
 	}
@@ -160,12 +180,12 @@ func (s *RolesService) ListRoles(ctx context.Context, req *v1.ListRolesRequest) 
 }
 
 func (s *RolesService) AddPermissionToRole(ctx context.Context, req *v1.AddPermissionToRoleRequest) (*utils_v1.EmptyReply, error) {
-	claims, _, err := s.sh.HasPermission(ctx, "admin.role.update")
+	tenantId, _, err := s.sh.HasPermission(ctx, "admin.role.update")
 	if err != nil {
 		return nil, err
 	}
 
-	role, err := s.uc.GetRoleById(ctx, claims.GetTenantId(), req.RoleId)
+	role, err := s.uc.GetRoleById(ctx, tenantId, req.RoleId)
 	if err != nil {
 		return nil, err
 	}
@@ -186,12 +206,12 @@ func (s *RolesService) AddPermissionToRole(ctx context.Context, req *v1.AddPermi
 }
 
 func (s *RolesService) RemovePermissionFromRole(ctx context.Context, req *v1.RemovePermissionFromRoleRequest) (*utils_v1.EmptyReply, error) {
-	claims, _, err := s.sh.HasPermission(ctx, "admin.role.update")
+	tenantId, _, err := s.sh.HasPermission(ctx, "admin.role.update")
 	if err != nil {
 		return nil, err
 	}
 
-	role, err := s.uc.GetRoleById(ctx, claims.GetTenantId(), req.RoleId)
+	role, err := s.uc.GetRoleById(ctx, tenantId, req.RoleId)
 	if err != nil {
 		return nil, err
 	}
@@ -209,12 +229,12 @@ func (s *RolesService) RemovePermissionFromRole(ctx context.Context, req *v1.Rem
 }
 
 func (s *RolesService) ListRolePermissions(ctx context.Context, req *v1.RoleRequest) (*v1.RolePermissionsReply, error) {
-	claims, _, err := s.sh.HasPermission(ctx, "admin.role.read")
+	tenantId, _, err := s.sh.HasPermission(ctx, "admin.role.read")
 	if err != nil {
 		return nil, err
 	}
 
-	role, err := s.uc.GetRoleById(ctx, claims.GetTenantId(), req.RoleId)
+	role, err := s.uc.GetRoleById(ctx, tenantId, req.RoleId)
 	if err != nil {
 		return nil, err
 	}

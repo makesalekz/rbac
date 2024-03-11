@@ -3,11 +3,13 @@ package service
 import (
 	"context"
 
+	"github.com/go-kratos/kratos/v2/metadata"
 	v1 "gitlab.calendaria.team/services/rbac/api/rbac/v1"
 	"gitlab.calendaria.team/services/rbac/ent"
 	"gitlab.calendaria.team/services/rbac/internal/biz"
 	"gitlab.calendaria.team/services/rbac/internal/data"
 	utils_v1 "gitlab.calendaria.team/services/utils/api/utils/v1"
+	"gitlab.calendaria.team/services/utils/v2/auth"
 )
 
 type AssignsService struct {
@@ -34,13 +36,25 @@ func NewAssignsService(
 }
 
 func (s *AssignsService) AssignRole(ctx context.Context, req *v1.AssignRoleRequest) (*utils_v1.EmptyReply, error) {
-	claims, _, err := s.sh.HasPermission(ctx, "admin.role.assign")
-	if err != nil {
-		return nil, err
+	tenantId := auth.GetTenantIdFromContext(ctx)
+	if tenantId == 0 {
+		return nil, v1.ErrorEmptyActorId("empty tenant id")
 	}
 
-	err = s.uc.AssignRole(ctx, data.AssignRoleDto{
-		TenantId:   claims.GetTenantId(),
+	isAdmin := false
+	if md, ok := metadata.FromServerContext(ctx); ok {
+		isAdmin = md.Get("x-md-global-actor-role") == "admin"
+	}
+
+	if !isAdmin {
+		_, _, err := s.sh.HasPermission(ctx, "admin.role.assign")
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	err := s.uc.AssignRole(ctx, data.AssignRoleDto{
+		TenantId:   tenantId,
 		RoleId:     req.GetRoleId(),
 		TeamId:     req.GetTeamId(),
 		IdentityId: req.GetIdentityId(),
@@ -53,12 +67,12 @@ func (s *AssignsService) AssignRole(ctx context.Context, req *v1.AssignRoleReque
 }
 
 func (s *AssignsService) UnassignRole(ctx context.Context, req *v1.AssignRequest) (*utils_v1.EmptyReply, error) {
-	claims, _, err := s.sh.HasPermission(ctx, "admin.role.assign")
+	tenantId, _, err := s.sh.HasPermission(ctx, "admin.role.assign")
 	if err != nil {
 		return nil, err
 	}
 
-	err = s.uc.UnassignRole(ctx, claims.GetTenantId(), req.GetAssignId())
+	err = s.uc.UnassignRole(ctx, tenantId, req.GetAssignId())
 	if err != nil {
 		return nil, err
 	}
@@ -66,7 +80,7 @@ func (s *AssignsService) UnassignRole(ctx context.Context, req *v1.AssignRequest
 }
 
 func (s *AssignsService) ListAssigns(ctx context.Context, req *v1.ListAssignsRequest) (*v1.ListAssignsReply, error) {
-	claims, _, err := s.sh.HasPermission(ctx, "admin.role.assign")
+	tenantId, _, err := s.sh.HasPermission(ctx, "admin.role.assign")
 	if err != nil {
 		return nil, err
 	}
@@ -83,7 +97,7 @@ func (s *AssignsService) ListAssigns(ctx context.Context, req *v1.ListAssignsReq
 	}
 
 	assignedRoles, err := s.uc.ListAssignedRoles(ctx, data.ListRolesDto{
-		TenantId:    claims.GetTenantId(),
+		TenantId:    tenantId,
 		IdentityIDs: identitiesIDs,
 		TeamsIDs:    teamsIDs,
 	})

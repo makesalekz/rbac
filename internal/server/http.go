@@ -1,12 +1,10 @@
 package server
 
 import (
-	v1 "gitlab.calendaria.team/services/rbac/api/rbac/v1"
 	"gitlab.calendaria.team/services/rbac/internal/conf"
-	"gitlab.calendaria.team/services/rbac/internal/service"
 	"gitlab.calendaria.team/services/utils/v1/jwt"
-	auth "gitlab.calendaria.team/services/utils/v1/middlewares/auth"
-	metrics "gitlab.calendaria.team/services/utils/v1/middlewares/metrics"
+	"gitlab.calendaria.team/services/utils/v1/middlewares/metrics"
+	"gitlab.calendaria.team/services/utils/v2/middlewares/auth"
 
 	prom "github.com/go-kratos/kratos/contrib/metrics/prometheus/v2"
 	"github.com/go-kratos/kratos/v2/middleware/metadata"
@@ -42,11 +40,6 @@ var _activeRequests = prometheus.NewGaugeVec(prometheus.GaugeOpts{
 func NewHTTPServer(
 	c *conf.Bootstrap,
 	jwtp *jwt.JwtProcessor,
-	roleSrvc *service.RolesService,
-	permissionsSrvc *service.PermissionsService,
-	teamSrvc *service.TeamsService,
-	teamIdentityRolesSrvc *service.AssignsService,
-	checkPermissionSrvc *service.CheckPermissionsService,
 ) *khttp.Server {
 	var opts = []khttp.ServerOption{
 		khttp.Middleware(
@@ -71,19 +64,9 @@ func NewHTTPServer(
 	}
 	srv := khttp.NewServer(opts...)
 
-	v1.RegisterRolesHTTPServer(srv, roleSrvc)
-	v1.RegisterPermissionsHTTPServer(srv, permissionsSrvc)
-	v1.RegisterTeamsHTTPServer(srv, teamSrvc)
-	v1.RegisterAssignsHTTPServer(srv, teamIdentityRolesSrvc)
-	v1.RegisterCheckPermissionsHTTPServer(srv, checkPermissionSrvc)
-
-	registerTechRoutes(srv)
-
-	return srv
-}
-
-func registerTechRoutes(s *khttp.Server) {
 	prometheus.MustRegister(_metricSeconds, _metricRequests, _activeRequests)
 
-	s.Handle("/metrics", promhttp.Handler())
+	srv.Handle("/metrics", promhttp.Handler())
+
+	return srv
 }
