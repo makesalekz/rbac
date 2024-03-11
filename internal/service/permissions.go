@@ -8,22 +8,26 @@ import (
 	"gitlab.calendaria.team/services/rbac/internal/biz"
 	"gitlab.calendaria.team/services/rbac/internal/data"
 	utils_v1 "gitlab.calendaria.team/services/utils/api/utils/v1"
+	"gitlab.calendaria.team/services/utils/v2/auth"
 )
 
 type PermissionsService struct {
 	v1.UnimplementedPermissionsServer
 
-	sh *ServiceHelper
-	uc *biz.PermissionsUsecase
+	sh    *ServiceHelper
+	uc    *biz.PermissionsUsecase
+	check *biz.CheckPermissionsUsecase
 }
 
 func NewPermissionsService(
 	sh *ServiceHelper,
 	uc *biz.PermissionsUsecase,
+	check *biz.CheckPermissionsUsecase,
 ) *PermissionsService {
 	return &PermissionsService{
-		sh: sh,
-		uc: uc,
+		sh:    sh,
+		uc:    uc,
+		check: check,
 	}
 }
 
@@ -96,15 +100,28 @@ func (s *PermissionsService) GetPermission(ctx context.Context, req *v1.Permissi
 }
 
 func (s *PermissionsService) ListPermissions(ctx context.Context, req *v1.ListPermissionsRequest) (*v1.ListPermissionsReply, error) {
-	claims, _, err := s.sh.HasPermission(ctx, "admin.permission.read")
+	tenantId := auth.GetTenantIdFromContext(ctx)
+	if tenantId == 0 {
+		return nil, v1.ErrorEmptyActorId("empty tenant id")
+	}
+
+	identities := auth.GetIdentitiesFromContext(ctx)
+	if len(identities) == 0 {
+		return nil, v1.ErrorEmptyActorId("empty identities")
+	}
+
+	fields, err := s.check.HasPermission(ctx, tenantId, identities, "admin.permission.read")
 	if err != nil {
 		return nil, err
+	}
+	if fields == nil {
+		return nil, v1.ErrorForbidden("has no permission")
 	}
 
 	groups, err := s.uc.GetGroupedPermissions(
 		ctx,
-		claims.GetTenantId(),
-		claims.GetIdentities(),
+		tenantId,
+		identities,
 		data.FilterPermissions{
 			AppsIds: req.AppsIds,
 		})

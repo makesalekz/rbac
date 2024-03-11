@@ -5,46 +5,39 @@ import (
 
 	v1 "gitlab.calendaria.team/services/rbac/api/rbac/v1"
 	"gitlab.calendaria.team/services/rbac/internal/biz"
-	"gitlab.calendaria.team/services/utils/v1/jwt"
+	"gitlab.calendaria.team/services/utils/v2/auth"
 )
 
 type ServiceHelper struct {
-	jwt *jwt.JwtProcessor
-	uc  *biz.CheckPermissionsUsecase
+	uc *biz.CheckPermissionsUsecase
 }
 
 func NewServiceHelper(
-	jwt *jwt.JwtProcessor,
 	uc *biz.CheckPermissionsUsecase,
 ) *ServiceHelper {
 	return &ServiceHelper{
-		jwt: jwt,
-		uc:  uc,
+		uc: uc,
 	}
 }
 
-func (s *ServiceHelper) GetClaims(ctx context.Context) (*jwt.TenantClaims, error) {
-	claims, ok := s.jwt.GetClaimsFromContext(ctx)
-	if ok && claims.IsUserTenantRequest() {
-		return claims, nil
+func (s *ServiceHelper) HasPermission(ctx context.Context, permission string) (int64, *v1.ListOfFields, error) {
+	tenantId := auth.GetTenantIdFromContext(ctx)
+	if tenantId == 0 {
+		return 0, nil, v1.ErrorEmptyActorId("empty tenant id")
 	}
 
-	return nil, v1.ErrorUnauthorized("invalid token")
-}
-
-func (s *ServiceHelper) HasPermission(ctx context.Context, permission string) (*jwt.TenantClaims, *v1.ListOfFields, error) {
-	claims, err := s.GetClaims(ctx)
-	if err != nil {
-		return nil, nil, err
+	identities := auth.GetIdentitiesFromContext(ctx)
+	if len(identities) == 0 {
+		return 0, nil, v1.ErrorEmptyActorId("empty identities")
 	}
 
-	fields, err := s.uc.HasPermission(ctx, claims.GetTenantId(), claims.GetIdentities(), permission)
+	fields, err := s.uc.HasPermission(ctx, tenantId, identities, permission)
 	if err != nil {
-		return nil, nil, err
+		return 0, nil, err
 	}
 	if fields == nil {
-		return nil, nil, v1.ErrorForbidden("has no permission")
+		return 0, nil, v1.ErrorForbidden("has no permission")
 	}
 
-	return claims, fields, nil
+	return tenantId, fields, nil
 }

@@ -29,13 +29,13 @@ func NewTeamsService(
 }
 
 func (s *TeamsService) CreateTeam(ctx context.Context, req *v1.CreateTeamRequest) (*v1.TeamReply, error) {
-	claims, _, err := s.sh.HasPermission(ctx, "admin.team.create")
+	tenantId, _, err := s.sh.HasPermission(ctx, "admin.team.create")
 	if err != nil {
 		return nil, err
 	}
 
 	team, err := s.tu.CreateTeam(ctx, data.TeamDto{
-		TenantId:    claims.GetTenantId(),
+		TenantId:    tenantId,
 		Name:        req.Name,
 		Description: req.Description,
 		ParentId:    req.ParentId,
@@ -49,12 +49,12 @@ func (s *TeamsService) CreateTeam(ctx context.Context, req *v1.CreateTeamRequest
 }
 
 func (s *TeamsService) UpdateTeam(ctx context.Context, req *v1.UpdateTeamRequest) (*v1.TeamReply, error) {
-	claims, _, err := s.sh.HasPermission(ctx, "admin.team.update")
+	tenantId, _, err := s.sh.HasPermission(ctx, "admin.team.update")
 	if err != nil {
 		return nil, err
 	}
 
-	team, err := s.tu.GetTeam(ctx, claims.GetTenantId(), req.GetTeamId(), false)
+	team, err := s.tu.GetTeam(ctx, tenantId, req.GetTeamId(), false)
 	if err != nil {
 		return nil, err
 	}
@@ -72,12 +72,12 @@ func (s *TeamsService) UpdateTeam(ctx context.Context, req *v1.UpdateTeamRequest
 }
 
 func (s *TeamsService) DeleteTeam(ctx context.Context, req *v1.TeamRequest) (*utils_v1.EmptyReply, error) {
-	claims, _, err := s.sh.HasPermission(ctx, "admin.team.delete")
+	tenantId, _, err := s.sh.HasPermission(ctx, "admin.team.delete")
 	if err != nil {
 		return nil, err
 	}
 
-	team, err := s.tu.GetTeam(ctx, claims.GetTenantId(), req.GetTeamId(), false)
+	team, err := s.tu.GetTeam(ctx, tenantId, req.GetTeamId(), false)
 	if err != nil {
 		return nil, err
 	}
@@ -90,12 +90,12 @@ func (s *TeamsService) DeleteTeam(ctx context.Context, req *v1.TeamRequest) (*ut
 }
 
 func (s *TeamsService) GetTeam(ctx context.Context, req *v1.TeamRequest) (*v1.TeamReply, error) {
-	claims, _, err := s.sh.HasPermission(ctx, "admin.team.read")
+	tenantId, _, err := s.sh.HasPermission(ctx, "admin.team.read")
 	if err != nil {
 		return nil, err
 	}
 
-	team, err := s.tu.GetTeam(ctx, claims.GetTenantId(), req.GetTeamId(), req.GetWithTree())
+	team, err := s.tu.GetTeam(ctx, tenantId, req.GetTeamId(), req.GetWithTree())
 	if err != nil {
 		return nil, err
 	}
@@ -106,13 +106,13 @@ func (s *TeamsService) GetTeam(ctx context.Context, req *v1.TeamRequest) (*v1.Te
 }
 
 func (s *TeamsService) ListTeams(ctx context.Context, req *v1.ListTeamsRequest) (*v1.ListTeamsReply, error) {
-	claims, _, err := s.sh.HasPermission(ctx, "admin.team.read")
+	tenantId, _, err := s.sh.HasPermission(ctx, "admin.team.read")
 	if err != nil {
 		return nil, err
 	}
 
 	list, err := s.tu.ListTeams(ctx, data.TeamsListFilter{
-		TenantId: claims.GetTenantId(),
+		TenantId: tenantId,
 		ParentId: req.GetParentId(),
 	}, req.GetPaginate())
 	if err != nil {
