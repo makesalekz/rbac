@@ -23,22 +23,22 @@ func NewCheckPermissionsService(
 }
 
 func (s *CheckPermissionsService) CheckPermissions(ctx context.Context, req *v1.CheckPermissionsRequest) (*v1.CheckPermissionsReply, error) {
-	identites := req.Identities
+	identities := req.Identities
 	tenantId := req.TenantId
 	// use context if request does not have tenantId and identities
-	if len(identites) == 0 {
-		tenantId := auth.GetTenantIdFromContext(ctx)
+	if len(identities) == 0 {
+		tenantId = auth.GetTenantIdFromContext(ctx)
 		if tenantId == 0 {
 			return nil, v1.ErrorEmptyActorId("empty tenant id")
 		}
 
-		identities := auth.GetIdentitiesFromContext(ctx)
+		identities = auth.GetIdentitiesFromContext(ctx)
 		if len(identities) == 0 {
 			return nil, v1.ErrorEmptyActorId("empty identities")
 		}
 	}
 
-	permissionsMap, err := s.uc.CheckPermissions(ctx, tenantId, identites, req.TeamId, req.Permissions)
+	permissionsMap, err := s.uc.CheckPermissions(ctx, tenantId, identities, req.TeamId, req.Permissions)
 	if err != nil {
 		return nil, err
 	}
