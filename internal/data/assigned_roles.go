@@ -62,7 +62,9 @@ func (t *assignedRolesRepo) UnassignRole(ctx context.Context, assignedRole *ent.
 
 func (t *assignedRolesRepo) ListAssignedRoles(ctx context.Context, dto ListRolesDto) ([]*ent.TeamIdentityRole, error) {
 	query := t.db.TeamIdentityRole.Query().
-		Where(teamidentityrole.TenantID(dto.TenantId))
+		Where(teamidentityrole.TenantID(dto.TenantId)).
+		WithRole().
+		WithTeam()
 
 	if len(dto.IdentityIDs) > 0 {
 		identityIDs := append(dto.IdentityIDs, "")
