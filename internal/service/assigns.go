@@ -112,6 +112,7 @@ func (s *AssignsService) ListAssigns(ctx context.Context, req *v1.ListAssignsReq
 
 func assignedRoleReply(assignedRole *ent.TeamIdentityRole) *v1.AssignedRole {
 	result := v1.AssignedRole{
+		AssignId:   assignedRole.ID,
 		IdentityId: &assignedRole.IdentityID,
 	}
 

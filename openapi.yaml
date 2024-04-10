@@ -466,6 +466,8 @@ components:
         rbac.v1.AssignedRole:
             type: object
             properties:
+                assignId:
+                    type: string
                 role:
                     $ref: '#/components/schemas/rbac.v1.Role'
                 identityId:
