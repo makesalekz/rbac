@@ -21,20 +21,45 @@ var _ = binding.EncodeURL
 const _ = http.SupportPackageIsVersion1
 
 const OperationAssignsAssignRole = "/rbac.v1.Assigns/AssignRole"
+const OperationAssignsAssignRoles = "/rbac.v1.Assigns/AssignRoles"
 const OperationAssignsListAssigns = "/rbac.v1.Assigns/ListAssigns"
 const OperationAssignsUnassignRole = "/rbac.v1.Assigns/UnassignRole"
 
 type AssignsHTTPServer interface {
 	AssignRole(context.Context, *AssignRoleRequest) (*v1.EmptyReply, error)
+	AssignRoles(context.Context, *AssignRolesRequest) (*v1.EmptyReply, error)
 	ListAssigns(context.Context, *ListAssignsRequest) (*ListAssignsReply, error)
 	UnassignRole(context.Context, *AssignRequest) (*v1.EmptyReply, error)
 }
 
 func RegisterAssignsHTTPServer(s *http.Server, srv AssignsHTTPServer) {
 	r := s.Route("/")
+	r.POST("/v1/rbac/assigns_roles", _Assigns_AssignRoles0_HTTP_Handler(srv))
 	r.POST("/v1/rbac/assigns", _Assigns_AssignRole0_HTTP_Handler(srv))
 	r.DELETE("/v1/rbac/assigns/{assignId}", _Assigns_UnassignRole0_HTTP_Handler(srv))
 	r.POST("/v1/rbac/assigns/list", _Assigns_ListAssigns0_HTTP_Handler(srv))
+}
+
+func _Assigns_AssignRoles0_HTTP_Handler(srv AssignsHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in AssignRolesRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationAssignsAssignRoles)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.AssignRoles(ctx, req.(*AssignRolesRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*v1.EmptyReply)
+		return ctx.Result(200, reply)
+	}
 }
 
 func _Assigns_AssignRole0_HTTP_Handler(srv AssignsHTTPServer) func(ctx http.Context) error {
@@ -105,6 +130,7 @@ func _Assigns_ListAssigns0_HTTP_Handler(srv AssignsHTTPServer) func(ctx http.Con
 
 type AssignsHTTPClient interface {
 	AssignRole(ctx context.Context, req *AssignRoleRequest, opts ...http.CallOption) (rsp *v1.EmptyReply, err error)
+	AssignRoles(ctx context.Context, req *AssignRolesRequest, opts ...http.CallOption) (rsp *v1.EmptyReply, err error)
 	ListAssigns(ctx context.Context, req *ListAssignsRequest, opts ...http.CallOption) (rsp *ListAssignsReply, err error)
 	UnassignRole(ctx context.Context, req *AssignRequest, opts ...http.CallOption) (rsp *v1.EmptyReply, err error)
 }
@@ -122,6 +148,19 @@ func (c *AssignsHTTPClientImpl) AssignRole(ctx context.Context, in *AssignRoleRe
 	pattern := "/v1/rbac/assigns"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationAssignsAssignRole))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *AssignsHTTPClientImpl) AssignRoles(ctx context.Context, in *AssignRolesRequest, opts ...http.CallOption) (*v1.EmptyReply, error) {
+	var out v1.EmptyReply
+	pattern := "/v1/rbac/assigns_roles"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationAssignsAssignRoles))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
 	if err != nil {

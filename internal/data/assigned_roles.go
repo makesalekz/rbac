@@ -13,7 +13,6 @@ type AssignRoleDto struct {
 	RoleId     int64
 	TeamId     int64
 	IdentityId string
-	TenantId   int64
 }
 
 type ListRolesDto struct {
@@ -24,7 +23,7 @@ type ListRolesDto struct {
 
 // AssignedRolesRepo
 type AssignedRolesRepo interface {
-	AssignRole(ctx context.Context, dto AssignRoleDto) error
+	AssignRoles(ctx context.Context, tenantId int64, dto []AssignRoleDto) error
 	UnassignRole(ctx context.Context, assignedRole *ent.TeamIdentityRole) error
 	GetAssignedRoleById(ctx context.Context, tenantId, assignId int64) (*ent.TeamIdentityRole, error)
 	ListAssignedRoles(ctx context.Context, dto ListRolesDto) ([]*ent.TeamIdentityRole, error)
@@ -34,17 +33,20 @@ type assignedRolesRepo struct {
 	db *ent.Client
 }
 
-func (t *assignedRolesRepo) AssignRole(ctx context.Context, dto AssignRoleDto) error {
-	query := t.db.TeamIdentityRole.Create().
-		SetTenantID(dto.TenantId).
-		SetIdentityID(dto.IdentityId).
-		SetRoleID(dto.RoleId)
+func (t *assignedRolesRepo) AssignRoles(ctx context.Context, tenantId int64, dto []AssignRoleDto) error {
+	assignQueries := make([]*ent.TeamIdentityRoleCreate, len(dto))
+	for i, assign := range dto {
+		assignQueries[i] = t.db.TeamIdentityRole.Create().
+			SetTenantID(tenantId).
+			SetIdentityID(assign.IdentityId).
+			SetRoleID(assign.RoleId)
 
-	if dto.TeamId != 0 {
-		query.SetTeamID(dto.TeamId)
+		if assign.TeamId != 0 {
+			assignQueries[i].SetTeamID(assign.TeamId)
+		}
 	}
 
-	return query.Exec(ctx)
+	return t.db.TeamIdentityRole.CreateBulk(assignQueries...).Exec(ctx)
 }
 
 func (t *assignedRolesRepo) GetAssignedRoleById(ctx context.Context, tenantId, assignId int64) (*ent.TeamIdentityRole, error) {

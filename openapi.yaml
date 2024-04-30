@@ -60,6 +60,24 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/utils.v1.EmptyReply'
+    /v1/rbac/assigns_roles:
+        post:
+            tags:
+                - Assigns
+            operationId: Assigns_AssignRoles
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/rbac.v1.AssignRolesRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/utils.v1.EmptyReply'
     /v1/rbac/check:
         post:
             tags:
@@ -463,6 +481,13 @@ components:
                     type: string
                 teamId:
                     type: string
+        rbac.v1.AssignRolesRequest:
+            type: object
+            properties:
+                assigns:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/rbac.v1.AssignRoleRequest'
         rbac.v1.AssignedRole:
             type: object
             properties:

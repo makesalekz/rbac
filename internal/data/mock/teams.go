@@ -96,6 +96,21 @@ func (mr *MockTeamsRepoMockRecorder) GetTeam(ctx, teamId, tenantId, getTree inte
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetTeam", reflect.TypeOf((*MockTeamsRepo)(nil).GetTeam), ctx, teamId, tenantId, getTree)
 }
 
+// GetTeams mocks base method.
+func (m *MockTeamsRepo) GetTeams(ctx context.Context, tenantId int64, teamIds []int64) ([]*ent.Team, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetTeams", ctx, tenantId, teamIds)
+	ret0, _ := ret[0].([]*ent.Team)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetTeams indicates an expected call of GetTeams.
+func (mr *MockTeamsRepoMockRecorder) GetTeams(ctx, tenantId, teamIds interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetTeams", reflect.TypeOf((*MockTeamsRepo)(nil).GetTeams), ctx, tenantId, teamIds)
+}
+
 // ListTeams mocks base method.
 func (m *MockTeamsRepo) ListTeams(ctx context.Context, filter data.TeamsListFilter, paginate *utils_v1.PaginateRequest) ([]*ent.Team, error) {
 	m.ctrl.T.Helper()

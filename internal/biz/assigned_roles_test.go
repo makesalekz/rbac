@@ -33,7 +33,6 @@ func TestAssignedRolesUsecase_AssignRole(t *testing.T) {
 
 	// Positive case
 	dto := data.AssignRoleDto{
-		TenantId:   tenantId,
 		IdentityId: identityId,
 		RoleId:     roleId,
 	}
@@ -44,16 +43,15 @@ func TestAssignedRolesUsecase_AssignRole(t *testing.T) {
 		Description: "testDesc",
 	}
 	roleRepo.EXPECT().GetRoleById(ctx, tenantId, roleId).Return(role, nil)
-	assignedRepo.EXPECT().AssignRole(ctx, dto).Return(nil)
+	assignedRepo.EXPECT().AssignRoles(ctx, tenantId, []data.AssignRoleDto{dto}).Return(nil)
 
-	err = uc.AssignRole(ctx, dto)
+	err = uc.AssignRole(ctx, tenantId, dto)
 	require.NoError(t, err)
 
 	// Negative case
 	roleRepo.EXPECT().GetRoleById(ctx, tenantId, roleId2).Return(nil, &ent.NotFoundError{})
 
-	err = uc.AssignRole(ctx, data.AssignRoleDto{
-		TenantId:   tenantId,
+	err = uc.AssignRole(ctx, tenantId, data.AssignRoleDto{
 		IdentityId: identityId,
 		RoleId:     roleId2,
 	})
@@ -64,8 +62,7 @@ func TestAssignedRolesUsecase_AssignRole(t *testing.T) {
 	roleRepo.EXPECT().GetRoleById(ctx, tenantId, roleId).Return(role, nil)
 	teamRepo.EXPECT().GetTeam(ctx, tenantId, teamId, false).Return(nil, &ent.NotFoundError{})
 
-	err = uc.AssignRole(ctx, data.AssignRoleDto{
-		TenantId:   tenantId,
+	err = uc.AssignRole(ctx, tenantId, data.AssignRoleDto{
 		IdentityId: identityId,
 		RoleId:     roleId,
 		TeamId:     teamId,

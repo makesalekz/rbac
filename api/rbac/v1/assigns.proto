@@ -11,6 +11,12 @@ option java_multiple_files = true;
 option java_package = "rbac.v1";
 
 service Assigns {
+  rpc AssignRoles(AssignRolesRequest) returns (utils.v1.EmptyReply){
+    option (google.api.http) = {
+      post: "/v1/rbac/assigns_roles"
+      body: "*"
+    };
+  }
   rpc AssignRole(AssignRoleRequest) returns (utils.v1.EmptyReply) {
     option (google.api.http) = {
       post: "/v1/rbac/assigns"
@@ -28,6 +34,10 @@ service Assigns {
       body: "*"
     };
   }
+}
+
+message AssignRolesRequest {
+  repeated AssignRoleRequest assigns = 1;
 }
 
 message AssignRoleRequest {
