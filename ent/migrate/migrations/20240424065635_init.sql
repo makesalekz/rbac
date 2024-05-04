@@ -19,7 +19,7 @@ INSERT INTO "roles" ("id", "name", "description", "is_system", "created_at", "up
   (3, 'Project Owner', 'Has all permissions of a project owner', TRUE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
   (4, 'Project Manager', 'Has all permissions of a project manager', TRUE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
   (5, 'Project Participant', 'Has all limitations of project participant', TRUE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-  (6, 'Project Viewer', 'Has all limitations of project viewer', TRUE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+  (6, 'Project Viewer', 'Has all limitations of project viewer', TRUE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
 
   (7, 'Direct Project Owner', 'Has all permissions of a direct project owner', TRUE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
   (8, 'Direct Project Manager', 'Has all permissions of a direct project manager', TRUE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
@@ -82,7 +82,7 @@ INSERT INTO "role_permissions" ("role_id", "permission_id", "deny", "fields") VA
   (6, 'project.project.manager', TRUE, '[]'),
   (6, 'project.team.assign', TRUE, '[]'),
   (6, 'project.attachments.create',TRUE,'[]'),
-  (6, 'project.attachments.delete',TRUE,'[]');
+  (6, 'project.attachments.delete',TRUE,'[]'),
 
 -- Project direct owner role
   (7, 'project.project.create', FALSE, '[]'),
