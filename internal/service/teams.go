@@ -9,6 +9,7 @@ import (
 	"gitlab.calendaria.team/services/rbac/internal/biz"
 	"gitlab.calendaria.team/services/rbac/internal/data"
 	utils_v1 "gitlab.calendaria.team/services/utils/api/utils/v1"
+	"gitlab.calendaria.team/services/utils/v2/auth"
 )
 
 type TeamsService struct {
@@ -29,9 +30,9 @@ func NewTeamsService(
 }
 
 func (s *TeamsService) CreateTeam(ctx context.Context, req *v1.CreateTeamRequest) (*v1.TeamReply, error) {
-	tenantId, _, err := s.sh.HasPermission(ctx, "admin.team.create")
-	if err != nil {
-		return nil, err
+	tenantId := auth.GetTenantIdFromContext(ctx)
+	if tenantId == 0 {
+		return nil, v1.ErrorEmptyActorId("empty tenant id")
 	}
 
 	team, err := s.tu.CreateTeam(ctx, data.TeamDto{

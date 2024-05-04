@@ -48,6 +48,7 @@ INSERT INTO "role_permissions" ("role_id", "permission_id", "deny", "fields") VA
   (2, 'project.attachments.create',TRUE,'[]'),
   (2, 'project.attachments.delete',TRUE,'[]'),
 -- Project owner role
+  (3, 'admin.team.read', FALSE, '[]'),
   (3, 'project.project.create', FALSE, '[]'),
   (3, 'project.project.read', FALSE, '[]'),
   (3, 'project.project.update', FALSE, '[]'),
@@ -57,6 +58,7 @@ INSERT INTO "role_permissions" ("role_id", "permission_id", "deny", "fields") VA
   (3, 'project.attachments.create',FALSE,'[]'),
   (3, 'project.attachments.delete',FALSE,'[]'),
 -- Project manager role
+  (4, 'admin.team.read', FALSE, '[]'),
   (4, 'project.project.create', FALSE, '[]'),
   (4, 'project.project.read', FALSE, '[]'),
   (4, 'project.project.update', FALSE, '[]'),
@@ -66,6 +68,7 @@ INSERT INTO "role_permissions" ("role_id", "permission_id", "deny", "fields") VA
   (4, 'project.attachments.create',FALSE,'[]'),
   (4, 'project.attachments.delete',FALSE,'[]'),
 -- Project participant limitations
+  (5, 'admin.team.read', TRUE, '[]'),
   (5, 'project.project.create', FALSE, '[]'),
   (5, 'project.project.read', FALSE, '[]'),
   (5, 'project.project.update', TRUE, '[]'),
@@ -75,6 +78,7 @@ INSERT INTO "role_permissions" ("role_id", "permission_id", "deny", "fields") VA
   (5, 'project.attachments.create',FALSE,'[]'),
   (5, 'project.attachments.delete',FALSE,'[]'),
 -- Project reporter limitations
+  (6, 'admin.team.read', TRUE, '[]'),
   (6, 'project.project.create', TRUE, '[]'),
   (6, 'project.project.read', FALSE, '[]'),
   (6, 'project.project.update', TRUE, '[]'),
@@ -85,6 +89,7 @@ INSERT INTO "role_permissions" ("role_id", "permission_id", "deny", "fields") VA
   (6, 'project.attachments.delete',TRUE,'[]'),
 
 -- Project direct owner role
+  (7, 'admin.team.read', FALSE, '[]'),
   (7, 'project.project.create', FALSE, '[]'),
   (7, 'project.project.read', TRUE, '[]'),
   (7, 'project.project.update', FALSE, '[]'),
@@ -94,6 +99,7 @@ INSERT INTO "role_permissions" ("role_id", "permission_id", "deny", "fields") VA
   (7, 'project.attachments.create',FALSE,'[]'),
   (7, 'project.attachments.delete',FALSE,'[]'),
 -- Project direct manager role
+  (8, 'admin.team.read', FALSE, '[]'),
   (8, 'project.project.create', FALSE, '[]'),
   (8, 'project.project.read', TRUE, '[]'),
   (8, 'project.project.update', FALSE, '[]'),
@@ -103,6 +109,7 @@ INSERT INTO "role_permissions" ("role_id", "permission_id", "deny", "fields") VA
   (8, 'project.attachments.create',FALSE,'[]'),
   (8, 'project.attachments.delete',FALSE,'[]'),
 -- Project direct participant limitations
+  (9, 'admin.team.read', TRUE, '[]'),
   (9, 'project.project.create', FALSE, '[]'),
   (9, 'project.project.read', TRUE, '[]'),
   (9, 'project.project.update', TRUE, '[]'),
@@ -112,6 +119,7 @@ INSERT INTO "role_permissions" ("role_id", "permission_id", "deny", "fields") VA
   (9, 'project.attachments.create',FALSE,'[]'),
   (9, 'project.attachments.delete',FALSE,'[]'),
 -- Project direct reporter limitations
+  (10, 'admin.team.read', TRUE, '[]'),
   (10, 'project.project.create', TRUE, '[]'),
   (10, 'project.project.read', TRUE, '[]'),
   (10, 'project.project.list', TRUE, '[]'),
