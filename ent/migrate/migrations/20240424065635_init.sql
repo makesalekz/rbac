@@ -1,6 +1,6 @@
 -- Create project permission groups
 INSERT INTO "permission_groups" ("id", "name", "app_id") VALUES
-  ('project.project', 'Project Manipulation', 'common'),
+  ('project.project', 'Project Manipulations', 'common'),
   ('project.team', 'Project Teams', 'common'),
   ('project.attachments', 'Project Attachments', 'common');
 
