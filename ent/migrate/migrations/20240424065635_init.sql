@@ -1,7 +1,7 @@
 -- Create project permission groups
 INSERT INTO "permission_groups" ("id", "name", "app_id") VALUES
   ('project.project', 'Project Manipulation', 'common'),
-  ('project.team', 'Project Team', 'common'),
+  ('project.team', 'Project Teams', 'common'),
   ('project.attachments', 'Project Attachments', 'common');
 
 INSERT INTO "permissions" ("id", "group_id", "name", "description", "app_id", "fields") VALUES
@@ -41,12 +41,6 @@ INSERT INTO "role_permissions" ("role_id", "permission_id", "deny", "fields") VA
 -- Basic plan limitations
   (2, 'project.project.create', FALSE, '[]'),
   (2, 'project.project.read', FALSE, '[]'),
-  (2, 'project.project.update', TRUE, '[]'),
-  (2, 'project.project.delete', TRUE, '[]'),
-  (2, 'project.project.manager', TRUE, '[]'),
-  (2, 'project.team.assign', TRUE, '[]'),
-  (2, 'project.attachments.create',TRUE,'[]'),
-  (2, 'project.attachments.delete',TRUE,'[]'),
 -- Project owner role
   (3, 'admin.team.read', FALSE, '[]'),
   (3, 'project.project.create', FALSE, '[]'),
@@ -63,35 +57,21 @@ INSERT INTO "role_permissions" ("role_id", "permission_id", "deny", "fields") VA
   (4, 'project.project.read', FALSE, '[]'),
   (4, 'project.project.update', FALSE, '[]'),
   (4, 'project.project.delete', FALSE, '[]'),
-  (4, 'project.project.manager', TRUE, '[]'),
   (4, 'project.team.assign', FALSE, '[]'),
   (4, 'project.attachments.create',FALSE,'[]'),
   (4, 'project.attachments.delete',FALSE,'[]'),
 -- Project participant limitations
-  (5, 'admin.team.read', TRUE, '[]'),
   (5, 'project.project.create', FALSE, '[]'),
   (5, 'project.project.read', FALSE, '[]'),
-  (5, 'project.project.update', TRUE, '[]'),
-  (5, 'project.project.delete', TRUE, '[]'),
-  (5, 'project.project.manager', TRUE, '[]'),
-  (5, 'project.team.assign', TRUE, '[]'),
   (5, 'project.attachments.create',FALSE,'[]'),
   (5, 'project.attachments.delete',FALSE,'[]'),
 -- Project reporter limitations
-  (6, 'admin.team.read', TRUE, '[]'),
-  (6, 'project.project.create', TRUE, '[]'),
+  (6, 'project.project.create', FALSE, '[]'),
   (6, 'project.project.read', FALSE, '[]'),
-  (6, 'project.project.update', TRUE, '[]'),
-  (6, 'project.project.delete', TRUE, '[]'),
-  (6, 'project.project.manager', TRUE, '[]'),
-  (6, 'project.team.assign', TRUE, '[]'),
-  (6, 'project.attachments.create',TRUE,'[]'),
-  (6, 'project.attachments.delete',TRUE,'[]'),
 
 -- Project direct owner role
   (7, 'admin.team.read', FALSE, '[]'),
   (7, 'project.project.create', FALSE, '[]'),
-  (7, 'project.project.read', TRUE, '[]'),
   (7, 'project.project.update', FALSE, '[]'),
   (7, 'project.project.delete', FALSE, '[]'),
   (7, 'project.project.manager', FALSE, '[]'),
@@ -101,31 +81,14 @@ INSERT INTO "role_permissions" ("role_id", "permission_id", "deny", "fields") VA
 -- Project direct manager role
   (8, 'admin.team.read', FALSE, '[]'),
   (8, 'project.project.create', FALSE, '[]'),
-  (8, 'project.project.read', TRUE, '[]'),
   (8, 'project.project.update', FALSE, '[]'),
   (8, 'project.project.delete', FALSE, '[]'),
-  (8, 'project.project.manager', TRUE, '[]'),
   (8, 'project.team.assign', FALSE, '[]'),
   (8, 'project.attachments.create',FALSE,'[]'),
   (8, 'project.attachments.delete',FALSE,'[]'),
 -- Project direct participant limitations
-  (9, 'admin.team.read', TRUE, '[]'),
   (9, 'project.project.create', FALSE, '[]'),
-  (9, 'project.project.read', TRUE, '[]'),
-  (9, 'project.project.update', TRUE, '[]'),
-  (9, 'project.project.delete', TRUE, '[]'),
-  (9, 'project.project.manager', TRUE, '[]'),
-  (9, 'project.team.assign', TRUE, '[]'),
   (9, 'project.attachments.create',FALSE,'[]'),
   (9, 'project.attachments.delete',FALSE,'[]'),
 -- Project direct reporter limitations
-  (10, 'admin.team.read', TRUE, '[]'),
-  (10, 'project.project.create', TRUE, '[]'),
-  (10, 'project.project.read', TRUE, '[]'),
-  (10, 'project.project.list', TRUE, '[]'),
-  (10, 'project.project.update', TRUE, '[]'),
-  (10, 'project.project.delete', TRUE, '[]'),
-  (10, 'project.project.manager', TRUE, '[]'),
-  (10, 'project.team.assign', TRUE, '[]'),
-  (10, 'project.attachments.create',TRUE,'[]'),
-  (10, 'project.attachments.delete',TRUE,'[]');
+  (10, 'project.project.create', FALSE, '[]'),
