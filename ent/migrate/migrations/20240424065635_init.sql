@@ -21,10 +21,7 @@ INSERT INTO "roles" ("id", "name", "description", "is_system", "created_at", "up
   (5, 'Project Participant', 'Has all limitations of project participant', TRUE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
   (6, 'Project Viewer', 'Has all limitations of project viewer', TRUE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
 
-  (7, 'Direct Project Owner', 'Has all permissions of a direct project owner', TRUE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-  (8, 'Direct Project Manager', 'Has all permissions of a direct project manager', TRUE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-  (9, 'Direct Project Participant', 'Has all limitations of direct project participant', TRUE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-  (10, 'Direct Project Viewer', 'Has all limitations of direct project viewer', TRUE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+  (7, 'Tenant Member', 'Has all permissions of a Tenant Member', TRUE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 
 -- Create permissions for basic roles
@@ -38,9 +35,6 @@ INSERT INTO "role_permissions" ("role_id", "permission_id", "deny", "fields") VA
   (1, 'project.team.assign', FALSE, '[]'),
   (1, 'project.attachments.create',FALSE,'[]'),
   (1, 'project.attachments.delete',FALSE,'[]'),
--- Basic plan limitations
-  (2, 'project.project.create', FALSE, '[]'),
-  (2, 'project.project.read', FALSE, '[]'),
 -- Project owner role
   (3, 'admin.team.read', FALSE, '[]'),
   (3, 'project.project.create', FALSE, '[]'),
@@ -69,26 +63,5 @@ INSERT INTO "role_permissions" ("role_id", "permission_id", "deny", "fields") VA
   (6, 'project.project.create', FALSE, '[]'),
   (6, 'project.project.read', FALSE, '[]'),
 
--- Project direct owner role
-  (7, 'admin.team.read', FALSE, '[]'),
-  (7, 'project.project.create', FALSE, '[]'),
-  (7, 'project.project.update', FALSE, '[]'),
-  (7, 'project.project.delete', FALSE, '[]'),
-  (7, 'project.project.manager', FALSE, '[]'),
-  (7, 'project.team.assign', FALSE, '[]'),
-  (7, 'project.attachments.create',FALSE,'[]'),
-  (7, 'project.attachments.delete',FALSE,'[]'),
--- Project direct manager role
-  (8, 'admin.team.read', FALSE, '[]'),
-  (8, 'project.project.create', FALSE, '[]'),
-  (8, 'project.project.update', FALSE, '[]'),
-  (8, 'project.project.delete', FALSE, '[]'),
-  (8, 'project.team.assign', FALSE, '[]'),
-  (8, 'project.attachments.create',FALSE,'[]'),
-  (8, 'project.attachments.delete',FALSE,'[]'),
--- Project direct participant limitations
-  (9, 'project.project.create', FALSE, '[]'),
-  (9, 'project.attachments.create',FALSE,'[]'),
-  (9, 'project.attachments.delete',FALSE,'[]'),
--- Project direct reporter limitations
-  (10, 'project.project.create', FALSE, '[]'),
+-- Tenant member limitation
+  (7, 'project.project.create', FALSE, '[]');
