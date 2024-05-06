@@ -21,7 +21,7 @@ INSERT INTO "roles" ("id", "name", "description", "is_system", "created_at", "up
   (5, 'Project Participant', 'Has all limitations of project participant', TRUE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
   (6, 'Project Viewer', 'Has all limitations of project viewer', TRUE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
 
-  (7, 'Workspace Participant', 'Has all permissions of a Workspace Participant', TRUE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+  (7, 'Direct Participant', 'Has all permissions of a Direct Participant', TRUE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 
 -- Create permissions for basic roles
@@ -63,5 +63,6 @@ INSERT INTO "role_permissions" ("role_id", "permission_id", "deny", "fields") VA
   (6, 'project.project.create', FALSE, '[]'),
   (6, 'project.project.read', FALSE, '[]'),
 
--- Tenant member limitation
+-- Direct particiant limitation
+  (7, 'project.project.read', TRUE, '[]'),
   (7, 'project.project.create', FALSE, '[]');
