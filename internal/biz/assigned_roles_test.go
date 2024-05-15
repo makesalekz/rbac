@@ -9,19 +9,21 @@ import (
 	"gitlab.calendaria.team/services/rbac/internal/biz"
 	"gitlab.calendaria.team/services/rbac/internal/data"
 	"gitlab.calendaria.team/services/rbac/internal/data/mock"
+	"gitlab.calendaria.team/services/utils/v2/zap"
 
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/require"
 )
 
 func TestAssignedRolesUsecase_AssignRole(t *testing.T) {
+	logger := zap.NewZapLogger(true)
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
 	assignedRepo := mock.NewMockAssignedRolesRepo(ctrl)
 	roleRepo := mock.NewMockRoleRepo(ctrl)
 	teamRepo := mock.NewMockTeamsRepo(ctrl)
-	uc, err := biz.NewAssignedRolesUsecase(assignedRepo, roleRepo, teamRepo)
+	uc, err := biz.NewAssignedRolesUsecase(logger, assignedRepo, roleRepo, teamRepo, nil)
 	require.NoError(t, err)
 
 	ctx := context.Background()
@@ -72,13 +74,14 @@ func TestAssignedRolesUsecase_AssignRole(t *testing.T) {
 }
 
 func TestAssignedRolesUsecase_UnassignRole(t *testing.T) {
+	logger := zap.NewZapLogger(true)
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
 	assignedRepo := mock.NewMockAssignedRolesRepo(ctrl)
 	roleRepo := mock.NewMockRoleRepo(ctrl)
 	teamRepo := mock.NewMockTeamsRepo(ctrl)
-	uc, err := biz.NewAssignedRolesUsecase(assignedRepo, roleRepo, teamRepo)
+	uc, err := biz.NewAssignedRolesUsecase(logger, assignedRepo, roleRepo, teamRepo, nil)
 	require.NoError(t, err)
 
 	ctx := context.Background()
@@ -110,13 +113,14 @@ func TestAssignedRolesUsecase_UnassignRole(t *testing.T) {
 }
 
 func TestAssignedRolesUsecase_ListIdentityRoles(t *testing.T) {
+	logger := zap.NewZapLogger(true)
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
 	assignedRepo := mock.NewMockAssignedRolesRepo(ctrl)
 	roleRepo := mock.NewMockRoleRepo(ctrl)
 	teamRepo := mock.NewMockTeamsRepo(ctrl)
-	uc, err := biz.NewAssignedRolesUsecase(assignedRepo, roleRepo, teamRepo)
+	uc, err := biz.NewAssignedRolesUsecase(logger, assignedRepo, roleRepo, teamRepo, nil)
 	require.NoError(t, err)
 
 	ctx := context.Background()
@@ -152,13 +156,14 @@ func TestAssignedRolesUsecase_ListIdentityRoles(t *testing.T) {
 }
 
 func TestAssignedRolesUsecase_ListAssignedRoles(t *testing.T) {
+	logger := zap.NewZapLogger(true)
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
 	assignedRepo := mock.NewMockAssignedRolesRepo(ctrl)
 	roleRepo := mock.NewMockRoleRepo(ctrl)
 	teamRepo := mock.NewMockTeamsRepo(ctrl)
-	uc, err := biz.NewAssignedRolesUsecase(assignedRepo, roleRepo, teamRepo)
+	uc, err := biz.NewAssignedRolesUsecase(logger, assignedRepo, roleRepo, teamRepo, nil)
 	require.NoError(t, err)
 
 	ctx := context.Background()

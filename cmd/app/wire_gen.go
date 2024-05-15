@@ -16,6 +16,7 @@ import (
 	"gitlab.calendaria.team/services/rbac/internal/service"
 	"gitlab.calendaria.team/services/utils/v1/config"
 	"gitlab.calendaria.team/services/utils/v1/jwt"
+	"gitlab.calendaria.team/services/utils/v1/nats"
 )
 
 import (
@@ -58,8 +59,15 @@ func wireApp(bootstrap *conf.Bootstrap, logger log.Logger) (*kratos.App, func(),
 		cleanup()
 		return nil, nil, err
 	}
-	assignedRolesUsecase, err := biz.NewAssignedRolesUsecase(assignedRolesRepo, roleRepo, teamsRepo)
+	encodedConn, cleanup2, err := data.NewNatsClient(bootstrap)
 	if err != nil {
+		cleanup()
+		return nil, nil, err
+	}
+	queueManager := nats.NewQueueManager(configConfig, encodedConn, logger)
+	assignedRolesUsecase, err := biz.NewAssignedRolesUsecase(logger, assignedRolesRepo, roleRepo, teamsRepo, queueManager)
+	if err != nil {
+		cleanup2()
 		cleanup()
 		return nil, nil, err
 	}
@@ -67,6 +75,7 @@ func wireApp(bootstrap *conf.Bootstrap, logger log.Logger) (*kratos.App, func(),
 	permissionsService := service.NewPermissionsService(serviceHelper, permissionsUsecase, checkPermissionsUsecase)
 	teamsUsecase, err := biz.NewTeamsUsecase(teamsRepo)
 	if err != nil {
+		cleanup2()
 		cleanup()
 		return nil, nil, err
 	}
@@ -77,6 +86,7 @@ func wireApp(bootstrap *conf.Bootstrap, logger log.Logger) (*kratos.App, func(),
 	httpServer := server.NewHTTPServer(bootstrap, jwtProcessor)
 	app := newApp(logger, configConfig, grpcServer, httpServer)
 	return app, func() {
+		cleanup2()
 		cleanup()
 	}, nil
 }
