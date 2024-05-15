@@ -154,7 +154,11 @@ func (u *AssignedRolesUsecase) UnassignRole(ctx context.Context, tenantId, assig
 	}
 
 	if u.queue != nil {
-		u.queue.GetLocal(QueueRoleUnassign).Pub(assignedRole)
+		u.queue.GetLocal(QueueRoleUnassign).Pub(&data.AssignRoleDto{
+			IdentityId: assignedRole.IdentityID,
+			TeamId:     *assignedRole.TeamID,
+			RoleId:     assignedRole.RoleID,
+		})
 	}
 
 	return nil
