@@ -3,61 +3,37 @@ package biz
 import (
 	"context"
 
+	"github.com/go-kratos/kratos/v2/log"
 	v1 "gitlab.calendaria.team/services/rbac/api/rbac/v1"
 	"gitlab.calendaria.team/services/rbac/ent"
 	"gitlab.calendaria.team/services/rbac/internal/data"
+	u_nats "gitlab.calendaria.team/services/utils/v1/nats"
 )
 
 // AssignedRolesUsecase .
 type AssignedRolesUsecase struct {
+	log      *log.Helper
 	repo     data.AssignedRolesRepo
 	roleRepo data.RoleRepo
 	teamRepo data.TeamsRepo
+	queue    *u_nats.QueueManager
 }
 
 // NewAssignedRolesUsecase .
 func NewAssignedRolesUsecase(
+	logger log.Logger,
 	repo data.AssignedRolesRepo,
 	roleRepo data.RoleRepo,
 	teamRepo data.TeamsRepo,
+	queue *u_nats.QueueManager,
 ) (*AssignedRolesUsecase, error) {
 	return &AssignedRolesUsecase{
+		log:      log.NewHelper(log.With(logger, "module", "biz/rbac")),
 		repo:     repo,
 		roleRepo: roleRepo,
 		teamRepo: teamRepo,
+		queue:    queue,
 	}, nil
-}
-
-// extractSlice extracts a slice of R from a slice of E using a function that returns
-// a value and a bool. If the bool is true, the value is appended to the result slice.
-//
-// Example:
-//
-//	type Person struct {
-//		Name string
-//		Age  int
-//	}
-//
-//	persons := []Person{
-//		{Name: "Alice", Age: 30},
-//		{Name: "Bob", Age: 35},
-//	}
-//
-//	names := extractSlice(persons, func(p Person) (string, bool) {
-//		return p.Name, true
-//	})
-//
-//	fmt.Println(names) // Output: [Alice Bob]
-//
-// The function is generic and works with any slice of any type.
-func extractSlice[S ~[]E, E, R any](slice S, extract func(E) (R, bool)) []R {
-	result := make([]R, 0, len(slice))
-	for _, item := range slice {
-		if value, ok := extract(item); ok {
-			result = append(result, value)
-		}
-	}
-	return result
 }
 
 // AssignRoles assigns multiple roles to identities.
@@ -69,7 +45,7 @@ func extractSlice[S ~[]E, E, R any](slice S, extract func(E) (R, bool)) []R {
 // - rbac.ErrorAlreadyExists: role already assigned
 // - rbac.ErrorBadRequest: there is no such teamId
 func (u *AssignedRolesUsecase) AssignRoles(ctx context.Context, tenantId int64, dtos []data.AssignRoleDto) error {
-	roleIds := extractSlice(dtos, func(e data.AssignRoleDto) (int64, bool) { return e.RoleId, true })
+	roleIds := data.ExtractSlice(dtos, func(e data.AssignRoleDto) (int64, bool) { return e.RoleId, true })
 	// Get roles by ids
 	_, err := u.roleRepo.GetRolesById(ctx, tenantId, roleIds)
 	if err != nil {
@@ -79,7 +55,7 @@ func (u *AssignedRolesUsecase) AssignRoles(ctx context.Context, tenantId int64, 
 		return v1.ErrorDatabaseQuery("get role failed: %v", err)
 	}
 
-	teamsIds := extractSlice(dtos, func(e data.AssignRoleDto) (int64, bool) {
+	teamsIds := data.ExtractSlice(dtos, func(e data.AssignRoleDto) (int64, bool) {
 		if e.TeamId != 0 {
 			return e.TeamId, true
 		}
@@ -118,6 +94,14 @@ func (u *AssignedRolesUsecase) AssignRoles(ctx context.Context, tenantId int64, 
 		return v1.ErrorDatabaseQuery("assign role failed: %v", err)
 	}
 
+	for _, dto := range dtos {
+		if u.queue == nil {
+			continue
+		}
+
+		u.queue.GetLocal(QueueRoleAssign).Pub(dto)
+	}
+
 	return nil
 }
 
@@ -148,6 +132,10 @@ func (u *AssignedRolesUsecase) AssignRole(ctx context.Context, tenantId int64, d
 		return v1.ErrorDatabaseQuery("assign role failed: %v", err)
 	}
 
+	if u.queue != nil {
+		u.queue.GetLocal(QueueRoleAssign).Pub(dto)
+	}
+
 	return nil
 }
 
@@ -160,7 +148,20 @@ func (u *AssignedRolesUsecase) UnassignRole(ctx context.Context, tenantId, assig
 		return v1.ErrorDatabaseQuery("get assigned role failed: %v", err)
 	}
 
-	return u.repo.UnassignRole(ctx, assignedRole)
+	err = u.repo.UnassignRole(ctx, assignedRole)
+	if err != nil {
+		return v1.ErrorDatabaseQuery("unassign role failed: %v", err)
+	}
+
+	if u.queue != nil {
+		u.queue.GetLocal(QueueRoleUnassign).Pub(&data.AssignRoleDto{
+			IdentityId: assignedRole.IdentityID,
+			TeamId:     *assignedRole.TeamID,
+			RoleId:     assignedRole.RoleID,
+		})
+	}
+
+	return nil
 }
 
 func (u *AssignedRolesUsecase) ListIdentityRoles(ctx context.Context, tenantId int64, identityId string) ([]*ent.TeamIdentityRole, error) {

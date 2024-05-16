@@ -8,8 +8,9 @@ import (
 	"github.com/google/wire"
 	"gitlab.calendaria.team/services/rbac/ent" //nolint:typecheck
 	"gitlab.calendaria.team/services/rbac/internal/conf"
-	"gitlab.calendaria.team/services/utils/v1/config"
-	"gitlab.calendaria.team/services/utils/v1/jwt"
+	u_config "gitlab.calendaria.team/services/utils/v1/config"
+	u_jwt "gitlab.calendaria.team/services/utils/v1/jwt"
+	u_tracing "gitlab.calendaria.team/services/utils/v2/tracing"
 
 	_ "gitlab.calendaria.team/services/rbac/ent/runtime"
 )
@@ -17,8 +18,9 @@ import (
 // ProviderSet is data providers.
 var ProviderSet = wire.NewSet(
 	NewData,
-	config.NewConfig,
-	jwt.NewJwtProcessor,
+	u_config.NewConfig,
+	u_jwt.NewJwtProcessor,
+	u_tracing.NewTracer,
 	NewNatsClient,
 	NewRoleRepo,
 	NewTeamsRepo,
@@ -33,7 +35,7 @@ type Data struct {
 }
 
 // NewData .
-func NewData(bc *conf.Bootstrap, c *config.Config, logger log.Logger) (*Data, func(), error) {
+func NewData(bc *conf.Bootstrap, c *u_config.Config, logger log.Logger) (*Data, func(), error) {
 	l := log.NewHelper(logger)
 
 	dbDsn := bc.Db // read from local config
@@ -79,4 +81,36 @@ func NewData(bc *conf.Bootstrap, c *config.Config, logger log.Logger) (*Data, fu
 		log: log.NewHelper(logger),
 		db:  client,
 	}, cleanup, nil
+}
+
+// extractSlice extracts a slice of R from a slice of E using a function that returns
+// a value and a bool. If the bool is true, the value is appended to the result slice.
+//
+// Example:
+//
+//	type Person struct {
+//		Name string
+//		Age  int
+//	}
+//
+//	persons := []Person{
+//		{Name: "Alice", Age: 30},
+//		{Name: "Bob", Age: 35},
+//	}
+//
+//	names := extractSlice(persons, func(p Person) (string, bool) {
+//		return p.Name, true
+//	})
+//
+//	fmt.Println(names) // Output: [Alice Bob]
+//
+// The function is generic and works with any slice of any type.
+func ExtractSlice[S ~[]E, E, R any](slice S, extract func(E) (R, bool)) []R {
+	result := make([]R, 0, len(slice))
+	for _, item := range slice {
+		if value, ok := extract(item); ok {
+			result = append(result, value)
+		}
+	}
+	return result
 }
