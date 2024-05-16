@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 
+	"github.com/go-kratos/kratos/v2/metadata"
 	v1 "gitlab.calendaria.team/services/rbac/api/rbac/v1"
 	"gitlab.calendaria.team/services/rbac/ent"
 	"gitlab.calendaria.team/services/rbac/internal/biz"
@@ -145,9 +146,21 @@ func (s *RolesService) DeleteRole(ctx context.Context, req *v1.RoleRequest) (*ut
 }
 
 func (s *RolesService) GetRole(ctx context.Context, req *v1.RoleRequest) (*v1.RoleReply, error) {
-	tenantId, _, err := s.sh.HasPermission(ctx, "admin.role.read")
-	if err != nil {
-		return nil, err
+	tenantId := auth.GetTenantIdFromContext(ctx)
+	if tenantId == 0 {
+		return nil, v1.ErrorEmptyActorId("empty tenant id")
+	}
+
+	isAdmin := false
+	if md, ok := metadata.FromServerContext(ctx); ok {
+		isAdmin = md.Get("x-md-global-actor-role") == "admin"
+	}
+
+	if !isAdmin {
+		_, _, err := s.sh.HasPermission(ctx, "admin.role.read")
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	role, err := s.uc.GetRoleById(ctx, tenantId, req.RoleId)
