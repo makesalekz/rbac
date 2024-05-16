@@ -101,13 +101,24 @@ func (s *AssignsService) UnassignRole(ctx context.Context, req *v1.AssignRequest
 }
 
 func (s *AssignsService) ListAssigns(ctx context.Context, req *v1.ListAssignsRequest) (*v1.ListAssignsReply, error) {
-	tenantId, _, err := s.sh.HasPermission(ctx, "admin.role.assign")
-	if err != nil {
-		return nil, err
+	tenantId := auth.GetTenantIdFromContext(ctx)
+	if tenantId == 0 {
+		return nil, v1.ErrorEmptyActorId("empty tenant id")
+	}
+
+	isAdmin := false
+	if md, ok := metadata.FromServerContext(ctx); ok {
+		isAdmin = md.Get("x-md-global-actor-role") == "admin"
+	}
+
+	if !isAdmin {
+		_, _, err := s.sh.HasPermission(ctx, "admin.role.assign")
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	teamsIDs := []int64{}
-
 	if req.GetTeamId() != 0 {
 		teamsIDs = []int64{req.GetTeamId()}
 	}
