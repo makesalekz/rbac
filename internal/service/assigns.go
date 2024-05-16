@@ -106,12 +106,7 @@ func (s *AssignsService) ListAssigns(ctx context.Context, req *v1.ListAssignsReq
 		return nil, err
 	}
 
-	identitiesIDs := []string{}
 	teamsIDs := []int64{}
-
-	if req.GetIdentityId() != "" {
-		identitiesIDs = []string{req.GetIdentityId()}
-	}
 
 	if req.GetTeamId() != 0 {
 		teamsIDs = []int64{req.GetTeamId()}
@@ -119,7 +114,7 @@ func (s *AssignsService) ListAssigns(ctx context.Context, req *v1.ListAssignsReq
 
 	assignedRoles, err := s.uc.ListAssignedRoles(ctx, data.ListRolesDto{
 		TenantId:    tenantId,
-		IdentityIDs: identitiesIDs,
+		IdentityIDs: req.GetIdentityIds(),
 		TeamsIDs:    teamsIDs,
 	})
 	if err != nil {

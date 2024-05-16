@@ -51,7 +51,7 @@ message AssignRequest {
 }
 
 message ListAssignsRequest {
-  string identityId = 1;
+  repeated string identityIds = 3;
   int64 teamId = 2;
 }
 

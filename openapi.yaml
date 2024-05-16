@@ -587,8 +587,10 @@ components:
         rbac.v1.ListAssignsRequest:
             type: object
             properties:
-                identityId:
-                    type: string
+                identityIds:
+                    type: array
+                    items:
+                        type: string
                 teamId:
                     type: string
         rbac.v1.ListOfFields:
