@@ -77,7 +77,7 @@ func (t *assignedRolesRepo) ListAssignedRoles(ctx context.Context, dto ListRoles
 		query.Where(
 			teamidentityrole.Or(
 				teamidentityrole.TeamIDIn(dto.TeamsIDs...),
-				teamidentityrole.TeamIDIsNil(),
+				teamidentityrole.TeamIDIsNil(), //TODO check if that's correct
 			),
 		)
 	}
