@@ -53,5 +53,4 @@ INSERT INTO "role_permissions" ("role_id", "permission_id", "deny", "fields") VA
   (5, 'project.project.read', FALSE, '[]'),
 
 -- Direct particiant limitation
-  (6, 'project.project.read', TRUE, '[]'),
   (6, 'project.project.create', FALSE, '[]');
