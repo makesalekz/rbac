@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+package rbac.v1;
+
+import "google/api/annotations.proto";
+import "api/utils/v1/models.proto";
+import "api/rbac/v1/models.proto";
+
+option go_package = "gitlab.calendaria.team/services/rbac/api/rbac/v1;rbac_v1";
+option java_multiple_files = true;
+option java_package = "rbac.v1";
+
+service Resources {
+    rpc GiveAccessToResource(GiveAccessToResourceRequest) returns (utils.v1.EmptyReply) {
+        option (google.api.http) = {
+            post: "/v1/rbac/resources";
+        };
+    };
+    rpc RevokeAccessToResource(RevokeAccessToResourceRequest) returns (utils.v1.EmptyReply) {
+        option (google.api.http) = {
+            delete: "/v1/rbac/resources/{resource}";
+        };
+    };
+    rpc CheckResourceAccess(CheckResourceAccessRequest) returns (utils.v1.EmptyReply) {
+        option (google.api.http) = {
+            get: "/v1/rbac/check/resource/{resource}"
+        };
+    };
+}
+
+
+message CheckResourceAccessRequest {
+    int64 tenantId = 1;
+    repeated string identities = 2;
+    string resource = 3;
+  }
