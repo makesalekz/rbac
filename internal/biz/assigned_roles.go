@@ -10,6 +10,11 @@ import (
 	u_nats "gitlab.calendaria.team/services/utils/v1/nats"
 )
 
+type AssignRoleMessage struct {
+	data.AssignRoleDto
+	TenantId int64
+}
+
 // AssignedRolesUsecase .
 type AssignedRolesUsecase struct {
 	log      *log.Helper
@@ -99,7 +104,10 @@ func (u *AssignedRolesUsecase) AssignRoles(ctx context.Context, tenantId int64, 
 			continue
 		}
 
-		u.queue.GetLocal(QueueRoleAssign).Pub(dto)
+		u.queue.GetLocal(QueueRoleAssign).Pub(AssignRoleMessage{
+			AssignRoleDto: dto,
+			TenantId:      tenantId,
+		})
 	}
 
 	return nil
@@ -133,7 +141,10 @@ func (u *AssignedRolesUsecase) AssignRole(ctx context.Context, tenantId int64, d
 	}
 
 	if u.queue != nil {
-		u.queue.GetLocal(QueueRoleAssign).Pub(dto)
+		u.queue.GetLocal(QueueRoleAssign).Pub(AssignRoleMessage{
+			AssignRoleDto: dto,
+			TenantId:      tenantId,
+		})
 	}
 
 	return nil
@@ -154,10 +165,13 @@ func (u *AssignedRolesUsecase) UnassignRole(ctx context.Context, tenantId, assig
 	}
 
 	if u.queue != nil {
-		u.queue.GetLocal(QueueRoleUnassign).Pub(&data.AssignRoleDto{
-			IdentityId: assignedRole.IdentityID,
-			TeamId:     *assignedRole.TeamID,
-			RoleId:     assignedRole.RoleID,
+		u.queue.GetLocal(QueueRoleUnassign).Pub(AssignRoleMessage{
+			AssignRoleDto: data.AssignRoleDto{
+				IdentityId: assignedRole.IdentityID,
+				TeamId:     *assignedRole.TeamID,
+				RoleId:     assignedRole.RoleID,
+			},
+			TenantId: tenantId,
 		})
 	}
 
