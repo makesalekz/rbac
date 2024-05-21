@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/go-kratos/kratos/v2/metadata"
 	v1 "gitlab.calendaria.team/services/rbac/api/rbac/v1"
 	"gitlab.calendaria.team/services/rbac/ent"
 	"gitlab.calendaria.team/services/rbac/internal/biz"
@@ -50,9 +51,21 @@ func (s *TeamsService) CreateTeam(ctx context.Context, req *v1.CreateTeamRequest
 }
 
 func (s *TeamsService) UpdateTeam(ctx context.Context, req *v1.UpdateTeamRequest) (*v1.TeamReply, error) {
-	tenantId, _, err := s.sh.HasPermission(ctx, "admin.team.update")
-	if err != nil {
-		return nil, err
+	tenantId := auth.GetTenantIdFromContext(ctx)
+	if tenantId == 0 {
+		return nil, v1.ErrorEmptyActorId("empty tenant id")
+	}
+
+	isAdmin := false
+	if md, ok := metadata.FromServerContext(ctx); ok {
+		isAdmin = md.Get("x-md-global-actor-role") == "admin"
+	}
+
+	if !isAdmin {
+		_, _, err := s.sh.HasPermission(ctx, "admin.team.update")
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	team, err := s.tu.GetTeam(ctx, tenantId, req.GetTeamId(), false)
@@ -73,9 +86,21 @@ func (s *TeamsService) UpdateTeam(ctx context.Context, req *v1.UpdateTeamRequest
 }
 
 func (s *TeamsService) DeleteTeam(ctx context.Context, req *v1.TeamRequest) (*utils_v1.EmptyReply, error) {
-	tenantId, _, err := s.sh.HasPermission(ctx, "admin.team.delete")
-	if err != nil {
-		return nil, err
+	tenantId := auth.GetTenantIdFromContext(ctx)
+	if tenantId == 0 {
+		return nil, v1.ErrorEmptyActorId("empty tenant id")
+	}
+
+	isAdmin := false
+	if md, ok := metadata.FromServerContext(ctx); ok {
+		isAdmin = md.Get("x-md-global-actor-role") == "admin"
+	}
+
+	if !isAdmin {
+		_, _, err := s.sh.HasPermission(ctx, "admin.team.delete")
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	team, err := s.tu.GetTeam(ctx, tenantId, req.GetTeamId(), false)
@@ -91,9 +116,21 @@ func (s *TeamsService) DeleteTeam(ctx context.Context, req *v1.TeamRequest) (*ut
 }
 
 func (s *TeamsService) GetTeam(ctx context.Context, req *v1.TeamRequest) (*v1.TeamReply, error) {
-	tenantId, _, err := s.sh.HasPermission(ctx, "admin.team.read")
-	if err != nil {
-		return nil, err
+	tenantId := auth.GetTenantIdFromContext(ctx)
+	if tenantId == 0 {
+		return nil, v1.ErrorEmptyActorId("empty tenant id")
+	}
+
+	isAdmin := false
+	if md, ok := metadata.FromServerContext(ctx); ok {
+		isAdmin = md.Get("x-md-global-actor-role") == "admin"
+	}
+
+	if !isAdmin {
+		_, _, err := s.sh.HasPermission(ctx, "admin.team.read")
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	team, err := s.tu.GetTeam(ctx, tenantId, req.GetTeamId(), req.GetWithTree())
@@ -107,9 +144,21 @@ func (s *TeamsService) GetTeam(ctx context.Context, req *v1.TeamRequest) (*v1.Te
 }
 
 func (s *TeamsService) ListTeams(ctx context.Context, req *v1.ListTeamsRequest) (*v1.ListTeamsReply, error) {
-	tenantId, _, err := s.sh.HasPermission(ctx, "admin.team.read")
-	if err != nil {
-		return nil, err
+	tenantId := auth.GetTenantIdFromContext(ctx)
+	if tenantId == 0 {
+		return nil, v1.ErrorEmptyActorId("empty tenant id")
+	}
+
+	isAdmin := false
+	if md, ok := metadata.FromServerContext(ctx); ok {
+		isAdmin = md.Get("x-md-global-actor-role") == "admin"
+	}
+
+	if !isAdmin {
+		_, _, err := s.sh.HasPermission(ctx, "admin.team.read")
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	list, err := s.tu.ListTeams(ctx, data.TeamsListFilter{
