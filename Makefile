@@ -142,6 +142,9 @@ cover:
 # generate mock - (example here)
 mock:
 	mockgen -source internal/data/teams.go -destination internal/data/mock/teams.go -package mock
+	mockgen -source internal/data/roles.go -destination internal/data/mock/roles.go -package mock
+	mockgen -source internal/data/assigned_roles.go -destination internal/data/mock/assigned_roles.go -package mock
+	mockgen -source internal/data/permissions.go -destination internal/data/mock/permissions.go -package mock
 
 # show help
 help:

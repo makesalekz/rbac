@@ -35,6 +35,32 @@ func NewAssignsService(
 	}
 }
 
+func (s *AssignsService) AssignRoles(ctx context.Context, req *v1.AssignRolesRequest) (*utils_v1.EmptyReply, error) {
+	tenantId := auth.GetTenantIdFromContext(ctx)
+	if tenantId == 0 {
+		return nil, v1.ErrorEmptyActorId("empty tenant id")
+	}
+
+	isAdmin := false
+	if md, ok := metadata.FromServerContext(ctx); ok {
+		isAdmin = md.Get("x-md-global-actor-role") == "admin"
+	}
+
+	if !isAdmin {
+		_, _, err := s.sh.HasPermission(ctx, "admin.role.assign")
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	err := s.uc.AssignRoles(ctx, tenantId, toDtos(req))
+	if err != nil {
+		return nil, err
+	}
+
+	return &utils_v1.EmptyReply{}, nil
+}
+
 func (s *AssignsService) AssignRole(ctx context.Context, req *v1.AssignRoleRequest) (*utils_v1.EmptyReply, error) {
 	tenantId := auth.GetTenantIdFromContext(ctx)
 	if tenantId == 0 {
@@ -53,12 +79,7 @@ func (s *AssignsService) AssignRole(ctx context.Context, req *v1.AssignRoleReque
 		}
 	}
 
-	err := s.uc.AssignRole(ctx, data.AssignRoleDto{
-		TenantId:   tenantId,
-		RoleId:     req.GetRoleId(),
-		TeamId:     req.GetTeamId(),
-		IdentityId: req.GetIdentityId(),
-	})
+	err := s.uc.AssignRole(ctx, tenantId, toDto(req))
 	if err != nil {
 		return nil, err
 	}
@@ -80,25 +101,31 @@ func (s *AssignsService) UnassignRole(ctx context.Context, req *v1.AssignRequest
 }
 
 func (s *AssignsService) ListAssigns(ctx context.Context, req *v1.ListAssignsRequest) (*v1.ListAssignsReply, error) {
-	tenantId, _, err := s.sh.HasPermission(ctx, "admin.role.assign")
-	if err != nil {
-		return nil, err
+	tenantId := auth.GetTenantIdFromContext(ctx)
+	if tenantId == 0 {
+		return nil, v1.ErrorEmptyActorId("empty tenant id")
 	}
 
-	identitiesIDs := []string{}
+	isAdmin := false
+	if md, ok := metadata.FromServerContext(ctx); ok {
+		isAdmin = md.Get("x-md-global-actor-role") == "admin"
+	}
+
+	if !isAdmin {
+		_, _, err := s.sh.HasPermission(ctx, "admin.role.assign")
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	teamsIDs := []int64{}
-
-	if req.GetIdentityId() != "" {
-		identitiesIDs = []string{req.GetIdentityId()}
-	}
-
 	if req.GetTeamId() != 0 {
 		teamsIDs = []int64{req.GetTeamId()}
 	}
 
 	assignedRoles, err := s.uc.ListAssignedRoles(ctx, data.ListRolesDto{
 		TenantId:    tenantId,
-		IdentityIDs: identitiesIDs,
+		IdentityIDs: req.GetIdentityIds(),
 		TeamsIDs:    teamsIDs,
 	})
 	if err != nil {
@@ -142,4 +169,25 @@ func assignedRolesReply(assignedRoles []*ent.TeamIdentityRole) []*v1.AssignedRol
 		result[i] = assignedRoleReply(assignedRole)
 	}
 	return result
+}
+
+func toDtos(req *v1.AssignRolesRequest) []data.AssignRoleDto {
+	dtos := make([]data.AssignRoleDto, len(req.Assigns))
+	for i, assign := range req.Assigns {
+		dtos[i] = data.AssignRoleDto{
+			RoleId:     assign.GetRoleId(),
+			TeamId:     assign.GetTeamId(),
+			IdentityId: assign.GetIdentityId(),
+		}
+	}
+
+	return dtos
+}
+
+func toDto(req *v1.AssignRoleRequest) data.AssignRoleDto {
+	return data.AssignRoleDto{
+		RoleId:     req.GetRoleId(),
+		TeamId:     req.GetTeamId(),
+		IdentityId: req.GetIdentityId(),
+	}
 }
