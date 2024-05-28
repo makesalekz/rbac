@@ -26,7 +26,7 @@ func (s *CheckPermissionsService) CheckPermissions(ctx context.Context, req *v1.
 	identities := req.Identities
 	tenantId := req.TenantId
 	// use context if request does not have tenantId and identities
-	if len(identities) == 0 {
+	if tenantId == 0 || len(identities) == 0 {
 		tenantId = auth.GetTenantIdFromContext(ctx)
 		if tenantId == 0 {
 			return nil, v1.ErrorEmptyActorId("empty tenant id")

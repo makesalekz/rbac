@@ -4,7 +4,6 @@ import (
 	"context"
 	"time"
 
-	"github.com/go-kratos/kratos/v2/metadata"
 	v1 "gitlab.calendaria.team/services/rbac/api/rbac/v1"
 	"gitlab.calendaria.team/services/rbac/ent"
 	"gitlab.calendaria.team/services/rbac/internal/biz"
@@ -56,18 +55,6 @@ func (s *TeamsService) UpdateTeam(ctx context.Context, req *v1.UpdateTeamRequest
 		return nil, v1.ErrorEmptyActorId("empty tenant id")
 	}
 
-	isAdmin := false
-	if md, ok := metadata.FromServerContext(ctx); ok {
-		isAdmin = md.Get("x-md-global-actor-role") == "admin"
-	}
-
-	if !isAdmin {
-		_, _, err := s.sh.HasPermission(ctx, "admin.team.update")
-		if err != nil {
-			return nil, err
-		}
-	}
-
 	team, err := s.tu.GetTeam(ctx, tenantId, req.GetTeamId(), false)
 	if err != nil {
 		return nil, err
@@ -91,18 +78,6 @@ func (s *TeamsService) DeleteTeam(ctx context.Context, req *v1.TeamRequest) (*ut
 		return nil, v1.ErrorEmptyActorId("empty tenant id")
 	}
 
-	isAdmin := false
-	if md, ok := metadata.FromServerContext(ctx); ok {
-		isAdmin = md.Get("x-md-global-actor-role") == "admin"
-	}
-
-	if !isAdmin {
-		_, _, err := s.sh.HasPermission(ctx, "admin.team.delete")
-		if err != nil {
-			return nil, err
-		}
-	}
-
 	team, err := s.tu.GetTeam(ctx, tenantId, req.GetTeamId(), false)
 	if err != nil {
 		return nil, err
@@ -121,18 +96,6 @@ func (s *TeamsService) GetTeam(ctx context.Context, req *v1.TeamRequest) (*v1.Te
 		return nil, v1.ErrorEmptyActorId("empty tenant id")
 	}
 
-	isAdmin := false
-	if md, ok := metadata.FromServerContext(ctx); ok {
-		isAdmin = md.Get("x-md-global-actor-role") == "admin"
-	}
-
-	if !isAdmin {
-		_, _, err := s.sh.HasPermission(ctx, "admin.team.read")
-		if err != nil {
-			return nil, err
-		}
-	}
-
 	team, err := s.tu.GetTeam(ctx, tenantId, req.GetTeamId(), req.GetWithTree())
 	if err != nil {
 		return nil, err
@@ -147,18 +110,6 @@ func (s *TeamsService) ListTeams(ctx context.Context, req *v1.ListTeamsRequest) 
 	tenantId := auth.GetTenantIdFromContext(ctx)
 	if tenantId == 0 {
 		return nil, v1.ErrorEmptyActorId("empty tenant id")
-	}
-
-	isAdmin := false
-	if md, ok := metadata.FromServerContext(ctx); ok {
-		isAdmin = md.Get("x-md-global-actor-role") == "admin"
-	}
-
-	if !isAdmin {
-		_, _, err := s.sh.HasPermission(ctx, "admin.team.read")
-		if err != nil {
-			return nil, err
-		}
 	}
 
 	list, err := s.tu.ListTeams(ctx, data.TeamsListFilter{

@@ -3,7 +3,6 @@ package service
 import (
 	"context"
 
-	"github.com/go-kratos/kratos/v2/metadata"
 	v1 "gitlab.calendaria.team/services/rbac/api/rbac/v1"
 	"gitlab.calendaria.team/services/rbac/ent"
 	"gitlab.calendaria.team/services/rbac/internal/biz"
@@ -39,14 +38,9 @@ func NewRolesService(
 }
 
 func (s *RolesService) CreateRole(ctx context.Context, req *v1.CreateRoleRequest) (*v1.RoleReply, error) {
-	permissionToCheck := "admin.role.create"
-	if req.IsSystem {
-		permissionToCheck = "admin.role_system.create"
-	}
-
-	tenantId, _, err := s.sh.HasPermission(ctx, permissionToCheck)
-	if err != nil {
-		return nil, err
+	tenantId := auth.GetTenantIdFromContext(ctx)
+	if tenantId == 0 {
+		return nil, v1.ErrorEmptyActorId("empty tenant id")
 	}
 
 	role, err := s.uc.CreateRole(ctx, data.CreateRoleDto{
@@ -71,30 +65,7 @@ func (s *RolesService) UpdateRole(ctx context.Context, req *v1.UpdateRoleRequest
 		return nil, v1.ErrorEmptyActorId("empty tenant id")
 	}
 
-	role, err := s.uc.GetRoleById(ctx, tenantId, req.RoleId)
-	if err != nil {
-		return nil, err
-	}
-
-	permissionToCheck := "admin.role.update"
-	if role.IsSystem {
-		permissionToCheck = "admin.role_system.update"
-	}
-
-	identities := auth.GetIdentitiesFromContext(ctx)
-	if len(identities) == 0 {
-		return nil, v1.ErrorEmptyActorId("empty identities")
-	}
-
-	fields, err := s.check.HasPermission(ctx, tenantId, identities, permissionToCheck)
-	if err != nil {
-		return nil, err
-	}
-	if fields == nil {
-		return nil, v1.ErrorForbidden("has no permission")
-	}
-
-	updated, err := s.uc.UpdateRole(ctx, role, data.UpdateRoleDto{
+	updated, err := s.uc.UpdateRole(ctx, tenantId, req.RoleId, data.UpdateRoleDto{
 		Name:        req.Name,
 		Description: req.Description,
 		Allow:       req.Allow,
@@ -115,30 +86,7 @@ func (s *RolesService) DeleteRole(ctx context.Context, req *v1.RoleRequest) (*ut
 		return nil, v1.ErrorEmptyActorId("empty tenant id")
 	}
 
-	role, err := s.uc.GetRoleById(ctx, tenantId, req.RoleId)
-	if err != nil {
-		return nil, err
-	}
-
-	permissionToCheck := "admin.role.delete"
-	if role.IsSystem {
-		permissionToCheck = "admin.role_system.delete"
-	}
-
-	identities := auth.GetIdentitiesFromContext(ctx)
-	if len(identities) == 0 {
-		return nil, v1.ErrorEmptyActorId("empty identities")
-	}
-
-	fields, err := s.check.HasPermission(ctx, tenantId, identities, permissionToCheck)
-	if err != nil {
-		return nil, err
-	}
-	if fields == nil {
-		return nil, v1.ErrorForbidden("has no permission")
-	}
-
-	err = s.uc.DeleteRole(ctx, role)
+	err := s.uc.DeleteRole(ctx, tenantId, req.RoleId)
 	if err != nil {
 		return nil, err
 	}
@@ -149,18 +97,6 @@ func (s *RolesService) GetRole(ctx context.Context, req *v1.RoleRequest) (*v1.Ro
 	tenantId := auth.GetTenantIdFromContext(ctx)
 	if tenantId == 0 {
 		return nil, v1.ErrorEmptyActorId("empty tenant id")
-	}
-
-	isAdmin := false
-	if md, ok := metadata.FromServerContext(ctx); ok {
-		isAdmin = md.Get("x-md-global-actor-role") == "admin"
-	}
-
-	if !isAdmin {
-		_, _, err := s.sh.HasPermission(ctx, "admin.role.read")
-		if err != nil {
-			return nil, err
-		}
 	}
 
 	role, err := s.uc.GetRoleById(ctx, tenantId, req.RoleId)
@@ -178,18 +114,6 @@ func (s *RolesService) ListRoles(ctx context.Context, req *v1.ListRolesRequest) 
 		return nil, v1.ErrorEmptyActorId("empty tenant id")
 	}
 
-	isAdmin := false
-	if md, ok := metadata.FromServerContext(ctx); ok {
-		isAdmin = md.Get("x-md-global-actor-role") == "admin"
-	}
-
-	if !isAdmin {
-		_, _, err := s.sh.HasPermission(ctx, "admin.role.read")
-		if err != nil {
-			return nil, err
-		}
-	}
-
 	roles, err := s.uc.GetRoles(ctx, tenantId, req.Search)
 	if err != nil {
 		return nil, err
@@ -205,14 +129,9 @@ func (s *RolesService) ListRoles(ctx context.Context, req *v1.ListRolesRequest) 
 }
 
 func (s *RolesService) AddPermissionToRole(ctx context.Context, req *v1.AddPermissionToRoleRequest) (*utils_v1.EmptyReply, error) {
-	tenantId, _, err := s.sh.HasPermission(ctx, "admin.role.update")
-	if err != nil {
-		return nil, err
-	}
-
-	role, err := s.uc.GetRoleById(ctx, tenantId, req.RoleId)
-	if err != nil {
-		return nil, err
+	tenantId := auth.GetTenantIdFromContext(ctx)
+	if tenantId == 0 {
+		return nil, v1.ErrorEmptyActorId("empty tenant id")
 	}
 
 	permission, err := s.pu.GetPermissionById(ctx, req.PermissionId)
@@ -220,7 +139,7 @@ func (s *RolesService) AddPermissionToRole(ctx context.Context, req *v1.AddPermi
 		return nil, err
 	}
 
-	err = s.uc.SetRolePermission(ctx, role, permission, data.CreateRolePermissionDto{
+	err = s.uc.SetRolePermission(ctx, tenantId, req.RoleId, permission, data.CreateRolePermissionDto{
 		Fields: req.Fields,
 		Deny:   *req.Deny,
 	})
@@ -231,14 +150,9 @@ func (s *RolesService) AddPermissionToRole(ctx context.Context, req *v1.AddPermi
 }
 
 func (s *RolesService) RemovePermissionFromRole(ctx context.Context, req *v1.RemovePermissionFromRoleRequest) (*utils_v1.EmptyReply, error) {
-	tenantId, _, err := s.sh.HasPermission(ctx, "admin.role.update")
-	if err != nil {
-		return nil, err
-	}
-
-	role, err := s.uc.GetRoleById(ctx, tenantId, req.RoleId)
-	if err != nil {
-		return nil, err
+	tenantId := auth.GetTenantIdFromContext(ctx)
+	if tenantId == 0 {
+		return nil, v1.ErrorEmptyActorId("empty tenant id")
 	}
 
 	permission, err := s.pu.GetPermissionById(ctx, req.PermissionId)
@@ -246,7 +160,7 @@ func (s *RolesService) RemovePermissionFromRole(ctx context.Context, req *v1.Rem
 		return nil, err
 	}
 
-	err = s.uc.RemovePermissionFromRole(ctx, role, permission)
+	err = s.uc.RemovePermissionFromRole(ctx, tenantId, req.RoleId, permission)
 	if err != nil {
 		return nil, err
 	}
@@ -259,24 +173,7 @@ func (s *RolesService) ListRolePermissions(ctx context.Context, req *v1.RoleRequ
 		return nil, v1.ErrorEmptyActorId("empty tenant id")
 	}
 
-	isAdmin := false
-	if md, ok := metadata.FromServerContext(ctx); ok {
-		isAdmin = md.Get("x-md-global-actor-role") == "admin"
-	}
-
-	if !isAdmin {
-		_, _, err := s.sh.HasPermission(ctx, "admin.role.read")
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	role, err := s.uc.GetRoleById(ctx, tenantId, req.RoleId)
-	if err != nil {
-		return nil, err
-	}
-
-	rolePermissions, err := s.uc.ListRolePermissions(ctx, role)
+	rolePermissions, err := s.uc.ListRolePermissions(ctx, tenantId, req.RoleId)
 	if err != nil {
 		return nil, err
 	}

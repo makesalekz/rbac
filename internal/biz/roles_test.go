@@ -66,19 +66,6 @@ func TestRolesUsecase_UpdateRole(t *testing.T) {
 	tenantId := int64(1)
 	roleId := int64(1)
 
-	role := &ent.Role{
-		ID:          roleId,
-		TenantID:    tenantId,
-		Name:        "testName",
-		Description: "testDesc",
-	}
-	systemRole := &ent.Role{
-		ID:          roleId,
-		TenantID:    tenantId,
-		Name:        "testName",
-		Description: "testDesc",
-		IsSystem:    true,
-	}
 	dto := data.UpdateRoleDto{
 		Name:        "updName",
 		Description: "updDesc",
@@ -89,16 +76,11 @@ func TestRolesUsecase_UpdateRole(t *testing.T) {
 		Name:        "updName",
 		Description: "updDesc",
 	}
-	rolesRepo.EXPECT().UpdateRole(ctx, role, dto).Return(roleUpdated, nil)
+	rolesRepo.EXPECT().UpdateRole(ctx, tenantId, roleId, dto).Return(roleUpdated, nil)
 
-	role1, err := uc.UpdateRole(ctx, role, dto)
+	role1, err := uc.UpdateRole(ctx, tenantId, roleId, dto)
 	require.NoError(t, err)
 	require.Equal(t, roleUpdated, role1)
-
-	role2, err := uc.UpdateRole(ctx, systemRole, dto)
-	require.Error(t, err)
-	require.Equal(t, v1.ErrorForbidden("unable to edit system role"), err)
-	require.Nil(t, role2)
 }
 
 func TestRolesUsecase_DeleteRole(t *testing.T) {
@@ -114,27 +96,10 @@ func TestRolesUsecase_DeleteRole(t *testing.T) {
 	tenantId := int64(1)
 	roleId := int64(1)
 
-	role := &ent.Role{
-		ID:          roleId,
-		TenantID:    tenantId,
-		Name:        "testName",
-		Description: "testDesc",
-	}
-	systemRole := &ent.Role{
-		ID:          roleId,
-		TenantID:    tenantId,
-		Name:        "testName",
-		Description: "testDesc",
-		IsSystem:    true,
-	}
-	rolesRepo.EXPECT().DeleteRole(ctx, role).Return(nil)
+	rolesRepo.EXPECT().DeleteRole(ctx, tenantId, roleId).Return(nil)
 
-	err = uc.DeleteRole(ctx, role)
+	err = uc.DeleteRole(ctx, tenantId, roleId)
 	require.NoError(t, err)
-
-	err = uc.DeleteRole(ctx, systemRole)
-	require.Error(t, err)
-	require.Equal(t, v1.ErrorForbidden("unable to delete system role"), err)
 }
 
 func TestRolesUsecase_GetRoles(t *testing.T) {
@@ -197,12 +162,6 @@ func TestRolesUsecase_CreateRole(t *testing.T) {
 	role1, err := uc.CreateRole(ctx, createRoleDto)
 	require.NoError(t, err)
 	require.Equal(t, role, role1)
-
-	createRoleDto.IsSystem = true
-	role2, err := uc.CreateRole(ctx, createRoleDto)
-	require.Error(t, err)
-	require.Equal(t, v1.ErrorForbidden("unable to create system role"), err)
-	require.Nil(t, role2)
 }
 
 func TestRolesUsecase_SetRolePermission(t *testing.T) {
@@ -219,19 +178,6 @@ func TestRolesUsecase_SetRolePermission(t *testing.T) {
 	roleId := int64(1)
 	permissionId := "some.permission"
 
-	role := &ent.Role{
-		ID:          roleId,
-		TenantID:    tenantId,
-		Name:        "testName",
-		Description: "testDesc",
-	}
-	systemRole := &ent.Role{
-		ID:          roleId,
-		TenantID:    tenantId,
-		Name:        "testName",
-		Description: "testDesc",
-		IsSystem:    true,
-	}
 	permission := &ent.Permission{
 		ID:          permissionId,
 		Name:        "testName",
@@ -244,16 +190,12 @@ func TestRolesUsecase_SetRolePermission(t *testing.T) {
 	dto2 := data.CreateRolePermissionDto{
 		Fields: []string{"field3"},
 	}
-	rolesRepo.EXPECT().SetRolePermission(ctx, role, permission, dto).Return(nil)
+	rolesRepo.EXPECT().SetRolePermission(ctx, tenantId, roleId, permission, dto).Return(nil)
 
-	err = uc.SetRolePermission(ctx, role, permission, dto)
+	err = uc.SetRolePermission(ctx, tenantId, roleId, permission, dto)
 	require.NoError(t, err)
 
-	err = uc.SetRolePermission(ctx, systemRole, permission, dto)
-	require.Error(t, err)
-	require.Equal(t, v1.ErrorForbidden("unable to edit system role"), err)
-
-	err = uc.SetRolePermission(ctx, role, permission, dto2)
+	err = uc.SetRolePermission(ctx, tenantId, roleId, permission, dto2)
 	require.Error(t, err)
 	require.Equal(t, v1.ErrorBadRequest("fields not valid"), err)
 }
@@ -272,33 +214,16 @@ func TestRolesUsecase_RemovePermissionFromRole(t *testing.T) {
 	roleId := int64(1)
 	permissionId := "some.permission"
 
-	role := &ent.Role{
-		ID:          roleId,
-		TenantID:    tenantId,
-		Name:        "testName",
-		Description: "testDesc",
-	}
-	systemRole := &ent.Role{
-		ID:          roleId,
-		TenantID:    tenantId,
-		Name:        "testName",
-		Description: "testDesc",
-		IsSystem:    true,
-	}
 	permission := &ent.Permission{
 		ID:          permissionId,
 		Name:        "testName",
 		Description: "testDesc",
 		Fields:      []string{"field1", "field2"},
 	}
-	rolesRepo.EXPECT().RemovePermissionFromRole(ctx, role, permission).Return(nil)
+	rolesRepo.EXPECT().RemovePermissionFromRole(ctx, tenantId, roleId, permission).Return(nil)
 
-	err = uc.RemovePermissionFromRole(ctx, role, permission)
+	err = uc.RemovePermissionFromRole(ctx, tenantId, roleId, permission)
 	require.NoError(t, err)
-
-	err = uc.RemovePermissionFromRole(ctx, systemRole, permission)
-	require.Error(t, err)
-	require.Equal(t, v1.ErrorForbidden("unable to edit system role"), err)
 }
 
 func TestRolesUsecase_ListRolePermissions(t *testing.T) {
@@ -314,12 +239,6 @@ func TestRolesUsecase_ListRolePermissions(t *testing.T) {
 	tenantId := int64(1)
 	roleId := int64(1)
 
-	role := &ent.Role{
-		ID:          roleId,
-		TenantID:    tenantId,
-		Name:        "testName",
-		Description: "testDesc",
-	}
 	permissions := []*ent.RolePermission{
 		{
 			ID:           1,
@@ -336,9 +255,9 @@ func TestRolesUsecase_ListRolePermissions(t *testing.T) {
 			Fields:       []string{"field3", "field4"},
 		},
 	}
-	rolesRepo.EXPECT().ListRolePermissions(ctx, role).Return(permissions, nil)
+	rolesRepo.EXPECT().ListRolePermissions(ctx, tenantId, roleId).Return(permissions, nil)
 
-	permissions1, err := uc.ListRolePermissions(ctx, role)
+	permissions1, err := uc.ListRolePermissions(ctx, tenantId, roleId)
 	require.NoError(t, err)
 	require.Equal(t, permissions, permissions1)
 }

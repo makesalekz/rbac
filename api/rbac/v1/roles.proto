@@ -11,53 +11,14 @@ option java_multiple_files = true;
 option java_package = "rbac.v1";
 
 service Roles {
-  rpc CreateRole(CreateRoleRequest) returns (RoleReply) {
-    option (google.api.http) = {
-      post: "/v1/rbac/roles"
-      body: "*"
-    };
-  };
-  rpc UpdateRole(UpdateRoleRequest) returns (RoleReply) {
-    option (google.api.http) = {
-      put: "/v1/rbac/roles/{roleId}"
-      body: "*"
-    };
-  };
-  rpc DeleteRole(RoleRequest) returns (utils.v1.EmptyReply) {
-    option (google.api.http) = {
-      delete: "/v1/rbac/roles/{roleId}"
-    };
-  };
-  rpc GetRole(RoleRequest) returns (RoleReply) {
-    option (google.api.http) = {
-      get: "/v1/rbac/roles/{roleId}"
-    };
-  };
-  rpc ListRoles(ListRolesRequest) returns (ListRolesReply) {
-    option (google.api.http) = {
-      post: "/v1/rbac/roles/list"
-      body: "*"
-    };
-  };
-  rpc AddPermissionToRole(AddPermissionToRoleRequest)
-      returns (utils.v1.EmptyReply) {
-    option (google.api.http) = {
-      post: "/v1/rbac/roles/{roleId}/permissions"
-      body: "*"
-    };
-  };
-  rpc RemovePermissionFromRole(RemovePermissionFromRoleRequest)
-      returns (utils.v1.EmptyReply) {
-    option (google.api.http) = {
-      delete: "/v1/rbac/roles/{roleId}/permissions/{permissionId}"
-    };
-  };
-  rpc ListRolePermissions(RoleRequest) returns (RolePermissionsReply) {
-    option (google.api.http) = {
-      post: "/v1/rbac/roles/{roleId}/permissions/list"
-      body: "*"
-    };
-  };
+  rpc CreateRole(CreateRoleRequest) returns (RoleReply);
+  rpc UpdateRole(UpdateRoleRequest) returns (RoleReply);
+  rpc DeleteRole(RoleRequest) returns (utils.v1.EmptyReply);
+  rpc GetRole(RoleRequest) returns (RoleReply);
+  rpc ListRoles(ListRolesRequest) returns (ListRolesReply);
+  rpc AddPermissionToRole(AddPermissionToRoleRequest) returns (utils.v1.EmptyReply);
+  rpc RemovePermissionFromRole(RemovePermissionFromRoleRequest) returns (utils.v1.EmptyReply);
+  rpc ListRolePermissions(RoleRequest) returns (RolePermissionsReply);
 }
 
 message CreateRoleRequest {
