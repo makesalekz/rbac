@@ -11,6 +11,8 @@ import (
 	"gitlab.calendaria.team/services/rbac/ent/permission"
 	"gitlab.calendaria.team/services/rbac/ent/permissiongroup"
 	"gitlab.calendaria.team/services/rbac/ent/predicate"
+	"gitlab.calendaria.team/services/rbac/ent/resourceaccess"
+	"gitlab.calendaria.team/services/rbac/ent/resourcetype"
 	"gitlab.calendaria.team/services/rbac/ent/role"
 	"gitlab.calendaria.team/services/rbac/ent/rolepermission"
 	"gitlab.calendaria.team/services/rbac/ent/team"
@@ -125,6 +127,60 @@ func (f TraversePermissionGroup) Traverse(ctx context.Context, q ent.Query) erro
 		return f(ctx, q)
 	}
 	return fmt.Errorf("unexpected query type %T. expect *ent.PermissionGroupQuery", q)
+}
+
+// The ResourceAccessFunc type is an adapter to allow the use of ordinary function as a Querier.
+type ResourceAccessFunc func(context.Context, *ent.ResourceAccessQuery) (ent.Value, error)
+
+// Query calls f(ctx, q).
+func (f ResourceAccessFunc) Query(ctx context.Context, q ent.Query) (ent.Value, error) {
+	if q, ok := q.(*ent.ResourceAccessQuery); ok {
+		return f(ctx, q)
+	}
+	return nil, fmt.Errorf("unexpected query type %T. expect *ent.ResourceAccessQuery", q)
+}
+
+// The TraverseResourceAccess type is an adapter to allow the use of ordinary function as Traverser.
+type TraverseResourceAccess func(context.Context, *ent.ResourceAccessQuery) error
+
+// Intercept is a dummy implementation of Intercept that returns the next Querier in the pipeline.
+func (f TraverseResourceAccess) Intercept(next ent.Querier) ent.Querier {
+	return next
+}
+
+// Traverse calls f(ctx, q).
+func (f TraverseResourceAccess) Traverse(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.ResourceAccessQuery); ok {
+		return f(ctx, q)
+	}
+	return fmt.Errorf("unexpected query type %T. expect *ent.ResourceAccessQuery", q)
+}
+
+// The ResourceTypeFunc type is an adapter to allow the use of ordinary function as a Querier.
+type ResourceTypeFunc func(context.Context, *ent.ResourceTypeQuery) (ent.Value, error)
+
+// Query calls f(ctx, q).
+func (f ResourceTypeFunc) Query(ctx context.Context, q ent.Query) (ent.Value, error) {
+	if q, ok := q.(*ent.ResourceTypeQuery); ok {
+		return f(ctx, q)
+	}
+	return nil, fmt.Errorf("unexpected query type %T. expect *ent.ResourceTypeQuery", q)
+}
+
+// The TraverseResourceType type is an adapter to allow the use of ordinary function as Traverser.
+type TraverseResourceType func(context.Context, *ent.ResourceTypeQuery) error
+
+// Intercept is a dummy implementation of Intercept that returns the next Querier in the pipeline.
+func (f TraverseResourceType) Intercept(next ent.Querier) ent.Querier {
+	return next
+}
+
+// Traverse calls f(ctx, q).
+func (f TraverseResourceType) Traverse(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.ResourceTypeQuery); ok {
+		return f(ctx, q)
+	}
+	return fmt.Errorf("unexpected query type %T. expect *ent.ResourceTypeQuery", q)
 }
 
 // The RoleFunc type is an adapter to allow the use of ordinary function as a Querier.
@@ -242,6 +298,10 @@ func NewQuery(q ent.Query) (Query, error) {
 		return &query[*ent.PermissionQuery, predicate.Permission, permission.OrderOption]{typ: ent.TypePermission, tq: q}, nil
 	case *ent.PermissionGroupQuery:
 		return &query[*ent.PermissionGroupQuery, predicate.PermissionGroup, permissiongroup.OrderOption]{typ: ent.TypePermissionGroup, tq: q}, nil
+	case *ent.ResourceAccessQuery:
+		return &query[*ent.ResourceAccessQuery, predicate.ResourceAccess, resourceaccess.OrderOption]{typ: ent.TypeResourceAccess, tq: q}, nil
+	case *ent.ResourceTypeQuery:
+		return &query[*ent.ResourceTypeQuery, predicate.ResourceType, resourcetype.OrderOption]{typ: ent.TypeResourceType, tq: q}, nil
 	case *ent.RoleQuery:
 		return &query[*ent.RoleQuery, predicate.Role, role.OrderOption]{typ: ent.TypeRole, tq: q}, nil
 	case *ent.RolePermissionQuery:

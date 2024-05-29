@@ -33,6 +33,30 @@ func (f PermissionGroupFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Va
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.PermissionGroupMutation", m)
 }
 
+// The ResourceAccessFunc type is an adapter to allow the use of ordinary
+// function as ResourceAccess mutator.
+type ResourceAccessFunc func(context.Context, *ent.ResourceAccessMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ResourceAccessFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ResourceAccessMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ResourceAccessMutation", m)
+}
+
+// The ResourceTypeFunc type is an adapter to allow the use of ordinary
+// function as ResourceType mutator.
+type ResourceTypeFunc func(context.Context, *ent.ResourceTypeMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ResourceTypeFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ResourceTypeMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ResourceTypeMutation", m)
+}
+
 // The RoleFunc type is an adapter to allow the use of ordinary
 // function as Role mutator.
 type RoleFunc func(context.Context, *ent.RoleMutation) (ent.Value, error)

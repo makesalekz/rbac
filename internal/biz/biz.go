@@ -1,8 +1,9 @@
 package biz
 
 import (
+	u_nats "gitlab.calendaria.team/services/utils/v1/nats"
+
 	"github.com/google/wire"
-	"gitlab.calendaria.team/services/utils/v1/nats"
 )
 
 var (
@@ -12,7 +13,7 @@ var (
 
 // ProviderSet is biz providers.
 var ProviderSet = wire.NewSet(
-	nats.NewQueueManager,
+	u_nats.NewQueueManager,
 	NewPermissionsUsecase,
 	NewRolesUsecase,
 	NewAssignedRolesUsecase,

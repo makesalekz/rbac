@@ -12,6 +12,12 @@ type Permission func(*sql.Selector)
 // PermissionGroup is the predicate function for permissiongroup builders.
 type PermissionGroup func(*sql.Selector)
 
+// ResourceAccess is the predicate function for resourceaccess builders.
+type ResourceAccess func(*sql.Selector)
+
+// ResourceType is the predicate function for resourcetype builders.
+type ResourceType func(*sql.Selector)
+
 // Role is the predicate function for role builders.
 type Role func(*sql.Selector)
 

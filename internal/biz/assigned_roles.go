@@ -21,7 +21,7 @@ type AssignedRolesUsecase struct {
 	repo     data.AssignedRolesRepo
 	roleRepo data.RoleRepo
 	teamRepo data.TeamsRepo
-	queue    *u_nats.QueueManager
+	qm       *u_nats.QueueManager
 }
 
 // NewAssignedRolesUsecase .
@@ -30,14 +30,14 @@ func NewAssignedRolesUsecase(
 	repo data.AssignedRolesRepo,
 	roleRepo data.RoleRepo,
 	teamRepo data.TeamsRepo,
-	queue *u_nats.QueueManager,
+	qm *u_nats.QueueManager,
 ) (*AssignedRolesUsecase, error) {
 	return &AssignedRolesUsecase{
 		log:      log.NewHelper(log.With(logger, "module", "biz/rbac")),
 		repo:     repo,
 		roleRepo: roleRepo,
 		teamRepo: teamRepo,
-		queue:    queue,
+		qm:       qm,
 	}, nil
 }
 
@@ -99,15 +99,16 @@ func (u *AssignedRolesUsecase) AssignRoles(ctx context.Context, tenantId int64, 
 		return v1.ErrorDatabaseQuery("assign role failed: %v", err)
 	}
 
-	for _, dto := range dtos {
-		if u.queue == nil {
-			continue
-		}
+	// TODO: remove check, with mock for QueueManager
+	if u.qm != nil {
+		queue := u.qm.GetLocal(QueueRoleAssign)
 
-		u.queue.GetLocal(QueueRoleAssign).Pub(AssignRoleMessage{
-			AssignRoleDto: dto,
-			TenantId:      tenantId,
-		})
+		for _, dto := range dtos {
+			queue.Pub(AssignRoleMessage{
+				AssignRoleDto: dto,
+				TenantId:      tenantId,
+			})
+		}
 	}
 
 	return nil
@@ -140,8 +141,9 @@ func (u *AssignedRolesUsecase) AssignRole(ctx context.Context, tenantId int64, d
 		return v1.ErrorDatabaseQuery("assign role failed: %v", err)
 	}
 
-	if u.queue != nil {
-		u.queue.GetLocal(QueueRoleAssign).Pub(AssignRoleMessage{
+	// TODO: remove check, with mock for QueueManager
+	if u.qm != nil {
+		u.qm.GetLocal(QueueRoleAssign).Pub(AssignRoleMessage{
 			AssignRoleDto: dto,
 			TenantId:      tenantId,
 		})
@@ -164,12 +166,27 @@ func (u *AssignedRolesUsecase) UnassignRole(ctx context.Context, tenantId, assig
 		return v1.ErrorDatabaseQuery("unassign role failed: %v", err)
 	}
 
-	if u.queue != nil {
-		u.queue.GetLocal(QueueRoleUnassign).Pub(AssignRoleMessage{
+	// TODO: remove check, with mock for QueueManager
+	if u.qm != nil {
+		var resource *v1.Resource
+		var teamId int64
+		if assignedRole.ResourceID != nil {
+			resource = &v1.Resource{
+				Type: *assignedRole.ResourceType,
+				Id:   *assignedRole.ResourceID,
+			}
+
+			if *assignedRole.ResourceType == data.RESOURCE_TYPE_TEAM { // for backward compatibility
+				teamId = *assignedRole.ResourceID
+			}
+		}
+
+		u.qm.GetLocal(QueueRoleUnassign).Pub(AssignRoleMessage{
 			AssignRoleDto: data.AssignRoleDto{
 				IdentityId: assignedRole.IdentityID,
-				TeamId:     *assignedRole.TeamID,
 				RoleId:     assignedRole.RoleID,
+				TeamId:     teamId,
+				Resource:   resource,
 			},
 			TenantId: tenantId,
 		})
@@ -178,13 +195,6 @@ func (u *AssignedRolesUsecase) UnassignRole(ctx context.Context, tenantId, assig
 	return nil
 }
 
-func (u *AssignedRolesUsecase) ListIdentityRoles(ctx context.Context, tenantId int64, identityId string) ([]*ent.TeamIdentityRole, error) {
-	return u.repo.ListAssignedRoles(ctx, data.ListRolesDto{
-		TenantId:    tenantId,
-		IdentityIDs: []string{identityId},
-	})
-}
-
-func (u *AssignedRolesUsecase) ListAssignedRoles(ctx context.Context, dto data.ListRolesDto) ([]*ent.TeamIdentityRole, error) {
-	return u.repo.ListAssignedRoles(ctx, dto)
+func (u *AssignedRolesUsecase) ListAssignedRoles(ctx context.Context, tenantId int64, identities []string, resource *v1.Resource) ([]*ent.ResourceAccess, error) {
+	return u.repo.ListAssignedRoles(ctx, tenantId, identities, resource)
 }

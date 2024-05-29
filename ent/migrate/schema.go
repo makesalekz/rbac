@@ -44,6 +44,64 @@ var (
 		Columns:    PermissionGroupsColumns,
 		PrimaryKey: []*schema.Column{PermissionGroupsColumns[0]},
 	}
+	// ResourceAccessesColumns holds the columns for the "resource_accesses" table.
+	ResourceAccessesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt64, Increment: true},
+		{Name: "tenant_id", Type: field.TypeInt64},
+		{Name: "resource_id", Type: field.TypeInt64, Nullable: true},
+		{Name: "identity_id", Type: field.TypeString, Default: ""},
+		{Name: "role_id", Type: field.TypeInt64},
+		{Name: "resource_type", Type: field.TypeString, Nullable: true},
+	}
+	// ResourceAccessesTable holds the schema information for the "resource_accesses" table.
+	ResourceAccessesTable = &schema.Table{
+		Name:       "resource_accesses",
+		Columns:    ResourceAccessesColumns,
+		PrimaryKey: []*schema.Column{ResourceAccessesColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "resource_accesses_roles_role",
+				Columns:    []*schema.Column{ResourceAccessesColumns[4]},
+				RefColumns: []*schema.Column{RolesColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "resource_accesses_resource_types_type",
+				Columns:    []*schema.Column{ResourceAccessesColumns[5]},
+				RefColumns: []*schema.Column{ResourceTypesColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "resourceaccess_tenant_id_role_id_identity_id_resource_type_resource_id",
+				Unique:  true,
+				Columns: []*schema.Column{ResourceAccessesColumns[1], ResourceAccessesColumns[4], ResourceAccessesColumns[3], ResourceAccessesColumns[5], ResourceAccessesColumns[2]},
+				Annotation: &entsql.IndexAnnotation{
+					Where: "resource_id IS NOT NULL",
+				},
+			},
+			{
+				Name:    "resourceaccess_tenant_id_role_id_identity_id",
+				Unique:  true,
+				Columns: []*schema.Column{ResourceAccessesColumns[1], ResourceAccessesColumns[4], ResourceAccessesColumns[3]},
+				Annotation: &entsql.IndexAnnotation{
+					Where: "resource_id IS NULL",
+				},
+			},
+		},
+	}
+	// ResourceTypesColumns holds the columns for the "resource_types" table.
+	ResourceTypesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString},
+		{Name: "description", Type: field.TypeString, Nullable: true, Default: ""},
+	}
+	// ResourceTypesTable holds the schema information for the "resource_types" table.
+	ResourceTypesTable = &schema.Table{
+		Name:       "resource_types",
+		Columns:    ResourceTypesColumns,
+		PrimaryKey: []*schema.Column{ResourceTypesColumns[0]},
+	}
 	// RolesColumns holds the columns for the "roles" table.
 	RolesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt64, Increment: true},
@@ -54,12 +112,21 @@ var (
 		{Name: "is_system", Type: field.TypeBool, Default: false},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "resource_type_roles", Type: field.TypeString, Nullable: true},
 	}
 	// RolesTable holds the schema information for the "roles" table.
 	RolesTable = &schema.Table{
 		Name:       "roles",
 		Columns:    RolesColumns,
 		PrimaryKey: []*schema.Column{RolesColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "roles_resource_types_roles",
+				Columns:    []*schema.Column{RolesColumns[8]},
+				RefColumns: []*schema.Column{ResourceTypesColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
 	}
 	// RolePermissionsColumns holds the columns for the "role_permissions" table.
 	RolePermissionsColumns = []*schema.Column{
@@ -173,6 +240,8 @@ var (
 	Tables = []*schema.Table{
 		PermissionsTable,
 		PermissionGroupsTable,
+		ResourceAccessesTable,
+		ResourceTypesTable,
 		RolesTable,
 		RolePermissionsTable,
 		TeamsTable,
@@ -182,6 +251,9 @@ var (
 
 func init() {
 	PermissionsTable.ForeignKeys[0].RefTable = PermissionGroupsTable
+	ResourceAccessesTable.ForeignKeys[0].RefTable = RolesTable
+	ResourceAccessesTable.ForeignKeys[1].RefTable = ResourceTypesTable
+	RolesTable.ForeignKeys[0].RefTable = ResourceTypesTable
 	RolePermissionsTable.ForeignKeys[0].RefTable = PermissionsTable
 	RolePermissionsTable.ForeignKeys[1].RefTable = RolesTable
 	TeamsTable.ForeignKeys[0].RefTable = TeamsTable

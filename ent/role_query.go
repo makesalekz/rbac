@@ -24,6 +24,7 @@ type RoleQuery struct {
 	inters          []Interceptor
 	predicates      []predicate.Role
 	withPermissions *RolePermissionQuery
+	withFKs         bool
 	modifiers       []func(*sql.Selector)
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
@@ -370,11 +371,15 @@ func (rq *RoleQuery) prepareQuery(ctx context.Context) error {
 func (rq *RoleQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Role, error) {
 	var (
 		nodes       = []*Role{}
+		withFKs     = rq.withFKs
 		_spec       = rq.querySpec()
 		loadedTypes = [1]bool{
 			rq.withPermissions != nil,
 		}
 	)
+	if withFKs {
+		_spec.Node.Columns = append(_spec.Node.Columns, role.ForeignKeys...)
+	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Role).scanValues(nil, columns)
 	}

@@ -81,16 +81,7 @@ func (s *AssignsService) ListAssigns(ctx context.Context, req *v1.ListAssignsReq
 		return nil, v1.ErrorEmptyActorId("empty tenant id")
 	}
 
-	teamsIDs := []int64{}
-	if req.GetTeamId() != 0 {
-		teamsIDs = []int64{req.GetTeamId()}
-	}
-
-	assignedRoles, err := s.uc.ListAssignedRoles(ctx, data.ListRolesDto{
-		TenantId:    tenantId,
-		IdentityIDs: req.GetIdentityIds(),
-		TeamsIDs:    teamsIDs,
-	})
+	assignedRoles, err := s.uc.ListAssignedRoles(ctx, tenantId, req.GetIdentityIds(), req.GetResource())
 	if err != nil {
 		return nil, err
 	}
@@ -100,17 +91,16 @@ func (s *AssignsService) ListAssigns(ctx context.Context, req *v1.ListAssignsReq
 	}, nil
 }
 
-func assignedRoleReply(assignedRole *ent.TeamIdentityRole) *v1.AssignedRole {
+func assignedRoleReply(assignedRole *ent.ResourceAccess) *v1.AssignedRole {
 	result := v1.AssignedRole{
 		AssignId:   assignedRole.ID,
 		IdentityId: &assignedRole.IdentityID,
 	}
 
-	if assignedRole.Edges.Team != nil {
-		result.Team = &v1.Team{
-			Id:          assignedRole.Edges.Team.ID,
-			Name:        assignedRole.Edges.Team.Name,
-			Description: assignedRole.Edges.Team.Description,
+	if assignedRole.ResourceType != nil && assignedRole.ResourceID != nil {
+		result.Resource = &v1.Resource{
+			Type: *assignedRole.ResourceType,
+			Id:   *assignedRole.ResourceID,
 		}
 	}
 
@@ -126,7 +116,7 @@ func assignedRoleReply(assignedRole *ent.TeamIdentityRole) *v1.AssignedRole {
 	return &result
 }
 
-func assignedRolesReply(assignedRoles []*ent.TeamIdentityRole) []*v1.AssignedRole {
+func assignedRolesReply(assignedRoles []*ent.ResourceAccess) []*v1.AssignedRole {
 	result := make([]*v1.AssignedRole, len(assignedRoles))
 	for i, assignedRole := range assignedRoles {
 		result[i] = assignedRoleReply(assignedRole)
@@ -134,23 +124,27 @@ func assignedRolesReply(assignedRoles []*ent.TeamIdentityRole) []*v1.AssignedRol
 	return result
 }
 
+func toDto(req *v1.AssignRoleRequest) data.AssignRoleDto {
+	teamId := req.GetTeamId()
+	resource := req.GetResource()
+	if teamId != 0 {
+		resource = &v1.Resource{
+			Type: data.RESOURCE_TYPE_TEAM,
+			Id:   teamId,
+		}
+	}
+	return data.AssignRoleDto{
+		IdentityId: req.GetIdentityId(),
+		RoleId:     req.GetRoleId(),
+		TeamId:     teamId,
+		Resource:   resource,
+	}
+}
+
 func toDtos(req *v1.AssignRolesRequest) []data.AssignRoleDto {
 	dtos := make([]data.AssignRoleDto, len(req.Assigns))
 	for i, assign := range req.Assigns {
-		dtos[i] = data.AssignRoleDto{
-			RoleId:     assign.GetRoleId(),
-			TeamId:     assign.GetTeamId(),
-			IdentityId: assign.GetIdentityId(),
-		}
+		dtos[i] = toDto(assign)
 	}
-
 	return dtos
-}
-
-func toDto(req *v1.AssignRoleRequest) data.AssignRoleDto {
-	return data.AssignRoleDto{
-		RoleId:     req.GetRoleId(),
-		TeamId:     req.GetTeamId(),
-		IdentityId: req.GetIdentityId(),
-	}
 }

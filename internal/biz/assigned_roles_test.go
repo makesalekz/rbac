@@ -92,7 +92,7 @@ func TestAssignedRolesUsecase_UnassignRole(t *testing.T) {
 	assignId2 := int64(2)
 
 	// Positive case
-	assignedRole := &ent.TeamIdentityRole{
+	assignedRole := &ent.ResourceAccess{
 		ID:         assignId,
 		TenantID:   tenantId,
 		IdentityID: identityId,
@@ -112,49 +112,6 @@ func TestAssignedRolesUsecase_UnassignRole(t *testing.T) {
 	require.Equal(t, v1.ErrorNotFound("assigned role not found"), err)
 }
 
-func TestAssignedRolesUsecase_ListIdentityRoles(t *testing.T) {
-	logger := zap.NewZapLogger(true)
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-
-	assignedRepo := mock.NewMockAssignedRolesRepo(ctrl)
-	roleRepo := mock.NewMockRoleRepo(ctrl)
-	teamRepo := mock.NewMockTeamsRepo(ctrl)
-	uc, err := biz.NewAssignedRolesUsecase(logger, assignedRepo, roleRepo, teamRepo, nil)
-	require.NoError(t, err)
-
-	ctx := context.Background()
-	tenantId := int64(1)
-	identityId := "identity1"
-	roleId := int64(1)
-	roleId2 := int64(2)
-
-	// Positive case
-	assignedRoles := []*ent.TeamIdentityRole{
-		{
-			ID:         1,
-			TenantID:   tenantId,
-			IdentityID: identityId,
-			RoleID:     roleId,
-		},
-		{
-			ID:         2,
-			TenantID:   tenantId,
-			IdentityID: identityId,
-			RoleID:     roleId2,
-		},
-	}
-	listRolesDto := data.ListRolesDto{
-		TenantId:    tenantId,
-		IdentityIDs: []string{identityId},
-	}
-	assignedRepo.EXPECT().ListAssignedRoles(ctx, listRolesDto).Return(assignedRoles, nil)
-
-	roles, err := uc.ListIdentityRoles(ctx, tenantId, identityId)
-	require.NoError(t, err)
-	require.Equal(t, assignedRoles, roles)
-}
-
 func TestAssignedRolesUsecase_ListAssignedRoles(t *testing.T) {
 	logger := zap.NewZapLogger(true)
 	ctrl := gomock.NewController(t)
@@ -171,14 +128,10 @@ func TestAssignedRolesUsecase_ListAssignedRoles(t *testing.T) {
 	identityId := "identity1"
 
 	// Positive case
-	assignedRoles := []*ent.TeamIdentityRole{}
-	listRolesDto := data.ListRolesDto{
-		TenantId:    tenantId,
-		IdentityIDs: []string{identityId},
-	}
-	assignedRepo.EXPECT().ListAssignedRoles(ctx, listRolesDto).Return(assignedRoles, nil)
+	assignedRoles := []*ent.ResourceAccess{}
+	assignedRepo.EXPECT().ListAssignedRoles(ctx, tenantId, []string{identityId}, nil).Return(assignedRoles, nil)
 
-	roles, err := uc.ListAssignedRoles(ctx, listRolesDto)
+	roles, err := uc.ListAssignedRoles(ctx, tenantId, []string{identityId}, nil)
 	require.NoError(t, err)
 	require.Equal(t, assignedRoles, roles)
 }

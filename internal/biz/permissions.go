@@ -65,10 +65,7 @@ func (uc *PermissionsUsecase) GetGroupedPermissions(ctx context.Context, tenantI
 	}
 
 	if !filter.WithDenied {
-		assignedRoles, err := uc.assignedRepo.ListAssignedRoles(ctx, data.ListRolesDto{
-			TenantId:    tenantId,
-			IdentityIDs: identities,
-		})
+		assignedRoles, err := uc.assignedRepo.ListAssignedRoles(ctx, tenantId, identities, nil)
 		if err != nil {
 			return nil, err
 		}

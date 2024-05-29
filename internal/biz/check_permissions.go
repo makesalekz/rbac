@@ -27,8 +27,7 @@ func NewCheckPermissionsUsecase(
 	}, nil
 }
 
-func (u *CheckPermissionsUsecase) CheckPermissions(ctx context.Context, tenantId int64, identities []string, teamId int64, permissions []string) (map[string]*v1.ListOfFields, error) {
-	var teamsIds []int64
+func (u *CheckPermissionsUsecase) getParentIds(ctx context.Context, tenantId, teamId int64) ([]int64, error) {
 	if tenantId != 0 && teamId != 0 {
 		team, err := u.teamRepo.GetTeam(ctx, tenantId, teamId, false)
 		if err != nil {
@@ -36,19 +35,40 @@ func (u *CheckPermissionsUsecase) CheckPermissions(ctx context.Context, tenantId
 		}
 
 		if team.ParentsIds != nil {
-			err = team.ParentsIds.AssignTo(&teamsIds)
+			var parentIds []int64
+			err = team.ParentsIds.AssignTo(&parentIds)
 			if err != nil {
 				return nil, err
 			}
+			return parentIds, nil
 		}
+	}
+	return nil, nil
+}
 
-		teamsIds = append(teamsIds, team.ID)
+func (u *CheckPermissionsUsecase) CheckPermissions(ctx context.Context, tenantId int64, identities []string, permissions []string, resources []*v1.Resource) (map[string]*v1.ListOfFields, error) {
+	var teamsIds []int64
+	for i := len(resources) - 1; i >= 0; i-- {
+		if resources[i].Type == data.RESOURCE_TYPE_TEAM {
+			parentIds, err := u.getParentIds(ctx, tenantId, resources[i].Id)
+			if err != nil {
+				return nil, err
+			}
+
+			teamsIds = append(teamsIds, resources[i].Id)
+			if parentIds != nil {
+				teamsIds = append(teamsIds, parentIds...)
+			}
+
+			resources = append(resources[:i], resources[i+1:]...)
+		}
 	}
 
-	assignedRoles, err := u.repo.ListAssignedRoles(ctx, data.ListRolesDto{
+	assignedRoles, err := u.repo.ListResourceRoles(ctx, data.ListRolesDto{
 		TenantId:    tenantId,
 		IdentityIDs: identities,
 		TeamsIDs:    teamsIds,
+		Resources:   resources,
 	})
 	if err != nil {
 		return nil, err
@@ -89,7 +109,7 @@ func (u *CheckPermissionsUsecase) CheckPermissions(ctx context.Context, tenantId
 }
 
 func (u *CheckPermissionsUsecase) HasPermission(ctx context.Context, tenantId int64, identities []string, permission string) (*v1.ListOfFields, error) {
-	permissionsMap, err := u.CheckPermissions(ctx, tenantId, identities, 0, []string{permission})
+	permissionsMap, err := u.CheckPermissions(ctx, tenantId, identities, []string{permission}, nil)
 	if err != nil {
 		return nil, err
 	}

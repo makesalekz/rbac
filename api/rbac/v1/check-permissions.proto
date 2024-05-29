@@ -2,10 +2,7 @@ syntax = "proto3";
 
 package rbac.v1;
 
-import "google/api/annotations.proto";
-import "api/utils/v1/models.proto";
 import "api/rbac/v1/models.proto";
-
 
 option go_package = "gitlab.calendaria.team/services/rbac/api/rbac/v1;rbac_v1";
 option java_multiple_files = true;
@@ -17,11 +14,10 @@ service CheckPermissions {
 
 message CheckPermissionsRequest {
   int64 tenantId = 1;
-  int64 teamId = 2;
   repeated string permissions = 3;
   repeated string identities = 4;
+  repeated Resource resources = 5;
 }
-
 
 message CheckPermissionsReply {
   map<string, ListOfFields> permissions = 1;

@@ -38,7 +38,7 @@ func (s *CheckPermissionsService) CheckPermissions(ctx context.Context, req *v1.
 		}
 	}
 
-	permissionsMap, err := s.uc.CheckPermissions(ctx, tenantId, identities, req.TeamId, req.Permissions)
+	permissionsMap, err := s.uc.CheckPermissions(ctx, tenantId, identities, req.Permissions, req.Resources)
 	if err != nil {
 		return nil, err
 	}

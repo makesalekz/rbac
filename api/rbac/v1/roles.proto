@@ -2,7 +2,6 @@ syntax = "proto3";
 
 package rbac.v1;
 
-import "google/api/annotations.proto";
 import "api/utils/v1/models.proto";
 import "api/rbac/v1/models.proto";
 
@@ -16,8 +15,10 @@ service Roles {
   rpc DeleteRole(RoleRequest) returns (utils.v1.EmptyReply);
   rpc GetRole(RoleRequest) returns (RoleReply);
   rpc ListRoles(ListRolesRequest) returns (ListRolesReply);
-  rpc AddPermissionToRole(AddPermissionToRoleRequest) returns (utils.v1.EmptyReply);
-  rpc RemovePermissionFromRole(RemovePermissionFromRoleRequest) returns (utils.v1.EmptyReply);
+  rpc AddPermissionToRole(AddPermissionToRoleRequest)
+      returns (utils.v1.EmptyReply);
+  rpc RemovePermissionFromRole(RemovePermissionFromRoleRequest)
+      returns (utils.v1.EmptyReply);
   rpc ListRolePermissions(RoleRequest) returns (RolePermissionsReply);
 }
 

@@ -38,7 +38,7 @@ func TestCheckPermissionsUsecase_CheckPermissions(t *testing.T) {
 	}
 	teamRepo.EXPECT().GetTeam(ctx, tenantId, teamId, false).Return(team, nil)
 
-	assignedRoles := []*ent.TeamIdentityRole{
+	assignedRoles := []*ent.ResourceAccess{
 		{
 			ID:         1,
 			TenantID:   tenantId,
@@ -56,8 +56,9 @@ func TestCheckPermissionsUsecase_CheckPermissions(t *testing.T) {
 		TenantId:    tenantId,
 		IdentityIDs: identities,
 		TeamsIDs:    []int64{teamId},
+		Resources:   []*v1.Resource{},
 	}
-	assignedRepo.EXPECT().ListAssignedRoles(ctx, listRolesDto).Return(assignedRoles, nil)
+	assignedRepo.EXPECT().ListResourceRoles(ctx, listRolesDto).Return(assignedRoles, nil)
 
 	filterRolePermissions := data.FilterRolePermissions{
 		TenantId:    tenantId,
@@ -82,7 +83,7 @@ func TestCheckPermissionsUsecase_CheckPermissions(t *testing.T) {
 	}
 	roleRepo.EXPECT().ListRolesPermissions(ctx, filterRolePermissions).Return(rolesPermissions, nil)
 
-	permissionsMap, err := uc.CheckPermissions(ctx, tenantId, identities, teamId, permissions)
+	permissionsMap, err := uc.CheckPermissions(ctx, tenantId, identities, permissions, []*v1.Resource{{Id: teamId, Type: data.RESOURCE_TYPE_TEAM}})
 	require.NoError(t, err)
 	require.Len(t, permissionsMap, 2)
 
