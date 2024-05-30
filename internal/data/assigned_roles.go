@@ -79,7 +79,10 @@ func (t *assignedRolesRepo) ListAssignedRoles(ctx context.Context, tenantId int6
 		query.Where(resourceaccess.IdentityIDIn(identityIDs...))
 	}
 
-	if resource != nil {
+	if resource == nil {
+		// not assigned on any resource (all resources on tenant)
+		query.Where(resourceaccess.ResourceIDIsNil())
+	} else {
 		// assigned only on provided resource
 		query.Where(
 			resourceaccess.ResourceType(resource.Type),
