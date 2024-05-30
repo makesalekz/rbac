@@ -79,6 +79,13 @@ migrations:
 		--to "ent://ent/schema" \
 		--dev-url "docker://postgres/15/test?search_path=public"
 
+.PHONY: migrate
+# apply migrations
+migrate:
+	atlas migrate apply \
+		--dir "file://ent/migrate/migrations" \
+		--url "postgres://$(DB_USER):$(DB_PASS)@localhost:$(DB_PORT)/$(DB_NAME)?search_path=public&sslmode=disable"
+
 .PHONY: hash
 # rehash migrations
 hash:

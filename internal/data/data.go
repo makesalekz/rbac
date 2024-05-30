@@ -4,13 +4,14 @@ import (
 	"context"
 	"os"
 
-	"github.com/go-kratos/kratos/v2/log"
-	"github.com/google/wire"
 	"gitlab.calendaria.team/services/rbac/ent" //nolint:typecheck
 	"gitlab.calendaria.team/services/rbac/internal/conf"
 	u_config "gitlab.calendaria.team/services/utils/v1/config"
 	u_jwt "gitlab.calendaria.team/services/utils/v1/jwt"
 	u_tracing "gitlab.calendaria.team/services/utils/v2/tracing"
+
+	"github.com/go-kratos/kratos/v2/log"
+	"github.com/google/wire"
 
 	_ "gitlab.calendaria.team/services/rbac/ent/runtime"
 )

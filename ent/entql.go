@@ -6,6 +6,8 @@ import (
 	"gitlab.calendaria.team/services/rbac/ent/permission"
 	"gitlab.calendaria.team/services/rbac/ent/permissiongroup"
 	"gitlab.calendaria.team/services/rbac/ent/predicate"
+	"gitlab.calendaria.team/services/rbac/ent/resourceaccess"
+	"gitlab.calendaria.team/services/rbac/ent/resourcetype"
 	"gitlab.calendaria.team/services/rbac/ent/role"
 	"gitlab.calendaria.team/services/rbac/ent/rolepermission"
 	"gitlab.calendaria.team/services/rbac/ent/team"
@@ -19,7 +21,7 @@ import (
 
 // schemaGraph holds a representation of ent/schema at runtime.
 var schemaGraph = func() *sqlgraph.Schema {
-	graph := &sqlgraph.Schema{Nodes: make([]*sqlgraph.Node, 6)}
+	graph := &sqlgraph.Schema{Nodes: make([]*sqlgraph.Node, 8)}
 	graph.Nodes[0] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
 			Table:   permission.Table,
@@ -55,6 +57,38 @@ var schemaGraph = func() *sqlgraph.Schema {
 	}
 	graph.Nodes[2] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
+			Table:   resourceaccess.Table,
+			Columns: resourceaccess.Columns,
+			ID: &sqlgraph.FieldSpec{
+				Type:   field.TypeInt64,
+				Column: resourceaccess.FieldID,
+			},
+		},
+		Type: "ResourceAccess",
+		Fields: map[string]*sqlgraph.FieldSpec{
+			resourceaccess.FieldTenantID:     {Type: field.TypeInt64, Column: resourceaccess.FieldTenantID},
+			resourceaccess.FieldResourceType: {Type: field.TypeString, Column: resourceaccess.FieldResourceType},
+			resourceaccess.FieldResourceID:   {Type: field.TypeInt64, Column: resourceaccess.FieldResourceID},
+			resourceaccess.FieldIdentityID:   {Type: field.TypeString, Column: resourceaccess.FieldIdentityID},
+			resourceaccess.FieldRoleID:       {Type: field.TypeInt64, Column: resourceaccess.FieldRoleID},
+		},
+	}
+	graph.Nodes[3] = &sqlgraph.Node{
+		NodeSpec: sqlgraph.NodeSpec{
+			Table:   resourcetype.Table,
+			Columns: resourcetype.Columns,
+			ID: &sqlgraph.FieldSpec{
+				Type:   field.TypeString,
+				Column: resourcetype.FieldID,
+			},
+		},
+		Type: "ResourceType",
+		Fields: map[string]*sqlgraph.FieldSpec{
+			resourcetype.FieldDescription: {Type: field.TypeString, Column: resourcetype.FieldDescription},
+		},
+	}
+	graph.Nodes[4] = &sqlgraph.Node{
+		NodeSpec: sqlgraph.NodeSpec{
 			Table:   role.Table,
 			Columns: role.Columns,
 			ID: &sqlgraph.FieldSpec{
@@ -73,7 +107,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			role.FieldUpdatedAt:   {Type: field.TypeTime, Column: role.FieldUpdatedAt},
 		},
 	}
-	graph.Nodes[3] = &sqlgraph.Node{
+	graph.Nodes[5] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
 			Table:   rolepermission.Table,
 			Columns: rolepermission.Columns,
@@ -91,7 +125,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			rolepermission.FieldFields:       {Type: field.TypeJSON, Column: rolepermission.FieldFields},
 		},
 	}
-	graph.Nodes[4] = &sqlgraph.Node{
+	graph.Nodes[6] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
 			Table:   team.Table,
 			Columns: team.Columns,
@@ -112,7 +146,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			team.FieldUpdatedAt:   {Type: field.TypeTime, Column: team.FieldUpdatedAt},
 		},
 	}
-	graph.Nodes[5] = &sqlgraph.Node{
+	graph.Nodes[7] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
 			Table:   teamidentityrole.Table,
 			Columns: teamidentityrole.Columns,
@@ -164,6 +198,42 @@ var schemaGraph = func() *sqlgraph.Schema {
 		},
 		"PermissionGroup",
 		"Permission",
+	)
+	graph.MustAddE(
+		"role",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   resourceaccess.RoleTable,
+			Columns: []string{resourceaccess.RoleColumn},
+			Bidi:    false,
+		},
+		"ResourceAccess",
+		"Role",
+	)
+	graph.MustAddE(
+		"type",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   resourceaccess.TypeTable,
+			Columns: []string{resourceaccess.TypeColumn},
+			Bidi:    false,
+		},
+		"ResourceAccess",
+		"ResourceType",
+	)
+	graph.MustAddE(
+		"roles",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   resourcetype.RolesTable,
+			Columns: []string{resourcetype.RolesColumn},
+			Bidi:    false,
+		},
+		"ResourceType",
+		"Role",
 	)
 	graph.MustAddE(
 		"permissions",
@@ -416,6 +486,158 @@ func (f *PermissionGroupFilter) WhereHasPermissionsWith(preds ...predicate.Permi
 }
 
 // addPredicate implements the predicateAdder interface.
+func (raq *ResourceAccessQuery) addPredicate(pred func(s *sql.Selector)) {
+	raq.predicates = append(raq.predicates, pred)
+}
+
+// Filter returns a Filter implementation to apply filters on the ResourceAccessQuery builder.
+func (raq *ResourceAccessQuery) Filter() *ResourceAccessFilter {
+	return &ResourceAccessFilter{config: raq.config, predicateAdder: raq}
+}
+
+// addPredicate implements the predicateAdder interface.
+func (m *ResourceAccessMutation) addPredicate(pred func(s *sql.Selector)) {
+	m.predicates = append(m.predicates, pred)
+}
+
+// Filter returns an entql.Where implementation to apply filters on the ResourceAccessMutation builder.
+func (m *ResourceAccessMutation) Filter() *ResourceAccessFilter {
+	return &ResourceAccessFilter{config: m.config, predicateAdder: m}
+}
+
+// ResourceAccessFilter provides a generic filtering capability at runtime for ResourceAccessQuery.
+type ResourceAccessFilter struct {
+	predicateAdder
+	config
+}
+
+// Where applies the entql predicate on the query filter.
+func (f *ResourceAccessFilter) Where(p entql.P) {
+	f.addPredicate(func(s *sql.Selector) {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[2].Type, p, s); err != nil {
+			s.AddError(err)
+		}
+	})
+}
+
+// WhereID applies the entql int64 predicate on the id field.
+func (f *ResourceAccessFilter) WhereID(p entql.Int64P) {
+	f.Where(p.Field(resourceaccess.FieldID))
+}
+
+// WhereTenantID applies the entql int64 predicate on the tenant_id field.
+func (f *ResourceAccessFilter) WhereTenantID(p entql.Int64P) {
+	f.Where(p.Field(resourceaccess.FieldTenantID))
+}
+
+// WhereResourceType applies the entql string predicate on the resource_type field.
+func (f *ResourceAccessFilter) WhereResourceType(p entql.StringP) {
+	f.Where(p.Field(resourceaccess.FieldResourceType))
+}
+
+// WhereResourceID applies the entql int64 predicate on the resource_id field.
+func (f *ResourceAccessFilter) WhereResourceID(p entql.Int64P) {
+	f.Where(p.Field(resourceaccess.FieldResourceID))
+}
+
+// WhereIdentityID applies the entql string predicate on the identity_id field.
+func (f *ResourceAccessFilter) WhereIdentityID(p entql.StringP) {
+	f.Where(p.Field(resourceaccess.FieldIdentityID))
+}
+
+// WhereRoleID applies the entql int64 predicate on the role_id field.
+func (f *ResourceAccessFilter) WhereRoleID(p entql.Int64P) {
+	f.Where(p.Field(resourceaccess.FieldRoleID))
+}
+
+// WhereHasRole applies a predicate to check if query has an edge role.
+func (f *ResourceAccessFilter) WhereHasRole() {
+	f.Where(entql.HasEdge("role"))
+}
+
+// WhereHasRoleWith applies a predicate to check if query has an edge role with a given conditions (other predicates).
+func (f *ResourceAccessFilter) WhereHasRoleWith(preds ...predicate.Role) {
+	f.Where(entql.HasEdgeWith("role", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// WhereHasType applies a predicate to check if query has an edge type.
+func (f *ResourceAccessFilter) WhereHasType() {
+	f.Where(entql.HasEdge("type"))
+}
+
+// WhereHasTypeWith applies a predicate to check if query has an edge type with a given conditions (other predicates).
+func (f *ResourceAccessFilter) WhereHasTypeWith(preds ...predicate.ResourceType) {
+	f.Where(entql.HasEdgeWith("type", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// addPredicate implements the predicateAdder interface.
+func (rtq *ResourceTypeQuery) addPredicate(pred func(s *sql.Selector)) {
+	rtq.predicates = append(rtq.predicates, pred)
+}
+
+// Filter returns a Filter implementation to apply filters on the ResourceTypeQuery builder.
+func (rtq *ResourceTypeQuery) Filter() *ResourceTypeFilter {
+	return &ResourceTypeFilter{config: rtq.config, predicateAdder: rtq}
+}
+
+// addPredicate implements the predicateAdder interface.
+func (m *ResourceTypeMutation) addPredicate(pred func(s *sql.Selector)) {
+	m.predicates = append(m.predicates, pred)
+}
+
+// Filter returns an entql.Where implementation to apply filters on the ResourceTypeMutation builder.
+func (m *ResourceTypeMutation) Filter() *ResourceTypeFilter {
+	return &ResourceTypeFilter{config: m.config, predicateAdder: m}
+}
+
+// ResourceTypeFilter provides a generic filtering capability at runtime for ResourceTypeQuery.
+type ResourceTypeFilter struct {
+	predicateAdder
+	config
+}
+
+// Where applies the entql predicate on the query filter.
+func (f *ResourceTypeFilter) Where(p entql.P) {
+	f.addPredicate(func(s *sql.Selector) {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[3].Type, p, s); err != nil {
+			s.AddError(err)
+		}
+	})
+}
+
+// WhereID applies the entql string predicate on the id field.
+func (f *ResourceTypeFilter) WhereID(p entql.StringP) {
+	f.Where(p.Field(resourcetype.FieldID))
+}
+
+// WhereDescription applies the entql string predicate on the description field.
+func (f *ResourceTypeFilter) WhereDescription(p entql.StringP) {
+	f.Where(p.Field(resourcetype.FieldDescription))
+}
+
+// WhereHasRoles applies a predicate to check if query has an edge roles.
+func (f *ResourceTypeFilter) WhereHasRoles() {
+	f.Where(entql.HasEdge("roles"))
+}
+
+// WhereHasRolesWith applies a predicate to check if query has an edge roles with a given conditions (other predicates).
+func (f *ResourceTypeFilter) WhereHasRolesWith(preds ...predicate.Role) {
+	f.Where(entql.HasEdgeWith("roles", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// addPredicate implements the predicateAdder interface.
 func (rq *RoleQuery) addPredicate(pred func(s *sql.Selector)) {
 	rq.predicates = append(rq.predicates, pred)
 }
@@ -444,7 +666,7 @@ type RoleFilter struct {
 // Where applies the entql predicate on the query filter.
 func (f *RoleFilter) Where(p entql.P) {
 	f.addPredicate(func(s *sql.Selector) {
-		if err := schemaGraph.EvalP(schemaGraph.Nodes[2].Type, p, s); err != nil {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[4].Type, p, s); err != nil {
 			s.AddError(err)
 		}
 	})
@@ -533,7 +755,7 @@ type RolePermissionFilter struct {
 // Where applies the entql predicate on the query filter.
 func (f *RolePermissionFilter) Where(p entql.P) {
 	f.addPredicate(func(s *sql.Selector) {
-		if err := schemaGraph.EvalP(schemaGraph.Nodes[3].Type, p, s); err != nil {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[5].Type, p, s); err != nil {
 			s.AddError(err)
 		}
 	})
@@ -626,7 +848,7 @@ type TeamFilter struct {
 // Where applies the entql predicate on the query filter.
 func (f *TeamFilter) Where(p entql.P) {
 	f.addPredicate(func(s *sql.Selector) {
-		if err := schemaGraph.EvalP(schemaGraph.Nodes[4].Type, p, s); err != nil {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[6].Type, p, s); err != nil {
 			s.AddError(err)
 		}
 	})
@@ -734,7 +956,7 @@ type TeamIdentityRoleFilter struct {
 // Where applies the entql predicate on the query filter.
 func (f *TeamIdentityRoleFilter) Where(p entql.P) {
 	f.addPredicate(func(s *sql.Selector) {
-		if err := schemaGraph.EvalP(schemaGraph.Nodes[5].Type, p, s); err != nil {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[7].Type, p, s); err != nil {
 			s.AddError(err)
 		}
 	})

@@ -2,7 +2,6 @@ syntax = "proto3";
 
 package rbac.v1;
 
-import "google/api/annotations.proto";
 import "api/utils/v1/models.proto";
 import "api/rbac/v1/models.proto";
 
@@ -11,34 +10,11 @@ option java_multiple_files = true;
 option java_package = "rbac.v1";
 
 service Permissions {
-  rpc CreatePermission(CreatePermissionRequest) returns (PermissionReply) {
-    option (google.api.http) = {
-      post: "/v1/rbac/permissions"
-      body: "*"
-    };
-  };
-  rpc UpdatePermission(UpdatePermissionRequest) returns (PermissionReply) {
-    option (google.api.http) = {
-      put: "/v1/rbac/permissions/{permissionId}"
-      body: "*"
-    };
-  };
-  rpc DeletePermission(PermissionRequest) returns (utils.v1.EmptyReply) {
-    option (google.api.http) = {
-      delete: "/v1/rbac/permissions/{permissionId}"
-    };
-  };
-  rpc GetPermission(PermissionRequest) returns (PermissionReply) {
-    option (google.api.http) = {
-      get: "/v1/rbac/permissions/{permissionId}"
-    };
-  };
-  rpc ListPermissions(ListPermissionsRequest) returns (ListPermissionsReply) {
-    option (google.api.http) = {
-      post: "/v1/rbac/permissions/list"
-      body: "*"
-    };
-  };
+  rpc CreatePermission(CreatePermissionRequest) returns (PermissionReply);
+  rpc UpdatePermission(UpdatePermissionRequest) returns (PermissionReply);
+  rpc DeletePermission(PermissionRequest) returns (utils.v1.EmptyReply);
+  rpc GetPermission(PermissionRequest) returns (PermissionReply);
+  rpc ListPermissions(ListPermissionsRequest) returns (ListPermissionsReply);
 }
 
 message CreatePermissionRequest {

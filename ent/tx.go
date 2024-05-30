@@ -16,6 +16,10 @@ type Tx struct {
 	Permission *PermissionClient
 	// PermissionGroup is the client for interacting with the PermissionGroup builders.
 	PermissionGroup *PermissionGroupClient
+	// ResourceAccess is the client for interacting with the ResourceAccess builders.
+	ResourceAccess *ResourceAccessClient
+	// ResourceType is the client for interacting with the ResourceType builders.
+	ResourceType *ResourceTypeClient
 	// Role is the client for interacting with the Role builders.
 	Role *RoleClient
 	// RolePermission is the client for interacting with the RolePermission builders.
@@ -157,6 +161,8 @@ func (tx *Tx) Client() *Client {
 func (tx *Tx) init() {
 	tx.Permission = NewPermissionClient(tx.config)
 	tx.PermissionGroup = NewPermissionGroupClient(tx.config)
+	tx.ResourceAccess = NewResourceAccessClient(tx.config)
+	tx.ResourceType = NewResourceTypeClient(tx.config)
 	tx.Role = NewRoleClient(tx.config)
 	tx.RolePermission = NewRolePermissionClient(tx.config)
 	tx.Team = NewTeamClient(tx.config)

@@ -7,6 +7,8 @@ import (
 
 	"gitlab.calendaria.team/services/rbac/ent/permission"
 	"gitlab.calendaria.team/services/rbac/ent/permissiongroup"
+	"gitlab.calendaria.team/services/rbac/ent/resourceaccess"
+	"gitlab.calendaria.team/services/rbac/ent/resourcetype"
 	"gitlab.calendaria.team/services/rbac/ent/role"
 	"gitlab.calendaria.team/services/rbac/ent/rolepermission"
 	"gitlab.calendaria.team/services/rbac/ent/schema"
@@ -74,6 +76,18 @@ func init() {
 			return nil
 		}
 	}()
+	resourceaccessFields := schema.ResourceAccess{}.Fields()
+	_ = resourceaccessFields
+	// resourceaccessDescIdentityID is the schema descriptor for identity_id field.
+	resourceaccessDescIdentityID := resourceaccessFields[3].Descriptor()
+	// resourceaccess.DefaultIdentityID holds the default value on creation for the identity_id field.
+	resourceaccess.DefaultIdentityID = resourceaccessDescIdentityID.Default.(string)
+	resourcetypeFields := schema.ResourceType{}.Fields()
+	_ = resourcetypeFields
+	// resourcetypeDescDescription is the schema descriptor for description field.
+	resourcetypeDescDescription := resourcetypeFields[1].Descriptor()
+	// resourcetype.DefaultDescription holds the default value on creation for the description field.
+	resourcetype.DefaultDescription = resourcetypeDescDescription.Default.(string)
 	roleMixin := schema.Role{}.Mixin()
 	roleMixinHooks0 := roleMixin[0].Hooks()
 	role.Hooks[0] = roleMixinHooks0[0]

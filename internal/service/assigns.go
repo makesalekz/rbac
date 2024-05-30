@@ -3,7 +3,6 @@ package service
 import (
 	"context"
 
-	"github.com/go-kratos/kratos/v2/metadata"
 	v1 "gitlab.calendaria.team/services/rbac/api/rbac/v1"
 	"gitlab.calendaria.team/services/rbac/ent"
 	"gitlab.calendaria.team/services/rbac/internal/biz"
@@ -41,18 +40,6 @@ func (s *AssignsService) AssignRoles(ctx context.Context, req *v1.AssignRolesReq
 		return nil, v1.ErrorEmptyActorId("empty tenant id")
 	}
 
-	isAdmin := false
-	if md, ok := metadata.FromServerContext(ctx); ok {
-		isAdmin = md.Get("x-md-global-actor-role") == "admin"
-	}
-
-	if !isAdmin {
-		_, _, err := s.sh.HasPermission(ctx, "admin.role.assign")
-		if err != nil {
-			return nil, err
-		}
-	}
-
 	err := s.uc.AssignRoles(ctx, tenantId, toDtos(req))
 	if err != nil {
 		return nil, err
@@ -67,18 +54,6 @@ func (s *AssignsService) AssignRole(ctx context.Context, req *v1.AssignRoleReque
 		return nil, v1.ErrorEmptyActorId("empty tenant id")
 	}
 
-	isAdmin := false
-	if md, ok := metadata.FromServerContext(ctx); ok {
-		isAdmin = md.Get("x-md-global-actor-role") == "admin"
-	}
-
-	if !isAdmin {
-		_, _, err := s.sh.HasPermission(ctx, "admin.role.assign")
-		if err != nil {
-			return nil, err
-		}
-	}
-
 	err := s.uc.AssignRole(ctx, tenantId, toDto(req))
 	if err != nil {
 		return nil, err
@@ -88,12 +63,12 @@ func (s *AssignsService) AssignRole(ctx context.Context, req *v1.AssignRoleReque
 }
 
 func (s *AssignsService) UnassignRole(ctx context.Context, req *v1.AssignRequest) (*utils_v1.EmptyReply, error) {
-	tenantId, _, err := s.sh.HasPermission(ctx, "admin.role.assign")
-	if err != nil {
-		return nil, err
+	tenantId := auth.GetTenantIdFromContext(ctx)
+	if tenantId == 0 {
+		return nil, v1.ErrorEmptyActorId("empty tenant id")
 	}
 
-	err = s.uc.UnassignRole(ctx, tenantId, req.GetAssignId())
+	err := s.uc.UnassignRole(ctx, tenantId, req.GetAssignId())
 	if err != nil {
 		return nil, err
 	}
@@ -106,28 +81,7 @@ func (s *AssignsService) ListAssigns(ctx context.Context, req *v1.ListAssignsReq
 		return nil, v1.ErrorEmptyActorId("empty tenant id")
 	}
 
-	isAdmin := false
-	if md, ok := metadata.FromServerContext(ctx); ok {
-		isAdmin = md.Get("x-md-global-actor-role") == "admin"
-	}
-
-	if !isAdmin {
-		_, _, err := s.sh.HasPermission(ctx, "admin.role.assign")
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	teamsIDs := []int64{}
-	if req.GetTeamId() != 0 {
-		teamsIDs = []int64{req.GetTeamId()}
-	}
-
-	assignedRoles, err := s.uc.ListAssignedRoles(ctx, data.ListRolesDto{
-		TenantId:    tenantId,
-		IdentityIDs: req.GetIdentityIds(),
-		TeamsIDs:    teamsIDs,
-	})
+	assignedRoles, err := s.uc.ListAssignedRoles(ctx, tenantId, req.GetIdentityIds(), req.GetResource())
 	if err != nil {
 		return nil, err
 	}
@@ -137,17 +91,16 @@ func (s *AssignsService) ListAssigns(ctx context.Context, req *v1.ListAssignsReq
 	}, nil
 }
 
-func assignedRoleReply(assignedRole *ent.TeamIdentityRole) *v1.AssignedRole {
+func assignedRoleReply(assignedRole *ent.ResourceAccess) *v1.AssignedRole {
 	result := v1.AssignedRole{
 		AssignId:   assignedRole.ID,
 		IdentityId: &assignedRole.IdentityID,
 	}
 
-	if assignedRole.Edges.Team != nil {
-		result.Team = &v1.Team{
-			Id:          assignedRole.Edges.Team.ID,
-			Name:        assignedRole.Edges.Team.Name,
-			Description: assignedRole.Edges.Team.Description,
+	if assignedRole.ResourceType != nil && assignedRole.ResourceID != nil {
+		result.Resource = &v1.Resource{
+			Type: *assignedRole.ResourceType,
+			Id:   *assignedRole.ResourceID,
 		}
 	}
 
@@ -163,7 +116,7 @@ func assignedRoleReply(assignedRole *ent.TeamIdentityRole) *v1.AssignedRole {
 	return &result
 }
 
-func assignedRolesReply(assignedRoles []*ent.TeamIdentityRole) []*v1.AssignedRole {
+func assignedRolesReply(assignedRoles []*ent.ResourceAccess) []*v1.AssignedRole {
 	result := make([]*v1.AssignedRole, len(assignedRoles))
 	for i, assignedRole := range assignedRoles {
 		result[i] = assignedRoleReply(assignedRole)
@@ -171,23 +124,27 @@ func assignedRolesReply(assignedRoles []*ent.TeamIdentityRole) []*v1.AssignedRol
 	return result
 }
 
+func toDto(req *v1.AssignRoleRequest) data.AssignRoleDto {
+	teamId := req.GetTeamId()
+	resource := req.GetResource()
+	if teamId != 0 {
+		resource = &v1.Resource{
+			Type: data.RESOURCE_TYPE_TEAM,
+			Id:   teamId,
+		}
+	}
+	return data.AssignRoleDto{
+		IdentityId: req.GetIdentityId(),
+		RoleId:     req.GetRoleId(),
+		TeamId:     teamId,
+		Resource:   resource,
+	}
+}
+
 func toDtos(req *v1.AssignRolesRequest) []data.AssignRoleDto {
 	dtos := make([]data.AssignRoleDto, len(req.Assigns))
 	for i, assign := range req.Assigns {
-		dtos[i] = data.AssignRoleDto{
-			RoleId:     assign.GetRoleId(),
-			TeamId:     assign.GetTeamId(),
-			IdentityId: assign.GetIdentityId(),
-		}
+		dtos[i] = toDto(assign)
 	}
-
 	return dtos
-}
-
-func toDto(req *v1.AssignRoleRequest) data.AssignRoleDto {
-	return data.AssignRoleDto{
-		RoleId:     req.GetRoleId(),
-		TeamId:     req.GetTeamId(),
-		IdentityId: req.GetIdentityId(),
-	}
 }

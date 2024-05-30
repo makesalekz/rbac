@@ -39,14 +39,14 @@ type FilterRolePermissions struct {
 // RoleRepo
 type RoleRepo interface {
 	CreateRole(ctx context.Context, roleDto CreateRoleDto) (*ent.Role, error)
-	UpdateRole(ctx context.Context, role *ent.Role, roleDto UpdateRoleDto) (*ent.Role, error)
-	DeleteRole(ctx context.Context, role *ent.Role) error
-	GetRoleById(ctx context.Context, tenantId int64, roleId int64) (*ent.Role, error)
+	UpdateRole(ctx context.Context, tenantId, roleId int64, roleDto UpdateRoleDto) (*ent.Role, error)
+	DeleteRole(ctx context.Context, tenantId, roleId int64) error
+	GetRoleById(ctx context.Context, tenantId, roleId int64) (*ent.Role, error)
 	GetRolesById(ctx context.Context, tenantId int64, roleIds []int64) ([]*ent.Role, error)
 	GetRolesList(ctx context.Context, tenantId int64, search string) ([]*ent.Role, error)
-	SetRolePermission(ctx context.Context, role *ent.Role, permission *ent.Permission, dto CreateRolePermissionDto) error
-	RemovePermissionFromRole(ctx context.Context, role *ent.Role, permission *ent.Permission) error
-	ListRolePermissions(ctx context.Context, role *ent.Role) ([]*ent.RolePermission, error)
+	SetRolePermission(ctx context.Context, tenantId, roleId int64, permission *ent.Permission, dto CreateRolePermissionDto) error
+	RemovePermissionFromRole(ctx context.Context, tenantId, roleId int64, permission *ent.Permission) error
+	ListRolePermissions(ctx context.Context, tenantId, roleId int64) ([]*ent.RolePermission, error)
 	ListRolesPermissions(ctx context.Context, filter FilterRolePermissions) ([]*ent.RolePermission, error)
 }
 
@@ -120,7 +120,7 @@ func (r *roleRepo) CreateRole(ctx context.Context, roleDto CreateRoleDto) (*ent.
 	return role, nil
 }
 
-func (r *roleRepo) UpdateRole(ctx context.Context, role *ent.Role, roleDto UpdateRoleDto) (*ent.Role, error) {
+func (r *roleRepo) UpdateRole(ctx context.Context, tenantId, roleId int64, roleDto UpdateRoleDto) (*ent.Role, error) {
 	tx, err := r.db.Tx(ctx)
 	if err != nil {
 		return nil, err
@@ -132,24 +132,14 @@ func (r *roleRepo) UpdateRole(ctx context.Context, role *ent.Role, roleDto Updat
 	}()
 
 	// update role data
-	shouldUpdate := false
-	query := tx.Role.UpdateOne(role)
+	role, err := tx.Role.UpdateOneID(roleId).
+		Where(role.TenantID(tenantId)).
+		SetName(roleDto.Name).
+		SetDescription(roleDto.Description).
+		Save(ctx)
 
-	if roleDto.Name != role.Name {
-		query.SetName(roleDto.Name)
-		shouldUpdate = true
-	}
-
-	if roleDto.Description != role.Description {
-		query.SetDescription(roleDto.Description)
-		shouldUpdate = true
-	}
-
-	if shouldUpdate {
-		role, err = query.Save(ctx)
-		if err != nil {
-			return nil, err
-		}
+	if err != nil {
+		return nil, err
 	}
 
 	// get existing role permissions
@@ -251,11 +241,13 @@ func (r *roleRepo) UpdateRole(ctx context.Context, role *ent.Role, roleDto Updat
 	return role, nil
 }
 
-func (r *roleRepo) DeleteRole(ctx context.Context, role *ent.Role) error {
-	return r.db.Role.DeleteOne(role).Exec(ctx)
+func (r *roleRepo) DeleteRole(ctx context.Context, tenantId, roleId int64) error {
+	return r.db.Role.DeleteOneID(roleId).
+		Where(role.TenantID(tenantId)).
+		Exec(ctx)
 }
 
-func (r *roleRepo) GetRoleById(ctx context.Context, tenantId int64, roleId int64) (*ent.Role, error) {
+func (r *roleRepo) GetRoleById(ctx context.Context, tenantId, roleId int64) (*ent.Role, error) {
 	return r.db.Role.Query().
 		Where(
 			role.ID(roleId),
@@ -283,10 +275,10 @@ func (r *roleRepo) GetRolesList(ctx context.Context, tenantId int64, search stri
 	return query.All(ctx)
 }
 
-func (r *roleRepo) SetRolePermission(ctx context.Context, role *ent.Role, permission *ent.Permission, dto CreateRolePermissionDto) error {
+func (r *roleRepo) SetRolePermission(ctx context.Context, tenantId, roleId int64, permission *ent.Permission, dto CreateRolePermissionDto) error {
 	return r.db.RolePermission.Create().
-		SetTenantID(role.TenantID).
-		SetRole(role).
+		SetTenantID(tenantId).
+		SetRoleID(roleId).
 		SetPermission(permission).
 		SetFields(dto.Fields).
 		SetDeny(dto.Deny).
@@ -295,11 +287,11 @@ func (r *roleRepo) SetRolePermission(ctx context.Context, role *ent.Role, permis
 		Exec(ctx)
 }
 
-func (r *roleRepo) RemovePermissionFromRole(ctx context.Context, role *ent.Role, permission *ent.Permission) error {
+func (r *roleRepo) RemovePermissionFromRole(ctx context.Context, tenantId, roleId int64, permission *ent.Permission) error {
 	_, err := r.db.RolePermission.Delete().
 		Where(
-			rolepermission.TenantID(role.TenantID),
-			rolepermission.RoleID(role.ID),
+			rolepermission.TenantID(tenantId),
+			rolepermission.RoleID(roleId),
 			rolepermission.PermissionID(permission.ID),
 		).
 		Exec(ctx)
@@ -307,11 +299,11 @@ func (r *roleRepo) RemovePermissionFromRole(ctx context.Context, role *ent.Role,
 	return err
 }
 
-func (r *roleRepo) ListRolePermissions(ctx context.Context, role *ent.Role) ([]*ent.RolePermission, error) {
+func (r *roleRepo) ListRolePermissions(ctx context.Context, tenantId, roleId int64) ([]*ent.RolePermission, error) {
 	return r.db.RolePermission.Query().
 		Where(
-			rolepermission.TenantID(role.TenantID),
-			rolepermission.RoleID(role.ID),
+			rolepermission.TenantID(tenantId),
+			rolepermission.RoleID(roleId),
 		).
 		All(ctx)
 }
