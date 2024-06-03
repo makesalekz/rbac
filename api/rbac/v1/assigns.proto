@@ -14,7 +14,7 @@ service Assigns {
   rpc AssignRoles(AssignRolesRequest) returns (utils.v1.EmptyReply);
   rpc UnassignRole(AssignRequest) returns (utils.v1.EmptyReply);
   rpc ListAssigns(ListAssignsRequest) returns (ListAssignsReply);
-  rpc ListResourceRoles(ListResourcesRolesRequest) returns (ListAssignsReply);
+  rpc ListResourcesRoles(ListResourcesRolesRequest) returns (ListAssignsReply);
 }
 
 message AssignRoleRequest {

@@ -91,7 +91,7 @@ func (s *AssignsService) ListAssigns(ctx context.Context, req *v1.ListAssignsReq
 	}, nil
 }
 
-func (s *AssignsService) ListResourceRoles(ctx context.Context, req *v1.ListResourcesRolesRequest) (*v1.ListAssignsReply, error) {
+func (s *AssignsService) ListResourcesRoles(ctx context.Context, req *v1.ListResourcesRolesRequest) (*v1.ListAssignsReply, error) {
 	tenantId := auth.GetTenantIdFromContext(ctx)
 	if tenantId == 0 {
 		return nil, v1.ErrorEmptyActorId("empty tenant id")
