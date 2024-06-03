@@ -2,7 +2,6 @@ package data
 
 import (
 	"context"
-
 	v1 "gitlab.calendaria.team/services/rbac/api/rbac/v1"
 	"gitlab.calendaria.team/services/rbac/ent"
 	"gitlab.calendaria.team/services/rbac/ent/predicate"
@@ -21,10 +20,11 @@ type AssignRoleDto struct {
 }
 
 type ListRolesDto struct {
-	TenantId    int64
-	IdentityIDs []string
-	TeamsIDs    []int64
-	Resources   []*v1.Resource
+	TenantId       int64
+	IdentityIDs    []string
+	TeamsIDs       []int64
+	Resources      []*v1.Resource
+	ResourceFilter []string
 }
 
 // AssignedRolesRepo
@@ -32,8 +32,8 @@ type AssignedRolesRepo interface {
 	AssignRoles(ctx context.Context, tenantId int64, dto []AssignRoleDto) error
 	UnassignRole(ctx context.Context, assignedRole *ent.ResourceAccess) error
 	GetAssignedRoleById(ctx context.Context, tenantId, assignId int64) (*ent.ResourceAccess, error)
-	ListAssignedRoles(ctx context.Context, tenantId int64, identities []string, resource *v1.Resource) ([]*ent.ResourceAccess, error)
-	ListResourceRoles(ctx context.Context, dto ListRolesDto) ([]*ent.ResourceAccess, error)
+	ListAssignedRoles(ctx context.Context, dto ListRolesDto) ([]*ent.ResourceAccess, error)
+	CheckRoles(ctx context.Context, dto ListRolesDto) ([]*ent.ResourceAccess, error)
 }
 
 type assignedRolesRepo struct {
@@ -69,32 +69,43 @@ func (t *assignedRolesRepo) UnassignRole(ctx context.Context, assignedRole *ent.
 	return t.db.ResourceAccess.DeleteOne(assignedRole).Exec(ctx)
 }
 
-func (t *assignedRolesRepo) ListAssignedRoles(ctx context.Context, tenantId int64, identities []string, resource *v1.Resource) ([]*ent.ResourceAccess, error) {
+func (t *assignedRolesRepo) ListAssignedRoles(ctx context.Context, dto ListRolesDto) ([]*ent.ResourceAccess, error) {
 	query := t.db.ResourceAccess.Query().
-		Where(resourceaccess.TenantID(tenantId)).
+		Where(resourceaccess.TenantID(dto.TenantId)).
 		WithRole()
 
-	if len(identities) > 0 {
-		identityIDs := append(identities, "") // all provided identities + "all" identity
+	if len(dto.IdentityIDs) > 0 {
+		identityIDs := append(dto.IdentityIDs, "") // all provided identities + "all" identity
 		query.Where(resourceaccess.IdentityIDIn(identityIDs...))
 	}
 
-	if resource == nil {
+	if len(dto.ResourceFilter) > 0 {
+		query.Where(
+			resourceaccess.Or(
+				resourceaccess.ResourceTypeIn(dto.ResourceFilter...),
+				resourceaccess.ResourceIDIsNil(),
+			),
+		)
+	} else if len(dto.Resources) > 0 {
+		// assigned only on provided resource
+		predicates := make([]predicate.ResourceAccess, len(dto.Resources))
+		for i, resource := range dto.Resources {
+			predicates[i] = resourceaccess.And(
+				resourceaccess.ResourceType(resource.Type),
+				resourceaccess.ResourceID(resource.Id),
+			)
+		}
+
+		query.Where(resourceaccess.Or(predicates...))
+	} else {
 		// not assigned on any resource (all resources on tenant)
 		query.Where(resourceaccess.ResourceIDIsNil())
-	} else {
-		// assigned only on provided resource
-		query.Where(
-			resourceaccess.ResourceType(resource.Type),
-			resourceaccess.ResourceID(resource.Id),
-		)
 	}
 
 	return query.All(ctx)
-
 }
 
-func (t *assignedRolesRepo) ListResourceRoles(ctx context.Context, dto ListRolesDto) ([]*ent.ResourceAccess, error) {
+func (t *assignedRolesRepo) CheckRoles(ctx context.Context, dto ListRolesDto) ([]*ent.ResourceAccess, error) {
 	query := t.db.ResourceAccess.Query().
 		Where(resourceaccess.TenantID(dto.TenantId)).
 		WithRole()

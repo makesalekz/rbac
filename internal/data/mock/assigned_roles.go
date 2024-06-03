@@ -9,7 +9,6 @@ import (
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
-	rbac_v1 "gitlab.calendaria.team/services/rbac/api/rbac/v1"
 	ent "gitlab.calendaria.team/services/rbac/ent"
 	data "gitlab.calendaria.team/services/rbac/internal/data"
 )
@@ -51,6 +50,21 @@ func (mr *MockAssignedRolesRepoMockRecorder) AssignRoles(ctx, tenantId, dto inte
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AssignRoles", reflect.TypeOf((*MockAssignedRolesRepo)(nil).AssignRoles), ctx, tenantId, dto)
 }
 
+// CheckRoles mocks base method.
+func (m *MockAssignedRolesRepo) CheckRoles(ctx context.Context, dto data.ListRolesDto) ([]*ent.ResourceAccess, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CheckRoles", ctx, dto)
+	ret0, _ := ret[0].([]*ent.ResourceAccess)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CheckRoles indicates an expected call of CheckRoles.
+func (mr *MockAssignedRolesRepoMockRecorder) CheckRoles(ctx, dto interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CheckRoles", reflect.TypeOf((*MockAssignedRolesRepo)(nil).CheckRoles), ctx, dto)
+}
+
 // GetAssignedRoleById mocks base method.
 func (m *MockAssignedRolesRepo) GetAssignedRoleById(ctx context.Context, tenantId, assignId int64) (*ent.ResourceAccess, error) {
 	m.ctrl.T.Helper()
@@ -67,33 +81,18 @@ func (mr *MockAssignedRolesRepoMockRecorder) GetAssignedRoleById(ctx, tenantId, 
 }
 
 // ListAssignedRoles mocks base method.
-func (m *MockAssignedRolesRepo) ListAssignedRoles(ctx context.Context, tenantId int64, identities []string, resource *rbac_v1.Resource) ([]*ent.ResourceAccess, error) {
+func (m *MockAssignedRolesRepo) ListAssignedRoles(ctx context.Context, dto data.ListRolesDto) ([]*ent.ResourceAccess, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ListAssignedRoles", ctx, tenantId, identities, resource)
+	ret := m.ctrl.Call(m, "ListAssignedRoles", ctx, dto)
 	ret0, _ := ret[0].([]*ent.ResourceAccess)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // ListAssignedRoles indicates an expected call of ListAssignedRoles.
-func (mr *MockAssignedRolesRepoMockRecorder) ListAssignedRoles(ctx, tenantId, identities, resource interface{}) *gomock.Call {
+func (mr *MockAssignedRolesRepoMockRecorder) ListAssignedRoles(ctx, dto interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListAssignedRoles", reflect.TypeOf((*MockAssignedRolesRepo)(nil).ListAssignedRoles), ctx, tenantId, identities, resource)
-}
-
-// ListResourceRoles mocks base method.
-func (m *MockAssignedRolesRepo) ListResourceRoles(ctx context.Context, dto data.ListRolesDto) ([]*ent.ResourceAccess, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ListResourceRoles", ctx, dto)
-	ret0, _ := ret[0].([]*ent.ResourceAccess)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// ListResourceRoles indicates an expected call of ListResourceRoles.
-func (mr *MockAssignedRolesRepoMockRecorder) ListResourceRoles(ctx, dto interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListResourceRoles", reflect.TypeOf((*MockAssignedRolesRepo)(nil).ListResourceRoles), ctx, dto)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListAssignedRoles", reflect.TypeOf((*MockAssignedRolesRepo)(nil).ListAssignedRoles), ctx, dto)
 }
 
 // UnassignRole mocks base method.
