@@ -91,6 +91,26 @@ func (s *AssignsService) ListAssigns(ctx context.Context, req *v1.ListAssignsReq
 	}, nil
 }
 
+func (s *AssignsService) ListResourcesRoles(ctx context.Context, req *v1.ListResourcesRolesRequest) (*v1.ListAssignsReply, error) {
+	tenantId := auth.GetTenantIdFromContext(ctx)
+	if tenantId == 0 {
+		return nil, v1.ErrorEmptyActorId("empty tenant id")
+	}
+
+	assignedRoles, err := s.uc.ListResourceRoles(ctx, data.ListRolesDto{
+		TenantId:    tenantId,
+		IdentityIDs: req.GetIdentityIds(),
+		Resources:   req.GetResources(),
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return &v1.ListAssignsReply{
+		Roles: assignedRolesReply(assignedRoles),
+	}, nil
+}
+
 func assignedRoleReply(assignedRole *ent.ResourceAccess) *v1.AssignedRole {
 	result := v1.AssignedRole{
 		AssignId:   assignedRole.ID,

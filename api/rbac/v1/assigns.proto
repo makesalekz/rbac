@@ -14,6 +14,7 @@ service Assigns {
   rpc AssignRoles(AssignRolesRequest) returns (utils.v1.EmptyReply);
   rpc UnassignRole(AssignRequest) returns (utils.v1.EmptyReply);
   rpc ListAssigns(ListAssignsRequest) returns (ListAssignsReply);
+  rpc ListResourcesRoles(ListResourcesRolesRequest) returns (ListAssignsReply);
 }
 
 message AssignRoleRequest {
@@ -34,6 +35,11 @@ message AssignRequest {
 message ListAssignsRequest {
   repeated string identityIds = 3;
   Resource resource = 4;
+}
+
+message ListResourcesRolesRequest {
+  repeated string identityIds = 3;
+  repeated Resource resources = 4;
 }
 
 message ListAssignsReply {
