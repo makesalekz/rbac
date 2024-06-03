@@ -25,6 +25,7 @@ type ListRolesDto struct {
 	IdentityIDs []string
 	TeamsIDs    []int64
 	Resources   []*v1.Resource
+	IncludeAll  bool
 }
 
 // AssignedRolesRepo
@@ -126,6 +127,12 @@ func (t *assignedRolesRepo) ListResourceRoles(ctx context.Context, dto ListRoles
 				),
 			)
 		}
+	}
+
+	if dto.IncludeAll {
+		predicates = append(predicates,
+			resourceaccess.ResourceIDNotNil(),
+		)
 	}
 
 	return query.Where(resourceaccess.Or(predicates...)).All(ctx)

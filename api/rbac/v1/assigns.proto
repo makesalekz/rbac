@@ -40,6 +40,7 @@ message ListAssignsRequest {
 message ListResourcesRolesRequest {
   repeated string identityIds = 3;
   repeated Resource resources = 4;
+  bool includeAllResources = 5;
 }
 
 message ListAssignsReply {

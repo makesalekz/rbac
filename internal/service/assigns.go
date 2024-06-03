@@ -101,6 +101,7 @@ func (s *AssignsService) ListResourcesRoles(ctx context.Context, req *v1.ListRes
 		TenantId:    tenantId,
 		IdentityIDs: req.GetIdentityIds(),
 		Resources:   req.GetResources(),
+		IncludeAll:  req.IncludeAllResources,
 	})
 	if err != nil {
 		return nil, err
