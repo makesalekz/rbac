@@ -58,7 +58,7 @@ func TestCheckPermissionsUsecase_CheckPermissions(t *testing.T) {
 		TeamsIDs:    []int64{teamId},
 		Resources:   []*v1.Resource{},
 	}
-	assignedRepo.EXPECT().ListResourceRoles(ctx, listRolesDto).Return(assignedRoles, nil)
+	assignedRepo.EXPECT().CheckRoles(ctx, listRolesDto).Return(assignedRoles, nil)
 
 	filterRolePermissions := data.FilterRolePermissions{
 		TenantId:    tenantId,
