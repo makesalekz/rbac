@@ -80,7 +80,12 @@ func (t *assignedRolesRepo) ListAssignedRoles(ctx context.Context, dto ListRoles
 	}
 
 	if dto.ResourceFilter != nil && len(dto.ResourceFilter.ResourceTypes) > 0 {
-		return query.Where(resourceaccess.ResourceTypeIn(dto.ResourceFilter.ResourceTypes...)).All(ctx)
+		query.Where(
+			resourceaccess.Or(
+				resourceaccess.ResourceTypeIn(dto.ResourceFilter.ResourceTypes...),
+				resourceaccess.ResourceIDIsNil(),
+			),
+		)
 	} else if len(dto.Resources) > 0 {
 		// assigned only on provided resource
 		for _, resource := range dto.Resources {
