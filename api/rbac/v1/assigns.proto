@@ -33,8 +33,14 @@ message AssignRequest {
 
 message ListAssignsRequest {
   repeated string identityIds = 3;
-  Resource resource = 4;
-  bool includeAllResources = 5;
+  oneof field{
+    ResourceFilter filter=5;
+    Resource resource = 4;
+  }
+}
+
+message ResourceFilter {
+  repeated string resourceTypes = 1;
 }
 
 message ListAssignsReply {
