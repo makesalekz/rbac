@@ -20,11 +20,10 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	Assigns_AssignRole_FullMethodName         = "/rbac.v1.Assigns/AssignRole"
-	Assigns_AssignRoles_FullMethodName        = "/rbac.v1.Assigns/AssignRoles"
-	Assigns_UnassignRole_FullMethodName       = "/rbac.v1.Assigns/UnassignRole"
-	Assigns_ListAssigns_FullMethodName        = "/rbac.v1.Assigns/ListAssigns"
-	Assigns_ListResourcesRoles_FullMethodName = "/rbac.v1.Assigns/ListResourcesRoles"
+	Assigns_AssignRole_FullMethodName   = "/rbac.v1.Assigns/AssignRole"
+	Assigns_AssignRoles_FullMethodName  = "/rbac.v1.Assigns/AssignRoles"
+	Assigns_UnassignRole_FullMethodName = "/rbac.v1.Assigns/UnassignRole"
+	Assigns_ListAssigns_FullMethodName  = "/rbac.v1.Assigns/ListAssigns"
 )
 
 // AssignsClient is the client API for Assigns service.
@@ -35,7 +34,6 @@ type AssignsClient interface {
 	AssignRoles(ctx context.Context, in *AssignRolesRequest, opts ...grpc.CallOption) (*v1.EmptyReply, error)
 	UnassignRole(ctx context.Context, in *AssignRequest, opts ...grpc.CallOption) (*v1.EmptyReply, error)
 	ListAssigns(ctx context.Context, in *ListAssignsRequest, opts ...grpc.CallOption) (*ListAssignsReply, error)
-	ListResourcesRoles(ctx context.Context, in *ListResourcesRolesRequest, opts ...grpc.CallOption) (*ListAssignsReply, error)
 }
 
 type assignsClient struct {
@@ -82,15 +80,6 @@ func (c *assignsClient) ListAssigns(ctx context.Context, in *ListAssignsRequest,
 	return out, nil
 }
 
-func (c *assignsClient) ListResourcesRoles(ctx context.Context, in *ListResourcesRolesRequest, opts ...grpc.CallOption) (*ListAssignsReply, error) {
-	out := new(ListAssignsReply)
-	err := c.cc.Invoke(ctx, Assigns_ListResourcesRoles_FullMethodName, in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 // AssignsServer is the server API for Assigns service.
 // All implementations must embed UnimplementedAssignsServer
 // for forward compatibility
@@ -99,7 +88,6 @@ type AssignsServer interface {
 	AssignRoles(context.Context, *AssignRolesRequest) (*v1.EmptyReply, error)
 	UnassignRole(context.Context, *AssignRequest) (*v1.EmptyReply, error)
 	ListAssigns(context.Context, *ListAssignsRequest) (*ListAssignsReply, error)
-	ListResourcesRoles(context.Context, *ListResourcesRolesRequest) (*ListAssignsReply, error)
 	mustEmbedUnimplementedAssignsServer()
 }
 
@@ -118,9 +106,6 @@ func (UnimplementedAssignsServer) UnassignRole(context.Context, *AssignRequest) 
 }
 func (UnimplementedAssignsServer) ListAssigns(context.Context, *ListAssignsRequest) (*ListAssignsReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListAssigns not implemented")
-}
-func (UnimplementedAssignsServer) ListResourcesRoles(context.Context, *ListResourcesRolesRequest) (*ListAssignsReply, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ListResourcesRoles not implemented")
 }
 func (UnimplementedAssignsServer) mustEmbedUnimplementedAssignsServer() {}
 
@@ -207,24 +192,6 @@ func _Assigns_ListAssigns_Handler(srv interface{}, ctx context.Context, dec func
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Assigns_ListResourcesRoles_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ListResourcesRolesRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(AssignsServer).ListResourcesRoles(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: Assigns_ListResourcesRoles_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AssignsServer).ListResourcesRoles(ctx, req.(*ListResourcesRolesRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 // Assigns_ServiceDesc is the grpc.ServiceDesc for Assigns service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -247,10 +214,6 @@ var Assigns_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListAssigns",
 			Handler:    _Assigns_ListAssigns_Handler,
-		},
-		{
-			MethodName: "ListResourcesRoles",
-			Handler:    _Assigns_ListResourcesRoles_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

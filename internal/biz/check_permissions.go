@@ -64,7 +64,7 @@ func (u *CheckPermissionsUsecase) CheckPermissions(ctx context.Context, tenantId
 		}
 	}
 
-	assignedRoles, err := u.repo.ListResourceRoles(ctx, data.ListRolesDto{
+	assignedRoles, err := u.repo.CheckRoles(ctx, data.ListRolesDto{
 		TenantId:    tenantId,
 		IdentityIDs: identities,
 		TeamsIDs:    teamsIds,

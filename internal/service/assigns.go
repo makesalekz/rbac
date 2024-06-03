@@ -81,27 +81,11 @@ func (s *AssignsService) ListAssigns(ctx context.Context, req *v1.ListAssignsReq
 		return nil, v1.ErrorEmptyActorId("empty tenant id")
 	}
 
-	assignedRoles, err := s.uc.ListAssignedRoles(ctx, tenantId, req.GetIdentityIds(), req.GetResource())
-	if err != nil {
-		return nil, err
-	}
-
-	return &v1.ListAssignsReply{
-		Roles: assignedRolesReply(assignedRoles),
-	}, nil
-}
-
-func (s *AssignsService) ListResourcesRoles(ctx context.Context, req *v1.ListResourcesRolesRequest) (*v1.ListAssignsReply, error) {
-	tenantId := auth.GetTenantIdFromContext(ctx)
-	if tenantId == 0 {
-		return nil, v1.ErrorEmptyActorId("empty tenant id")
-	}
-
-	assignedRoles, err := s.uc.ListResourceRoles(ctx, data.ListRolesDto{
+	assignedRoles, err := s.uc.ListAssignedRoles(ctx, data.ListRolesDto{
 		TenantId:            tenantId,
 		IdentityIDs:         req.GetIdentityIds(),
-		Resources:           req.GetResources(),
-		IncludeAllResources: req.IncludeAllResources,
+		Resources:           []*v1.Resource{req.GetResource()},
+		IncludeAllResources: req.GetIncludeAllResources(),
 	})
 	if err != nil {
 		return nil, err
