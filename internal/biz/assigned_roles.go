@@ -198,3 +198,7 @@ func (u *AssignedRolesUsecase) UnassignRole(ctx context.Context, tenantId, assig
 func (u *AssignedRolesUsecase) ListAssignedRoles(ctx context.Context, tenantId int64, identities []string, resource *v1.Resource) ([]*ent.ResourceAccess, error) {
 	return u.repo.ListAssignedRoles(ctx, tenantId, identities, resource)
 }
+
+func (u *AssignedRolesUsecase) ListResourceRoles(ctx context.Context, dto data.ListRolesDto) ([]*ent.ResourceAccess, error) {
+	return u.repo.ListResourceRoles(ctx, dto)
+}
