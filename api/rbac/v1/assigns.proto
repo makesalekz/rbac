@@ -33,7 +33,7 @@ message AssignRequest {
 
 message ListAssignsRequest {
   repeated string identityIds = 3;
-  oneof field{
+  oneof requestType{
     ResourceFilter filter=5;
     Resource resource = 4;
   }
