@@ -24,7 +24,7 @@ type ListRolesDto struct {
 	IdentityIDs    []string
 	TeamsIDs       []int64
 	Resources      []*v1.Resource
-	ResourceFilter *v1.ResourceFilter
+	ResourceFilter []string
 }
 
 // AssignedRolesRepo
@@ -79,21 +79,24 @@ func (t *assignedRolesRepo) ListAssignedRoles(ctx context.Context, dto ListRoles
 		query.Where(resourceaccess.IdentityIDIn(identityIDs...))
 	}
 
-	if dto.ResourceFilter != nil && len(dto.ResourceFilter.ResourceTypes) > 0 {
+	if len(dto.ResourceFilter) > 0 {
 		query.Where(
 			resourceaccess.Or(
-				resourceaccess.ResourceTypeIn(dto.ResourceFilter.ResourceTypes...),
+				resourceaccess.ResourceTypeIn(dto.ResourceFilter...),
 				resourceaccess.ResourceIDIsNil(),
 			),
 		)
 	} else if len(dto.Resources) > 0 {
 		// assigned only on provided resource
-		for _, resource := range dto.Resources {
-			query.Where(
+		predicates := make([]predicate.ResourceAccess, len(dto.Resources))
+		for i, resource := range dto.Resources {
+			predicates[i] = resourceaccess.And(
 				resourceaccess.ResourceType(resource.Type),
 				resourceaccess.ResourceID(resource.Id),
 			)
 		}
+
+		query.Where(resourceaccess.Or(predicates...))
 	} else {
 		// not assigned on any resource (all resources on tenant)
 		query.Where(resourceaccess.ResourceIDIsNil())

@@ -84,7 +84,7 @@ func (s *AssignsService) ListAssigns(ctx context.Context, req *v1.ListAssignsReq
 	assignedRoles, err := s.uc.ListAssignedRoles(ctx, data.ListRolesDto{
 		TenantId:       tenantId,
 		IdentityIDs:    req.GetIdentityIds(),
-		Resources:      []*v1.Resource{req.GetResource()},
+		Resources:      req.GetResources(),
 		ResourceFilter: req.GetFilter(),
 	})
 	if err != nil {
