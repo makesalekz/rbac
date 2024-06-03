@@ -128,6 +128,11 @@ all:
 	make config;
 	make generate;
 
+.PHONY: lint
+# run linter
+lint:
+	golangci-lint run -v
+
 .PHONY: test
 # run tests
 test:
