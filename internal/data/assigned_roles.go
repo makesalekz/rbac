@@ -21,11 +21,11 @@ type AssignRoleDto struct {
 }
 
 type ListRolesDto struct {
-	TenantId    int64
-	IdentityIDs []string
-	TeamsIDs    []int64
-	Resources   []*v1.Resource
-	IncludeAll  bool
+	TenantId            int64
+	IdentityIDs         []string
+	TeamsIDs            []int64
+	Resources           []*v1.Resource
+	IncludeAllResources bool
 }
 
 // AssignedRolesRepo
@@ -129,7 +129,7 @@ func (t *assignedRolesRepo) ListResourceRoles(ctx context.Context, dto ListRoles
 		}
 	}
 
-	if dto.IncludeAll {
+	if dto.IncludeAllResources {
 		predicates = append(predicates,
 			resourceaccess.ResourceIDNotNil(),
 		)
