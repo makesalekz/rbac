@@ -85,7 +85,7 @@ func (s *AssignsService) ListAssigns(ctx context.Context, req *v1.ListAssignsReq
 		TenantId:       tenantId,
 		IdentityIDs:    req.GetIdentityIds(),
 		Resources:      req.GetResources(),
-		ResourceFilter: req.GetFilter(),
+		ResourceFilter: req.GetResourceTypes(),
 	})
 	if err != nil {
 		return nil, err

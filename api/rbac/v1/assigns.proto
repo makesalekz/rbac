@@ -33,7 +33,7 @@ message AssignRequest {
 
 message ListAssignsRequest {
   repeated string identityIds = 3;
-  repeated string filter = 6;
+  repeated string resourceTypes = 6;
   repeated Resource resources = 5;
 }
 
