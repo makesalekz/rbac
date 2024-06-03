@@ -51,10 +51,6 @@ func (t *assignedRolesRepo) AssignRoles(ctx context.Context, tenantId int64, dto
 		if dto.Resource != nil {
 			assignQueries[i].SetResourceID(dto.Resource.Id).SetResourceType(dto.Resource.Type)
 		}
-
-		if dto.TeamId != 0 {
-			assignQueries[i].SetResourceID(dto.TeamId).SetResourceType(RESOURCE_TYPE_TEAM)
-		}
 	}
 
 	return t.db.ResourceAccess.CreateBulk(assignQueries...).Exec(ctx)
