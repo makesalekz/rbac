@@ -8,34 +8,14 @@ import (
 	"gitlab.calendaria.team/services/rbac/ent/permissiongroup"
 )
 
-type UpdatePermissionDto struct {
-	Name        string
-	Description string
-	Fields      []string
-}
-
-type CreatePermissionDto struct {
-	Id          string
-	Name        string
-	Description string
-	GroupId     string
-	AppId       string
-	Fields      []string
-}
-
-type FilterPermissions struct {
-	AppsIds    []string
-	WithDenied bool
-}
-
-// PermissionRepo
+// PermissionRepo.
 type PermissionRepo interface {
 	CreatePermission(ctx context.Context, createPermissionDto CreatePermissionDto) (*ent.Permission, error)
 	UpdatePermission(ctx context.Context, id string, data UpdatePermissionDto) (*ent.Permission, error)
 	DeletePermission(ctx context.Context, id string) error
-	GetPermissionById(ctx context.Context, id string) (*ent.Permission, error)
-	GetPermissionsByIds(ctx context.Context, ids []string) ([]*ent.Permission, error)
-	GetPermissions(ctx context.Context, appId string, ids []string) ([]*ent.Permission, error)
+	GetPermissionByID(ctx context.Context, id string) (*ent.Permission, error)
+	GetPermissionsByIDs(ctx context.Context, ids []string) ([]*ent.Permission, error)
+	GetPermissions(ctx context.Context, appID string, ids []string) ([]*ent.Permission, error)
 	GetGroupedPermissions(ctx context.Context, filter FilterPermissions) ([]*ent.PermissionGroup, error)
 }
 
@@ -43,7 +23,10 @@ type permissionRepo struct {
 	db *ent.Client
 }
 
-func (p *permissionRepo) CreatePermission(ctx context.Context, createPermissionDto CreatePermissionDto) (*ent.Permission, error) {
+func (p *permissionRepo) CreatePermission(
+	ctx context.Context,
+	createPermissionDto CreatePermissionDto,
+) (*ent.Permission, error) {
 	return p.db.Permission.Create().
 		SetID(createPermissionDto.Id).
 		SetGroupID(createPermissionDto.GroupId).
@@ -54,7 +37,11 @@ func (p *permissionRepo) CreatePermission(ctx context.Context, createPermissionD
 		Save(ctx)
 }
 
-func (p *permissionRepo) UpdatePermission(ctx context.Context, id string, data UpdatePermissionDto) (*ent.Permission, error) {
+func (p *permissionRepo) UpdatePermission(
+	ctx context.Context,
+	id string,
+	data UpdatePermissionDto,
+) (*ent.Permission, error) {
 	// check permission is exists
 	permission, err := p.db.Permission.Get(ctx, id)
 	if err != nil {
@@ -79,19 +66,23 @@ func (p *permissionRepo) DeletePermission(ctx context.Context, id string) error 
 	return p.db.Permission.DeleteOneID(id).Exec(ctx)
 }
 
-func (p *permissionRepo) GetPermissionById(ctx context.Context, id string) (*ent.Permission, error) {
+func (p *permissionRepo) GetPermissionByID(ctx context.Context, id string) (*ent.Permission, error) {
 	return p.db.Permission.Get(ctx, id)
 }
 
-func (p *permissionRepo) GetPermissionsByIds(ctx context.Context, ids []string) ([]*ent.Permission, error) {
+func (p *permissionRepo) GetPermissionsByIDs(ctx context.Context, ids []string) ([]*ent.Permission, error) {
 	return p.db.Permission.Query().Where(permission.IDIn(ids...)).All(ctx)
 }
 
-func (p *permissionRepo) GetPermissions(ctx context.Context, appId string, ids []string) ([]*ent.Permission, error) {
+func (p *permissionRepo) GetPermissions(
+	ctx context.Context,
+	appID string,
+	ids []string,
+) ([]*ent.Permission, error) {
 	query := p.db.Permission.Query()
 	// check if app exists
-	if appId != "" {
-		query.Where(permission.AppID(appId))
+	if appID != "" {
+		query.Where(permission.AppID(appID))
 	}
 	if ids != nil {
 		query.Where(permission.IDIn(ids...))
@@ -99,7 +90,10 @@ func (p *permissionRepo) GetPermissions(ctx context.Context, appId string, ids [
 	return query.All(ctx)
 }
 
-func (p *permissionRepo) GetGroupedPermissions(ctx context.Context, filter FilterPermissions) ([]*ent.PermissionGroup, error) {
+func (p *permissionRepo) GetGroupedPermissions(
+	ctx context.Context,
+	filter FilterPermissions,
+) ([]*ent.PermissionGroup, error) {
 	query := p.db.PermissionGroup.Query().WithPermissions()
 
 	if len(filter.AppsIds) > 0 {

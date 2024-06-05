@@ -80,49 +80,49 @@ func (mr *MockPermissionRepoMockRecorder) GetGroupedPermissions(ctx, filter inte
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetGroupedPermissions", reflect.TypeOf((*MockPermissionRepo)(nil).GetGroupedPermissions), ctx, filter)
 }
 
-// GetPermissionById mocks base method.
-func (m *MockPermissionRepo) GetPermissionById(ctx context.Context, id string) (*ent.Permission, error) {
+// GetPermissionByID mocks base method.
+func (m *MockPermissionRepo) GetPermissionByID(ctx context.Context, id string) (*ent.Permission, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetPermissionById", ctx, id)
+	ret := m.ctrl.Call(m, "GetPermissionByID", ctx, id)
 	ret0, _ := ret[0].(*ent.Permission)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// GetPermissionById indicates an expected call of GetPermissionById.
-func (mr *MockPermissionRepoMockRecorder) GetPermissionById(ctx, id interface{}) *gomock.Call {
+// GetPermissionByID indicates an expected call of GetPermissionByID.
+func (mr *MockPermissionRepoMockRecorder) GetPermissionByID(ctx, id interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPermissionById", reflect.TypeOf((*MockPermissionRepo)(nil).GetPermissionById), ctx, id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPermissionByID", reflect.TypeOf((*MockPermissionRepo)(nil).GetPermissionByID), ctx, id)
 }
 
 // GetPermissions mocks base method.
-func (m *MockPermissionRepo) GetPermissions(ctx context.Context, appId string, ids []string) ([]*ent.Permission, error) {
+func (m *MockPermissionRepo) GetPermissions(ctx context.Context, appID string, ids []string) ([]*ent.Permission, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetPermissions", ctx, appId, ids)
+	ret := m.ctrl.Call(m, "GetPermissions", ctx, appID, ids)
 	ret0, _ := ret[0].([]*ent.Permission)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetPermissions indicates an expected call of GetPermissions.
-func (mr *MockPermissionRepoMockRecorder) GetPermissions(ctx, appId, ids interface{}) *gomock.Call {
+func (mr *MockPermissionRepoMockRecorder) GetPermissions(ctx, appID, ids interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPermissions", reflect.TypeOf((*MockPermissionRepo)(nil).GetPermissions), ctx, appId, ids)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPermissions", reflect.TypeOf((*MockPermissionRepo)(nil).GetPermissions), ctx, appID, ids)
 }
 
-// GetPermissionsByIds mocks base method.
-func (m *MockPermissionRepo) GetPermissionsByIds(ctx context.Context, ids []string) ([]*ent.Permission, error) {
+// GetPermissionsByIDs mocks base method.
+func (m *MockPermissionRepo) GetPermissionsByIDs(ctx context.Context, ids []string) ([]*ent.Permission, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetPermissionsByIds", ctx, ids)
+	ret := m.ctrl.Call(m, "GetPermissionsByIDs", ctx, ids)
 	ret0, _ := ret[0].([]*ent.Permission)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// GetPermissionsByIds indicates an expected call of GetPermissionsByIds.
-func (mr *MockPermissionRepoMockRecorder) GetPermissionsByIds(ctx, ids interface{}) *gomock.Call {
+// GetPermissionsByIDs indicates an expected call of GetPermissionsByIDs.
+func (mr *MockPermissionRepoMockRecorder) GetPermissionsByIDs(ctx, ids interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPermissionsByIds", reflect.TypeOf((*MockPermissionRepo)(nil).GetPermissionsByIds), ctx, ids)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPermissionsByIDs", reflect.TypeOf((*MockPermissionRepo)(nil).GetPermissionsByIDs), ctx, ids)
 }
 
 // UpdatePermission mocks base method.
