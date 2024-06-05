@@ -41,9 +41,9 @@ func (s *PermissionsService) CreatePermission(
 	}
 
 	dto := data.CreatePermissionDto{
-		Id:          req.GetId(),
-		GroupId:     req.GetGroupId(),
-		AppId:       req.GetAppId(),
+		ID:          req.GetId(),
+		GroupID:     req.GetGroupId(),
+		AppID:       req.GetAppId(),
 		Name:        req.GetName(),
 		Description: req.GetDescription(),
 		Fields:      req.GetFields(),
@@ -149,7 +149,7 @@ func (s *PermissionsService) ListPermissions(
 		tenantID,
 		identities,
 		data.FilterPermissions{
-			AppsIds: req.GetAppsIds(),
+			AppsIDs: req.GetAppsIds(),
 		})
 	if err != nil {
 		return nil, err

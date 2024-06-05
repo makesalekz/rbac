@@ -61,14 +61,14 @@ func TestPermissionsUsecase_CreatePermission(t *testing.T) {
 
 	ctx := context.Background()
 	dto := data.CreatePermissionDto{
-		Id:          "some.permission",
+		ID:          "some.permission",
 		Name:        "testName",
 		Description: "testDesc",
-		AppId:       "app-id",
+		AppID:       "app-id",
 	}
 	permission := &ent.Permission{
 		ID:          "some.permission",
-		AppID:       dto.AppId,
+		AppID:       dto.AppID,
 		Name:        dto.Name,
 		Description: dto.Description,
 	}

@@ -28,11 +28,11 @@ func (p *permissionRepo) CreatePermission(
 	createPermissionDto CreatePermissionDto,
 ) (*ent.Permission, error) {
 	return p.db.Permission.Create().
-		SetID(createPermissionDto.Id).
-		SetGroupID(createPermissionDto.GroupId).
+		SetID(createPermissionDto.ID).
+		SetGroupID(createPermissionDto.GroupID).
 		SetName(createPermissionDto.Name).
 		SetDescription(createPermissionDto.Description).
-		SetAppID(createPermissionDto.AppId).
+		SetAppID(createPermissionDto.AppID).
 		SetFields(createPermissionDto.Fields).
 		Save(ctx)
 }
@@ -96,8 +96,8 @@ func (p *permissionRepo) GetGroupedPermissions(
 ) ([]*ent.PermissionGroup, error) {
 	query := p.db.PermissionGroup.Query().WithPermissions()
 
-	if len(filter.AppsIds) > 0 {
-		query.Where(permissiongroup.AppIDIn(filter.AppsIds...))
+	if len(filter.AppsIDs) > 0 {
+		query.Where(permissiongroup.AppIDIn(filter.AppsIDs...))
 	}
 
 	return query.All(ctx)

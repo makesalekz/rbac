@@ -80,12 +80,12 @@ func TestPermissionsService_CreatePermission(t *testing.T) {
 		Name:    "testName",
 	}
 	permission := &ent.Permission{
-		ID:          req.Id,
-		GroupID:     req.GroupId,
-		AppID:       req.AppId,
-		Name:        req.Name,
-		Description: req.Description,
-		Fields:      req.Fields,
+		ID:          req.GetId(),
+		GroupID:     req.GetGroupId(),
+		AppID:       req.GetAppId(),
+		Name:        req.GetName(),
+		Description: req.GetDescription(),
+		Fields:      req.GetFields(),
 	}
 	assignedRepo.EXPECT().CheckRoles(ctx, gomock.Any()).Return(mockAccess(), nil)
 	roleRepo.EXPECT().ListRolesPermissions(ctx, gomock.Any()).Return(mockRolePermissions("admin.permission.create"), nil)
@@ -102,7 +102,7 @@ func TestPermissionsService_CreatePermission(t *testing.T) {
 
 	reply, err := service.CreatePermission(ctx, req)
 	require.NoError(t, err)
-	require.Equal(t, expect, reply.Permission)
+	require.Equal(t, expect, reply.GetPermission())
 }
 
 func TestPermissionsService_CreatePermissionAccessDenied(t *testing.T) {
@@ -364,8 +364,8 @@ func TestPermissionsService_UpdatePermission(t *testing.T) {
 		Name:         "testNewName",
 	}
 	permission := &ent.Permission{
-		ID:          req.PermissionId,
-		Name:        req.Name,
+		ID:          req.GetPermissionId(),
+		Name:        req.GetName(),
 		GroupID:     "some.group",
 		AppID:       "app-id",
 		Description: "testDesc",
@@ -373,7 +373,7 @@ func TestPermissionsService_UpdatePermission(t *testing.T) {
 	}
 	assignedRepo.EXPECT().CheckRoles(ctx, gomock.Any()).Return(mockAccess(), nil)
 	roleRepo.EXPECT().ListRolesPermissions(ctx, gomock.Any()).Return(mockRolePermissions("admin.permission.update"), nil)
-	permissionRepo.EXPECT().UpdatePermission(ctx, req.PermissionId, gomock.Any()).Return(permission, nil)
+	permissionRepo.EXPECT().UpdatePermission(ctx, req.GetPermissionId(), gomock.Any()).Return(permission, nil)
 
 	expect := &v1.Permission{
 		Id:          permission.ID,
@@ -386,7 +386,7 @@ func TestPermissionsService_UpdatePermission(t *testing.T) {
 
 	reply, err := service.UpdatePermission(ctx, req)
 	require.NoError(t, err)
-	require.Equal(t, expect, reply.Permission)
+	require.Equal(t, expect, reply.GetPermission())
 }
 
 func TestPermissionsService_UpdatePermissionAccessDenied(t *testing.T) {
@@ -487,7 +487,7 @@ func TestPermissionsService_DeletePermission(t *testing.T) {
 	}
 	assignedRepo.EXPECT().CheckRoles(ctx, gomock.Any()).Return(mockAccess(), nil)
 	roleRepo.EXPECT().ListRolesPermissions(ctx, gomock.Any()).Return(mockRolePermissions("admin.permission.delete"), nil)
-	permissionRepo.EXPECT().DeletePermission(ctx, req.PermissionId).Return(nil)
+	permissionRepo.EXPECT().DeletePermission(ctx, req.GetPermissionId()).Return(nil)
 
 	_, err = service.DeletePermission(ctx, req)
 	require.NoError(t, err)
@@ -554,7 +554,7 @@ func TestPermissionsService_GetPermission(t *testing.T) {
 		PermissionId: "some.group.permission",
 	}
 	permission := &ent.Permission{
-		ID:          req.PermissionId,
+		ID:          req.GetPermissionId(),
 		GroupID:     "some.group",
 		AppID:       "app-id",
 		Name:        "testName",
@@ -563,7 +563,7 @@ func TestPermissionsService_GetPermission(t *testing.T) {
 	}
 	assignedRepo.EXPECT().CheckRoles(ctx, gomock.Any()).Return(mockAccess(), nil)
 	roleRepo.EXPECT().ListRolesPermissions(ctx, gomock.Any()).Return(mockRolePermissions("admin.permission.read"), nil)
-	permissionRepo.EXPECT().GetPermissionByID(ctx, req.PermissionId).Return(permission, nil)
+	permissionRepo.EXPECT().GetPermissionByID(ctx, req.GetPermissionId()).Return(permission, nil)
 
 	expect := &v1.Permission{
 		Id:          permission.ID,
@@ -576,7 +576,7 @@ func TestPermissionsService_GetPermission(t *testing.T) {
 
 	reply, err := service.GetPermission(ctx, req)
 	require.NoError(t, err)
-	require.Equal(t, expect, reply.Permission)
+	require.Equal(t, expect, reply.GetPermission())
 }
 
 func TestPermissionsService_GetPermissionAccessDenied(t *testing.T) {
@@ -641,7 +641,7 @@ func TestPermissionsService_ListPermissions(t *testing.T) {
 		AppsIds: []string{"app-id"},
 	}
 	filter := data.FilterPermissions{
-		AppsIds: req.AppsIds,
+		AppsIDs: req.GetAppsIds(),
 	}
 	groups := []*ent.PermissionGroup{
 		{
@@ -723,8 +723,8 @@ func TestPermissionsService_ListPermissions(t *testing.T) {
 
 	reply, err := service.ListPermissions(ctx, req)
 	require.NoError(t, err)
-	require.Equal(t, 2, len(reply.Groups))
-	require.Equal(t, expectGroup, reply.Groups[0])
+	require.Len(t, reply.GetGroups(), 2)
+	require.Equal(t, expectGroup, reply.GetGroups()[0])
 }
 
 func TestPermissionsService_ListPermissionsAccessDenied(t *testing.T) {

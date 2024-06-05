@@ -5,30 +5,30 @@ import (
 )
 
 type CreatePermissionDto struct {
-	Id          string
+	ID          string
 	Name        string
 	Description string
-	GroupId     string
-	AppId       string
+	GroupID     string
+	AppID       string
 	Fields      []string
 }
 
 func (dto CreatePermissionDto) Validate() error {
-	if dto.Id == "" {
+	if dto.ID == "" {
 		return v1.ErrorBadRequest("empty id")
 	}
 	if dto.Name == "" {
 		return v1.ErrorBadRequest("empty name")
 	}
-	if dto.GroupId == "" {
+	if dto.GroupID == "" {
 		return v1.ErrorBadRequest("empty group")
 	}
-	if dto.AppId == "" {
+	if dto.AppID == "" {
 		return v1.ErrorBadRequest("empty app id")
 	}
 	// check if GroupId matches first part of Id
 	// example: GroupId = "group1", Id = "group1.permission1"
-	if dto.Id[:len(dto.GroupId)] != dto.GroupId {
+	if dto.ID[:len(dto.GroupID)] != dto.GroupID {
 		return v1.ErrorBadRequest("id must start with group id")
 	}
 	return nil
@@ -41,6 +41,6 @@ type UpdatePermissionDto struct {
 }
 
 type FilterPermissions struct {
-	AppsIds    []string
+	AppsIDs    []string
 	WithDenied bool
 }
