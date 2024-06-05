@@ -27,47 +27,47 @@ func TestAssignedRolesUsecase_AssignRole(t *testing.T) {
 	require.NoError(t, err)
 
 	ctx := context.Background()
-	tenantId := int64(1)
-	identityId := "identity1"
-	roleId := int64(1)
-	roleId2 := int64(2)
-	teamId := int64(1)
+	tenantID := int64(1)
+	identityID := "identity1"
+	roleID := int64(1)
+	roleID2 := int64(2)
+	teamID := int64(1)
 
 	// Positive case
 	dto := data.AssignRoleDto{
-		IdentityId: identityId,
-		RoleId:     roleId,
+		IdentityId: identityID,
+		RoleId:     roleID,
 	}
 	role := &ent.Role{
-		ID:          roleId,
-		TenantID:    tenantId,
+		ID:          roleID,
+		TenantID:    tenantID,
 		Name:        "testName",
 		Description: "testDesc",
 	}
-	roleRepo.EXPECT().GetRoleById(ctx, tenantId, roleId).Return(role, nil)
-	assignedRepo.EXPECT().AssignRoles(ctx, tenantId, []data.AssignRoleDto{dto}).Return(nil)
+	roleRepo.EXPECT().GetRoleByID(ctx, tenantID, roleID).Return(role, nil)
+	assignedRepo.EXPECT().AssignRoles(ctx, tenantID, []data.AssignRoleDto{dto}).Return(nil)
 
-	err = uc.AssignRole(ctx, tenantId, dto)
+	err = uc.AssignRole(ctx, tenantID, dto)
 	require.NoError(t, err)
 
 	// Negative case
-	roleRepo.EXPECT().GetRoleById(ctx, tenantId, roleId2).Return(nil, &ent.NotFoundError{})
+	roleRepo.EXPECT().GetRoleByID(ctx, tenantID, roleID2).Return(nil, &ent.NotFoundError{})
 
-	err = uc.AssignRole(ctx, tenantId, data.AssignRoleDto{
-		IdentityId: identityId,
-		RoleId:     roleId2,
+	err = uc.AssignRole(ctx, tenantID, data.AssignRoleDto{
+		IdentityId: identityID,
+		RoleId:     roleID2,
 	})
 	require.Error(t, err)
 	require.Equal(t, v1.ErrorNotFound("role not found"), err)
 
 	// Negative case
-	roleRepo.EXPECT().GetRoleById(ctx, tenantId, roleId).Return(role, nil)
-	teamRepo.EXPECT().GetTeam(ctx, tenantId, teamId, false).Return(nil, &ent.NotFoundError{})
+	roleRepo.EXPECT().GetRoleByID(ctx, tenantID, roleID).Return(role, nil)
+	teamRepo.EXPECT().GetTeam(ctx, tenantID, teamID, false).Return(nil, &ent.NotFoundError{})
 
-	err = uc.AssignRole(ctx, tenantId, data.AssignRoleDto{
-		IdentityId: identityId,
-		RoleId:     roleId,
-		TeamId:     teamId,
+	err = uc.AssignRole(ctx, tenantID, data.AssignRoleDto{
+		IdentityId: identityID,
+		RoleId:     roleID,
+		TeamId:     teamID,
 	})
 	require.Error(t, err)
 	require.Equal(t, v1.ErrorNotFound("team not found"), err)
@@ -85,29 +85,29 @@ func TestAssignedRolesUsecase_UnassignRole(t *testing.T) {
 	require.NoError(t, err)
 
 	ctx := context.Background()
-	tenantId := int64(1)
-	identityId := "identity1"
-	roleId := int64(1)
-	assignId := int64(1)
-	assignId2 := int64(2)
+	tenantID := int64(1)
+	identityID := "identity1"
+	roleID := int64(1)
+	assignID := int64(1)
+	assignID2 := int64(2)
 
 	// Positive case
 	assignedRole := &ent.ResourceAccess{
-		ID:         assignId,
-		TenantID:   tenantId,
-		IdentityID: identityId,
-		RoleID:     roleId,
+		ID:         assignID,
+		TenantID:   tenantID,
+		IdentityID: identityID,
+		RoleID:     roleID,
 	}
-	assignedRepo.EXPECT().GetAssignedRoleById(ctx, tenantId, assignId).Return(assignedRole, nil)
+	assignedRepo.EXPECT().GetAssignedRoleById(ctx, tenantID, assignID).Return(assignedRole, nil)
 	assignedRepo.EXPECT().UnassignRole(ctx, assignedRole).Return(nil)
 
-	err = uc.UnassignRole(ctx, tenantId, assignId)
+	err = uc.UnassignRole(ctx, tenantID, assignID)
 	require.NoError(t, err)
 
 	// Negative case
-	assignedRepo.EXPECT().GetAssignedRoleById(ctx, tenantId, assignId2).Return(nil, &ent.NotFoundError{})
+	assignedRepo.EXPECT().GetAssignedRoleById(ctx, tenantID, assignID2).Return(nil, &ent.NotFoundError{})
 
-	err = uc.UnassignRole(ctx, tenantId, assignId2)
+	err = uc.UnassignRole(ctx, tenantID, assignID2)
 	require.Error(t, err)
 	require.Equal(t, v1.ErrorNotFound("assigned role not found"), err)
 }
@@ -124,14 +124,14 @@ func TestAssignedRolesUsecase_ListAssignedRoles(t *testing.T) {
 	require.NoError(t, err)
 
 	ctx := context.Background()
-	tenantId := int64(1)
-	identityId := "identity1"
+	tenantID := int64(1)
+	identityID := "identity1"
 
 	// Positive case
 	assignedRoles := []*ent.ResourceAccess{}
-	assignedRepo.EXPECT().ListAssignedRoles(ctx, data.ListRolesDto{TenantId: tenantId, IdentityIDs: []string{identityId}}).Return(assignedRoles, nil)
+	assignedRepo.EXPECT().ListAssignedRoles(ctx, data.ListRolesDto{TenantId: tenantID, IdentityIDs: []string{identityID}}).Return(assignedRoles, nil)
 
-	roles, err := uc.ListAssignedRoles(ctx, data.ListRolesDto{TenantId: tenantId, IdentityIDs: []string{identityId}})
+	roles, err := uc.ListAssignedRoles(ctx, data.ListRolesDto{TenantId: tenantID, IdentityIDs: []string{identityID}})
 	require.NoError(t, err)
 	require.Equal(t, assignedRoles, roles)
 }

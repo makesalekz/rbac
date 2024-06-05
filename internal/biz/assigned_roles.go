@@ -48,11 +48,11 @@ func NewAssignedRolesUsecase(
 // - rbac.ErrorNotFound: role or team not found
 // - rbac.ErrorDatabaseQuery: failed to get role or team
 // - rbac.ErrorAlreadyExists: role already assigned
-// - rbac.ErrorBadRequest: there is no such teamId
+// - rbac.ErrorBadRequest: there is no such teamId.
 func (u *AssignedRolesUsecase) AssignRoles(ctx context.Context, tenantId int64, dtos []data.AssignRoleDto) error {
 	roleIds := data.ExtractSlice(dtos, func(e data.AssignRoleDto) (int64, bool) { return e.RoleId, true })
 	// Get roles by ids
-	_, err := u.roleRepo.GetRolesById(ctx, tenantId, roleIds)
+	_, err := u.roleRepo.GetRolesByID(ctx, tenantId, roleIds)
 	if err != nil {
 		if ent.IsNotFound(err) {
 			return v1.ErrorNotFound("role not found")
@@ -115,7 +115,7 @@ func (u *AssignedRolesUsecase) AssignRoles(ctx context.Context, tenantId int64, 
 }
 
 func (u *AssignedRolesUsecase) AssignRole(ctx context.Context, tenantId int64, dto data.AssignRoleDto) error {
-	_, err := u.roleRepo.GetRoleById(ctx, tenantId, dto.RoleId)
+	_, err := u.roleRepo.GetRoleByID(ctx, tenantId, dto.RoleId)
 	if err != nil {
 		if ent.IsNotFound(err) {
 			return v1.ErrorNotFound("role not found")

@@ -46,16 +46,22 @@ func (u *CheckPermissionsUsecase) getParentIds(ctx context.Context, tenantId, te
 	return nil, nil
 }
 
-func (u *CheckPermissionsUsecase) CheckPermissions(ctx context.Context, tenantId int64, identities []string, permissions []string, resources []*v1.Resource) (map[string]*v1.ListOfFields, error) {
+func (u *CheckPermissionsUsecase) CheckPermissions(
+	ctx context.Context,
+	tenantId int64,
+	identities []string,
+	permissions []string,
+	resources []*v1.Resource,
+) (map[string]*v1.ListOfFields, error) {
 	var teamsIds []int64
 	for i := len(resources) - 1; i >= 0; i-- {
-		if resources[i].Type == data.RESOURCE_TYPE_TEAM {
-			parentIds, err := u.getParentIds(ctx, tenantId, resources[i].Id)
+		if resources[i].GetType() == data.RESOURCE_TYPE_TEAM {
+			parentIds, err := u.getParentIds(ctx, tenantId, resources[i].GetId())
 			if err != nil {
 				return nil, err
 			}
 
-			teamsIds = append(teamsIds, resources[i].Id)
+			teamsIds = append(teamsIds, resources[i].GetId())
 			if parentIds != nil {
 				teamsIds = append(teamsIds, parentIds...)
 			}
@@ -80,8 +86,8 @@ func (u *CheckPermissionsUsecase) CheckPermissions(ctx context.Context, tenantId
 	}
 
 	rolesPermissions, err := u.roleRepo.ListRolesPermissions(ctx, data.FilterRolePermissions{
-		TenantId:    tenantId,
-		RolesIds:    rolesIds,
+		TenantID:    tenantId,
+		RolesIDs:    rolesIds,
 		Permissions: permissions,
 	})
 	if err != nil {
@@ -95,7 +101,7 @@ func (u *CheckPermissionsUsecase) CheckPermissions(ctx context.Context, tenantId
 				Fields: rolePermission.Fields,
 			}
 		} else {
-			result[rolePermission.PermissionID].Fields = mergeFields(result[rolePermission.PermissionID].Fields, rolePermission.Fields)
+			result[rolePermission.PermissionID].Fields = mergeFields(result[rolePermission.PermissionID].GetFields(), rolePermission.Fields)
 		}
 	}
 
@@ -115,7 +121,7 @@ func (u *CheckPermissionsUsecase) HasPermission(ctx context.Context, tenantId in
 	}
 
 	if len(permissionsMap) == 0 {
-		return nil, nil
+		return &v1.ListOfFields{}, nil
 	}
 
 	return permissionsMap[permission], nil

@@ -43,14 +43,20 @@ func (s *RolesService) CreateRole(ctx context.Context, req *v1.CreateRoleRequest
 		return nil, v1.ErrorEmptyActorId("empty tenant id")
 	}
 
-	role, err := s.uc.CreateRole(ctx, data.CreateRoleDto{
-		TenantId:    tenantID,
+	dto := data.CreateRoleDto{
+		TenantID:    tenantID,
 		Name:        req.GetName(),
 		Description: req.GetDescription(),
 		IsSystem:    req.GetIsSystem(),
 		Allow:       req.GetAllow(),
 		Deny:        req.GetDeny(),
-	})
+	}
+	err := dto.Validate()
+	if err != nil {
+		return nil, err
+	}
+
+	role, err := s.uc.CreateRole(ctx, dto)
 	if err != nil {
 		return nil, v1.ErrorDatabaseQuery(err.Error())
 	}
@@ -63,6 +69,10 @@ func (s *RolesService) UpdateRole(ctx context.Context, req *v1.UpdateRoleRequest
 	tenantID := auth.GetTenantIdFromContext(ctx)
 	if tenantID == 0 {
 		return nil, v1.ErrorEmptyActorId("empty tenant id")
+	}
+
+	if req.GetRoleId() == 0 {
+		return nil, v1.ErrorBadRequest("empty role id")
 	}
 
 	updated, err := s.uc.UpdateRole(ctx, tenantID, req.GetRoleId(), data.UpdateRoleDto{
@@ -86,6 +96,10 @@ func (s *RolesService) DeleteRole(ctx context.Context, req *v1.RoleRequest) (*ut
 		return nil, v1.ErrorEmptyActorId("empty tenant id")
 	}
 
+	if req.GetRoleId() == 0 {
+		return nil, v1.ErrorBadRequest("empty role id")
+	}
+
 	err := s.uc.DeleteRole(ctx, tenantID, req.GetRoleId())
 	if err != nil {
 		return nil, err
@@ -97,6 +111,10 @@ func (s *RolesService) GetRole(ctx context.Context, req *v1.RoleRequest) (*v1.Ro
 	tenantID := auth.GetTenantIdFromContext(ctx)
 	if tenantID == 0 {
 		return nil, v1.ErrorEmptyActorId("empty tenant id")
+	}
+
+	if req.GetRoleId() == 0 {
+		return nil, v1.ErrorBadRequest("empty role id")
 	}
 
 	role, err := s.uc.GetRoleById(ctx, tenantID, req.GetRoleId())
@@ -137,6 +155,14 @@ func (s *RolesService) AddPermissionToRole(
 		return nil, v1.ErrorEmptyActorId("empty tenant id")
 	}
 
+	if req.GetRoleId() == 0 {
+		return nil, v1.ErrorBadRequest("empty role id")
+	}
+
+	if req.GetPermissionId() == "" {
+		return nil, v1.ErrorBadRequest("empty permission id")
+	}
+
 	permission, err := s.pu.GetPermissionByID(ctx, req.GetPermissionId())
 	if err != nil {
 		return nil, err
@@ -159,6 +185,14 @@ func (s *RolesService) RemovePermissionFromRole(
 	tenantID := auth.GetTenantIdFromContext(ctx)
 	if tenantID == 0 {
 		return nil, v1.ErrorEmptyActorId("empty tenant id")
+	}
+
+	if req.GetRoleId() == 0 {
+		return nil, v1.ErrorBadRequest("empty role id")
+	}
+
+	if req.GetPermissionId() == "" {
+		return nil, v1.ErrorBadRequest("empty permission id")
 	}
 
 	permission, err := s.pu.GetPermissionByID(ctx, req.GetPermissionId())

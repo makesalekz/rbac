@@ -4,6 +4,8 @@ import (
 	v1 "gitlab.calendaria.team/services/rbac/api/rbac/v1"
 )
 
+// ------- Permissions -------
+
 type CreatePermissionDto struct {
 	ID          string
 	Name        string
@@ -43,4 +45,41 @@ type UpdatePermissionDto struct {
 type FilterPermissions struct {
 	AppsIDs    []string
 	WithDenied bool
+}
+
+// ------- Roles -------------
+
+type CreateRoleDto struct {
+	Name        string
+	Description string
+	TenantID    int64
+	IsSystem    bool
+	Allow       []string
+	Deny        []string
+}
+
+func (dto CreateRoleDto) Validate() error {
+	if dto.Name == "" {
+		return v1.ErrorBadRequest("empty name")
+	}
+	return nil
+}
+
+type UpdateRoleDto struct {
+	Name        string
+	Description string
+	Allow       []string
+	Deny        []string
+}
+
+type CreateRolePermissionDto struct {
+	Deny   bool
+	Fields []string
+}
+
+type FilterRolePermissions struct {
+	TenantID    int64
+	RolesIDs    []int64
+	Permissions []string
+	DeniedOnly  bool
 }

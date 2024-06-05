@@ -231,8 +231,8 @@ func TestPermissionsUsecase_GetGroupedPermissions(t *testing.T) {
 	}
 
 	filterRolePermissions := data.FilterRolePermissions{
-		TenantId:   tenantID,
-		RolesIds:   []int64{1, 2},
+		TenantID:   tenantID,
+		RolesIDs:   []int64{1, 2},
 		DeniedOnly: true,
 	}
 	permissionGroups2 := []*ent.PermissionGroup{

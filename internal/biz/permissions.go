@@ -88,8 +88,8 @@ func (uc *PermissionsUsecase) GetDeniedPermissions(
 	}
 
 	permissions, err := uc.roleRepo.ListRolesPermissions(ctx, data.FilterRolePermissions{
-		TenantId:   tenantID,
-		RolesIds:   rolesIDs,
+		TenantID:   tenantID,
+		RolesIDs:   rolesIDs,
 		DeniedOnly: true,
 	})
 	if err != nil {
