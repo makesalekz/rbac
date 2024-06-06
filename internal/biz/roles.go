@@ -24,7 +24,7 @@ func NewRolesUsecase(
 	}, nil
 }
 
-func (uc *RolesUsecase) GetRoleById(ctx context.Context, tenantID, roleID int64) (*ent.Role, error) {
+func (uc *RolesUsecase) GetRoleByID(ctx context.Context, tenantID, roleID int64) (*ent.Role, error) {
 	role, err := uc.repo.GetRoleByID(ctx, tenantID, roleID)
 	if err != nil {
 		if ent.IsNotFound(err) {
@@ -36,7 +36,11 @@ func (uc *RolesUsecase) GetRoleById(ctx context.Context, tenantID, roleID int64)
 	return role, nil
 }
 
-func (uc *RolesUsecase) UpdateRole(ctx context.Context, tenantID, roleID int64, dto data.UpdateRoleDto) (*ent.Role, error) {
+func (uc *RolesUsecase) UpdateRole(
+	ctx context.Context,
+	tenantID, roleID int64,
+	dto data.UpdateRoleDto,
+) (*ent.Role, error) {
 	return uc.repo.UpdateRole(ctx, tenantID, roleID, dto)
 }
 
@@ -52,7 +56,12 @@ func (uc *RolesUsecase) CreateRole(ctx context.Context, dto data.CreateRoleDto) 
 	return uc.repo.CreateRole(ctx, dto)
 }
 
-func (uc *RolesUsecase) SetRolePermission(ctx context.Context, tenantID, roleID int64, permission *ent.Permission, dto data.CreateRolePermissionDto) error {
+func (uc *RolesUsecase) SetRolePermission(
+	ctx context.Context,
+	tenantID, roleID int64,
+	permission *ent.Permission,
+	dto data.CreateRolePermissionDto,
+) error {
 	if !validateFields(permission.Fields, dto.Fields) {
 		return v1.ErrorBadRequest("fields not valid")
 	}
@@ -60,11 +69,18 @@ func (uc *RolesUsecase) SetRolePermission(ctx context.Context, tenantID, roleID 
 	return uc.repo.SetRolePermission(ctx, tenantID, roleID, permission, dto)
 }
 
-func (uc *RolesUsecase) RemovePermissionFromRole(ctx context.Context, tenantID, roleID int64, permission *ent.Permission) error {
+func (uc *RolesUsecase) RemovePermissionFromRole(
+	ctx context.Context,
+	tenantID, roleID int64,
+	permission *ent.Permission,
+) error {
 	return uc.repo.RemovePermissionFromRole(ctx, tenantID, roleID, permission)
 }
 
-func (uc *RolesUsecase) ListRolePermissions(ctx context.Context, tenantID, roleID int64) ([]*ent.RolePermission, error) {
+func (uc *RolesUsecase) ListRolePermissions(
+	ctx context.Context,
+	tenantID, roleID int64,
+) ([]*ent.RolePermission, error) {
 	return uc.repo.ListRolePermissions(ctx, tenantID, roleID)
 }
 

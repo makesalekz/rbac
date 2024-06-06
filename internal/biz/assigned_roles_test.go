@@ -129,9 +129,10 @@ func TestAssignedRolesUsecase_ListAssignedRoles(t *testing.T) {
 
 	// Positive case
 	assignedRoles := []*ent.ResourceAccess{}
-	assignedRepo.EXPECT().ListAssignedRoles(ctx, data.ListRolesDto{TenantId: tenantID, IdentityIDs: []string{identityID}}).Return(assignedRoles, nil)
+	dto := data.ListRolesDto{TenantId: tenantID, IdentityIDs: []string{identityID}}
+	assignedRepo.EXPECT().ListAssignedRoles(ctx, dto).Return(assignedRoles, nil)
 
-	roles, err := uc.ListAssignedRoles(ctx, data.ListRolesDto{TenantId: tenantID, IdentityIDs: []string{identityID}})
+	roles, err := uc.ListAssignedRoles(ctx, dto)
 	require.NoError(t, err)
 	require.Equal(t, assignedRoles, roles)
 }

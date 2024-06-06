@@ -27,20 +27,20 @@ func NewCheckPermissionsUsecase(
 	}, nil
 }
 
-func (u *CheckPermissionsUsecase) getParentIds(ctx context.Context, tenantId, teamId int64) ([]int64, error) {
-	if tenantId != 0 && teamId != 0 {
-		team, err := u.teamRepo.GetTeam(ctx, tenantId, teamId, false)
+func (u *CheckPermissionsUsecase) getParentIDs(ctx context.Context, tenantID, teamID int64) ([]int64, error) {
+	if tenantID != 0 && teamID != 0 {
+		team, err := u.teamRepo.GetTeam(ctx, tenantID, teamID, false)
 		if err != nil {
 			return nil, err
 		}
 
 		if team.ParentsIds != nil {
-			var parentIds []int64
-			err = team.ParentsIds.AssignTo(&parentIds)
+			var parentIDs []int64
+			err = team.ParentsIds.AssignTo(&parentIDs)
 			if err != nil {
 				return nil, err
 			}
-			return parentIds, nil
+			return parentIDs, nil
 		}
 	}
 	return nil, nil
@@ -48,22 +48,22 @@ func (u *CheckPermissionsUsecase) getParentIds(ctx context.Context, tenantId, te
 
 func (u *CheckPermissionsUsecase) CheckPermissions(
 	ctx context.Context,
-	tenantId int64,
+	tenantID int64,
 	identities []string,
 	permissions []string,
 	resources []*v1.Resource,
 ) (map[string]*v1.ListOfFields, error) {
-	var teamsIds []int64
+	var teamsIDs []int64
 	for i := len(resources) - 1; i >= 0; i-- {
 		if resources[i].GetType() == data.RESOURCE_TYPE_TEAM {
-			parentIds, err := u.getParentIds(ctx, tenantId, resources[i].GetId())
+			parentIDs, err := u.getParentIDs(ctx, tenantID, resources[i].GetId())
 			if err != nil {
 				return nil, err
 			}
 
-			teamsIds = append(teamsIds, resources[i].GetId())
-			if parentIds != nil {
-				teamsIds = append(teamsIds, parentIds...)
+			teamsIDs = append(teamsIDs, resources[i].GetId())
+			if parentIDs != nil {
+				teamsIDs = append(teamsIDs, parentIDs...)
 			}
 
 			resources = append(resources[:i], resources[i+1:]...)
@@ -71,23 +71,23 @@ func (u *CheckPermissionsUsecase) CheckPermissions(
 	}
 
 	assignedRoles, err := u.repo.CheckRoles(ctx, data.ListRolesDto{
-		TenantId:    tenantId,
+		TenantId:    tenantID,
 		IdentityIDs: identities,
-		TeamsIDs:    teamsIds,
+		TeamsIDs:    teamsIDs,
 		Resources:   resources,
 	})
 	if err != nil {
 		return nil, err
 	}
 
-	rolesIds := make([]int64, len(assignedRoles))
+	rolesIDs := make([]int64, len(assignedRoles))
 	for i, assignedRole := range assignedRoles {
-		rolesIds[i] = assignedRole.RoleID
+		rolesIDs[i] = assignedRole.RoleID
 	}
 
 	rolesPermissions, err := u.roleRepo.ListRolesPermissions(ctx, data.FilterRolePermissions{
-		TenantID:    tenantId,
-		RolesIDs:    rolesIds,
+		TenantID:    tenantID,
+		RolesIDs:    rolesIDs,
 		Permissions: permissions,
 	})
 	if err != nil {
@@ -101,7 +101,10 @@ func (u *CheckPermissionsUsecase) CheckPermissions(
 				Fields: rolePermission.Fields,
 			}
 		} else {
-			result[rolePermission.PermissionID].Fields = mergeFields(result[rolePermission.PermissionID].GetFields(), rolePermission.Fields)
+			result[rolePermission.PermissionID].Fields = mergeFields(
+				result[rolePermission.PermissionID].GetFields(),
+				rolePermission.Fields,
+			)
 		}
 	}
 
@@ -114,8 +117,13 @@ func (u *CheckPermissionsUsecase) CheckPermissions(
 	return result, nil
 }
 
-func (u *CheckPermissionsUsecase) HasPermission(ctx context.Context, tenantId int64, identities []string, permission string) (*v1.ListOfFields, error) {
-	permissionsMap, err := u.CheckPermissions(ctx, tenantId, identities, []string{permission}, nil)
+func (u *CheckPermissionsUsecase) HasPermission(
+	ctx context.Context,
+	tenantID int64,
+	identities []string,
+	permission string,
+) (*v1.ListOfFields, error) {
+	permissionsMap, err := u.CheckPermissions(ctx, tenantID, identities, []string{permission}, nil)
 	if err != nil {
 		return nil, err
 	}

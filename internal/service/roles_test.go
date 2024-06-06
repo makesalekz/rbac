@@ -2,7 +2,7 @@ package service_test
 
 import (
 	"context"
-	"fmt"
+	"strconv"
 	"testing"
 	"time"
 
@@ -22,7 +22,7 @@ import (
 
 func mockTenantServerContext(tenantID int64) context.Context {
 	md := metadata.Metadata{
-		"x-md-global-tenant-id":  []string{fmt.Sprintf("%d", tenantID)},
+		"x-md-global-tenant-id":  []string{strconv.FormatInt(tenantID, 10)},
 		"x-md-global-actor-id":   []string{"1234567"},
 		"x-md-global-identities": []string{"identity1", "identity2"},
 		"x-md-global-app-id":     []string{"app-id"},
@@ -132,7 +132,7 @@ func TestRolesService_UpdateRole(t *testing.T) {
 
 	service := createRolesService(t, permissionRepo, assignedRepo, roleRepo, teamsRepo)
 
-	tenantID := int64(1234)
+	tenantID := int64(123456)
 	ctx := mockTenantServerContext(tenantID)
 
 	req := &v1.UpdateRoleRequest{

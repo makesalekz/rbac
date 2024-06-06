@@ -117,7 +117,7 @@ func (s *RolesService) GetRole(ctx context.Context, req *v1.RoleRequest) (*v1.Ro
 		return nil, v1.ErrorBadRequest("empty role id")
 	}
 
-	role, err := s.uc.GetRoleById(ctx, tenantID, req.GetRoleId())
+	role, err := s.uc.GetRoleByID(ctx, tenantID, req.GetRoleId())
 	if err != nil {
 		return nil, err
 	}

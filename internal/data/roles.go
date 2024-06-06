@@ -97,6 +97,47 @@ func (r *roleRepo) CreateRole(ctx context.Context, roleDto CreateRoleDto) (*ent.
 	return role, nil
 }
 
+func (r *roleRepo) allowDenyToUpdate(permissions []*ent.RolePermission, roleDto UpdateRoleDto) (
+	map[string]bool,
+	map[string]bool,
+	[]string,
+) {
+	var rpDelete []string
+
+	allow := make(map[string]bool)
+	deny := make(map[string]bool)
+
+	for _, pid := range roleDto.Allow {
+		allow[pid] = true
+	}
+
+	for _, pid := range roleDto.Deny {
+		deny[pid] = true
+	}
+
+	// fill rpDelete
+	for _, rp := range permissions {
+		// don't rewrite existing permissions
+		if allow[rp.PermissionID] {
+			if !rp.Deny {
+				delete(allow, rp.PermissionID)
+			}
+			continue
+		}
+
+		if deny[rp.PermissionID] {
+			if rp.Deny {
+				delete(deny, rp.PermissionID)
+			}
+			continue
+		}
+
+		rpDelete = append(rpDelete, rp.PermissionID)
+	}
+
+	return allow, deny, rpDelete
+}
+
 func (r *roleRepo) UpdateRole(
 	ctx context.Context,
 	tenantID, roleID int64,
@@ -135,38 +176,7 @@ func (r *roleRepo) UpdateRole(
 	}
 
 	var rpCreate []*ent.RolePermissionCreate
-	var rpDelete []string
-
-	allow := make(map[string]bool)
-	deny := make(map[string]bool)
-
-	for _, pid := range roleDto.Allow {
-		allow[pid] = true
-	}
-
-	for _, pid := range roleDto.Deny {
-		deny[pid] = true
-	}
-
-	// fill rpCreate and rpDelete
-	for _, rp := range permissions {
-		// don't rewrite existing permissions
-		if allow[rp.PermissionID] {
-			if !rp.Deny {
-				delete(allow, rp.PermissionID)
-			}
-			continue
-		}
-
-		if deny[rp.PermissionID] {
-			if rp.Deny {
-				delete(deny, rp.PermissionID)
-			}
-			continue
-		}
-
-		rpDelete = append(rpDelete, rp.PermissionID)
-	}
+	allow, deny, rpDelete := r.allowDenyToUpdate(permissions, roleDto)
 
 	for pid := range allow {
 		query := tx.RolePermission.Create().

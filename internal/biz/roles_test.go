@@ -38,16 +38,16 @@ func TestRolesUsecase_GetRoleById(t *testing.T) {
 	rolesRepo.EXPECT().GetRoleByID(ctx, gomock.Any(), gomock.Not(roleID)).Return(nil, &ent.NotFoundError{})
 	rolesRepo.EXPECT().GetRoleByID(ctx, gomock.Not(tenantID), gomock.Any()).Return(nil, &ent.NotFoundError{})
 
-	role1, err := uc.GetRoleById(ctx, tenantID, roleID)
+	role1, err := uc.GetRoleByID(ctx, tenantID, roleID)
 	require.NoError(t, err)
 	require.Equal(t, role, role1)
 
-	role2, err := uc.GetRoleById(ctx, 2, roleID)
+	role2, err := uc.GetRoleByID(ctx, 2, roleID)
 	require.Error(t, err)
 	require.Equal(t, v1.ErrorNotFound("role not found"), err)
 	require.Nil(t, role2)
 
-	role3, err := uc.GetRoleById(ctx, tenantID, 3)
+	role3, err := uc.GetRoleByID(ctx, tenantID, 3)
 	require.Error(t, err)
 	require.Equal(t, v1.ErrorNotFound("role not found"), err)
 	require.Nil(t, role3)

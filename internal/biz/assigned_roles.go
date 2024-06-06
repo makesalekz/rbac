@@ -12,7 +12,7 @@ import (
 
 type AssignRoleMessage struct {
 	data.AssignRoleDto
-	TenantId int64
+	TenantID int64
 }
 
 // AssignedRolesUsecase .
@@ -49,10 +49,10 @@ func NewAssignedRolesUsecase(
 // - rbac.ErrorDatabaseQuery: failed to get role or team
 // - rbac.ErrorAlreadyExists: role already assigned
 // - rbac.ErrorBadRequest: there is no such teamId.
-func (u *AssignedRolesUsecase) AssignRoles(ctx context.Context, tenantId int64, dtos []data.AssignRoleDto) error {
-	roleIds := data.ExtractSlice(dtos, func(e data.AssignRoleDto) (int64, bool) { return e.RoleId, true })
+func (u *AssignedRolesUsecase) AssignRoles(ctx context.Context, tenantID int64, dtos []data.AssignRoleDto) error {
+	roleIDs := data.ExtractSlice(dtos, func(e data.AssignRoleDto) (int64, bool) { return e.RoleId, true })
 	// Get roles by ids
-	_, err := u.roleRepo.GetRolesByID(ctx, tenantId, roleIds)
+	_, err := u.roleRepo.GetRolesByID(ctx, tenantID, roleIDs)
 	if err != nil {
 		if ent.IsNotFound(err) {
 			return v1.ErrorNotFound("role not found")
@@ -60,7 +60,7 @@ func (u *AssignedRolesUsecase) AssignRoles(ctx context.Context, tenantId int64, 
 		return v1.ErrorDatabaseQuery("get role failed: %v", err)
 	}
 
-	teamsIds := data.ExtractSlice(dtos, func(e data.AssignRoleDto) (int64, bool) {
+	teamsIDs := data.ExtractUnique(dtos, func(e data.AssignRoleDto) (int64, bool) {
 		if e.TeamId != 0 {
 			return e.TeamId, true
 		}
@@ -68,30 +68,21 @@ func (u *AssignedRolesUsecase) AssignRoles(ctx context.Context, tenantId int64, 
 	})
 
 	// If there are team ids, get teams by ids, then check if the returned ids are equal to the input ids
-	if len(teamsIds) > 0 {
-		teams, err := u.teamRepo.GetTeams(ctx, tenantId, teamsIds)
+	if len(teamsIDs) > 0 {
+		teams, err := u.teamRepo.GetTeams(ctx, tenantID, teamsIDs)
 		if err != nil {
-			if len(teams) == 0 {
-				return v1.ErrorNotFound("teams not found")
-			}
-			return v1.ErrorDatabaseQuery("get team failed: %v", err)
+			return v1.ErrorDatabaseQuery("get teams failed: %v", err)
 		}
-
-		returnedIds := map[int64]struct{}{}
-		for _, team := range teams {
-			returnedIds[team.ID] = struct{}{}
+		if len(teams) == 0 {
+			return v1.ErrorNotFound("teams not found")
 		}
-
-		for _, teamId := range teamsIds {
-			_, ok := returnedIds[teamId]
-			if !ok {
-				return v1.ErrorBadRequest("there is no such teamId: %d", teamId)
-			}
+		if len(teams) < len(teamsIDs) {
+			return v1.ErrorNotFound("some teams not found")
 		}
 	}
 
 	// Assign roles
-	err = u.repo.AssignRoles(ctx, tenantId, dtos)
+	err = u.repo.AssignRoles(ctx, tenantID, dtos)
 	if err != nil {
 		if ent.IsConstraintError(err) {
 			return v1.ErrorAlreadyExists("role already assigned")
@@ -106,7 +97,7 @@ func (u *AssignedRolesUsecase) AssignRoles(ctx context.Context, tenantId int64, 
 		for _, dto := range dtos {
 			queue.Pub(AssignRoleMessage{
 				AssignRoleDto: dto,
-				TenantId:      tenantId,
+				TenantID:      tenantID,
 			})
 		}
 	}
@@ -114,8 +105,8 @@ func (u *AssignedRolesUsecase) AssignRoles(ctx context.Context, tenantId int64, 
 	return nil
 }
 
-func (u *AssignedRolesUsecase) AssignRole(ctx context.Context, tenantId int64, dto data.AssignRoleDto) error {
-	_, err := u.roleRepo.GetRoleByID(ctx, tenantId, dto.RoleId)
+func (u *AssignedRolesUsecase) AssignRole(ctx context.Context, tenantID int64, dto data.AssignRoleDto) error {
+	_, err := u.roleRepo.GetRoleByID(ctx, tenantID, dto.RoleId)
 	if err != nil {
 		if ent.IsNotFound(err) {
 			return v1.ErrorNotFound("role not found")
@@ -124,7 +115,7 @@ func (u *AssignedRolesUsecase) AssignRole(ctx context.Context, tenantId int64, d
 	}
 
 	if dto.TeamId != 0 {
-		_, err = u.teamRepo.GetTeam(ctx, tenantId, dto.TeamId, false)
+		_, err = u.teamRepo.GetTeam(ctx, tenantID, dto.TeamId, false)
 		if err != nil {
 			if ent.IsNotFound(err) {
 				return v1.ErrorNotFound("team not found")
@@ -133,7 +124,7 @@ func (u *AssignedRolesUsecase) AssignRole(ctx context.Context, tenantId int64, d
 		}
 	}
 
-	err = u.repo.AssignRoles(ctx, tenantId, []data.AssignRoleDto{dto})
+	err = u.repo.AssignRoles(ctx, tenantID, []data.AssignRoleDto{dto})
 	if err != nil {
 		if ent.IsConstraintError(err) {
 			return v1.ErrorAlreadyExists("role already assigned")
@@ -145,15 +136,15 @@ func (u *AssignedRolesUsecase) AssignRole(ctx context.Context, tenantId int64, d
 	if u.qm != nil {
 		u.qm.GetLocal(QueueRoleAssign).Pub(AssignRoleMessage{
 			AssignRoleDto: dto,
-			TenantId:      tenantId,
+			TenantID:      tenantID,
 		})
 	}
 
 	return nil
 }
 
-func (u *AssignedRolesUsecase) UnassignRole(ctx context.Context, tenantId, assignId int64) error {
-	assignedRole, err := u.repo.GetAssignedRoleById(ctx, tenantId, assignId)
+func (u *AssignedRolesUsecase) UnassignRole(ctx context.Context, tenantID, assignID int64) error {
+	assignedRole, err := u.repo.GetAssignedRoleById(ctx, tenantID, assignID)
 	if err != nil {
 		if ent.IsNotFound(err) {
 			return v1.ErrorNotFound("assigned role not found")
@@ -169,7 +160,7 @@ func (u *AssignedRolesUsecase) UnassignRole(ctx context.Context, tenantId, assig
 	// TODO: remove check, with mock for QueueManager
 	if u.qm != nil {
 		var resource *v1.Resource
-		var teamId int64
+		var teamID int64
 		if assignedRole.ResourceID != nil {
 			resource = &v1.Resource{
 				Type: *assignedRole.ResourceType,
@@ -177,7 +168,7 @@ func (u *AssignedRolesUsecase) UnassignRole(ctx context.Context, tenantId, assig
 			}
 
 			if *assignedRole.ResourceType == data.RESOURCE_TYPE_TEAM { // for backward compatibility
-				teamId = *assignedRole.ResourceID
+				teamID = *assignedRole.ResourceID
 			}
 		}
 
@@ -185,16 +176,19 @@ func (u *AssignedRolesUsecase) UnassignRole(ctx context.Context, tenantId, assig
 			AssignRoleDto: data.AssignRoleDto{
 				IdentityId: assignedRole.IdentityID,
 				RoleId:     assignedRole.RoleID,
-				TeamId:     teamId,
+				TeamId:     teamID,
 				Resource:   resource,
 			},
-			TenantId: tenantId,
+			TenantID: tenantID,
 		})
 	}
 
 	return nil
 }
 
-func (u *AssignedRolesUsecase) ListAssignedRoles(ctx context.Context, dto data.ListRolesDto) ([]*ent.ResourceAccess, error) {
+func (u *AssignedRolesUsecase) ListAssignedRoles(
+	ctx context.Context,
+	dto data.ListRolesDto,
+) ([]*ent.ResourceAccess, error) {
 	return u.repo.ListAssignedRoles(ctx, dto)
 }
