@@ -17,7 +17,7 @@ import (
 )
 
 // ProviderSet is data providers.
-//nolint: gochecknoglobals // this global variable is required for wire
+// nolint: gochecknoglobals // this global variable is required for wire
 var ProviderSet = wire.NewSet(
 	NewData,
 	u_config.NewConfig,
