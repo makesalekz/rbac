@@ -3,6 +3,7 @@ package data
 import (
 	"context"
 	"os"
+	"slices"
 
 	"gitlab.calendaria.team/services/rbac/ent"
 	"gitlab.calendaria.team/services/rbac/internal/conf"
@@ -155,6 +156,16 @@ func ExtractUnique[S ~[]E, E, R comparable](slice S, extract func(E) (R, bool)) 
 				uniques[value] = struct{}{}
 				result = append(result, value)
 			}
+		}
+	}
+	return result
+}
+
+func Diff[T comparable, S ~[]T](slice S, other S) []T {
+	var result []T
+	for _, item := range slice {
+		if !slices.Contains(other, item) {
+			result = append(result, item)
 		}
 	}
 	return result

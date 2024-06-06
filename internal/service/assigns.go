@@ -40,7 +40,12 @@ func (s *AssignsService) AssignRoles(ctx context.Context, req *v1.AssignRolesReq
 		return nil, v1.ErrorEmptyActorId("empty tenant id")
 	}
 
-	err := s.uc.AssignRoles(ctx, tenantId, toDtos(req))
+	dtos, err := toDtos(req)
+	if err != nil {
+		return nil, err
+	}
+
+	err = s.uc.AssignRoles(ctx, tenantId, dtos)
 	if err != nil {
 		return nil, err
 	}
@@ -54,7 +59,12 @@ func (s *AssignsService) AssignRole(ctx context.Context, req *v1.AssignRoleReque
 		return nil, v1.ErrorEmptyActorId("empty tenant id")
 	}
 
-	err := s.uc.AssignRole(ctx, tenantId, toDto(req))
+	dto, err := toDto(req)
+	if err != nil {
+		return nil, err
+	}
+
+	err = s.uc.AssignRole(ctx, tenantId, dto)
 	if err != nil {
 		return nil, err
 	}
@@ -129,7 +139,8 @@ func assignedRolesReply(assignedRoles []*ent.ResourceAccess) []*v1.AssignedRole 
 	return result
 }
 
-func toDto(req *v1.AssignRoleRequest) data.AssignRoleDto {
+func toDto(req *v1.AssignRoleRequest) (data.AssignRoleDto, error) {
+	roleId := req.GetRoleId()
 	teamId := req.GetTeamId()
 	resource := req.GetResource()
 	if teamId != 0 {
@@ -138,18 +149,25 @@ func toDto(req *v1.AssignRoleRequest) data.AssignRoleDto {
 			Id:   teamId,
 		}
 	}
+	if roleId == 0 {
+		return data.AssignRoleDto{}, v1.ErrorBadRequest("empty role id")
+	}
 	return data.AssignRoleDto{
 		IdentityId: req.GetIdentityId(),
-		RoleId:     req.GetRoleId(),
+		RoleId:     roleId,
 		TeamId:     teamId,
 		Resource:   resource,
-	}
+	}, nil
 }
 
-func toDtos(req *v1.AssignRolesRequest) []data.AssignRoleDto {
+func toDtos(req *v1.AssignRolesRequest) ([]data.AssignRoleDto, error) {
 	dtos := make([]data.AssignRoleDto, len(req.Assigns))
 	for i, assign := range req.Assigns {
-		dtos[i] = toDto(assign)
+		dto, err := toDto(assign)
+		if err != nil {
+			return nil, err
+		}
+		dtos[i] = dto
 	}
-	return dtos
+	return dtos, nil
 }

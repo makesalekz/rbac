@@ -50,17 +50,19 @@ func NewAssignedRolesUsecase(
 // - rbac.ErrorAlreadyExists: role already assigned
 // - rbac.ErrorBadRequest: there is no such teamId.
 func (u *AssignedRolesUsecase) AssignRoles(ctx context.Context, tenantID int64, dtos []data.AssignRoleDto) error {
-	roleIDs := data.ExtractSlice(dtos, func(e data.AssignRoleDto) (int64, bool) { return e.RoleId, true })
+	roleIDs := data.ExtractUnique(dtos, func(e data.AssignRoleDto) (int64, bool) { return e.RoleId, true })
 	// Get roles by ids
-	_, err := u.roleRepo.GetRolesByID(ctx, tenantID, roleIDs)
+	roles, err := u.roleRepo.GetRolesByID(ctx, tenantID, roleIDs)
 	if err != nil {
-		if ent.IsNotFound(err) {
-			return v1.ErrorNotFound("role not found")
-		}
 		return v1.ErrorDatabaseQuery("get role failed: %v", err)
 	}
+	if len(roles) < len(roleIDs) {
+		foundIDs := data.ExtractSlice(roles, func(e *ent.Role) (int64, bool) { return e.ID, true })
+		diff := data.Diff(roleIDs, foundIDs)
+		return v1.ErrorBadRequest("invalid role ids %v", diff)
+	}
 
-	teamsIDs := data.ExtractUnique(dtos, func(e data.AssignRoleDto) (int64, bool) {
+	teamIDs := data.ExtractUnique(dtos, func(e data.AssignRoleDto) (int64, bool) {
 		if e.TeamId != 0 {
 			return e.TeamId, true
 		}
@@ -68,16 +70,15 @@ func (u *AssignedRolesUsecase) AssignRoles(ctx context.Context, tenantID int64, 
 	})
 
 	// If there are team ids, get teams by ids, then check if the returned ids are equal to the input ids
-	if len(teamsIDs) > 0 {
-		teams, err := u.teamRepo.GetTeams(ctx, tenantID, teamsIDs)
+	if len(teamIDs) > 0 {
+		teams, err := u.teamRepo.GetTeams(ctx, tenantID, teamIDs)
 		if err != nil {
 			return v1.ErrorDatabaseQuery("get teams failed: %v", err)
 		}
-		if len(teams) == 0 {
-			return v1.ErrorNotFound("teams not found")
-		}
-		if len(teams) < len(teamsIDs) {
-			return v1.ErrorNotFound("some teams not found")
+		if len(teams) < len(teamIDs) {
+			foundIDs := data.ExtractSlice(teams, func(e *ent.Team) (int64, bool) { return e.ID, true })
+			diff := data.Diff(teamIDs, foundIDs)
+			return v1.ErrorBadRequest("invalid team ids %v", diff)
 		}
 	}
 

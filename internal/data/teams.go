@@ -30,7 +30,7 @@ type TeamsRepo interface {
 	CreateTeam(ctx context.Context, dto TeamDto) (*ent.Team, error)
 	UpdateTeam(ctx context.Context, team *ent.Team, dto TeamDto) (*ent.Team, error)
 	DeleteTeam(ctx context.Context, team *ent.Team) error
-	GetTeam(ctx context.Context, teamId, tenantId int64, getTree bool) (*ent.Team, error)
+	GetTeam(ctx context.Context, tenantId, teamId int64, getTree bool) (*ent.Team, error)
 	GetTeams(ctx context.Context, tenantId int64, teamIds []int64) ([]*ent.Team, error)
 	ListTeams(ctx context.Context, filter TeamsListFilter, paginate *utils_v1.PaginateRequest) ([]*ent.Team, error)
 	CountListTeams(ctx context.Context, filter TeamsListFilter) (int32, error)
