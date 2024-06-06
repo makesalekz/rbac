@@ -26,24 +26,33 @@ func NewTeamsUsecase(repo data.TeamsRepo) (*TeamsUsecase, error) {
 	}, nil
 }
 
-func (uc *TeamsUsecase) CreateTeam(ctx context.Context, dto data.TeamDto) (*ent.Team, error) {
-	if dto.ParentId != 0 {
-		parentTeam, err := uc.repo.GetTeam(ctx, dto.ParentId, dto.TenantId, false)
+func (uc *TeamsUsecase) getParentIDs(ctx context.Context, tenantID, teamID int64) ([]int64, error) {
+	team, err := uc.repo.GetTeam(ctx, tenantID, teamID, false)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return nil, v1.ErrorNotFound("parent team not found")
+		}
+		return nil, err
+	}
+
+	var parentsIDs []int64
+	if team.ParentsIds != nil {
+		err = team.ParentsIds.AssignTo(&parentsIDs)
 		if err != nil {
-			if ent.IsNotFound(err) {
-				return nil, v1.ErrorNotFound("parent team not found")
-			}
 			return nil, err
 		}
+	}
+	parentsIDs = append(parentsIDs, team.ID)
+	return parentsIDs, nil
+}
 
-		var parentsIds []int64
-		if parentTeam.ParentsIds != nil {
-			err = parentTeam.ParentsIds.AssignTo(&parentsIds)
-			if err != nil {
-				return nil, err
-			}
+func (uc *TeamsUsecase) CreateTeam(ctx context.Context, dto data.TeamDto) (*ent.Team, error) {
+	if dto.ParentID != 0 {
+		parentsIDs, err := uc.getParentIDs(ctx, dto.TenantID, dto.ParentID)
+		if err != nil {
+			return nil, err
 		}
-		dto.ParentsIds = append(parentsIds, parentTeam.ID)
+		dto.ParentsIDs = parentsIDs
 	}
 
 	return uc.repo.CreateTeam(ctx, dto)
@@ -57,8 +66,8 @@ func (uc *TeamsUsecase) DeleteTeam(ctx context.Context, team *ent.Team) error {
 	return uc.repo.DeleteTeam(ctx, team)
 }
 
-func (uc *TeamsUsecase) GetTeam(ctx context.Context, tenantId, teamId int64, getTree bool) (*ent.Team, error) {
-	team, err := uc.repo.GetTeam(ctx, tenantId, teamId, getTree)
+func (uc *TeamsUsecase) GetTeam(ctx context.Context, tenantID, teamID int64, getTree bool) (*ent.Team, error) {
+	team, err := uc.repo.GetTeam(ctx, tenantID, teamID, getTree)
 	if err != nil {
 		if ent.IsNotFound(err) {
 			return nil, v1.ErrorNotFound("team not found")
@@ -69,7 +78,11 @@ func (uc *TeamsUsecase) GetTeam(ctx context.Context, tenantId, teamId int64, get
 	return team, nil
 }
 
-func (uc *TeamsUsecase) ListTeams(ctx context.Context, filter data.TeamsListFilter, paginate *utils_v1.PaginateRequest) (*TeamsList, error) {
+func (uc *TeamsUsecase) ListTeams(
+	ctx context.Context,
+	filter data.TeamsListFilter,
+	paginate *utils_v1.PaginateRequest,
+) (*TeamsList, error) {
 	if paginate == nil {
 		paginate = &utils_v1.PaginateRequest{}
 	}
@@ -88,7 +101,7 @@ func (uc *TeamsUsecase) ListTeams(ctx context.Context, filter data.TeamsListFilt
 		Total: &total,
 	}
 
-	if len(teams) == int(paginate.Limit) {
+	if len(teams) == int(paginate.GetLimit()) {
 		paginateReply.FromId = &teams[len(teams)-1].ID
 	}
 

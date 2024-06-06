@@ -13,25 +13,25 @@ import (
 )
 
 type TeamDto struct {
-	TenantId    int64
+	TenantID    int64
 	Name        string
 	Description string
-	ParentId    int64
-	ParentsIds  []int64
+	ParentID    int64
+	ParentsIDs  []int64
 }
 
 type TeamsListFilter struct {
-	TenantId int64
-	ParentId int64
+	TenantID int64
+	ParentID int64
 }
 
-// TeamsRepo
+// TeamsRepo.
 type TeamsRepo interface {
 	CreateTeam(ctx context.Context, dto TeamDto) (*ent.Team, error)
 	UpdateTeam(ctx context.Context, team *ent.Team, dto TeamDto) (*ent.Team, error)
 	DeleteTeam(ctx context.Context, team *ent.Team) error
-	GetTeam(ctx context.Context, tenantId, teamId int64, getTree bool) (*ent.Team, error)
-	GetTeams(ctx context.Context, tenantId int64, teamIds []int64) ([]*ent.Team, error)
+	GetTeam(ctx context.Context, tenantID, teamID int64, getTree bool) (*ent.Team, error)
+	GetTeams(ctx context.Context, tenantID int64, teamIDs []int64) ([]*ent.Team, error)
 	ListTeams(ctx context.Context, filter TeamsListFilter, paginate *utils_v1.PaginateRequest) ([]*ent.Team, error)
 	CountListTeams(ctx context.Context, filter TeamsListFilter) (int32, error)
 }
@@ -49,23 +49,23 @@ func NewTeamsRepo(d *Data) TeamsRepo {
 
 func (r *teamsRepo) CreateTeam(ctx context.Context, dto TeamDto) (*ent.Team, error) {
 	query := r.db.Team.Create().
-		SetTenantID(dto.TenantId).
+		SetTenantID(dto.TenantID).
 		SetName(dto.Name).
 		SetDescription(dto.Description)
 
-	if dto.ParentId != 0 {
-		query.SetParentID(dto.ParentId)
+	if dto.ParentID != 0 {
+		query.SetParentID(dto.ParentID)
 	}
 
-	parentsIds := &pgtype.Int8Array{Status: pgtype.Present}
+	parentsIDs := &pgtype.Int8Array{Status: pgtype.Present}
 
-	if len(dto.ParentsIds) > 0 {
-		err := parentsIds.Set(dto.ParentsIds)
+	if len(dto.ParentsIDs) > 0 {
+		err := parentsIDs.Set(dto.ParentsIDs)
 		if err != nil {
 			return nil, err
 		}
 	}
-	return query.SetParentsIds(parentsIds).Save(ctx)
+	return query.SetParentsIds(parentsIDs).Save(ctx)
 }
 
 func (r *teamsRepo) UpdateTeam(ctx context.Context, team *ent.Team, dto TeamDto) (*ent.Team, error) {
@@ -79,15 +79,15 @@ func (r *teamsRepo) DeleteTeam(ctx context.Context, team *ent.Team) error {
 	return r.db.Team.DeleteOne(team).Exec(ctx)
 }
 
-func (r *teamsRepo) GetTeam(ctx context.Context, tenantId, teamId int64, getTree bool) (*ent.Team, error) {
-	team, err := r.db.Team.Query().Where(team.ID(teamId), team.TenantID(tenantId)).Only(ctx)
+func (r *teamsRepo) GetTeam(ctx context.Context, tenantID, teamID int64, getTree bool) (*ent.Team, error) {
+	team, err := r.db.Team.Query().Where(team.ID(teamID), team.TenantID(tenantID)).Only(ctx)
 	if err != nil {
 		return nil, err
 	}
 
 	if getTree {
 		subs, err := r.db.Team.Query().Where(func(s *sql.Selector) {
-			s.Where(sql.ExprP("parents_ids @> ARRAY[$1]::bigint[]", teamId))
+			s.Where(sql.ExprP("parents_ids @> ARRAY[$1]::bigint[]", teamID))
 		}).All(ctx)
 		if err != nil {
 			return nil, err
@@ -99,11 +99,11 @@ func (r *teamsRepo) GetTeam(ctx context.Context, tenantId, teamId int64, getTree
 	return team, err
 }
 
-func (r *teamsRepo) GetTeams(ctx context.Context, tenantId int64, teamIds []int64) ([]*ent.Team, error) {
+func (r *teamsRepo) GetTeams(ctx context.Context, tenantID int64, teamIDs []int64) ([]*ent.Team, error) {
 	return r.db.Team.Query().
 		Where(
-			team.IDIn(teamIds...),
-			team.TenantID(tenantId),
+			team.IDIn(teamIDs...),
+			team.TenantID(tenantID),
 		).All(ctx)
 }
 
@@ -116,37 +116,41 @@ func findChildren(team *ent.Team, subs []*ent.Team) {
 	}
 }
 
-func (r *teamsRepo) ListTeams(ctx context.Context, filter TeamsListFilter, paginate *utils_v1.PaginateRequest) ([]*ent.Team, error) {
+func (r *teamsRepo) ListTeams(
+	ctx context.Context,
+	filter TeamsListFilter,
+	paginate *utils_v1.PaginateRequest,
+) ([]*ent.Team, error) {
 	query := r.db.Team.Query()
 
-	if filter.TenantId != 0 {
-		query.Where(team.TenantID(filter.TenantId))
+	if filter.TenantID != 0 {
+		query.Where(team.TenantID(filter.TenantID))
 	}
 
-	if filter.ParentId != 0 {
-		query.Where(team.ParentID(filter.ParentId))
+	if filter.ParentID != 0 {
+		query.Where(team.ParentID(filter.ParentID))
 	}
 
-	if paginate.FromId != 0 {
-		query.Where(team.IDGT(paginate.FromId))
+	if paginate.GetFromId() != 0 {
+		query.Where(team.IDGT(paginate.GetFromId()))
 	}
 
-	if paginate.Limit == 0 {
+	if paginate.GetLimit() == 0 {
 		paginate.Limit = 100
 	}
 
-	return query.Limit(int(paginate.Limit)).Order(ent.Asc(team.FieldID)).All(ctx)
+	return query.Limit(int(paginate.GetLimit())).Order(ent.Asc(team.FieldID)).All(ctx)
 }
 
 func (r *teamsRepo) CountListTeams(ctx context.Context, filter TeamsListFilter) (int32, error) {
 	query := r.db.Team.Query()
 
-	if filter.TenantId != 0 {
-		query.Where(team.TenantID(filter.TenantId))
+	if filter.TenantID != 0 {
+		query.Where(team.TenantID(filter.TenantID))
 	}
 
-	if filter.ParentId != 0 {
-		query.Where(team.ParentID(filter.ParentId))
+	if filter.ParentID != 0 {
+		query.Where(team.ParentID(filter.ParentID))
 	}
 
 	count, err := query.Count(ctx)

@@ -25,7 +25,7 @@ func TestTeamsUsecase_CreateTeam(t *testing.T) {
 
 	ctx := context.Background()
 	dto := data.TeamDto{
-		TenantId: 1,
+		TenantID: 1,
 	}
 	team := &ent.Team{
 		ID: 1,
@@ -46,36 +46,36 @@ func TestTeamsUsecase_CreateChildTeam(t *testing.T) {
 	require.NoError(t, err)
 
 	ctx := context.Background()
-	parentId := int64(1)
-	tenantId := int64(1)
+	parentID := int64(1)
+	tenantID := int64(1)
 	dto := data.TeamDto{
-		ParentId:   parentId,
-		TenantId:   tenantId,
-		ParentsIds: []int64{parentId},
+		ParentID:   parentID,
+		TenantID:   tenantID,
+		ParentsIDs: []int64{parentID},
 	}
 	dto2 := data.TeamDto{
-		ParentId: 2,
-		TenantId: tenantId,
+		ParentID: 2,
+		TenantID: tenantID,
 	}
 	dto3 := data.TeamDto{
-		ParentId: parentId,
-		TenantId: 2,
+		ParentID: parentID,
+		TenantID: 2,
 	}
 	parentTeam := &ent.Team{
-		ID:         parentId,
-		TenantID:   tenantId,
+		ID:         parentID,
+		TenantID:   tenantID,
 		ParentsIds: nil,
 	}
 	team := &ent.Team{
 		ID:       2,
-		ParentID: &parentId,
-		TenantID: tenantId,
+		ParentID: &parentID,
+		TenantID: tenantID,
 	}
 
 	repo.EXPECT().CreateTeam(ctx, dto).Return(team, nil)
-	repo.EXPECT().GetTeam(ctx, parentId, tenantId, false).Return(parentTeam, nil)
-	repo.EXPECT().GetTeam(ctx, gomock.Not(parentId), tenantId, false).Return(nil, &ent.NotFoundError{})
-	repo.EXPECT().GetTeam(ctx, parentId, gomock.Not(tenantId), false).Return(nil, &ent.NotFoundError{})
+	repo.EXPECT().GetTeam(ctx, parentID, tenantID, false).Return(parentTeam, nil)
+	repo.EXPECT().GetTeam(ctx, gomock.Not(parentID), tenantID, false).Return(nil, &ent.NotFoundError{})
+	repo.EXPECT().GetTeam(ctx, parentID, gomock.Not(tenantID), false).Return(nil, &ent.NotFoundError{})
 
 	team1, err := uc.CreateTeam(ctx, dto)
 	require.NoError(t, err)
@@ -105,7 +105,7 @@ func TestTeamsUsecase_UpdateTeam(t *testing.T) {
 		ID: 1,
 	}
 	dto := data.TeamDto{
-		TenantId: 1,
+		TenantID: 1,
 	}
 	repo.EXPECT().UpdateTeam(ctx, team, dto).Return(team, nil)
 
@@ -141,25 +141,25 @@ func TestTeamsUsecase_GetTeam(t *testing.T) {
 	require.NoError(t, err)
 
 	ctx := context.Background()
-	tenantId := int64(1)
-	teamId := int64(1)
+	tenantID := int64(1)
+	teamID := int64(1)
 	team := &ent.Team{
 		ID: 1,
 	}
-	repo.EXPECT().GetTeam(ctx, tenantId, teamId, false).Return(team, nil)
-	repo.EXPECT().GetTeam(ctx, tenantId, gomock.Not(int64(teamId)), false).Return(nil, &ent.NotFoundError{})
-	repo.EXPECT().GetTeam(ctx, gomock.Not(int64(tenantId)), teamId, false).Return(nil, &ent.NotFoundError{})
+	repo.EXPECT().GetTeam(ctx, tenantID, teamID, false).Return(team, nil)
+	repo.EXPECT().GetTeam(ctx, tenantID, gomock.Not(teamID), false).Return(nil, &ent.NotFoundError{})
+	repo.EXPECT().GetTeam(ctx, gomock.Not(tenantID), teamID, false).Return(nil, &ent.NotFoundError{})
 
-	team1, err := uc.GetTeam(ctx, tenantId, teamId, false)
+	team1, err := uc.GetTeam(ctx, tenantID, teamID, false)
 	require.NoError(t, err)
 	require.Equal(t, team, team1)
 
-	team2, err := uc.GetTeam(ctx, tenantId, 2, false)
+	team2, err := uc.GetTeam(ctx, tenantID, 2, false)
 	require.Error(t, err)
 	require.Equal(t, v1.ErrorNotFound("team not found"), err)
 	require.Nil(t, team2)
 
-	team3, err := uc.GetTeam(ctx, 2, teamId, false)
+	team3, err := uc.GetTeam(ctx, 2, teamID, false)
 	require.Error(t, err)
 	require.Equal(t, v1.ErrorNotFound("team not found"), err)
 	require.Nil(t, team3)

@@ -1,7 +1,7 @@
 package service_test
 
 import (
-	"fmt"
+	"errors"
 	"testing"
 
 	v1 "gitlab.calendaria.team/services/rbac/api/rbac/v1"
@@ -245,7 +245,8 @@ func TestRolesService_AssignRolesAlreadyAssigned(t *testing.T) {
 	}
 	roleRepo.EXPECT().GetRolesByID(ctx, tenantID, []int64{11, 12}).Return(roles, nil)
 	teamsRepo.EXPECT().GetTeams(ctx, tenantID, []int64{22}).Return(teams, nil)
-	assignedRepo.EXPECT().AssignRoles(ctx, tenantID, dtos).Return(ent.NewConstraintError("id exists", fmt.Errorf("id exists")))
+	e := ent.NewConstraintError("id exists", errors.New("id exists"))
+	assignedRepo.EXPECT().AssignRoles(ctx, tenantID, dtos).Return(e)
 
 	reply, err := service.AssignRoles(ctx, req)
 	require.Error(t, err)
@@ -399,7 +400,8 @@ func TestRolesService_AssignRoleAlreadyAssigned(t *testing.T) {
 	}
 	roleRepo.EXPECT().GetRoleByID(ctx, tenantID, req.GetRoleId()).Return(role, nil)
 	teamsRepo.EXPECT().GetTeam(ctx, tenantID, req.GetTeamId(), false).Return(team, nil)
-	assignedRepo.EXPECT().AssignRoles(ctx, tenantID, dtos).Return(ent.NewConstraintError("id exists", fmt.Errorf("id exists")))
+	e := ent.NewConstraintError("id exists", errors.New("id exists"))
+	assignedRepo.EXPECT().AssignRoles(ctx, tenantID, dtos).Return(e)
 
 	reply, err := service.AssignRole(ctx, req)
 	require.Error(t, err)
@@ -451,7 +453,8 @@ func TestRolesService_UnassignRoleNotFound(t *testing.T) {
 	req := &v1.AssignRequest{
 		AssignId: 1234,
 	}
-	assignedRepo.EXPECT().GetAssignedRoleById(ctx, tenantID, req.GetAssignId()).Return(nil, ent.NewNotFoundError("not found"))
+	e := ent.NewNotFoundError("not found")
+	assignedRepo.EXPECT().GetAssignedRoleById(ctx, tenantID, req.GetAssignId()).Return(nil, e)
 
 	reply, err := service.UnassignRole(ctx, req)
 	require.Error(t, err)
