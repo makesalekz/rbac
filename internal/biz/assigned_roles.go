@@ -145,7 +145,7 @@ func (u *AssignedRolesUsecase) AssignRole(ctx context.Context, tenantID int64, d
 }
 
 func (u *AssignedRolesUsecase) UnassignRole(ctx context.Context, tenantID, assignID int64) error {
-	assignedRole, err := u.repo.GetAssignedRoleById(ctx, tenantID, assignID)
+	assignedRole, err := u.repo.GetAssignedRoleByID(ctx, tenantID, assignID)
 	if err != nil {
 		if ent.IsNotFound(err) {
 			return v1.ErrorNotFound("assigned role not found")
@@ -168,7 +168,7 @@ func (u *AssignedRolesUsecase) UnassignRole(ctx context.Context, tenantID, assig
 				Id:   *assignedRole.ResourceID,
 			}
 
-			if *assignedRole.ResourceType == data.RESOURCE_TYPE_TEAM { // for backward compatibility
+			if *assignedRole.ResourceType == data.ResourceTypeTeam { // for backward compatibility
 				teamID = *assignedRole.ResourceID
 			}
 		}

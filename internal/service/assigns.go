@@ -145,7 +145,7 @@ func toDto(req *v1.AssignRoleRequest) (data.AssignRoleDto, error) {
 	resource := req.GetResource()
 	if teamID != 0 {
 		resource = &v1.Resource{
-			Type: data.RESOURCE_TYPE_TEAM,
+			Type: data.ResourceTypeTeam,
 			Id:   teamID,
 		}
 	}

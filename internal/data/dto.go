@@ -4,7 +4,7 @@ import (
 	v1 "gitlab.calendaria.team/services/rbac/api/rbac/v1"
 )
 
-const RESOURCE_TYPE_TEAM = "team"
+const ResourceTypeTeam = "team"
 
 // ------- Assigns -----------
 

@@ -79,7 +79,7 @@ func TestRolesService_AssignRoles(t *testing.T) {
 		{ID: 22},
 	}
 	dtos := []data.AssignRoleDto{
-		{IdentityID: "1234", RoleID: 11, TeamID: 22, Resource: &v1.Resource{Type: data.RESOURCE_TYPE_TEAM, Id: 22}},
+		{IdentityID: "1234", RoleID: 11, TeamID: 22, Resource: &v1.Resource{Type: data.ResourceTypeTeam, Id: 22}},
 		{RoleID: 12},
 	}
 	roleRepo.EXPECT().GetRolesByID(ctx, tenantID, []int64{11, 12}).Return(roles, nil)
@@ -240,7 +240,7 @@ func TestRolesService_AssignRolesAlreadyAssigned(t *testing.T) {
 		{ID: 22},
 	}
 	dtos := []data.AssignRoleDto{
-		{IdentityID: "1234", RoleID: 11, TeamID: 22, Resource: &v1.Resource{Type: data.RESOURCE_TYPE_TEAM, Id: 22}},
+		{IdentityID: "1234", RoleID: 11, TeamID: 22, Resource: &v1.Resource{Type: data.ResourceTypeTeam, Id: 22}},
 		{RoleID: 12},
 	}
 	roleRepo.EXPECT().GetRolesByID(ctx, tenantID, []int64{11, 12}).Return(roles, nil)
@@ -281,7 +281,7 @@ func TestRolesService_AssignRole(t *testing.T) {
 			IdentityID: req.GetIdentityId(),
 			RoleID:     req.GetRoleId(),
 			TeamID:     req.GetTeamId(),
-			Resource:   &v1.Resource{Type: data.RESOURCE_TYPE_TEAM, Id: req.GetTeamId()},
+			Resource:   &v1.Resource{Type: data.ResourceTypeTeam, Id: req.GetTeamId()},
 		},
 	}
 	roleRepo.EXPECT().GetRoleByID(ctx, tenantID, req.GetRoleId()).Return(role, nil)
@@ -395,7 +395,7 @@ func TestRolesService_AssignRoleAlreadyAssigned(t *testing.T) {
 			IdentityID: req.GetIdentityId(),
 			RoleID:     req.GetRoleId(),
 			TeamID:     req.GetTeamId(),
-			Resource:   &v1.Resource{Type: data.RESOURCE_TYPE_TEAM, Id: req.GetTeamId()},
+			Resource:   &v1.Resource{Type: data.ResourceTypeTeam, Id: req.GetTeamId()},
 		},
 	}
 	roleRepo.EXPECT().GetRoleByID(ctx, tenantID, req.GetRoleId()).Return(role, nil)
@@ -430,7 +430,7 @@ func TestRolesService_UnassignRole(t *testing.T) {
 	assignedRole := &ent.ResourceAccess{
 		ID: req.GetAssignId(),
 	}
-	assignedRepo.EXPECT().GetAssignedRoleById(ctx, tenantID, req.GetAssignId()).Return(assignedRole, nil)
+	assignedRepo.EXPECT().GetAssignedRoleByID(ctx, tenantID, req.GetAssignId()).Return(assignedRole, nil)
 	assignedRepo.EXPECT().UnassignRole(ctx, assignedRole).Return(nil)
 
 	_, err := service.UnassignRole(ctx, req)
@@ -454,7 +454,7 @@ func TestRolesService_UnassignRoleNotFound(t *testing.T) {
 		AssignId: 1234,
 	}
 	e := ent.NewNotFoundError("not found")
-	assignedRepo.EXPECT().GetAssignedRoleById(ctx, tenantID, req.GetAssignId()).Return(nil, e)
+	assignedRepo.EXPECT().GetAssignedRoleByID(ctx, tenantID, req.GetAssignId()).Return(nil, e)
 
 	reply, err := service.UnassignRole(ctx, req)
 	require.Error(t, err)

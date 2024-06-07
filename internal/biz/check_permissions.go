@@ -28,11 +28,15 @@ func NewCheckPermissionsUsecase(
 	}, nil
 }
 
-func (u *CheckPermissionsUsecase) appendTeamParents(ctx context.Context, tenantID int64, resources []*v1.Resource) ([]*v1.Resource, error) {
+func (u *CheckPermissionsUsecase) appendTeamParents(
+	ctx context.Context,
+	tenantID int64,
+	resources []*v1.Resource,
+) ([]*v1.Resource, error) {
 	var teamsIDs []int64
 	// extract teams from resources
 	for i := len(resources) - 1; i >= 0; i-- {
-		if resources[i].GetType() == data.RESOURCE_TYPE_TEAM {
+		if resources[i].GetType() == data.ResourceTypeTeam {
 			teamsIDs = append(teamsIDs, resources[i].GetId())
 			resources = append(resources[:i], resources[i+1:]...)
 		}
@@ -51,7 +55,7 @@ func (u *CheckPermissionsUsecase) appendTeamParents(ctx context.Context, tenantI
 	for _, team := range teams {
 		resources = append(resources, &v1.Resource{
 			Id:   team.ID,
-			Type: data.RESOURCE_TYPE_TEAM,
+			Type: data.ResourceTypeTeam,
 		})
 
 		if team.ParentsIds != nil {
@@ -64,7 +68,7 @@ func (u *CheckPermissionsUsecase) appendTeamParents(ctx context.Context, tenantI
 			for _, parentID := range parentIDs {
 				resources = append(resources, &v1.Resource{
 					Id:   parentID,
-					Type: data.RESOURCE_TYPE_TEAM,
+					Type: data.ResourceTypeTeam,
 				})
 			}
 		}
@@ -73,7 +77,9 @@ func (u *CheckPermissionsUsecase) appendTeamParents(ctx context.Context, tenantI
 	return resources, nil
 }
 
-func (u *CheckPermissionsUsecase) getPermissionFields(rolePermissions []*ent.RolePermission) map[string]*v1.ListOfFields {
+func (u *CheckPermissionsUsecase) getPermissionFields(
+	rolePermissions []*ent.RolePermission,
+) map[string]*v1.ListOfFields {
 	result := make(map[string]*v1.ListOfFields)
 	for _, rolePermission := range rolePermissions {
 		if _, ok := result[rolePermission.PermissionID]; !ok {

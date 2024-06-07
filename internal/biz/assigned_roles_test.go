@@ -98,14 +98,14 @@ func TestAssignedRolesUsecase_UnassignRole(t *testing.T) {
 		IdentityID: identityID,
 		RoleID:     roleID,
 	}
-	assignedRepo.EXPECT().GetAssignedRoleById(ctx, tenantID, assignID).Return(assignedRole, nil)
+	assignedRepo.EXPECT().GetAssignedRoleByID(ctx, tenantID, assignID).Return(assignedRole, nil)
 	assignedRepo.EXPECT().UnassignRole(ctx, assignedRole).Return(nil)
 
 	err = uc.UnassignRole(ctx, tenantID, assignID)
 	require.NoError(t, err)
 
 	// Negative case
-	assignedRepo.EXPECT().GetAssignedRoleById(ctx, tenantID, assignID2).Return(nil, &ent.NotFoundError{})
+	assignedRepo.EXPECT().GetAssignedRoleByID(ctx, tenantID, assignID2).Return(nil, &ent.NotFoundError{})
 
 	err = uc.UnassignRole(ctx, tenantID, assignID2)
 	require.Error(t, err)
