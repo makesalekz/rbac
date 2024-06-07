@@ -37,17 +37,17 @@ func (m *MockAssignedRolesRepo) EXPECT() *MockAssignedRolesRepoMockRecorder {
 }
 
 // AssignRoles mocks base method.
-func (m *MockAssignedRolesRepo) AssignRoles(ctx context.Context, tenantId int64, dto []data.AssignRoleDto) error {
+func (m *MockAssignedRolesRepo) AssignRoles(ctx context.Context, tenantID int64, dto []data.AssignRoleDto) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "AssignRoles", ctx, tenantId, dto)
+	ret := m.ctrl.Call(m, "AssignRoles", ctx, tenantID, dto)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // AssignRoles indicates an expected call of AssignRoles.
-func (mr *MockAssignedRolesRepoMockRecorder) AssignRoles(ctx, tenantId, dto interface{}) *gomock.Call {
+func (mr *MockAssignedRolesRepoMockRecorder) AssignRoles(ctx, tenantID, dto interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AssignRoles", reflect.TypeOf((*MockAssignedRolesRepo)(nil).AssignRoles), ctx, tenantId, dto)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AssignRoles", reflect.TypeOf((*MockAssignedRolesRepo)(nil).AssignRoles), ctx, tenantID, dto)
 }
 
 // CheckRoles mocks base method.
@@ -65,19 +65,19 @@ func (mr *MockAssignedRolesRepoMockRecorder) CheckRoles(ctx, dto interface{}) *g
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CheckRoles", reflect.TypeOf((*MockAssignedRolesRepo)(nil).CheckRoles), ctx, dto)
 }
 
-// GetAssignedRoleById mocks base method.
-func (m *MockAssignedRolesRepo) GetAssignedRoleById(ctx context.Context, tenantId, assignId int64) (*ent.ResourceAccess, error) {
+// GetAssignedRoleByID mocks base method.
+func (m *MockAssignedRolesRepo) GetAssignedRoleByID(ctx context.Context, tenantID, assignID int64) (*ent.ResourceAccess, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetAssignedRoleById", ctx, tenantId, assignId)
+	ret := m.ctrl.Call(m, "GetAssignedRoleByID", ctx, tenantID, assignID)
 	ret0, _ := ret[0].(*ent.ResourceAccess)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// GetAssignedRoleById indicates an expected call of GetAssignedRoleById.
-func (mr *MockAssignedRolesRepoMockRecorder) GetAssignedRoleById(ctx, tenantId, assignId interface{}) *gomock.Call {
+// GetAssignedRoleByID indicates an expected call of GetAssignedRoleByID.
+func (mr *MockAssignedRolesRepoMockRecorder) GetAssignedRoleByID(ctx, tenantID, assignID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAssignedRoleById", reflect.TypeOf((*MockAssignedRolesRepo)(nil).GetAssignedRoleById), ctx, tenantId, assignId)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAssignedRoleByID", reflect.TypeOf((*MockAssignedRolesRepo)(nil).GetAssignedRoleByID), ctx, tenantID, assignID)
 }
 
 // ListAssignedRoles mocks base method.

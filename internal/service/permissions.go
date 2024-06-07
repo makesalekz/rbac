@@ -31,19 +31,29 @@ func NewPermissionsService(
 	}
 }
 
-func (s *PermissionsService) CreatePermission(ctx context.Context, req *v1.CreatePermissionRequest) (*v1.PermissionReply, error) {
+func (s *PermissionsService) CreatePermission(
+	ctx context.Context,
+	req *v1.CreatePermissionRequest,
+) (*v1.PermissionReply, error) {
 	_, _, err := s.sh.HasPermission(ctx, "admin.permission.create")
 	if err != nil {
 		return nil, err
 	}
 
-	permission, err := s.uc.CreatePermission(ctx, data.CreatePermissionDto{
-		Id:          req.Id,
-		AppId:       req.AppId,
-		Name:        req.Name,
-		Description: req.Description,
-		Fields:      req.Fields,
-	})
+	dto := data.CreatePermissionDto{
+		ID:          req.GetId(),
+		GroupID:     req.GetGroupId(),
+		AppID:       req.GetAppId(),
+		Name:        req.GetName(),
+		Description: req.GetDescription(),
+		Fields:      req.GetFields(),
+	}
+	err = dto.Validate()
+	if err != nil {
+		return nil, err
+	}
+
+	permission, err := s.uc.CreatePermission(ctx, dto)
 	if err != nil {
 		return nil, v1.ErrorDatabaseQuery(err.Error())
 	}
@@ -52,16 +62,23 @@ func (s *PermissionsService) CreatePermission(ctx context.Context, req *v1.Creat
 	}, nil
 }
 
-func (s *PermissionsService) UpdatePermission(ctx context.Context, req *v1.UpdatePermissionRequest) (*v1.PermissionReply, error) {
+func (s *PermissionsService) UpdatePermission(
+	ctx context.Context,
+	req *v1.UpdatePermissionRequest,
+) (*v1.PermissionReply, error) {
 	_, _, err := s.sh.HasPermission(ctx, "admin.permission.update")
 	if err != nil {
 		return nil, err
 	}
 
-	permission, err := s.uc.UpdatePermission(ctx, req.PermissionId, data.UpdatePermissionDto{
-		Name:        req.Name,
-		Description: req.Description,
-		Fields:      req.Fields,
+	if req.GetPermissionId() == "" {
+		return nil, v1.ErrorBadRequest("empty permission id")
+	}
+
+	permission, err := s.uc.UpdatePermission(ctx, req.GetPermissionId(), data.UpdatePermissionDto{
+		Name:        req.GetName(),
+		Description: req.GetDescription(),
+		Fields:      req.GetFields(),
 	})
 	if err != nil {
 		return nil, err
@@ -71,26 +88,32 @@ func (s *PermissionsService) UpdatePermission(ctx context.Context, req *v1.Updat
 	}, nil
 }
 
-func (s *PermissionsService) DeletePermission(ctx context.Context, req *v1.PermissionRequest) (*utils_v1.EmptyReply, error) {
+func (s *PermissionsService) DeletePermission(
+	ctx context.Context,
+	req *v1.PermissionRequest,
+) (*utils_v1.EmptyReply, error) {
 	_, _, err := s.sh.HasPermission(ctx, "admin.permission.delete")
 	if err != nil {
 		return nil, err
 	}
 
-	err = s.uc.DeletePermission(ctx, req.PermissionId)
+	err = s.uc.DeletePermission(ctx, req.GetPermissionId())
 	if err != nil {
 		return nil, err
 	}
 	return &utils_v1.EmptyReply{}, nil
 }
 
-func (s *PermissionsService) GetPermission(ctx context.Context, req *v1.PermissionRequest) (*v1.PermissionReply, error) {
+func (s *PermissionsService) GetPermission(
+	ctx context.Context,
+	req *v1.PermissionRequest,
+) (*v1.PermissionReply, error) {
 	_, _, err := s.sh.HasPermission(ctx, "admin.permission.read")
 	if err != nil {
 		return nil, err
 	}
 
-	permission, err := s.uc.GetPermissionById(ctx, req.PermissionId)
+	permission, err := s.uc.GetPermissionByID(ctx, req.GetPermissionId())
 	if err != nil {
 		return nil, err
 	}
@@ -99,9 +122,12 @@ func (s *PermissionsService) GetPermission(ctx context.Context, req *v1.Permissi
 	}, nil
 }
 
-func (s *PermissionsService) ListPermissions(ctx context.Context, req *v1.ListPermissionsRequest) (*v1.ListPermissionsReply, error) {
-	tenantId := auth.GetTenantIdFromContext(ctx)
-	if tenantId == 0 {
+func (s *PermissionsService) ListPermissions(
+	ctx context.Context,
+	req *v1.ListPermissionsRequest,
+) (*v1.ListPermissionsReply, error) {
+	tenantID := auth.GetTenantIdFromContext(ctx)
+	if tenantID == 0 {
 		return nil, v1.ErrorEmptyActorId("empty tenant id")
 	}
 
@@ -110,7 +136,7 @@ func (s *PermissionsService) ListPermissions(ctx context.Context, req *v1.ListPe
 		return nil, v1.ErrorEmptyActorId("empty identities")
 	}
 
-	fields, err := s.check.HasPermission(ctx, tenantId, identities, "admin.permission.read")
+	fields, err := s.check.HasPermission(ctx, tenantID, identities, "admin.permission.read")
 	if err != nil {
 		return nil, err
 	}
@@ -120,10 +146,10 @@ func (s *PermissionsService) ListPermissions(ctx context.Context, req *v1.ListPe
 
 	groups, err := s.uc.GetGroupedPermissions(
 		ctx,
-		tenantId,
+		tenantID,
 		identities,
 		data.FilterPermissions{
-			AppsIds: req.AppsIds,
+			AppsIDs: req.GetAppsIds(),
 		})
 	if err != nil {
 		return nil, err
@@ -142,6 +168,7 @@ func (s *PermissionsService) ListPermissions(ctx context.Context, req *v1.ListPe
 func (s *PermissionsService) permissionReply(permission *ent.Permission) *v1.Permission {
 	return &v1.Permission{
 		Id:          permission.ID,
+		GroupId:     permission.GroupID,
 		AppId:       permission.AppID,
 		Name:        permission.Name,
 		Description: permission.Description,

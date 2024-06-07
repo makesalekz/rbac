@@ -27,22 +27,22 @@ func TestPermissionsUsecase_GetPermissionById(t *testing.T) {
 	require.NoError(t, err)
 
 	ctx := context.Background()
-	permissionId := "some.permission"
+	permissionID := "some.permission"
 
 	permission := &ent.Permission{
-		ID:          permissionId,
+		ID:          permissionID,
 		AppID:       "app-id",
 		Name:        "testName",
 		Description: "testDesc",
 	}
-	permissionRepo.EXPECT().GetPermissionById(ctx, permissionId).Return(permission, nil)
-	permissionRepo.EXPECT().GetPermissionById(ctx, gomock.Not(permissionId)).Return(nil, &ent.NotFoundError{})
+	permissionRepo.EXPECT().GetPermissionByID(ctx, permissionID).Return(permission, nil)
+	permissionRepo.EXPECT().GetPermissionByID(ctx, gomock.Not(permissionID)).Return(nil, &ent.NotFoundError{})
 
-	permission1, err := uc.GetPermissionById(ctx, permissionId)
+	permission1, err := uc.GetPermissionByID(ctx, permissionID)
 	require.NoError(t, err)
 	require.Equal(t, permission, permission1)
 
-	permission2, err := uc.GetPermissionById(ctx, "other.permission")
+	permission2, err := uc.GetPermissionByID(ctx, "other.permission")
 	require.Error(t, err)
 	require.Equal(t, v1.ErrorNotFound("permission not found"), err)
 	require.Nil(t, permission2)
@@ -61,14 +61,14 @@ func TestPermissionsUsecase_CreatePermission(t *testing.T) {
 
 	ctx := context.Background()
 	dto := data.CreatePermissionDto{
-		Id:          "some.permission",
+		ID:          "some.permission",
 		Name:        "testName",
 		Description: "testDesc",
-		AppId:       "app-id",
+		AppID:       "app-id",
 	}
 	permission := &ent.Permission{
 		ID:          "some.permission",
-		AppID:       dto.AppId,
+		AppID:       dto.AppID,
 		Name:        dto.Name,
 		Description: dto.Description,
 	}
@@ -91,20 +91,20 @@ func TestPermissionsUsecase_UpdatePermission(t *testing.T) {
 	require.NoError(t, err)
 
 	ctx := context.Background()
-	permissionId := "some.permission"
+	permissionID := "some.permission"
 	dto := data.UpdatePermissionDto{
 		Name:        "testName",
 		Description: "testDesc",
 	}
 	permission := &ent.Permission{
-		ID:          permissionId,
+		ID:          permissionID,
 		AppID:       "app-id",
 		Name:        dto.Name,
 		Description: dto.Description,
 	}
-	permissionRepo.EXPECT().UpdatePermission(ctx, permissionId, dto).Return(permission, nil)
+	permissionRepo.EXPECT().UpdatePermission(ctx, permissionID, dto).Return(permission, nil)
 
-	permission1, err := uc.UpdatePermission(ctx, permissionId, dto)
+	permission1, err := uc.UpdatePermission(ctx, permissionID, dto)
 	require.NoError(t, err)
 	require.Equal(t, permission, permission1)
 }
@@ -121,10 +121,10 @@ func TestPermissionsUsecase_DeletePermission(t *testing.T) {
 	require.NoError(t, err)
 
 	ctx := context.Background()
-	permissionId := "some.permission"
-	permissionRepo.EXPECT().DeletePermission(ctx, permissionId).Return(nil)
+	permissionID := "some.permission"
+	permissionRepo.EXPECT().DeletePermission(ctx, permissionID).Return(nil)
 
-	err = uc.DeletePermission(ctx, permissionId)
+	err = uc.DeletePermission(ctx, permissionID)
 	require.NoError(t, err)
 }
 
@@ -140,26 +140,26 @@ func TestPermissionsUsecase_GetPermissions(t *testing.T) {
 	require.NoError(t, err)
 
 	ctx := context.Background()
-	appId := "app-id"
-	permissionIds := []string{"first.permission", "second.permission"}
+	appID := "app-id"
+	permissionIDs := []string{"first.permission", "second.permission"}
 
 	permissions := []*ent.Permission{
 		{
 			ID:          "first.permission",
-			AppID:       appId,
+			AppID:       appID,
 			Name:        "firstName",
 			Description: "firstDesc",
 		},
 		{
 			ID:          "second.permission",
-			AppID:       appId,
+			AppID:       appID,
 			Name:        "secondName",
 			Description: "secondDesc",
 		},
 	}
-	permissionRepo.EXPECT().GetPermissions(ctx, appId, permissionIds).Return(permissions, nil)
+	permissionRepo.EXPECT().GetPermissions(ctx, appID, permissionIDs).Return(permissions, nil)
 
-	permissions1, err := uc.GetPermissions(ctx, appId, permissionIds)
+	permissions1, err := uc.GetPermissions(ctx, appID, permissionIDs)
 	require.NoError(t, err)
 	require.Equal(t, permissions, permissions1)
 }
@@ -176,7 +176,7 @@ func TestPermissionsUsecase_GetGroupedPermissions(t *testing.T) {
 	require.NoError(t, err)
 
 	ctx := context.Background()
-	tenantId := int64(1)
+	tenantID := int64(1)
 	permission1 := &ent.Permission{
 		ID:   "permission.one",
 		Name: "Permission One",
@@ -218,21 +218,21 @@ func TestPermissionsUsecase_GetGroupedPermissions(t *testing.T) {
 	assignedRoles := []*ent.ResourceAccess{
 		{
 			ID:         1,
-			TenantID:   tenantId,
+			TenantID:   tenantID,
 			IdentityID: "identity1",
 			RoleID:     1,
 		},
 		{
 			ID:         2,
-			TenantID:   tenantId,
+			TenantID:   tenantID,
 			IdentityID: "identity2",
 			RoleID:     2,
 		},
 	}
 
 	filterRolePermissions := data.FilterRolePermissions{
-		TenantId:   tenantId,
-		RolesIds:   []int64{1, 2},
+		TenantID:   tenantID,
+		RoleIDs:    []int64{1, 2},
 		DeniedOnly: true,
 	}
 	permissionGroups2 := []*ent.PermissionGroup{
@@ -254,21 +254,23 @@ func TestPermissionsUsecase_GetGroupedPermissions(t *testing.T) {
 
 	permissionRepo.EXPECT().GetGroupedPermissions(ctx, filter).Return(permissionGroups, nil)
 	permissionRepo.EXPECT().GetGroupedPermissions(ctx, filter2).Return(permissionGroups, nil)
-	assignedRepo.EXPECT().ListAssignedRoles(ctx, data.ListRolesDto{TenantId: tenantId, IdentityIDs: identities}).Return(assignedRoles, nil)
+	assignedRepo.EXPECT().
+		ListAssignedRoles(ctx, data.ListRolesDto{TenantID: tenantID, IdentityIDs: identities}).
+		Return(assignedRoles, nil)
 	roleRepo.EXPECT().ListRolesPermissions(ctx, filterRolePermissions).Return([]*ent.RolePermission{
 		{
 			ID:           1,
-			TenantID:     tenantId,
+			TenantID:     tenantID,
 			RoleID:       1,
 			PermissionID: permission1.ID,
 		},
 	}, nil)
 
-	pg, err := uc.GetGroupedPermissions(ctx, tenantId, identities, filter)
+	pg, err := uc.GetGroupedPermissions(ctx, tenantID, identities, filter)
 	require.NoError(t, err)
 	require.Equal(t, permissionGroups, pg)
 
-	pg, err = uc.GetGroupedPermissions(ctx, tenantId, identities, filter2)
+	pg, err = uc.GetGroupedPermissions(ctx, tenantID, identities, filter2)
 	require.NoError(t, err)
 	require.Equal(t, permissionGroups2, pg)
 }

@@ -35,12 +35,17 @@ func NewAssignsService(
 }
 
 func (s *AssignsService) AssignRoles(ctx context.Context, req *v1.AssignRolesRequest) (*utils_v1.EmptyReply, error) {
-	tenantId := auth.GetTenantIdFromContext(ctx)
-	if tenantId == 0 {
+	tenantID := auth.GetTenantIdFromContext(ctx)
+	if tenantID == 0 {
 		return nil, v1.ErrorEmptyActorId("empty tenant id")
 	}
 
-	err := s.uc.AssignRoles(ctx, tenantId, toDtos(req))
+	dtos, err := toDtos(req)
+	if err != nil {
+		return nil, err
+	}
+
+	err = s.uc.AssignRoles(ctx, tenantID, dtos)
 	if err != nil {
 		return nil, err
 	}
@@ -49,12 +54,17 @@ func (s *AssignsService) AssignRoles(ctx context.Context, req *v1.AssignRolesReq
 }
 
 func (s *AssignsService) AssignRole(ctx context.Context, req *v1.AssignRoleRequest) (*utils_v1.EmptyReply, error) {
-	tenantId := auth.GetTenantIdFromContext(ctx)
-	if tenantId == 0 {
+	tenantID := auth.GetTenantIdFromContext(ctx)
+	if tenantID == 0 {
 		return nil, v1.ErrorEmptyActorId("empty tenant id")
 	}
 
-	err := s.uc.AssignRole(ctx, tenantId, toDto(req))
+	dto, err := toDto(req)
+	if err != nil {
+		return nil, err
+	}
+
+	err = s.uc.AssignRole(ctx, tenantID, dto)
 	if err != nil {
 		return nil, err
 	}
@@ -63,12 +73,12 @@ func (s *AssignsService) AssignRole(ctx context.Context, req *v1.AssignRoleReque
 }
 
 func (s *AssignsService) UnassignRole(ctx context.Context, req *v1.AssignRequest) (*utils_v1.EmptyReply, error) {
-	tenantId := auth.GetTenantIdFromContext(ctx)
-	if tenantId == 0 {
+	tenantID := auth.GetTenantIdFromContext(ctx)
+	if tenantID == 0 {
 		return nil, v1.ErrorEmptyActorId("empty tenant id")
 	}
 
-	err := s.uc.UnassignRole(ctx, tenantId, req.GetAssignId())
+	err := s.uc.UnassignRole(ctx, tenantID, req.GetAssignId())
 	if err != nil {
 		return nil, err
 	}
@@ -76,13 +86,13 @@ func (s *AssignsService) UnassignRole(ctx context.Context, req *v1.AssignRequest
 }
 
 func (s *AssignsService) ListAssigns(ctx context.Context, req *v1.ListAssignsRequest) (*v1.ListAssignsReply, error) {
-	tenantId := auth.GetTenantIdFromContext(ctx)
-	if tenantId == 0 {
+	tenantID := auth.GetTenantIdFromContext(ctx)
+	if tenantID == 0 {
 		return nil, v1.ErrorEmptyActorId("empty tenant id")
 	}
 
 	assignedRoles, err := s.uc.ListAssignedRoles(ctx, data.ListRolesDto{
-		TenantId:       tenantId,
+		TenantID:       tenantID,
 		IdentityIDs:    req.GetIdentityIds(),
 		Resources:      req.GetResources(),
 		ResourceFilter: req.GetResourceTypes(),
@@ -129,27 +139,35 @@ func assignedRolesReply(assignedRoles []*ent.ResourceAccess) []*v1.AssignedRole 
 	return result
 }
 
-func toDto(req *v1.AssignRoleRequest) data.AssignRoleDto {
-	teamId := req.GetTeamId()
+func toDto(req *v1.AssignRoleRequest) (data.AssignRoleDto, error) {
+	roleID := req.GetRoleId()
+	teamID := req.GetTeamId()
 	resource := req.GetResource()
-	if teamId != 0 {
+	if teamID != 0 {
 		resource = &v1.Resource{
-			Type: data.RESOURCE_TYPE_TEAM,
-			Id:   teamId,
+			Type: data.ResourceTypeTeam,
+			Id:   teamID,
 		}
 	}
-	return data.AssignRoleDto{
-		IdentityId: req.GetIdentityId(),
-		RoleId:     req.GetRoleId(),
-		TeamId:     teamId,
-		Resource:   resource,
+	if roleID == 0 {
+		return data.AssignRoleDto{}, v1.ErrorBadRequest("empty role id")
 	}
+	return data.AssignRoleDto{
+		IdentityID: req.GetIdentityId(),
+		RoleID:     roleID,
+		TeamID:     teamID,
+		Resource:   resource,
+	}, nil
 }
 
-func toDtos(req *v1.AssignRolesRequest) []data.AssignRoleDto {
-	dtos := make([]data.AssignRoleDto, len(req.Assigns))
-	for i, assign := range req.Assigns {
-		dtos[i] = toDto(assign)
+func toDtos(req *v1.AssignRolesRequest) ([]data.AssignRoleDto, error) {
+	dtos := make([]data.AssignRoleDto, len(req.GetAssigns()))
+	for i, assign := range req.GetAssigns() {
+		dto, err := toDto(assign)
+		if err != nil {
+			return nil, err
+		}
+		dtos[i] = dto
 	}
-	return dtos
+	return dtos, nil
 }

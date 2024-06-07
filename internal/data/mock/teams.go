@@ -82,33 +82,33 @@ func (mr *MockTeamsRepoMockRecorder) DeleteTeam(ctx, team interface{}) *gomock.C
 }
 
 // GetTeam mocks base method.
-func (m *MockTeamsRepo) GetTeam(ctx context.Context, teamId, tenantId int64, getTree bool) (*ent.Team, error) {
+func (m *MockTeamsRepo) GetTeam(ctx context.Context, tenantID, teamID int64, getTree bool) (*ent.Team, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetTeam", ctx, teamId, tenantId, getTree)
+	ret := m.ctrl.Call(m, "GetTeam", ctx, tenantID, teamID, getTree)
 	ret0, _ := ret[0].(*ent.Team)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetTeam indicates an expected call of GetTeam.
-func (mr *MockTeamsRepoMockRecorder) GetTeam(ctx, teamId, tenantId, getTree interface{}) *gomock.Call {
+func (mr *MockTeamsRepoMockRecorder) GetTeam(ctx, tenantID, teamID, getTree interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetTeam", reflect.TypeOf((*MockTeamsRepo)(nil).GetTeam), ctx, teamId, tenantId, getTree)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetTeam", reflect.TypeOf((*MockTeamsRepo)(nil).GetTeam), ctx, tenantID, teamID, getTree)
 }
 
 // GetTeams mocks base method.
-func (m *MockTeamsRepo) GetTeams(ctx context.Context, tenantId int64, teamIds []int64) ([]*ent.Team, error) {
+func (m *MockTeamsRepo) GetTeams(ctx context.Context, tenantID int64, teamIDs []int64) ([]*ent.Team, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetTeams", ctx, tenantId, teamIds)
+	ret := m.ctrl.Call(m, "GetTeams", ctx, tenantID, teamIDs)
 	ret0, _ := ret[0].([]*ent.Team)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetTeams indicates an expected call of GetTeams.
-func (mr *MockTeamsRepoMockRecorder) GetTeams(ctx, tenantId, teamIds interface{}) *gomock.Call {
+func (mr *MockTeamsRepoMockRecorder) GetTeams(ctx, tenantID, teamIDs interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetTeams", reflect.TypeOf((*MockTeamsRepo)(nil).GetTeams), ctx, tenantId, teamIds)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetTeams", reflect.TypeOf((*MockTeamsRepo)(nil).GetTeams), ctx, tenantID, teamIDs)
 }
 
 // ListTeams mocks base method.

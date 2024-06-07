@@ -30,8 +30,8 @@ func NewPermissionsUsecase(
 	}, nil
 }
 
-func (uc *PermissionsUsecase) GetPermissionById(ctx context.Context, permissionId string) (*ent.Permission, error) {
-	permission, err := uc.permissionRepo.GetPermissionById(ctx, permissionId)
+func (uc *PermissionsUsecase) GetPermissionByID(ctx context.Context, permissionID string) (*ent.Permission, error) {
+	permission, err := uc.permissionRepo.GetPermissionByID(ctx, permissionID)
 	if err != nil {
 		if ent.IsNotFound(err) {
 			return nil, v1.ErrorNotFound("permission not found")
@@ -42,54 +42,83 @@ func (uc *PermissionsUsecase) GetPermissionById(ctx context.Context, permissionI
 	return permission, nil
 }
 
-func (uc *PermissionsUsecase) CreatePermission(ctx context.Context, data data.CreatePermissionDto) (*ent.Permission, error) {
+func (uc *PermissionsUsecase) CreatePermission(
+	ctx context.Context,
+	data data.CreatePermissionDto,
+) (*ent.Permission, error) {
 	return uc.permissionRepo.CreatePermission(ctx, data)
 }
 
-func (uc *PermissionsUsecase) UpdatePermission(ctx context.Context, permissionId string, data data.UpdatePermissionDto) (*ent.Permission, error) {
-	return uc.permissionRepo.UpdatePermission(ctx, permissionId, data)
+func (uc *PermissionsUsecase) UpdatePermission(
+	ctx context.Context,
+	permissionID string,
+	data data.UpdatePermissionDto,
+) (*ent.Permission, error) {
+	return uc.permissionRepo.UpdatePermission(ctx, permissionID, data)
 }
 
-func (uc *PermissionsUsecase) DeletePermission(ctx context.Context, permissionId string) error {
-	return uc.permissionRepo.DeletePermission(ctx, permissionId)
+func (uc *PermissionsUsecase) DeletePermission(ctx context.Context, permissionID string) error {
+	return uc.permissionRepo.DeletePermission(ctx, permissionID)
 }
 
-func (uc *PermissionsUsecase) GetPermissions(ctx context.Context, appId string, permissionIds []string) ([]*ent.Permission, error) {
-	return uc.permissionRepo.GetPermissions(ctx, appId, permissionIds)
+func (uc *PermissionsUsecase) GetPermissions(
+	ctx context.Context,
+	appID string,
+	permissionIDs []string,
+) ([]*ent.Permission, error) {
+	return uc.permissionRepo.GetPermissions(ctx, appID, permissionIDs)
 }
 
-func (uc *PermissionsUsecase) GetGroupedPermissions(ctx context.Context, tenantId int64, identities []string, filter data.FilterPermissions) ([]*ent.PermissionGroup, error) {
+func (uc *PermissionsUsecase) GetDeniedPermissions(
+	ctx context.Context,
+	tenantID int64,
+	identities []string,
+) (map[string]bool, error) {
+	assignedRoles, err := uc.assignedRepo.ListAssignedRoles(ctx, data.ListRolesDto{
+		TenantID:    tenantID,
+		IdentityIDs: identities,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	rolesIDs := make([]int64, len(assignedRoles))
+	for i, assignedRole := range assignedRoles {
+		rolesIDs[i] = assignedRole.RoleID
+	}
+
+	permissions, err := uc.roleRepo.ListRolesPermissions(ctx, data.FilterRolePermissions{
+		TenantID:   tenantID,
+		RoleIDs:    rolesIDs,
+		DeniedOnly: true,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	excludePermissions := make(map[string]bool)
+	for _, permission := range permissions {
+		excludePermissions[permission.PermissionID] = true
+	}
+
+	return excludePermissions, nil
+}
+
+func (uc *PermissionsUsecase) GetGroupedPermissions(
+	ctx context.Context,
+	tenantID int64,
+	identities []string,
+	filter data.FilterPermissions,
+) ([]*ent.PermissionGroup, error) {
 	groups, err := uc.permissionRepo.GetGroupedPermissions(ctx, filter)
 	if err != nil {
 		return nil, err
 	}
 
 	if !filter.WithDenied {
-		assignedRoles, err := uc.assignedRepo.ListAssignedRoles(ctx, data.ListRolesDto{
-			TenantId:    tenantId,
-			IdentityIDs: identities,
-		})
+		excludePermissions, err := uc.GetDeniedPermissions(ctx, tenantID, identities)
 		if err != nil {
 			return nil, err
-		}
-
-		rolesIds := make([]int64, len(assignedRoles))
-		for i, assignedRole := range assignedRoles {
-			rolesIds[i] = assignedRole.RoleID
-		}
-
-		permissions, err := uc.roleRepo.ListRolesPermissions(ctx, data.FilterRolePermissions{
-			TenantId:   tenantId,
-			RolesIds:   rolesIds,
-			DeniedOnly: true,
-		})
-		if err != nil {
-			return nil, err
-		}
-
-		excludePermissions := make(map[string]bool)
-		for _, permission := range permissions {
-			excludePermissions[permission.PermissionID] = true
 		}
 
 		// filter denied permissions & empty groups

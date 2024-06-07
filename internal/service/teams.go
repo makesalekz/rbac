@@ -30,17 +30,23 @@ func NewTeamsService(
 }
 
 func (s *TeamsService) CreateTeam(ctx context.Context, req *v1.CreateTeamRequest) (*v1.TeamReply, error) {
-	tenantId := auth.GetTenantIdFromContext(ctx)
-	if tenantId == 0 {
+	tenantID := auth.GetTenantIdFromContext(ctx)
+	if tenantID == 0 {
 		return nil, v1.ErrorEmptyActorId("empty tenant id")
 	}
 
-	team, err := s.tu.CreateTeam(ctx, data.TeamDto{
-		TenantId:    tenantId,
-		Name:        req.Name,
-		Description: req.Description,
-		ParentId:    req.ParentId,
-	})
+	dto := data.TeamDto{
+		TenantID:    tenantID,
+		Name:        req.GetName(),
+		Description: req.GetDescription(),
+		ParentID:    req.GetParentId(),
+	}
+	err := dto.Validate()
+	if err != nil {
+		return nil, err
+	}
+
+	team, err := s.tu.CreateTeam(ctx, dto)
 	if err != nil {
 		return nil, err
 	}
@@ -50,19 +56,23 @@ func (s *TeamsService) CreateTeam(ctx context.Context, req *v1.CreateTeamRequest
 }
 
 func (s *TeamsService) UpdateTeam(ctx context.Context, req *v1.UpdateTeamRequest) (*v1.TeamReply, error) {
-	tenantId := auth.GetTenantIdFromContext(ctx)
-	if tenantId == 0 {
+	tenantID := auth.GetTenantIdFromContext(ctx)
+	if tenantID == 0 {
 		return nil, v1.ErrorEmptyActorId("empty tenant id")
 	}
 
-	team, err := s.tu.GetTeam(ctx, tenantId, req.GetTeamId(), false)
+	if req.GetTeamId() == 0 {
+		return nil, v1.ErrorBadRequest("empty team id")
+	}
+
+	team, err := s.tu.GetTeam(ctx, tenantID, req.GetTeamId(), false)
 	if err != nil {
 		return nil, err
 	}
 
 	updated, err := s.tu.UpdateTeam(ctx, team, data.TeamDto{
-		Name:        req.Name,
-		Description: req.Description,
+		Name:        req.GetName(),
+		Description: req.GetDescription(),
 	})
 	if err != nil {
 		return nil, err
@@ -73,12 +83,16 @@ func (s *TeamsService) UpdateTeam(ctx context.Context, req *v1.UpdateTeamRequest
 }
 
 func (s *TeamsService) DeleteTeam(ctx context.Context, req *v1.TeamRequest) (*utils_v1.EmptyReply, error) {
-	tenantId := auth.GetTenantIdFromContext(ctx)
-	if tenantId == 0 {
+	tenantID := auth.GetTenantIdFromContext(ctx)
+	if tenantID == 0 {
 		return nil, v1.ErrorEmptyActorId("empty tenant id")
 	}
 
-	team, err := s.tu.GetTeam(ctx, tenantId, req.GetTeamId(), false)
+	if req.GetTeamId() == 0 {
+		return nil, v1.ErrorBadRequest("empty team id")
+	}
+
+	team, err := s.tu.GetTeam(ctx, tenantID, req.GetTeamId(), false)
 	if err != nil {
 		return nil, err
 	}
@@ -91,12 +105,16 @@ func (s *TeamsService) DeleteTeam(ctx context.Context, req *v1.TeamRequest) (*ut
 }
 
 func (s *TeamsService) GetTeam(ctx context.Context, req *v1.TeamRequest) (*v1.TeamReply, error) {
-	tenantId := auth.GetTenantIdFromContext(ctx)
-	if tenantId == 0 {
+	tenantID := auth.GetTenantIdFromContext(ctx)
+	if tenantID == 0 {
 		return nil, v1.ErrorEmptyActorId("empty tenant id")
 	}
 
-	team, err := s.tu.GetTeam(ctx, tenantId, req.GetTeamId(), req.GetWithTree())
+	if req.GetTeamId() == 0 {
+		return nil, v1.ErrorBadRequest("empty team id")
+	}
+
+	team, err := s.tu.GetTeam(ctx, tenantID, req.GetTeamId(), req.GetWithTree())
 	if err != nil {
 		return nil, err
 	}
@@ -107,14 +125,14 @@ func (s *TeamsService) GetTeam(ctx context.Context, req *v1.TeamRequest) (*v1.Te
 }
 
 func (s *TeamsService) ListTeams(ctx context.Context, req *v1.ListTeamsRequest) (*v1.ListTeamsReply, error) {
-	tenantId := auth.GetTenantIdFromContext(ctx)
-	if tenantId == 0 {
+	tenantID := auth.GetTenantIdFromContext(ctx)
+	if tenantID == 0 {
 		return nil, v1.ErrorEmptyActorId("empty tenant id")
 	}
 
 	list, err := s.tu.ListTeams(ctx, data.TeamsListFilter{
-		TenantId: tenantId,
-		ParentId: req.GetParentId(),
+		TenantID: tenantID,
+		ParentID: req.GetParentId(),
 	}, req.GetPaginate())
 	if err != nil {
 		return nil, err
@@ -141,7 +159,7 @@ func replyTeam(team *ent.Team) *v1.Team {
 		result.Subs = replyTeams(team.Edges.Children)
 	}
 
-	if len(team.ParentsIds.Elements) > 0 {
+	if team.ParentsIds != nil && len(team.ParentsIds.Elements) > 0 {
 		_ = team.ParentsIds.AssignTo(&result.ParentsIds)
 	}
 

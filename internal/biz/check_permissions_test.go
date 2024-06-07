@@ -25,57 +25,58 @@ func TestCheckPermissionsUsecase_CheckPermissions(t *testing.T) {
 	require.NoError(t, err)
 
 	ctx := context.Background()
-	tenantId := int64(1)
+	tenantID := int64(1)
 	identities := []string{"identity1", "identity2"}
-	teamId := int64(1)
+	teamID := int64(1)
 	permissions := []string{"permission.one", "permission.two"}
 
 	team := &ent.Team{
-		ID:         teamId,
-		TenantID:   tenantId,
+		ID:         teamID,
+		TenantID:   tenantID,
 		Name:       "testName",
 		ParentsIds: nil,
 	}
-	teamRepo.EXPECT().GetTeam(ctx, tenantId, teamId, false).Return(team, nil)
+	teamRepo.EXPECT().GetTeams(ctx, tenantID, []int64{teamID}).Return([]*ent.Team{team}, nil)
 
 	assignedRoles := []*ent.ResourceAccess{
 		{
 			ID:         1,
-			TenantID:   tenantId,
+			TenantID:   tenantID,
 			IdentityID: "identity1",
 			RoleID:     1,
 		},
 		{
 			ID:         2,
-			TenantID:   tenantId,
+			TenantID:   tenantID,
 			IdentityID: "identity2",
 			RoleID:     2,
 		},
 	}
 	listRolesDto := data.ListRolesDto{
-		TenantId:    tenantId,
+		TenantID:    tenantID,
 		IdentityIDs: identities,
-		TeamsIDs:    []int64{teamId},
-		Resources:   []*v1.Resource{},
+		Resources: []*v1.Resource{
+			{Id: teamID, Type: data.ResourceTypeTeam},
+		},
 	}
 	assignedRepo.EXPECT().CheckRoles(ctx, listRolesDto).Return(assignedRoles, nil)
 
 	filterRolePermissions := data.FilterRolePermissions{
-		TenantId:    tenantId,
-		RolesIds:    []int64{1, 2},
+		TenantID:    tenantID,
+		RoleIDs:     []int64{1, 2},
 		Permissions: permissions,
 	}
 	rolesPermissions := []*ent.RolePermission{
 		{
 			ID:           1,
-			TenantID:     tenantId,
+			TenantID:     tenantID,
 			RoleID:       1,
 			PermissionID: "permission.one",
 			Fields:       []string{"field1", "field2"},
 		},
 		{
 			ID:           2,
-			TenantID:     tenantId,
+			TenantID:     tenantID,
 			RoleID:       2,
 			PermissionID: "permission.two",
 			Fields:       []string{"field3", "field4"},
@@ -83,7 +84,9 @@ func TestCheckPermissionsUsecase_CheckPermissions(t *testing.T) {
 	}
 	roleRepo.EXPECT().ListRolesPermissions(ctx, filterRolePermissions).Return(rolesPermissions, nil)
 
-	permissionsMap, err := uc.CheckPermissions(ctx, tenantId, identities, permissions, []*v1.Resource{{Id: teamId, Type: data.RESOURCE_TYPE_TEAM}})
+	resources := []*v1.Resource{{Id: teamID, Type: data.ResourceTypeTeam}}
+
+	permissionsMap, err := uc.CheckPermissions(ctx, tenantID, identities, permissions, resources)
 	require.NoError(t, err)
 	require.Len(t, permissionsMap, 2)
 

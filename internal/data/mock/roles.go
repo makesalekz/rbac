@@ -52,77 +52,77 @@ func (mr *MockRoleRepoMockRecorder) CreateRole(ctx, roleDto interface{}) *gomock
 }
 
 // DeleteRole mocks base method.
-func (m *MockRoleRepo) DeleteRole(ctx context.Context, tenantId, roleId int64) error {
+func (m *MockRoleRepo) DeleteRole(ctx context.Context, tenantID, roleID int64) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "DeleteRole", ctx, tenantId, roleId)
+	ret := m.ctrl.Call(m, "DeleteRole", ctx, tenantID, roleID)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // DeleteRole indicates an expected call of DeleteRole.
-func (mr *MockRoleRepoMockRecorder) DeleteRole(ctx, tenantId, roleId interface{}) *gomock.Call {
+func (mr *MockRoleRepoMockRecorder) DeleteRole(ctx, tenantID, roleID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteRole", reflect.TypeOf((*MockRoleRepo)(nil).DeleteRole), ctx, tenantId, roleId)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteRole", reflect.TypeOf((*MockRoleRepo)(nil).DeleteRole), ctx, tenantID, roleID)
 }
 
-// GetRoleById mocks base method.
-func (m *MockRoleRepo) GetRoleById(ctx context.Context, tenantId, roleId int64) (*ent.Role, error) {
+// GetRoleByID mocks base method.
+func (m *MockRoleRepo) GetRoleByID(ctx context.Context, tenantID, roleID int64) (*ent.Role, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetRoleById", ctx, tenantId, roleId)
+	ret := m.ctrl.Call(m, "GetRoleByID", ctx, tenantID, roleID)
 	ret0, _ := ret[0].(*ent.Role)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// GetRoleById indicates an expected call of GetRoleById.
-func (mr *MockRoleRepoMockRecorder) GetRoleById(ctx, tenantId, roleId interface{}) *gomock.Call {
+// GetRoleByID indicates an expected call of GetRoleByID.
+func (mr *MockRoleRepoMockRecorder) GetRoleByID(ctx, tenantID, roleID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRoleById", reflect.TypeOf((*MockRoleRepo)(nil).GetRoleById), ctx, tenantId, roleId)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRoleByID", reflect.TypeOf((*MockRoleRepo)(nil).GetRoleByID), ctx, tenantID, roleID)
 }
 
-// GetRolesById mocks base method.
-func (m *MockRoleRepo) GetRolesById(ctx context.Context, tenantId int64, roleIds []int64) ([]*ent.Role, error) {
+// GetRolesByID mocks base method.
+func (m *MockRoleRepo) GetRolesByID(ctx context.Context, tenantID int64, roleIDs []int64) ([]*ent.Role, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetRolesById", ctx, tenantId, roleIds)
+	ret := m.ctrl.Call(m, "GetRolesByID", ctx, tenantID, roleIDs)
 	ret0, _ := ret[0].([]*ent.Role)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// GetRolesById indicates an expected call of GetRolesById.
-func (mr *MockRoleRepoMockRecorder) GetRolesById(ctx, tenantId, roleIds interface{}) *gomock.Call {
+// GetRolesByID indicates an expected call of GetRolesByID.
+func (mr *MockRoleRepoMockRecorder) GetRolesByID(ctx, tenantID, roleIDs interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRolesById", reflect.TypeOf((*MockRoleRepo)(nil).GetRolesById), ctx, tenantId, roleIds)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRolesByID", reflect.TypeOf((*MockRoleRepo)(nil).GetRolesByID), ctx, tenantID, roleIDs)
 }
 
 // GetRolesList mocks base method.
-func (m *MockRoleRepo) GetRolesList(ctx context.Context, tenantId int64, search string) ([]*ent.Role, error) {
+func (m *MockRoleRepo) GetRolesList(ctx context.Context, tenantID int64, search string) ([]*ent.Role, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetRolesList", ctx, tenantId, search)
+	ret := m.ctrl.Call(m, "GetRolesList", ctx, tenantID, search)
 	ret0, _ := ret[0].([]*ent.Role)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetRolesList indicates an expected call of GetRolesList.
-func (mr *MockRoleRepoMockRecorder) GetRolesList(ctx, tenantId, search interface{}) *gomock.Call {
+func (mr *MockRoleRepoMockRecorder) GetRolesList(ctx, tenantID, search interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRolesList", reflect.TypeOf((*MockRoleRepo)(nil).GetRolesList), ctx, tenantId, search)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRolesList", reflect.TypeOf((*MockRoleRepo)(nil).GetRolesList), ctx, tenantID, search)
 }
 
 // ListRolePermissions mocks base method.
-func (m *MockRoleRepo) ListRolePermissions(ctx context.Context, tenantId, roleId int64) ([]*ent.RolePermission, error) {
+func (m *MockRoleRepo) ListRolePermissions(ctx context.Context, tenantID, roleID int64) ([]*ent.RolePermission, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ListRolePermissions", ctx, tenantId, roleId)
+	ret := m.ctrl.Call(m, "ListRolePermissions", ctx, tenantID, roleID)
 	ret0, _ := ret[0].([]*ent.RolePermission)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // ListRolePermissions indicates an expected call of ListRolePermissions.
-func (mr *MockRoleRepoMockRecorder) ListRolePermissions(ctx, tenantId, roleId interface{}) *gomock.Call {
+func (mr *MockRoleRepoMockRecorder) ListRolePermissions(ctx, tenantID, roleID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListRolePermissions", reflect.TypeOf((*MockRoleRepo)(nil).ListRolePermissions), ctx, tenantId, roleId)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListRolePermissions", reflect.TypeOf((*MockRoleRepo)(nil).ListRolePermissions), ctx, tenantID, roleID)
 }
 
 // ListRolesPermissions mocks base method.
@@ -141,44 +141,44 @@ func (mr *MockRoleRepoMockRecorder) ListRolesPermissions(ctx, filter interface{}
 }
 
 // RemovePermissionFromRole mocks base method.
-func (m *MockRoleRepo) RemovePermissionFromRole(ctx context.Context, tenantId, roleId int64, permission *ent.Permission) error {
+func (m *MockRoleRepo) RemovePermissionFromRole(ctx context.Context, tenantID, roleID int64, permission *ent.Permission) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "RemovePermissionFromRole", ctx, tenantId, roleId, permission)
+	ret := m.ctrl.Call(m, "RemovePermissionFromRole", ctx, tenantID, roleID, permission)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // RemovePermissionFromRole indicates an expected call of RemovePermissionFromRole.
-func (mr *MockRoleRepoMockRecorder) RemovePermissionFromRole(ctx, tenantId, roleId, permission interface{}) *gomock.Call {
+func (mr *MockRoleRepoMockRecorder) RemovePermissionFromRole(ctx, tenantID, roleID, permission interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemovePermissionFromRole", reflect.TypeOf((*MockRoleRepo)(nil).RemovePermissionFromRole), ctx, tenantId, roleId, permission)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemovePermissionFromRole", reflect.TypeOf((*MockRoleRepo)(nil).RemovePermissionFromRole), ctx, tenantID, roleID, permission)
 }
 
 // SetRolePermission mocks base method.
-func (m *MockRoleRepo) SetRolePermission(ctx context.Context, tenantId, roleId int64, permission *ent.Permission, dto data.CreateRolePermissionDto) error {
+func (m *MockRoleRepo) SetRolePermission(ctx context.Context, tenantID, roleID int64, permission *ent.Permission, dto data.CreateRolePermissionDto) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SetRolePermission", ctx, tenantId, roleId, permission, dto)
+	ret := m.ctrl.Call(m, "SetRolePermission", ctx, tenantID, roleID, permission, dto)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // SetRolePermission indicates an expected call of SetRolePermission.
-func (mr *MockRoleRepoMockRecorder) SetRolePermission(ctx, tenantId, roleId, permission, dto interface{}) *gomock.Call {
+func (mr *MockRoleRepoMockRecorder) SetRolePermission(ctx, tenantID, roleID, permission, dto interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetRolePermission", reflect.TypeOf((*MockRoleRepo)(nil).SetRolePermission), ctx, tenantId, roleId, permission, dto)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetRolePermission", reflect.TypeOf((*MockRoleRepo)(nil).SetRolePermission), ctx, tenantID, roleID, permission, dto)
 }
 
 // UpdateRole mocks base method.
-func (m *MockRoleRepo) UpdateRole(ctx context.Context, tenantId, roleId int64, roleDto data.UpdateRoleDto) (*ent.Role, error) {
+func (m *MockRoleRepo) UpdateRole(ctx context.Context, tenantID, roleID int64, roleDto data.UpdateRoleDto) (*ent.Role, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UpdateRole", ctx, tenantId, roleId, roleDto)
+	ret := m.ctrl.Call(m, "UpdateRole", ctx, tenantID, roleID, roleDto)
 	ret0, _ := ret[0].(*ent.Role)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // UpdateRole indicates an expected call of UpdateRole.
-func (mr *MockRoleRepoMockRecorder) UpdateRole(ctx, tenantId, roleId, roleDto interface{}) *gomock.Call {
+func (mr *MockRoleRepoMockRecorder) UpdateRole(ctx, tenantID, roleID, roleDto interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateRole", reflect.TypeOf((*MockRoleRepo)(nil).UpdateRole), ctx, tenantId, roleId, roleDto)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateRole", reflect.TypeOf((*MockRoleRepo)(nil).UpdateRole), ctx, tenantID, roleID, roleDto)
 }
