@@ -115,11 +115,15 @@ func TestRolesService_CreateTeamWithParent(t *testing.T) {
 		ParentID:    req.GetParentId(),
 		ParentsIDs:  []int64{1, 2, 3},
 	}
+	teamParentIDs := &pgtype.Int8Array{
+		Elements: append(parentIDs, pgtype.Int8{Int: 3, Status: pgtype.Present}),
+		Status:   pgtype.Present,
+	}
 	team := &ent.Team{
 		Name:        req.GetName(),
 		Description: req.GetDescription(),
 		ParentID:    &parentTeam.ID,
-		ParentsIds:  &pgtype.Int8Array{Elements: append(parentIDs, pgtype.Int8{Int: 3, Status: pgtype.Present}), Status: pgtype.Present},
+		ParentsIds:  teamParentIDs,
 		CreatedAt:   time.Now(),
 		UpdatedAt:   time.Now(),
 	}
