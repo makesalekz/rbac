@@ -12,19 +12,6 @@ import (
 	_ "github.com/lib/pq"
 )
 
-type TeamDto struct {
-	TenantID    int64
-	Name        string
-	Description string
-	ParentID    int64
-	ParentsIDs  []int64
-}
-
-type TeamsListFilter struct {
-	TenantID int64
-	ParentID int64
-}
-
 // TeamsRepo.
 type TeamsRepo interface {
 	CreateTeam(ctx context.Context, dto TeamDto) (*ent.Team, error)

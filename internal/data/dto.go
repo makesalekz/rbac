@@ -83,3 +83,25 @@ type FilterRolePermissions struct {
 	Permissions []string
 	DeniedOnly  bool
 }
+
+// ------- Teams -------------
+
+type TeamDto struct {
+	TenantID    int64
+	Name        string
+	Description string
+	ParentID    int64
+	ParentsIDs  []int64
+}
+
+func (dto TeamDto) Validate() error {
+	if dto.Name == "" {
+		return v1.ErrorBadRequest("empty name")
+	}
+	return nil
+}
+
+type TeamsListFilter struct {
+	TenantID int64
+	ParentID int64
+}
