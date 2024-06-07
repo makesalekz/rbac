@@ -232,7 +232,7 @@ func TestPermissionsUsecase_GetGroupedPermissions(t *testing.T) {
 
 	filterRolePermissions := data.FilterRolePermissions{
 		TenantID:   tenantID,
-		RolesIDs:   []int64{1, 2},
+		RoleIDs:    []int64{1, 2},
 		DeniedOnly: true,
 	}
 	permissionGroups2 := []*ent.PermissionGroup{
@@ -255,7 +255,7 @@ func TestPermissionsUsecase_GetGroupedPermissions(t *testing.T) {
 	permissionRepo.EXPECT().GetGroupedPermissions(ctx, filter).Return(permissionGroups, nil)
 	permissionRepo.EXPECT().GetGroupedPermissions(ctx, filter2).Return(permissionGroups, nil)
 	assignedRepo.EXPECT().
-		ListAssignedRoles(ctx, data.ListRolesDto{TenantId: tenantID, IdentityIDs: identities}).
+		ListAssignedRoles(ctx, data.ListRolesDto{TenantID: tenantID, IdentityIDs: identities}).
 		Return(assignedRoles, nil)
 	roleRepo.EXPECT().ListRolesPermissions(ctx, filterRolePermissions).Return([]*ent.RolePermission{
 		{

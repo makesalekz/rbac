@@ -4,6 +4,24 @@ import (
 	v1 "gitlab.calendaria.team/services/rbac/api/rbac/v1"
 )
 
+const RESOURCE_TYPE_TEAM = "team"
+
+// ------- Assigns -----------
+
+type AssignRoleDto struct {
+	IdentityID string
+	RoleID     int64
+	TeamID     int64
+	Resource   *v1.Resource
+}
+
+type ListRolesDto struct {
+	TenantID       int64
+	IdentityIDs    []string
+	Resources      []*v1.Resource
+	ResourceFilter []string
+}
+
 // ------- Permissions -------
 
 type CreatePermissionDto struct {
@@ -79,7 +97,7 @@ type CreateRolePermissionDto struct {
 
 type FilterRolePermissions struct {
 	TenantID    int64
-	RolesIDs    []int64
+	RoleIDs     []int64
 	Permissions []string
 	DeniedOnly  bool
 }

@@ -92,7 +92,7 @@ func (s *AssignsService) ListAssigns(ctx context.Context, req *v1.ListAssignsReq
 	}
 
 	assignedRoles, err := s.uc.ListAssignedRoles(ctx, data.ListRolesDto{
-		TenantId:       tenantID,
+		TenantID:       tenantID,
 		IdentityIDs:    req.GetIdentityIds(),
 		Resources:      req.GetResources(),
 		ResourceFilter: req.GetResourceTypes(),
@@ -153,9 +153,9 @@ func toDto(req *v1.AssignRoleRequest) (data.AssignRoleDto, error) {
 		return data.AssignRoleDto{}, v1.ErrorBadRequest("empty role id")
 	}
 	return data.AssignRoleDto{
-		IdentityId: req.GetIdentityId(),
-		RoleId:     roleID,
-		TeamId:     teamID,
+		IdentityID: req.GetIdentityId(),
+		RoleID:     roleID,
+		TeamID:     teamID,
 		Resource:   resource,
 	}, nil
 }

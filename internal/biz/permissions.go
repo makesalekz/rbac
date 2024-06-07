@@ -75,7 +75,7 @@ func (uc *PermissionsUsecase) GetDeniedPermissions(
 	identities []string,
 ) (map[string]bool, error) {
 	assignedRoles, err := uc.assignedRepo.ListAssignedRoles(ctx, data.ListRolesDto{
-		TenantId:    tenantID,
+		TenantID:    tenantID,
 		IdentityIDs: identities,
 	})
 	if err != nil {
@@ -89,7 +89,7 @@ func (uc *PermissionsUsecase) GetDeniedPermissions(
 
 	permissions, err := uc.roleRepo.ListRolesPermissions(ctx, data.FilterRolePermissions{
 		TenantID:   tenantID,
-		RolesIDs:   rolesIDs,
+		RoleIDs:    rolesIDs,
 		DeniedOnly: true,
 	})
 	if err != nil {

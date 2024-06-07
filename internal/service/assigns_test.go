@@ -79,8 +79,8 @@ func TestRolesService_AssignRoles(t *testing.T) {
 		{ID: 22},
 	}
 	dtos := []data.AssignRoleDto{
-		{IdentityId: "1234", RoleId: 11, TeamId: 22, Resource: &v1.Resource{Type: data.RESOURCE_TYPE_TEAM, Id: 22}},
-		{RoleId: 12},
+		{IdentityID: "1234", RoleID: 11, TeamID: 22, Resource: &v1.Resource{Type: data.RESOURCE_TYPE_TEAM, Id: 22}},
+		{RoleID: 12},
 	}
 	roleRepo.EXPECT().GetRolesByID(ctx, tenantID, []int64{11, 12}).Return(roles, nil)
 	teamsRepo.EXPECT().GetTeams(ctx, tenantID, []int64{22}).Return(teams, nil)
@@ -240,8 +240,8 @@ func TestRolesService_AssignRolesAlreadyAssigned(t *testing.T) {
 		{ID: 22},
 	}
 	dtos := []data.AssignRoleDto{
-		{IdentityId: "1234", RoleId: 11, TeamId: 22, Resource: &v1.Resource{Type: data.RESOURCE_TYPE_TEAM, Id: 22}},
-		{RoleId: 12},
+		{IdentityID: "1234", RoleID: 11, TeamID: 22, Resource: &v1.Resource{Type: data.RESOURCE_TYPE_TEAM, Id: 22}},
+		{RoleID: 12},
 	}
 	roleRepo.EXPECT().GetRolesByID(ctx, tenantID, []int64{11, 12}).Return(roles, nil)
 	teamsRepo.EXPECT().GetTeams(ctx, tenantID, []int64{22}).Return(teams, nil)
@@ -278,9 +278,9 @@ func TestRolesService_AssignRole(t *testing.T) {
 	team := &ent.Team{ID: req.GetTeamId()}
 	dtos := []data.AssignRoleDto{
 		{
-			IdentityId: req.GetIdentityId(),
-			RoleId:     req.GetRoleId(),
-			TeamId:     req.GetTeamId(),
+			IdentityID: req.GetIdentityId(),
+			RoleID:     req.GetRoleId(),
+			TeamID:     req.GetTeamId(),
 			Resource:   &v1.Resource{Type: data.RESOURCE_TYPE_TEAM, Id: req.GetTeamId()},
 		},
 	}
@@ -392,9 +392,9 @@ func TestRolesService_AssignRoleAlreadyAssigned(t *testing.T) {
 	team := &ent.Team{ID: req.GetTeamId()}
 	dtos := []data.AssignRoleDto{
 		{
-			IdentityId: req.GetIdentityId(),
-			RoleId:     req.GetRoleId(),
-			TeamId:     req.GetTeamId(),
+			IdentityID: req.GetIdentityId(),
+			RoleID:     req.GetRoleId(),
+			TeamID:     req.GetTeamId(),
 			Resource:   &v1.Resource{Type: data.RESOURCE_TYPE_TEAM, Id: req.GetTeamId()},
 		},
 	}
@@ -500,7 +500,7 @@ func TestRolesService_ListAssigns(t *testing.T) {
 		Resources:   []*v1.Resource{resource},
 	}
 	dto := data.ListRolesDto{
-		TenantId:       tenantID,
+		TenantID:       tenantID,
 		IdentityIDs:    req.GetIdentityIds(),
 		Resources:      req.GetResources(),
 		ResourceFilter: req.GetResourceTypes(),

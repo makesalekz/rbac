@@ -50,7 +50,7 @@ func NewAssignedRolesUsecase(
 // - rbac.ErrorAlreadyExists: role already assigned
 // - rbac.ErrorBadRequest: there is no such teamId.
 func (u *AssignedRolesUsecase) AssignRoles(ctx context.Context, tenantID int64, dtos []data.AssignRoleDto) error {
-	roleIDs := data.ExtractUnique(dtos, func(e data.AssignRoleDto) (int64, bool) { return e.RoleId, true })
+	roleIDs := data.ExtractUnique(dtos, func(e data.AssignRoleDto) (int64, bool) { return e.RoleID, true })
 	// Get roles by ids
 	roles, err := u.roleRepo.GetRolesByID(ctx, tenantID, roleIDs)
 	if err != nil {
@@ -63,8 +63,8 @@ func (u *AssignedRolesUsecase) AssignRoles(ctx context.Context, tenantID int64, 
 	}
 
 	teamIDs := data.ExtractUnique(dtos, func(e data.AssignRoleDto) (int64, bool) {
-		if e.TeamId != 0 {
-			return e.TeamId, true
+		if e.TeamID != 0 {
+			return e.TeamID, true
 		}
 		return 0, false
 	})
@@ -107,7 +107,7 @@ func (u *AssignedRolesUsecase) AssignRoles(ctx context.Context, tenantID int64, 
 }
 
 func (u *AssignedRolesUsecase) AssignRole(ctx context.Context, tenantID int64, dto data.AssignRoleDto) error {
-	_, err := u.roleRepo.GetRoleByID(ctx, tenantID, dto.RoleId)
+	_, err := u.roleRepo.GetRoleByID(ctx, tenantID, dto.RoleID)
 	if err != nil {
 		if ent.IsNotFound(err) {
 			return v1.ErrorNotFound("role not found")
@@ -115,8 +115,8 @@ func (u *AssignedRolesUsecase) AssignRole(ctx context.Context, tenantID int64, d
 		return v1.ErrorDatabaseQuery("get role failed: %v", err)
 	}
 
-	if dto.TeamId != 0 {
-		_, err = u.teamRepo.GetTeam(ctx, tenantID, dto.TeamId, false)
+	if dto.TeamID != 0 {
+		_, err = u.teamRepo.GetTeam(ctx, tenantID, dto.TeamID, false)
 		if err != nil {
 			if ent.IsNotFound(err) {
 				return v1.ErrorNotFound("team not found")
@@ -175,9 +175,9 @@ func (u *AssignedRolesUsecase) UnassignRole(ctx context.Context, tenantID, assig
 
 		u.qm.GetLocal(QueueRoleUnassign).Pub(AssignRoleMessage{
 			AssignRoleDto: data.AssignRoleDto{
-				IdentityId: assignedRole.IdentityID,
-				RoleId:     assignedRole.RoleID,
-				TeamId:     teamID,
+				IdentityID: assignedRole.IdentityID,
+				RoleID:     assignedRole.RoleID,
+				TeamID:     teamID,
 				Resource:   resource,
 			},
 			TenantID: tenantID,

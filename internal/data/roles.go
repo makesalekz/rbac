@@ -315,7 +315,7 @@ func (r *roleRepo) ListRolesPermissions(
 	query := r.db.RolePermission.
 		Query().
 		Where(
-			rolepermission.RoleIDIn(filter.RolesIDs...),
+			rolepermission.RoleIDIn(filter.RoleIDs...),
 			rolepermission.TenantIDIn(filter.TenantID, 0),
 		)
 

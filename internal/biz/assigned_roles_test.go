@@ -35,8 +35,8 @@ func TestAssignedRolesUsecase_AssignRole(t *testing.T) {
 
 	// Positive case
 	dto := data.AssignRoleDto{
-		IdentityId: identityID,
-		RoleId:     roleID,
+		IdentityID: identityID,
+		RoleID:     roleID,
 	}
 	role := &ent.Role{
 		ID:          roleID,
@@ -54,8 +54,8 @@ func TestAssignedRolesUsecase_AssignRole(t *testing.T) {
 	roleRepo.EXPECT().GetRoleByID(ctx, tenantID, roleID2).Return(nil, &ent.NotFoundError{})
 
 	err = uc.AssignRole(ctx, tenantID, data.AssignRoleDto{
-		IdentityId: identityID,
-		RoleId:     roleID2,
+		IdentityID: identityID,
+		RoleID:     roleID2,
 	})
 	require.Error(t, err)
 	require.Equal(t, v1.ErrorNotFound("role not found"), err)
@@ -65,9 +65,9 @@ func TestAssignedRolesUsecase_AssignRole(t *testing.T) {
 	teamRepo.EXPECT().GetTeam(ctx, tenantID, teamID, false).Return(nil, &ent.NotFoundError{})
 
 	err = uc.AssignRole(ctx, tenantID, data.AssignRoleDto{
-		IdentityId: identityID,
-		RoleId:     roleID,
-		TeamId:     teamID,
+		IdentityID: identityID,
+		RoleID:     roleID,
+		TeamID:     teamID,
 	})
 	require.Error(t, err)
 	require.Equal(t, v1.ErrorNotFound("team not found"), err)
@@ -129,7 +129,7 @@ func TestAssignedRolesUsecase_ListAssignedRoles(t *testing.T) {
 
 	// Positive case
 	assignedRoles := []*ent.ResourceAccess{}
-	dto := data.ListRolesDto{TenantId: tenantID, IdentityIDs: []string{identityID}}
+	dto := data.ListRolesDto{TenantID: tenantID, IdentityIDs: []string{identityID}}
 	assignedRepo.EXPECT().ListAssignedRoles(ctx, dto).Return(assignedRoles, nil)
 
 	roles, err := uc.ListAssignedRoles(ctx, dto)

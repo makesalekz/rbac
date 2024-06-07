@@ -2,30 +2,13 @@ package data
 
 import (
 	"context"
-	v1 "gitlab.calendaria.team/services/rbac/api/rbac/v1"
+
 	"gitlab.calendaria.team/services/rbac/ent"
 	"gitlab.calendaria.team/services/rbac/ent/predicate"
 	"gitlab.calendaria.team/services/rbac/ent/resourceaccess"
 
 	_ "github.com/lib/pq"
 )
-
-const RESOURCE_TYPE_TEAM = "team"
-
-type AssignRoleDto struct {
-	IdentityId string
-	RoleId     int64
-	TeamId     int64
-	Resource   *v1.Resource
-}
-
-type ListRolesDto struct {
-	TenantId       int64
-	IdentityIDs    []string
-	TeamsIDs       []int64
-	Resources      []*v1.Resource
-	ResourceFilter []string
-}
 
 // AssignedRolesRepo
 type AssignedRolesRepo interface {
@@ -45,8 +28,8 @@ func (t *assignedRolesRepo) AssignRoles(ctx context.Context, tenantId int64, dto
 	for i, dto := range dtos {
 		assignQueries[i] = t.db.ResourceAccess.Create().
 			SetTenantID(tenantId).
-			SetIdentityID(dto.IdentityId).
-			SetRoleID(dto.RoleId)
+			SetIdentityID(dto.IdentityID).
+			SetRoleID(dto.RoleID)
 
 		if dto.Resource != nil {
 			assignQueries[i].SetResourceID(dto.Resource.Id).SetResourceType(dto.Resource.Type)
@@ -71,7 +54,7 @@ func (t *assignedRolesRepo) UnassignRole(ctx context.Context, assignedRole *ent.
 
 func (t *assignedRolesRepo) ListAssignedRoles(ctx context.Context, dto ListRolesDto) ([]*ent.ResourceAccess, error) {
 	query := t.db.ResourceAccess.Query().
-		Where(resourceaccess.TenantID(dto.TenantId)).
+		Where(resourceaccess.TenantID(dto.TenantID)).
 		WithRole()
 
 	if len(dto.IdentityIDs) > 0 {
@@ -107,7 +90,7 @@ func (t *assignedRolesRepo) ListAssignedRoles(ctx context.Context, dto ListRoles
 
 func (t *assignedRolesRepo) CheckRoles(ctx context.Context, dto ListRolesDto) ([]*ent.ResourceAccess, error) {
 	query := t.db.ResourceAccess.Query().
-		Where(resourceaccess.TenantID(dto.TenantId)).
+		Where(resourceaccess.TenantID(dto.TenantID)).
 		WithRole()
 
 	if len(dto.IdentityIDs) > 0 {
@@ -117,15 +100,6 @@ func (t *assignedRolesRepo) CheckRoles(ctx context.Context, dto ListRolesDto) ([
 
 	predicates := []predicate.ResourceAccess{
 		resourceaccess.ResourceIDIsNil(),
-	}
-
-	if len(dto.TeamsIDs) > 0 {
-		predicates = append(predicates,
-			resourceaccess.And(
-				resourceaccess.ResourceType(RESOURCE_TYPE_TEAM),
-				resourceaccess.ResourceIDIn(dto.TeamsIDs...),
-			),
-		)
 	}
 
 	if len(dto.Resources) > 0 {
