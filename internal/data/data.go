@@ -9,6 +9,7 @@ import (
 	"gitlab.calendaria.team/services/rbac/internal/conf"
 	u_config "gitlab.calendaria.team/services/utils/v1/config"
 	u_jwt "gitlab.calendaria.team/services/utils/v1/jwt"
+	u_nats "gitlab.calendaria.team/services/utils/v1/nats"
 	u_tracing "gitlab.calendaria.team/services/utils/v2/tracing"
 
 	"github.com/go-kratos/kratos/v2/log"
@@ -22,10 +23,11 @@ import (
 //nolint:gochecknoglobals // this global variable is required for wire
 var ProviderSet = wire.NewSet(
 	NewData,
+	NewNatsClient,
 	u_config.NewConfig,
 	u_jwt.NewJwtProcessor,
 	u_tracing.NewTracer,
-	NewNatsClient,
+	u_nats.NewQueueManager,
 	NewRoleRepo,
 	NewTeamsRepo,
 	NewPermissionRepo,
