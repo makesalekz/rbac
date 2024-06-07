@@ -13,7 +13,7 @@ require (
 	github.com/nats-io/nats.go v1.31.0
 	github.com/prometheus/client_golang v1.18.0
 	github.com/stretchr/testify v1.8.4
-	gitlab.calendaria.team/services/utils v0.2.17
+	gitlab.calendaria.team/services/utils v0.3.5
 	go.uber.org/automaxprocs v1.5.3
 	google.golang.org/grpc v1.61.1
 	google.golang.org/protobuf v1.32.0

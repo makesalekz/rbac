@@ -9,6 +9,7 @@ import (
 	"gitlab.calendaria.team/services/rbac/internal/biz"
 	"gitlab.calendaria.team/services/rbac/internal/data"
 	"gitlab.calendaria.team/services/rbac/internal/data/mock"
+	u_nats_mock "gitlab.calendaria.team/services/utils/v1/nats/mock"
 	"gitlab.calendaria.team/services/utils/v2/zap"
 
 	"github.com/golang/mock/gomock"
@@ -20,10 +21,12 @@ func TestAssignedRolesUsecase_AssignRole(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
+	qm := u_nats_mock.NewMockIQueueManager(ctrl)
+	queue := u_nats_mock.NewMockIQueue(ctrl)
 	assignedRepo := mock.NewMockAssignedRolesRepo(ctrl)
 	roleRepo := mock.NewMockRoleRepo(ctrl)
 	teamRepo := mock.NewMockTeamsRepo(ctrl)
-	uc, err := biz.NewAssignedRolesUsecase(logger, assignedRepo, roleRepo, teamRepo, nil)
+	uc, err := biz.NewAssignedRolesUsecase(logger, assignedRepo, roleRepo, teamRepo, qm)
 	require.NoError(t, err)
 
 	ctx := context.Background()
@@ -46,6 +49,12 @@ func TestAssignedRolesUsecase_AssignRole(t *testing.T) {
 	}
 	roleRepo.EXPECT().GetRoleByID(ctx, tenantID, roleID).Return(role, nil)
 	assignedRepo.EXPECT().AssignRoles(ctx, tenantID, []data.AssignRoleDto{dto}).Return(nil)
+
+	qm.EXPECT().GetLocal(biz.QueueRoleAssign).Return(queue)
+	queue.EXPECT().Pub(biz.AssignRoleMessage{
+		AssignRoleDto: dto,
+		TenantID:      tenantID,
+	})
 
 	err = uc.AssignRole(ctx, tenantID, dto)
 	require.NoError(t, err)
@@ -78,10 +87,12 @@ func TestAssignedRolesUsecase_UnassignRole(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
+	qm := u_nats_mock.NewMockIQueueManager(ctrl)
+	queue := u_nats_mock.NewMockIQueue(ctrl)
 	assignedRepo := mock.NewMockAssignedRolesRepo(ctrl)
 	roleRepo := mock.NewMockRoleRepo(ctrl)
 	teamRepo := mock.NewMockTeamsRepo(ctrl)
-	uc, err := biz.NewAssignedRolesUsecase(logger, assignedRepo, roleRepo, teamRepo, nil)
+	uc, err := biz.NewAssignedRolesUsecase(logger, assignedRepo, roleRepo, teamRepo, qm)
 	require.NoError(t, err)
 
 	ctx := context.Background()
@@ -101,6 +112,15 @@ func TestAssignedRolesUsecase_UnassignRole(t *testing.T) {
 	assignedRepo.EXPECT().GetAssignedRoleByID(ctx, tenantID, assignID).Return(assignedRole, nil)
 	assignedRepo.EXPECT().UnassignRole(ctx, assignedRole).Return(nil)
 
+	qm.EXPECT().GetLocal(biz.QueueRoleUnassign).Return(queue)
+	queue.EXPECT().Pub(biz.AssignRoleMessage{
+		AssignRoleDto: data.AssignRoleDto{
+			IdentityID: assignedRole.IdentityID,
+			RoleID:     assignedRole.RoleID,
+		},
+		TenantID: tenantID,
+	})
+
 	err = uc.UnassignRole(ctx, tenantID, assignID)
 	require.NoError(t, err)
 
@@ -117,10 +137,11 @@ func TestAssignedRolesUsecase_ListAssignedRoles(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
+	qm := u_nats_mock.NewMockIQueueManager(ctrl)
 	assignedRepo := mock.NewMockAssignedRolesRepo(ctrl)
 	roleRepo := mock.NewMockRoleRepo(ctrl)
 	teamRepo := mock.NewMockTeamsRepo(ctrl)
-	uc, err := biz.NewAssignedRolesUsecase(logger, assignedRepo, roleRepo, teamRepo, nil)
+	uc, err := biz.NewAssignedRolesUsecase(logger, assignedRepo, roleRepo, teamRepo, qm)
 	require.NoError(t, err)
 
 	ctx := context.Background()
