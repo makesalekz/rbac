@@ -1,6 +1,7 @@
 -- Create project permission groups
 INSERT INTO "permission_groups" ("id", "name", "app_id")
-VALUES ('project.comment', 'Project Comment', 'common');
+VALUES ('project.comment', 'Project Comment', 'common'),
+       ('project.task', 'Project Task', 'common');
 
 INSERT INTO "permissions" ("id", "group_id", "name", "description", "app_id", "fields")
 VALUES ('project.task.create', 'project.task', 'Task Create', '', 'common', '[]'),
