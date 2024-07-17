@@ -29,6 +29,7 @@ VALUES
 (1, 'project.comment.update', FALSE, '[]'),
 (1, 'project.comment.delete', FALSE, '[]'),
 -- Project manager role
+(3, 'project.task.create', FALSE, '[]'),
 (3, 'project.task.read', FALSE, '[]'),
 (3, 'project.task.update', FALSE, '[]'),
 (3, 'project.task.delete', FALSE, '[]'),
@@ -36,12 +37,14 @@ VALUES
 (3, 'project.comment.read', FALSE, '[]'),
 (3, 'project.comment.delete', FALSE, '[]'),
 -- Project participant limitations
+(4, 'project.task.create', FALSE, '[]'),
 (4, 'project.task.read', FALSE, '[]'),
 (4, 'project.task.update', FALSE, '[]'),
 (4, 'project.task.delete', FALSE, '[]'),
 (4, 'project.comment.create', FALSE, '[]'),
 (4, 'project.comment.read', FALSE, '[]'),
 -- Project reporter limitations
+(5, 'project.task.create', FALSE, '[]'),
 (5, 'project.task.read', FALSE, '[]'),
 (5, 'project.comment.create', FALSE, '[]'),
 (5, 'project.comment.read', FALSE, '[]');
