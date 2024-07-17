@@ -44,7 +44,6 @@ VALUES
 (4, 'project.comment.create', FALSE, '[]'),
 (4, 'project.comment.read', FALSE, '[]'),
 -- Project reporter limitations
-(5, 'project.task.create', FALSE, '[]'),
 (5, 'project.task.read', FALSE, '[]'),
 (5, 'project.comment.create', FALSE, '[]'),
 (5, 'project.comment.read', FALSE, '[]');
