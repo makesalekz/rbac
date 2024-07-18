@@ -40,7 +40,6 @@ VALUES
 (4, 'project.task.create', FALSE, '[]'),
 (4, 'project.task.read', FALSE, '[]'),
 (4, 'project.task.update', FALSE, '[]'),
-(4, 'project.task.delete', FALSE, '[]'),
 (4, 'project.comment.create', FALSE, '[]'),
 (4, 'project.comment.read', FALSE, '[]'),
 -- Project reporter limitations
