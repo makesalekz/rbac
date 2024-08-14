@@ -6,6 +6,8 @@ INSERT INTO "role_permissions" ("role_id", "permission_id", "deny", "fields")
 VALUES
 -- Tenant admin role
 (1, 'project.attachment.read', FALSE, '[]'),
+-- Basic role
+(2, 'project.project.create', FALSE, '[]'),
 -- Project manager role
 (3, 'project.attachment.read', FALSE, '[]'),
 -- Project participant limitations
