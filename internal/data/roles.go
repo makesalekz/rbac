@@ -257,7 +257,12 @@ func (r *roleRepo) GetRolesByID(ctx context.Context, tenantID int64, roleIDs []i
 }
 
 func (r *roleRepo) GetRolesList(ctx context.Context, tenantID int64, search string) ([]*ent.Role, error) {
-	query := r.db.Role.Query().Where(role.TenantID(tenantID))
+	query := r.db.Role.Query().
+		Where(
+			role.TenantID(tenantID),
+			role.IsSystem(true),
+			role.IDNotIn(AdminRoleID, BasicRoleID),
+		)
 
 	if search != "" {
 		query = query.Where(role.NameContainsFold(search))

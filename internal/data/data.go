@@ -18,6 +18,12 @@ import (
 	_ "gitlab.calendaria.team/services/rbac/ent/runtime"
 )
 
+// Hidden role ids
+const (
+	AdminRoleID = 1
+	BasicRoleID = 2
+)
+
 // ProviderSet is data providers.
 //
 //nolint:gochecknoglobals // this global variable is required for wire
