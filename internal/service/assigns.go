@@ -143,6 +143,10 @@ func toDto(req *v1.AssignRoleRequest) (data.AssignRoleDto, error) {
 	roleID := req.GetRoleId()
 	teamID := req.GetTeamId()
 	resource := req.GetResource()
+	if resource.GetType() == "" && resource.GetId() == 0 {
+		resource = nil
+	}
+
 	if teamID != 0 {
 		resource = &v1.Resource{
 			Type: data.ResourceTypeTeam,
