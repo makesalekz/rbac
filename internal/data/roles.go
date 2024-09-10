@@ -260,13 +260,21 @@ func (r *roleRepo) GetRolesList(ctx context.Context, tenantID int64, search stri
 	[]*ent.Role,
 	error,
 ) {
-	query := r.db.Role.Query().Where(role.TenantID(tenantID))
+	query := r.db.Role.Query()
 
 	if includeSystemRoles {
-		query = query.Where(
-			role.IsSystem(true),
-			role.IDNotIn(AdminRoleID, BasicRoleID),
+		query.Where(
+			role.Or(
+				role.TenantID(tenantID),
+				role.And(
+					role.TenantID(0),
+					role.IsSystem(true),
+					role.IDNotIn(AdminRoleID, BasicRoleID),
+				),
+			),
 		)
+	} else {
+		query.Where(role.TenantID(tenantID))
 	}
 
 	if search != "" {
