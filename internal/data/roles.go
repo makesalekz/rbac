@@ -278,7 +278,7 @@ func (r *roleRepo) GetRolesList(ctx context.Context, tenantID int64, search stri
 	}
 
 	if search != "" {
-		query = query.Where(role.NameContainsFold(search))
+		query.Where(role.NameContainsFold(search))
 	}
 
 	return query.All(ctx)
