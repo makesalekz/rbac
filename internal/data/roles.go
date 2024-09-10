@@ -15,7 +15,7 @@ type RoleRepo interface {
 	DeleteRole(ctx context.Context, tenantID, roleID int64) error
 	GetRoleByID(ctx context.Context, tenantID, roleID int64) (*ent.Role, error)
 	GetRolesByID(ctx context.Context, tenantID int64, roleIDs []int64) ([]*ent.Role, error)
-	GetRolesList(ctx context.Context, tenantID int64, search string) ([]*ent.Role, error)
+	GetRolesList(ctx context.Context, tenantID int64, search string, includeSystemRoles bool) ([]*ent.Role, error)
 	SetRolePermission(
 		ctx context.Context,
 		tenantID, roleID int64,
@@ -256,11 +256,29 @@ func (r *roleRepo) GetRolesByID(ctx context.Context, tenantID int64, roleIDs []i
 		All(ctx)
 }
 
-func (r *roleRepo) GetRolesList(ctx context.Context, tenantID int64, search string) ([]*ent.Role, error) {
-	query := r.db.Role.Query().Where(role.TenantID(tenantID))
+func (r *roleRepo) GetRolesList(ctx context.Context, tenantID int64, search string, includeSystemRoles bool) (
+	[]*ent.Role,
+	error,
+) {
+	query := r.db.Role.Query()
+
+	if includeSystemRoles {
+		query.Where(
+			role.Or(
+				role.TenantID(tenantID),
+				role.And(
+					role.TenantID(0),
+					role.IsSystem(true),
+					role.IDNotIn(AdminRoleID, BasicRoleID),
+				),
+			),
+		)
+	} else {
+		query.Where(role.TenantID(tenantID))
+	}
 
 	if search != "" {
-		query = query.Where(role.NameContainsFold(search))
+		query.Where(role.NameContainsFold(search))
 	}
 
 	return query.All(ctx)
