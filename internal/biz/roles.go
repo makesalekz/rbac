@@ -48,13 +48,8 @@ func (uc *RolesUsecase) DeleteRole(ctx context.Context, tenantID, roleID int64) 
 	return uc.repo.DeleteRole(ctx, tenantID, roleID)
 }
 
-func (uc *RolesUsecase) GetRoles(ctx context.Context, tenantID int64, search, appID string) ([]*ent.Role, error) {
-	var isSystem = false
-	if appID == PmsAppID {
-		isSystem = true
-	}
-
-	return uc.repo.GetRolesList(ctx, tenantID, search, isSystem)
+func (uc *RolesUsecase) GetRoles(ctx context.Context, tenantID int64, search string, includeSystemRoles bool) ([]*ent.Role, error) {
+	return uc.repo.GetRolesList(ctx, tenantID, search, includeSystemRoles)
 }
 
 func (uc *RolesUsecase) CreateRole(ctx context.Context, dto data.CreateRoleDto) (*ent.Role, error) {

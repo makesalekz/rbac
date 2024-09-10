@@ -132,7 +132,7 @@ func (s *RolesService) ListRoles(ctx context.Context, req *v1.ListRolesRequest) 
 		return nil, v1.ErrorEmptyActorId("empty tenant id")
 	}
 
-	roles, err := s.uc.GetRoles(ctx, tenantID, req.GetSearch(), req.AppID)
+	roles, err := s.uc.GetRoles(ctx, tenantID, req.GetSearch(), req.GetIncludeSystem())
 	if err != nil {
 		return nil, err
 	}

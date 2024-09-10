@@ -129,9 +129,9 @@ func TestRolesUsecase_GetRoles(t *testing.T) {
 			Description: "testDesc2",
 		},
 	}
-	rolesRepo.EXPECT().GetRolesList(ctx, tenantID, search, false).Return(roles, nil)
+	rolesRepo.EXPECT().GetRolesList(ctx, tenantID, search, true).Return(roles, nil)
 
-	roles1, err := uc.GetRoles(ctx, tenantID, search, "")
+	roles1, err := uc.GetRoles(ctx, tenantID, search, true)
 	require.NoError(t, err)
 	require.Equal(t, roles, roles1)
 }

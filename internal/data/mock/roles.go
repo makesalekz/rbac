@@ -96,9 +96,9 @@ func (mr *MockRoleRepoMockRecorder) GetRolesByID(ctx, tenantID, roleIDs interfac
 }
 
 // GetRolesList mocks base method.
-func (m *MockRoleRepo) GetRolesList(ctx context.Context, tenantID int64, search string, isSystem bool) ([]*ent.Role, error) {
+func (m *MockRoleRepo) GetRolesList(ctx context.Context, tenantID int64, search string, includeSystemRoles bool) ([]*ent.Role, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetRolesList", ctx, tenantID, search, isSystem)
+	ret := m.ctrl.Call(m, "GetRolesList", ctx, tenantID, search, includeSystemRoles)
 	ret0, _ := ret[0].([]*ent.Role)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
