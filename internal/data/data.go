@@ -18,7 +18,7 @@ import (
 	_ "gitlab.calendaria.team/services/rbac/ent/runtime"
 )
 
-// Hidden role ids
+// Hidden role ids.
 const (
 	AdminRoleID = 1
 	BasicRoleID = 2

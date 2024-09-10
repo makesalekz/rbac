@@ -256,7 +256,10 @@ func (r *roleRepo) GetRolesByID(ctx context.Context, tenantID int64, roleIDs []i
 		All(ctx)
 }
 
-func (r *roleRepo) GetRolesList(ctx context.Context, tenantID int64, search string, includeSystemRoles bool) ([]*ent.Role, error) {
+func (r *roleRepo) GetRolesList(ctx context.Context, tenantID int64, search string, includeSystemRoles bool) (
+	[]*ent.Role,
+	error,
+) {
 	query := r.db.Role.Query().Where(role.TenantID(tenantID))
 
 	if includeSystemRoles {

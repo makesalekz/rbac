@@ -48,7 +48,9 @@ func (uc *RolesUsecase) DeleteRole(ctx context.Context, tenantID, roleID int64) 
 	return uc.repo.DeleteRole(ctx, tenantID, roleID)
 }
 
-func (uc *RolesUsecase) GetRoles(ctx context.Context, tenantID int64, search string, includeSystemRoles bool) ([]*ent.Role, error) {
+func (uc *RolesUsecase) GetRoles(ctx context.Context, tenantID int64, search string, includeSystemRoles bool) (
+	[]*ent.Role, error,
+) {
 	return uc.repo.GetRolesList(ctx, tenantID, search, includeSystemRoles)
 }
 
