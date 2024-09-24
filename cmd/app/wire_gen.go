@@ -64,8 +64,8 @@ func wireApp(bootstrap *conf.Bootstrap, logger log.Logger) (*kratos.App, func(),
 		cleanup()
 		return nil, nil, err
 	}
-	queueManager := nats.NewQueueManager(configConfig, encodedConn, logger)
-	assignedRolesUsecase, err := biz.NewAssignedRolesUsecase(logger, assignedRolesRepo, roleRepo, teamsRepo, queueManager)
+	iQueueManager := nats.NewQueueManager(configConfig, encodedConn, logger)
+	assignedRolesUsecase, err := biz.NewAssignedRolesUsecase(logger, assignedRolesRepo, roleRepo, teamsRepo, iQueueManager)
 	if err != nil {
 		cleanup2()
 		cleanup()

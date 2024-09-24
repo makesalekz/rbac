@@ -320,7 +320,7 @@ func TestRolesService_ListRoles(t *testing.T) {
 	assignedRepo := mock.NewMockAssignedRolesRepo(ctrl)
 	teamsRepo := mock.NewMockTeamsRepo(ctrl)
 
-	service := createRolesService(t, qm, permissionRepo, assignedRepo, roleRepo, teamsRepo)
+	rolesService := createRolesService(t, qm, permissionRepo, assignedRepo, roleRepo, teamsRepo)
 
 	tenantID := int64(1234)
 	ctx := mockTenantServerContext(tenantID)
@@ -349,7 +349,7 @@ func TestRolesService_ListRoles(t *testing.T) {
 			DeletedAt:   nil,
 		},
 	}
-	roleRepo.EXPECT().GetRolesList(ctx, tenantID, req.GetSearch()).Return(roles, nil)
+	roleRepo.EXPECT().GetRolesList(ctx, tenantID, req.GetSearch(), false).Return(roles, nil)
 
 	expect := &v1.Role{
 		Id:          role.ID,
@@ -361,7 +361,7 @@ func TestRolesService_ListRoles(t *testing.T) {
 		DeletedAt:   "",
 	}
 
-	reply, err := service.ListRoles(ctx, req)
+	reply, err := rolesService.ListRoles(ctx, req)
 	require.NoError(t, err)
 	require.Len(t, reply.GetRoles(), 2)
 	require.Equal(t, expect, reply.GetRoles()[0])
