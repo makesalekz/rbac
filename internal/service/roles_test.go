@@ -12,8 +12,8 @@ import (
 	"gitlab.calendaria.team/services/rbac/internal/data"
 	"gitlab.calendaria.team/services/rbac/internal/data/mock"
 	"gitlab.calendaria.team/services/rbac/internal/service"
-	u_nats "gitlab.calendaria.team/services/utils/v1/nats"
-	u_nats_mock "gitlab.calendaria.team/services/utils/v1/nats/mock"
+	u_nats "gitlab.calendaria.team/services/utils/v2/nats"
+	u_nats_mock "gitlab.calendaria.team/services/utils/v2/nats/mock"
 	u_zap "gitlab.calendaria.team/services/utils/v2/zap"
 
 	"github.com/go-kratos/kratos/v2/metadata"
