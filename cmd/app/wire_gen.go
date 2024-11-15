@@ -15,8 +15,8 @@ import (
 	"gitlab.calendaria.team/services/rbac/internal/server"
 	"gitlab.calendaria.team/services/rbac/internal/service"
 	"gitlab.calendaria.team/services/utils/v1/config"
-	"gitlab.calendaria.team/services/utils/v1/jwt"
-	"gitlab.calendaria.team/services/utils/v1/nats"
+	"gitlab.calendaria.team/services/utils/v2/jwt"
+	"gitlab.calendaria.team/services/utils/v2/nats"
 )
 
 import (
@@ -31,7 +31,7 @@ func wireApp(bootstrap *conf.Bootstrap, logger log.Logger) (*kratos.App, func(),
 	if err != nil {
 		return nil, nil, err
 	}
-	jwtProcessor, err := jwt.NewJwtProcessor(configConfig)
+	iJwtProcessor, err := jwt.NewJwtProcessor(configConfig)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -59,12 +59,12 @@ func wireApp(bootstrap *conf.Bootstrap, logger log.Logger) (*kratos.App, func(),
 		cleanup()
 		return nil, nil, err
 	}
-	encodedConn, cleanup2, err := data.NewNatsClient(bootstrap)
+	conn, cleanup2, err := data.NewNatsClient(bootstrap)
 	if err != nil {
 		cleanup()
 		return nil, nil, err
 	}
-	iQueueManager := nats.NewQueueManager(configConfig, encodedConn, logger)
+	iQueueManager := nats.NewQueueManager(configConfig, conn, logger)
 	assignedRolesUsecase, err := biz.NewAssignedRolesUsecase(logger, assignedRolesRepo, roleRepo, teamsRepo, iQueueManager)
 	if err != nil {
 		cleanup2()
@@ -82,8 +82,8 @@ func wireApp(bootstrap *conf.Bootstrap, logger log.Logger) (*kratos.App, func(),
 	teamsService := service.NewTeamsService(serviceHelper, teamsUsecase)
 	assignsService := service.NewAssignsService(rolesUsecase, teamsUsecase, assignedRolesUsecase, serviceHelper)
 	checkPermissionsService := service.NewCheckPermissionsService(checkPermissionsUsecase)
-	grpcServer := server.NewGRPCServer(bootstrap, jwtProcessor, rolesService, permissionsService, teamsService, assignsService, checkPermissionsService)
-	httpServer := server.NewHTTPServer(bootstrap, jwtProcessor)
+	grpcServer := server.NewGRPCServer(bootstrap, iJwtProcessor, rolesService, permissionsService, teamsService, assignsService, checkPermissionsService)
+	httpServer := server.NewHTTPServer(bootstrap, iJwtProcessor)
 	app := newApp(logger, configConfig, grpcServer, httpServer)
 	return app, func() {
 		cleanup2()
