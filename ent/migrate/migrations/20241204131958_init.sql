@@ -1,6 +1,6 @@
 -- Modify "role_permissions" table
 ALTER TABLE "role_permissions"
-    ADD COLUMN "value" double precision NULL DEFAULT 0;
+    ADD COLUMN "value" bigint NULL DEFAULT 0;
 
 -- Allow project manager to assign roles
 INSERT INTO "role_permissions" ("role_id", "permission_id", "deny", "fields")
