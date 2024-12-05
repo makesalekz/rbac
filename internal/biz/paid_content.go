@@ -15,7 +15,7 @@ import (
 const (
 	QalaiBasicRoleID              = 7
 	QalaiPremiumSubscriptionQueue = "qalai-premium-features"
-	QalaiExpiredSubscriptionQueue = "qalai-premium-features/revoke"
+	QalaiExpiredSubscriptionQueue = "qalai-premium-features_revoke"
 )
 
 type PaidContent struct {
