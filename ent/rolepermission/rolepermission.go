@@ -22,6 +22,8 @@ const (
 	FieldDeny = "deny"
 	// FieldFields holds the string denoting the fields field in the database.
 	FieldFields = "fields"
+	// FieldValue holds the string denoting the value field in the database.
+	FieldValue = "value"
 	// EdgeRole holds the string denoting the role edge name in mutations.
 	EdgeRole = "role"
 	// EdgePermission holds the string denoting the permission edge name in mutations.
@@ -52,6 +54,7 @@ var Columns = []string{
 	FieldPermissionID,
 	FieldDeny,
 	FieldFields,
+	FieldValue,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -69,6 +72,8 @@ var (
 	DefaultTenantID int64
 	// DefaultDeny holds the default value on creation for the "deny" field.
 	DefaultDeny bool
+	// DefaultValue holds the default value on creation for the "value" field.
+	DefaultValue int64
 )
 
 // OrderOption defines the ordering options for the RolePermission queries.
@@ -97,6 +102,11 @@ func ByPermissionID(opts ...sql.OrderTermOption) OrderOption {
 // ByDeny orders the results by the deny field.
 func ByDeny(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldDeny, opts...).ToFunc()
+}
+
+// ByValue orders the results by the value field.
+func ByValue(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldValue, opts...).ToFunc()
 }
 
 // ByRoleField orders the results by role field.

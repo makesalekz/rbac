@@ -62,7 +62,7 @@ func (rau *ResourceAccessUpdate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (rau *ResourceAccessUpdate) check() error {
-	if _, ok := rau.mutation.RoleID(); rau.mutation.RoleCleared() && !ok {
+	if rau.mutation.RoleCleared() && len(rau.mutation.RoleIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "ResourceAccess.role"`)
 	}
 	return nil
@@ -158,7 +158,7 @@ func (rauo *ResourceAccessUpdateOne) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (rauo *ResourceAccessUpdateOne) check() error {
-	if _, ok := rauo.mutation.RoleID(); rauo.mutation.RoleCleared() && !ok {
+	if rauo.mutation.RoleCleared() && len(rauo.mutation.RoleIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "ResourceAccess.role"`)
 	}
 	return nil

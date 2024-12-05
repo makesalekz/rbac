@@ -26,12 +26,17 @@ func (s *ServiceHelper) HasPermission(ctx context.Context, permission string) (i
 		return 0, nil, v1.ErrorEmptyActorId("empty tenant id")
 	}
 
+	appID := auth.GetAppIdFromContext(ctx)
+	if appID == "" {
+		return 0, nil, v1.ErrorEmptyAppId("empty app id")
+	}
+
 	identities := auth.GetIdentitiesFromContext(ctx)
 	if len(identities) == 0 {
 		return 0, nil, v1.ErrorEmptyActorId("empty identities")
 	}
 
-	fields, err := s.uc.HasPermission(ctx, tenantId, identities, permission)
+	fields, err := s.uc.HasPermission(ctx, tenantId, appID, identities, permission)
 	if err != nil {
 		return 0, nil, err
 	}

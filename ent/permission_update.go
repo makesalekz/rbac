@@ -157,7 +157,7 @@ func (pu *PermissionUpdate) check() error {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Permission.name": %w`, err)}
 		}
 	}
-	if _, ok := pu.mutation.GroupID(); pu.mutation.GroupCleared() && !ok {
+	if pu.mutation.GroupCleared() && len(pu.mutation.GroupIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "Permission.group"`)
 	}
 	return nil
@@ -408,7 +408,7 @@ func (puo *PermissionUpdateOne) check() error {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Permission.name": %w`, err)}
 		}
 	}
-	if _, ok := puo.mutation.GroupID(); puo.mutation.GroupCleared() && !ok {
+	if puo.mutation.GroupCleared() && len(puo.mutation.GroupIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "Permission.group"`)
 	}
 	return nil

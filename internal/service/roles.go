@@ -213,7 +213,12 @@ func (s *RolesService) ListRolePermissions(ctx context.Context, req *v1.RoleRequ
 		return nil, v1.ErrorEmptyActorId("empty tenant id")
 	}
 
-	rolePermissions, err := s.uc.ListRolePermissions(ctx, tenantID, req.GetRoleId())
+	appID := auth.GetAppIdFromContext(ctx)
+	if appID == "" {
+		return nil, v1.ErrorEmptyAppId("empty app id")
+	}
+
+	rolePermissions, err := s.uc.ListRolePermissions(ctx, tenantID, appID, req.GetRoleId())
 	if err != nil {
 		return nil, err
 	}

@@ -4,9 +4,10 @@ import (
 	v1 "gitlab.calendaria.team/services/rbac/api/rbac/v1"
 	"gitlab.calendaria.team/services/rbac/internal/conf"
 	"gitlab.calendaria.team/services/rbac/internal/service"
-	"gitlab.calendaria.team/services/utils/v1/jwt"
 	"gitlab.calendaria.team/services/utils/v1/middlewares/metrics"
+	"gitlab.calendaria.team/services/utils/v2/jwt"
 	"gitlab.calendaria.team/services/utils/v2/middlewares/auth"
+	u_tracing "gitlab.calendaria.team/services/utils/v2/tracing"
 
 	prom "github.com/go-kratos/kratos/contrib/metrics/prometheus/v2"
 	"github.com/go-kratos/kratos/v2/middleware/metadata"
@@ -17,13 +18,19 @@ import (
 // NewGRPCServer new a gRPC server.
 func NewGRPCServer(
 	c *conf.Bootstrap,
-	jwtp *jwt.JwtProcessor,
+	jwtp jwt.IJwtProcessor,
+	tracer *u_tracing.Tracer,
 	roleSrvc *service.RolesService,
 	permissionsSrvc *service.PermissionsService,
 	teamSrvc *service.TeamsService,
 	teamIdentityRolesSrvc *service.AssignsService,
 	checkPermissionSrvc *service.CheckPermissionsService,
 ) *grpc.Server {
+	err := tracer.Initialize()
+	if err != nil {
+		panic(err)
+	}
+
 	var opts = []grpc.ServerOption{
 		grpc.Middleware(
 			recovery.Recovery(),

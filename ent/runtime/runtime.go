@@ -143,6 +143,10 @@ func init() {
 	rolepermissionDescDeny := rolepermissionFields[3].Descriptor()
 	// rolepermission.DefaultDeny holds the default value on creation for the deny field.
 	rolepermission.DefaultDeny = rolepermissionDescDeny.Default.(bool)
+	// rolepermissionDescValue is the schema descriptor for value field.
+	rolepermissionDescValue := rolepermissionFields[5].Descriptor()
+	// rolepermission.DefaultValue holds the default value on creation for the value field.
+	rolepermission.DefaultValue = rolepermissionDescValue.Default.(int64)
 	teamMixin := schema.Team{}.Mixin()
 	teamMixinHooks0 := teamMixin[0].Hooks()
 	team.Hooks[0] = teamMixinHooks0[0]
@@ -171,6 +175,6 @@ func init() {
 }
 
 const (
-	Version = "v0.12.5"                                         // Version of ent codegen.
-	Sum     = "h1:KREM5E4CSoej4zeGa88Ou/gfturAnpUv0mzAjch1sj4=" // Sum of ent codegen.
+	Version = "v0.14.1"                                         // Version of ent codegen.
+	Sum     = "h1:fUERL506Pqr92EPHJqr8EYxbPioflJo6PudkrEA8a/s=" // Sum of ent codegen.
 )

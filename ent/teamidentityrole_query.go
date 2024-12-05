@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"math"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -109,7 +110,7 @@ func (tirq *TeamIdentityRoleQuery) QueryTeam() *TeamQuery {
 // First returns the first TeamIdentityRole entity from the query.
 // Returns a *NotFoundError when no TeamIdentityRole was found.
 func (tirq *TeamIdentityRoleQuery) First(ctx context.Context) (*TeamIdentityRole, error) {
-	nodes, err := tirq.Limit(1).All(setContextOp(ctx, tirq.ctx, "First"))
+	nodes, err := tirq.Limit(1).All(setContextOp(ctx, tirq.ctx, ent.OpQueryFirst))
 	if err != nil {
 		return nil, err
 	}
@@ -132,7 +133,7 @@ func (tirq *TeamIdentityRoleQuery) FirstX(ctx context.Context) *TeamIdentityRole
 // Returns a *NotFoundError when no TeamIdentityRole ID was found.
 func (tirq *TeamIdentityRoleQuery) FirstID(ctx context.Context) (id int64, err error) {
 	var ids []int64
-	if ids, err = tirq.Limit(1).IDs(setContextOp(ctx, tirq.ctx, "FirstID")); err != nil {
+	if ids, err = tirq.Limit(1).IDs(setContextOp(ctx, tirq.ctx, ent.OpQueryFirstID)); err != nil {
 		return
 	}
 	if len(ids) == 0 {
@@ -155,7 +156,7 @@ func (tirq *TeamIdentityRoleQuery) FirstIDX(ctx context.Context) int64 {
 // Returns a *NotSingularError when more than one TeamIdentityRole entity is found.
 // Returns a *NotFoundError when no TeamIdentityRole entities are found.
 func (tirq *TeamIdentityRoleQuery) Only(ctx context.Context) (*TeamIdentityRole, error) {
-	nodes, err := tirq.Limit(2).All(setContextOp(ctx, tirq.ctx, "Only"))
+	nodes, err := tirq.Limit(2).All(setContextOp(ctx, tirq.ctx, ent.OpQueryOnly))
 	if err != nil {
 		return nil, err
 	}
@@ -183,7 +184,7 @@ func (tirq *TeamIdentityRoleQuery) OnlyX(ctx context.Context) *TeamIdentityRole 
 // Returns a *NotFoundError when no entities are found.
 func (tirq *TeamIdentityRoleQuery) OnlyID(ctx context.Context) (id int64, err error) {
 	var ids []int64
-	if ids, err = tirq.Limit(2).IDs(setContextOp(ctx, tirq.ctx, "OnlyID")); err != nil {
+	if ids, err = tirq.Limit(2).IDs(setContextOp(ctx, tirq.ctx, ent.OpQueryOnlyID)); err != nil {
 		return
 	}
 	switch len(ids) {
@@ -208,7 +209,7 @@ func (tirq *TeamIdentityRoleQuery) OnlyIDX(ctx context.Context) int64 {
 
 // All executes the query and returns a list of TeamIdentityRoles.
 func (tirq *TeamIdentityRoleQuery) All(ctx context.Context) ([]*TeamIdentityRole, error) {
-	ctx = setContextOp(ctx, tirq.ctx, "All")
+	ctx = setContextOp(ctx, tirq.ctx, ent.OpQueryAll)
 	if err := tirq.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
@@ -230,7 +231,7 @@ func (tirq *TeamIdentityRoleQuery) IDs(ctx context.Context) (ids []int64, err er
 	if tirq.ctx.Unique == nil && tirq.path != nil {
 		tirq.Unique(true)
 	}
-	ctx = setContextOp(ctx, tirq.ctx, "IDs")
+	ctx = setContextOp(ctx, tirq.ctx, ent.OpQueryIDs)
 	if err = tirq.Select(teamidentityrole.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -248,7 +249,7 @@ func (tirq *TeamIdentityRoleQuery) IDsX(ctx context.Context) []int64 {
 
 // Count returns the count of the given query.
 func (tirq *TeamIdentityRoleQuery) Count(ctx context.Context) (int, error) {
-	ctx = setContextOp(ctx, tirq.ctx, "Count")
+	ctx = setContextOp(ctx, tirq.ctx, ent.OpQueryCount)
 	if err := tirq.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
@@ -266,7 +267,7 @@ func (tirq *TeamIdentityRoleQuery) CountX(ctx context.Context) int {
 
 // Exist returns true if the query has elements in the graph.
 func (tirq *TeamIdentityRoleQuery) Exist(ctx context.Context) (bool, error) {
-	ctx = setContextOp(ctx, tirq.ctx, "Exist")
+	ctx = setContextOp(ctx, tirq.ctx, ent.OpQueryExist)
 	switch _, err := tirq.FirstID(ctx); {
 	case IsNotFound(err):
 		return false, nil
@@ -301,8 +302,9 @@ func (tirq *TeamIdentityRoleQuery) Clone() *TeamIdentityRoleQuery {
 		withRole:   tirq.withRole.Clone(),
 		withTeam:   tirq.withTeam.Clone(),
 		// clone intermediate query.
-		sql:  tirq.sql.Clone(),
-		path: tirq.path,
+		sql:       tirq.sql.Clone(),
+		path:      tirq.path,
+		modifiers: append([]func(*sql.Selector){}, tirq.modifiers...),
 	}
 }
 
@@ -622,7 +624,7 @@ func (tirgb *TeamIdentityRoleGroupBy) Aggregate(fns ...AggregateFunc) *TeamIdent
 
 // Scan applies the selector query and scans the result into the given value.
 func (tirgb *TeamIdentityRoleGroupBy) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, tirgb.build.ctx, "GroupBy")
+	ctx = setContextOp(ctx, tirgb.build.ctx, ent.OpQueryGroupBy)
 	if err := tirgb.build.prepareQuery(ctx); err != nil {
 		return err
 	}
@@ -670,7 +672,7 @@ func (tirs *TeamIdentityRoleSelect) Aggregate(fns ...AggregateFunc) *TeamIdentit
 
 // Scan applies the selector query and scans the result into the given value.
 func (tirs *TeamIdentityRoleSelect) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, tirs.ctx, "Select")
+	ctx = setContextOp(ctx, tirs.ctx, ent.OpQuerySelect)
 	if err := tirs.prepareQuery(ctx); err != nil {
 		return err
 	}

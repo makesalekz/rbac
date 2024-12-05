@@ -6,7 +6,7 @@ import (
 )
 
 // NewNatsClient .
-func NewNatsClient(conf *conf.Bootstrap) (*nats.EncodedConn, func(), error) {
+func NewNatsClient(conf *conf.Bootstrap) (*nats.Conn, func(), error) {
 	nc, err := nats.Connect(conf.Nats)
 	if err != nil {
 		return nil, nil, err
@@ -23,5 +23,5 @@ func NewNatsClient(conf *conf.Bootstrap) (*nats.EncodedConn, func(), error) {
 		nc.Close()
 	}
 
-	return ec, cleanup, nil
+	return ec.Conn, cleanup, nil
 }

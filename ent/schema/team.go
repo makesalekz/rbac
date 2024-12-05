@@ -3,13 +3,12 @@ package schema
 import (
 	"time"
 
-	"gitlab.calendaria.team/services/rbac/ent/mixins"
-
 	"entgo.io/ent"
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 	"github.com/jackc/pgtype"
+	"gitlab.calendaria.team/services/rbac/ent/mixins"
 )
 
 // Team holds the schema definition for the Team entity.

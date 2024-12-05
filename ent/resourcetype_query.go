@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"math"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -86,7 +87,7 @@ func (rtq *ResourceTypeQuery) QueryRoles() *RoleQuery {
 // First returns the first ResourceType entity from the query.
 // Returns a *NotFoundError when no ResourceType was found.
 func (rtq *ResourceTypeQuery) First(ctx context.Context) (*ResourceType, error) {
-	nodes, err := rtq.Limit(1).All(setContextOp(ctx, rtq.ctx, "First"))
+	nodes, err := rtq.Limit(1).All(setContextOp(ctx, rtq.ctx, ent.OpQueryFirst))
 	if err != nil {
 		return nil, err
 	}
@@ -109,7 +110,7 @@ func (rtq *ResourceTypeQuery) FirstX(ctx context.Context) *ResourceType {
 // Returns a *NotFoundError when no ResourceType ID was found.
 func (rtq *ResourceTypeQuery) FirstID(ctx context.Context) (id string, err error) {
 	var ids []string
-	if ids, err = rtq.Limit(1).IDs(setContextOp(ctx, rtq.ctx, "FirstID")); err != nil {
+	if ids, err = rtq.Limit(1).IDs(setContextOp(ctx, rtq.ctx, ent.OpQueryFirstID)); err != nil {
 		return
 	}
 	if len(ids) == 0 {
@@ -132,7 +133,7 @@ func (rtq *ResourceTypeQuery) FirstIDX(ctx context.Context) string {
 // Returns a *NotSingularError when more than one ResourceType entity is found.
 // Returns a *NotFoundError when no ResourceType entities are found.
 func (rtq *ResourceTypeQuery) Only(ctx context.Context) (*ResourceType, error) {
-	nodes, err := rtq.Limit(2).All(setContextOp(ctx, rtq.ctx, "Only"))
+	nodes, err := rtq.Limit(2).All(setContextOp(ctx, rtq.ctx, ent.OpQueryOnly))
 	if err != nil {
 		return nil, err
 	}
@@ -160,7 +161,7 @@ func (rtq *ResourceTypeQuery) OnlyX(ctx context.Context) *ResourceType {
 // Returns a *NotFoundError when no entities are found.
 func (rtq *ResourceTypeQuery) OnlyID(ctx context.Context) (id string, err error) {
 	var ids []string
-	if ids, err = rtq.Limit(2).IDs(setContextOp(ctx, rtq.ctx, "OnlyID")); err != nil {
+	if ids, err = rtq.Limit(2).IDs(setContextOp(ctx, rtq.ctx, ent.OpQueryOnlyID)); err != nil {
 		return
 	}
 	switch len(ids) {
@@ -185,7 +186,7 @@ func (rtq *ResourceTypeQuery) OnlyIDX(ctx context.Context) string {
 
 // All executes the query and returns a list of ResourceTypes.
 func (rtq *ResourceTypeQuery) All(ctx context.Context) ([]*ResourceType, error) {
-	ctx = setContextOp(ctx, rtq.ctx, "All")
+	ctx = setContextOp(ctx, rtq.ctx, ent.OpQueryAll)
 	if err := rtq.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
@@ -207,7 +208,7 @@ func (rtq *ResourceTypeQuery) IDs(ctx context.Context) (ids []string, err error)
 	if rtq.ctx.Unique == nil && rtq.path != nil {
 		rtq.Unique(true)
 	}
-	ctx = setContextOp(ctx, rtq.ctx, "IDs")
+	ctx = setContextOp(ctx, rtq.ctx, ent.OpQueryIDs)
 	if err = rtq.Select(resourcetype.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -225,7 +226,7 @@ func (rtq *ResourceTypeQuery) IDsX(ctx context.Context) []string {
 
 // Count returns the count of the given query.
 func (rtq *ResourceTypeQuery) Count(ctx context.Context) (int, error) {
-	ctx = setContextOp(ctx, rtq.ctx, "Count")
+	ctx = setContextOp(ctx, rtq.ctx, ent.OpQueryCount)
 	if err := rtq.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
@@ -243,7 +244,7 @@ func (rtq *ResourceTypeQuery) CountX(ctx context.Context) int {
 
 // Exist returns true if the query has elements in the graph.
 func (rtq *ResourceTypeQuery) Exist(ctx context.Context) (bool, error) {
-	ctx = setContextOp(ctx, rtq.ctx, "Exist")
+	ctx = setContextOp(ctx, rtq.ctx, ent.OpQueryExist)
 	switch _, err := rtq.FirstID(ctx); {
 	case IsNotFound(err):
 		return false, nil
@@ -277,8 +278,9 @@ func (rtq *ResourceTypeQuery) Clone() *ResourceTypeQuery {
 		predicates: append([]predicate.ResourceType{}, rtq.predicates...),
 		withRoles:  rtq.withRoles.Clone(),
 		// clone intermediate query.
-		sql:  rtq.sql.Clone(),
-		path: rtq.path,
+		sql:       rtq.sql.Clone(),
+		path:      rtq.path,
+		modifiers: append([]func(*sql.Selector){}, rtq.modifiers...),
 	}
 }
 
@@ -545,7 +547,7 @@ func (rtgb *ResourceTypeGroupBy) Aggregate(fns ...AggregateFunc) *ResourceTypeGr
 
 // Scan applies the selector query and scans the result into the given value.
 func (rtgb *ResourceTypeGroupBy) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, rtgb.build.ctx, "GroupBy")
+	ctx = setContextOp(ctx, rtgb.build.ctx, ent.OpQueryGroupBy)
 	if err := rtgb.build.prepareQuery(ctx); err != nil {
 		return err
 	}
@@ -593,7 +595,7 @@ func (rts *ResourceTypeSelect) Aggregate(fns ...AggregateFunc) *ResourceTypeSele
 
 // Scan applies the selector query and scans the result into the given value.
 func (rts *ResourceTypeSelect) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, rts.ctx, "Select")
+	ctx = setContextOp(ctx, rts.ctx, ent.OpQuerySelect)
 	if err := rts.prepareQuery(ctx); err != nil {
 		return err
 	}

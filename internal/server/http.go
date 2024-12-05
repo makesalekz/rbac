@@ -2,8 +2,8 @@ package server
 
 import (
 	"gitlab.calendaria.team/services/rbac/internal/conf"
-	"gitlab.calendaria.team/services/utils/v1/jwt"
 	"gitlab.calendaria.team/services/utils/v1/middlewares/metrics"
+	"gitlab.calendaria.team/services/utils/v2/jwt"
 	"gitlab.calendaria.team/services/utils/v2/middlewares/auth"
 
 	prom "github.com/go-kratos/kratos/contrib/metrics/prometheus/v2"
@@ -39,7 +39,7 @@ var _activeRequests = prometheus.NewGaugeVec(prometheus.GaugeOpts{
 // NewHTTPServer new an HTTP server.
 func NewHTTPServer(
 	c *conf.Bootstrap,
-	jwtp *jwt.JwtProcessor,
+	jwtp jwt.IJwtProcessor,
 ) *khttp.Server {
 	var opts = []khttp.ServerOption{
 		khttp.Middleware(

@@ -22,7 +22,14 @@ func NewCheckPermissionsService(
 	}
 }
 
-func (s *CheckPermissionsService) CheckPermissions(ctx context.Context, req *v1.CheckPermissionsRequest) (*v1.CheckPermissionsReply, error) {
+func (s *CheckPermissionsService) CheckPermissions(
+	ctx context.Context, req *v1.CheckPermissionsRequest,
+) (*v1.CheckPermissionsReply, error) {
+	appID := auth.GetAppIdFromContext(ctx)
+	if appID == "" {
+		return nil, v1.ErrorEmptyAppId("empty app id")
+	}
+
 	identities := req.Identities
 	tenantId := req.TenantId
 	// use context if request does not have tenantId and identities
@@ -38,7 +45,9 @@ func (s *CheckPermissionsService) CheckPermissions(ctx context.Context, req *v1.
 		}
 	}
 
-	permissionsMap, err := s.uc.CheckPermissions(ctx, tenantId, identities, req.Permissions, req.Resources)
+	permissionsMap, err := s.uc.CheckPermissions(ctx, tenantId, appID,
+		identities, req.Permissions, req.Resources,
+		req.GetValue())
 	if err != nil {
 		return nil, err
 	}
