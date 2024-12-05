@@ -86,7 +86,9 @@ func wireApp(bootstrap *conf.Bootstrap, logger log.Logger) (*kratos.App, func(),
 	checkPermissionsService := service.NewCheckPermissionsService(checkPermissionsUsecase)
 	grpcServer := server.NewGRPCServer(bootstrap, iJwtProcessor, tracer, rolesService, permissionsService, teamsService, assignsService, checkPermissionsService)
 	httpServer := server.NewHTTPServer(bootstrap, iJwtProcessor)
-	app := newApp(logger, configConfig, grpcServer, httpServer)
+	paidContent := biz.NewPaidContent(iQueueManager, assignedRolesRepo, logger)
+	backgroundServer := server.NewBackgroundServer(logger, paidContent)
+	app := newApp(logger, configConfig, grpcServer, httpServer, backgroundServer)
 	return app, func() {
 		cleanup2()
 		cleanup()

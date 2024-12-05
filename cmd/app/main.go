@@ -12,6 +12,7 @@ import (
 	"github.com/go-kratos/kratos/v2/transport/grpc"
 	"github.com/go-kratos/kratos/v2/transport/http"
 	"gitlab.calendaria.team/services/rbac/internal/conf"
+	"gitlab.calendaria.team/services/rbac/internal/server"
 	"gitlab.calendaria.team/services/utils/v1/config"
 	u_log "gitlab.calendaria.team/services/utils/v1/log"
 
@@ -34,7 +35,9 @@ func init() {
 	flag.StringVar(&flagconf, "conf", "config.yaml", "config path, eg: -conf config.yaml")
 }
 
-func newApp(logger log.Logger, c *config.Config, gs *grpc.Server, hs *http.Server) *kratos.App {
+func newApp(
+	logger log.Logger, c *config.Config, gs *grpc.Server, hs *http.Server, bgs *server.BackgroundServer,
+) *kratos.App {
 	return kratos.New(
 		kratos.ID(id),
 		kratos.Name(c.GetAppName()),
@@ -44,6 +47,7 @@ func newApp(logger log.Logger, c *config.Config, gs *grpc.Server, hs *http.Serve
 		kratos.Server(
 			gs,
 			hs,
+			bgs,
 		),
 		// with registrar
 		kratos.Registrar(c.GetRegistry()),
