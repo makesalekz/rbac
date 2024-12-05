@@ -58,7 +58,7 @@ func (s *RolesService) CreateRole(ctx context.Context, req *v1.CreateRoleRequest
 
 	role, err := s.uc.CreateRole(ctx, dto)
 	if err != nil {
-		return nil, v1.ErrorDatabaseQuery(err.Error())
+		return nil, v1.ErrorDatabaseQuery("failed to create role, error: %s", err.Error())
 	}
 	return &v1.RoleReply{
 		Role: s.roleReply(role),
@@ -173,7 +173,7 @@ func (s *RolesService) AddPermissionToRole(
 		Deny:   req.GetDeny(),
 	})
 	if err != nil {
-		return nil, v1.ErrorDatabaseQuery(err.Error())
+		return nil, v1.ErrorDatabaseQuery("failed to add permission to role, error: %s", err.Error())
 	}
 	return &utils_v1.EmptyReply{}, nil
 }

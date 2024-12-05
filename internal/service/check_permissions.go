@@ -30,12 +30,12 @@ func (s *CheckPermissionsService) CheckPermissions(
 		return nil, v1.ErrorEmptyAppId("empty app id")
 	}
 
-	identities := req.Identities
-	tenantId := req.TenantId
+	identities := req.GetIdentities()
+	tenantID := req.GetTenantId()
 	// use context if request does not have tenantId and identities
-	if tenantId == 0 || len(identities) == 0 {
-		tenantId = auth.GetTenantIdFromContext(ctx)
-		if tenantId == 0 {
+	if tenantID == 0 || len(identities) == 0 {
+		tenantID = auth.GetTenantIdFromContext(ctx)
+		if tenantID == 0 {
 			return nil, v1.ErrorEmptyActorId("empty tenant id")
 		}
 
@@ -45,8 +45,8 @@ func (s *CheckPermissionsService) CheckPermissions(
 		}
 	}
 
-	permissionsMap, err := s.uc.CheckPermissions(ctx, tenantId, appID,
-		identities, req.Permissions, req.Resources,
+	permissionsMap, err := s.uc.CheckPermissions(ctx, tenantID, appID,
+		identities, req.GetPermissions(), req.GetResources(),
 		req.GetValue())
 	if err != nil {
 		return nil, err

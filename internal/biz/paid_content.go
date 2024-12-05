@@ -13,6 +13,7 @@ import (
 )
 
 const (
+	QalaiBasicRoleID              = 7
 	QalaiPremiumSubscriptionQueue = "qalai-premium-features"
 	QalaiExpiredSubscriptionQueue = "qalai-premium-features/revoke"
 )
@@ -50,7 +51,7 @@ func (uc *PaidContent) qalaiPremiumSubscriptionHandler(ctx context.Context, m je
 		return true
 	}
 
-	nonPremiumAssigns, err := uc.assignedRoles.GetAssignedRolesByRoleID(ctx, invoiceMessage.TenantID, 7)
+	nonPremiumAssigns, err := uc.assignedRoles.GetAssignedRolesByRoleID(ctx, invoiceMessage.TenantID, QalaiBasicRoleID)
 	if err != nil && !ent.IsNotFound(err) {
 		uc.log.Errorf("failed to get non premium assign: %v", err)
 
@@ -71,7 +72,6 @@ func (uc *PaidContent) qalaiPremiumSubscriptionHandler(ctx context.Context, m je
 }
 
 func (uc *PaidContent) qalaiExpiredSubscriptionHandler(ctx context.Context, m jetstream.Msg) bool {
-
 	var invoiceMessage billing_v1.RefreshItems
 
 	err := json.Unmarshal(m.Data(), &invoiceMessage)
@@ -83,7 +83,7 @@ func (uc *PaidContent) qalaiExpiredSubscriptionHandler(ctx context.Context, m je
 
 	err = uc.assignedRoles.AssignRoles(ctx, invoiceMessage.TenantID, []data.AssignRoleDto{
 		{
-			RoleID: 7,
+			RoleID: QalaiBasicRoleID,
 		},
 	})
 	if err != nil {

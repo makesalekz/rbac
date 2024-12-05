@@ -21,8 +21,8 @@ func NewServiceHelper(
 }
 
 func (s *ServiceHelper) HasPermission(ctx context.Context, permission string) (int64, *v1.ListOfFields, error) {
-	tenantId := auth.GetTenantIdFromContext(ctx)
-	if tenantId == 0 {
+	tenantID := auth.GetTenantIdFromContext(ctx)
+	if tenantID == 0 {
 		return 0, nil, v1.ErrorEmptyActorId("empty tenant id")
 	}
 
@@ -36,7 +36,7 @@ func (s *ServiceHelper) HasPermission(ctx context.Context, permission string) (i
 		return 0, nil, v1.ErrorEmptyActorId("empty identities")
 	}
 
-	fields, err := s.uc.HasPermission(ctx, tenantId, appID, identities, permission)
+	fields, err := s.uc.HasPermission(ctx, tenantID, appID, identities, permission)
 	if err != nil {
 		return 0, nil, err
 	}
@@ -44,5 +44,5 @@ func (s *ServiceHelper) HasPermission(ctx context.Context, permission string) (i
 		return 0, nil, v1.ErrorForbidden("has no permission")
 	}
 
-	return tenantId, fields, nil
+	return tenantID, fields, nil
 }

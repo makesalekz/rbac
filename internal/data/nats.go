@@ -1,13 +1,13 @@
 package data
 
 import (
-	"github.com/nats-io/nats.go"
+	nats "github.com/nats-io/nats.go"
 	"gitlab.calendaria.team/services/rbac/internal/conf"
 )
 
 // NewNatsClient .
 func NewNatsClient(conf *conf.Bootstrap) (*nats.Conn, func(), error) {
-	nc, err := nats.Connect(conf.Nats)
+	nc, err := nats.Connect(conf.GetNats())
 	if err != nil {
 		return nil, nil, err
 	}

@@ -238,6 +238,7 @@ func TestRolesUsecase_ListRolePermissions(t *testing.T) {
 	ctx := context.Background()
 	tenantID := int64(1)
 	roleID := int64(1)
+	appID := "calendaria"
 
 	permissions := []*ent.RolePermission{
 		{
@@ -255,9 +256,10 @@ func TestRolesUsecase_ListRolePermissions(t *testing.T) {
 			Fields:       []string{"field3", "field4"},
 		},
 	}
-	rolesRepo.EXPECT().ListRolePermissions(ctx, tenantID, roleID).Return(permissions, nil)
+	rolesRepo.EXPECT().ListRolePermissions(ctx, tenantID, roleID,
+		[]string{appID, "common", "admin"}).Return(permissions, nil)
 
-	permissions1, err := uc.ListRolePermissions(ctx, tenantID, roleID)
+	permissions1, err := uc.ListRolePermissions(ctx, tenantID, appID, roleID)
 	require.NoError(t, err)
 	require.Equal(t, permissions, permissions1)
 }

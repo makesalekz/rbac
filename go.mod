@@ -10,7 +10,7 @@ require (
 	github.com/google/wire v0.6.0
 	github.com/jackc/pgtype v1.14.4
 	github.com/lib/pq v1.10.9
-	github.com/nats-io/nats.go v1.37.0
+	github.com/nats-io/nats.go v1.36.0
 	github.com/prometheus/client_golang v1.18.0
 	github.com/stretchr/testify v1.8.4
 	gitlab.calendaria.team/services/finance/billing v0.0.1-dev.2

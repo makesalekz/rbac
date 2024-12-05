@@ -17,7 +17,7 @@ type AssignedRolesRepo interface {
 	GetAssignedRoleByID(ctx context.Context, tenantID, assignID int64) (*ent.ResourceAccess, error)
 	ListAssignedRoles(ctx context.Context, dto ListRolesDto) ([]*ent.ResourceAccess, error)
 	CheckRoles(ctx context.Context, dto ListRolesDto) ([]*ent.ResourceAccess, error)
-	GetAssignedRolesByRoleID(ctx context.Context, tenantID, roleId int64) ([]*ent.ResourceAccess, error)
+	GetAssignedRolesByRoleID(ctx context.Context, tenantID, roleID int64) ([]*ent.ResourceAccess, error)
 }
 
 type assignedRolesRepo struct {
@@ -121,13 +121,13 @@ func (t *assignedRolesRepo) CheckRoles(ctx context.Context, dto ListRolesDto) ([
 	return query.Where(resourceaccess.Or(predicates...)).All(ctx)
 }
 
-func (t *assignedRolesRepo) GetAssignedRolesByRoleID(ctx context.Context, tenantID, roleId int64) (
+func (t *assignedRolesRepo) GetAssignedRolesByRoleID(ctx context.Context, tenantID, roleID int64) (
 	[]*ent.ResourceAccess, error,
 ) {
 	return t.db.ResourceAccess.Query().
 		Where(
 			resourceaccess.TenantID(tenantID),
-			resourceaccess.RoleID(roleId),
+			resourceaccess.RoleID(roleID),
 		).
 		All(ctx)
 }

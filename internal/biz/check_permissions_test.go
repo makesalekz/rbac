@@ -26,6 +26,7 @@ func TestCheckPermissionsUsecase_CheckPermissions(t *testing.T) {
 
 	ctx := context.Background()
 	tenantID := int64(1)
+	appID := "calendaria"
 	identities := []string{"identity1", "identity2"}
 	teamID := int64(1)
 	permissions := []string{"permission.one", "permission.two"}
@@ -65,6 +66,7 @@ func TestCheckPermissionsUsecase_CheckPermissions(t *testing.T) {
 		TenantID:    tenantID,
 		RoleIDs:     []int64{1, 2},
 		Permissions: permissions,
+		AppIDs:      []string{appID, "common", "admin"},
 	}
 	rolesPermissions := []*ent.RolePermission{
 		{
@@ -86,7 +88,7 @@ func TestCheckPermissionsUsecase_CheckPermissions(t *testing.T) {
 
 	resources := []*v1.Resource{{Id: teamID, Type: data.ResourceTypeTeam}}
 
-	permissionsMap, err := uc.CheckPermissions(ctx, tenantID, identities, permissions, resources)
+	permissionsMap, err := uc.CheckPermissions(ctx, tenantID, appID, identities, permissions, resources, 0)
 	require.NoError(t, err)
 	require.Len(t, permissionsMap, 2)
 

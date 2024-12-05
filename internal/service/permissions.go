@@ -55,7 +55,7 @@ func (s *PermissionsService) CreatePermission(
 
 	permission, err := s.uc.CreatePermission(ctx, dto)
 	if err != nil {
-		return nil, v1.ErrorDatabaseQuery(err.Error())
+		return nil, v1.ErrorDatabaseQuery("failed to create permission, error: %s", err.Error())
 	}
 	return &v1.PermissionReply{
 		Permission: s.permissionReply(permission),
