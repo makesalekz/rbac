@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"math"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -86,7 +87,7 @@ func (pgq *PermissionGroupQuery) QueryPermissions() *PermissionQuery {
 // First returns the first PermissionGroup entity from the query.
 // Returns a *NotFoundError when no PermissionGroup was found.
 func (pgq *PermissionGroupQuery) First(ctx context.Context) (*PermissionGroup, error) {
-	nodes, err := pgq.Limit(1).All(setContextOp(ctx, pgq.ctx, "First"))
+	nodes, err := pgq.Limit(1).All(setContextOp(ctx, pgq.ctx, ent.OpQueryFirst))
 	if err != nil {
 		return nil, err
 	}
@@ -109,7 +110,7 @@ func (pgq *PermissionGroupQuery) FirstX(ctx context.Context) *PermissionGroup {
 // Returns a *NotFoundError when no PermissionGroup ID was found.
 func (pgq *PermissionGroupQuery) FirstID(ctx context.Context) (id string, err error) {
 	var ids []string
-	if ids, err = pgq.Limit(1).IDs(setContextOp(ctx, pgq.ctx, "FirstID")); err != nil {
+	if ids, err = pgq.Limit(1).IDs(setContextOp(ctx, pgq.ctx, ent.OpQueryFirstID)); err != nil {
 		return
 	}
 	if len(ids) == 0 {
@@ -132,7 +133,7 @@ func (pgq *PermissionGroupQuery) FirstIDX(ctx context.Context) string {
 // Returns a *NotSingularError when more than one PermissionGroup entity is found.
 // Returns a *NotFoundError when no PermissionGroup entities are found.
 func (pgq *PermissionGroupQuery) Only(ctx context.Context) (*PermissionGroup, error) {
-	nodes, err := pgq.Limit(2).All(setContextOp(ctx, pgq.ctx, "Only"))
+	nodes, err := pgq.Limit(2).All(setContextOp(ctx, pgq.ctx, ent.OpQueryOnly))
 	if err != nil {
 		return nil, err
 	}
@@ -160,7 +161,7 @@ func (pgq *PermissionGroupQuery) OnlyX(ctx context.Context) *PermissionGroup {
 // Returns a *NotFoundError when no entities are found.
 func (pgq *PermissionGroupQuery) OnlyID(ctx context.Context) (id string, err error) {
 	var ids []string
-	if ids, err = pgq.Limit(2).IDs(setContextOp(ctx, pgq.ctx, "OnlyID")); err != nil {
+	if ids, err = pgq.Limit(2).IDs(setContextOp(ctx, pgq.ctx, ent.OpQueryOnlyID)); err != nil {
 		return
 	}
 	switch len(ids) {
@@ -185,7 +186,7 @@ func (pgq *PermissionGroupQuery) OnlyIDX(ctx context.Context) string {
 
 // All executes the query and returns a list of PermissionGroups.
 func (pgq *PermissionGroupQuery) All(ctx context.Context) ([]*PermissionGroup, error) {
-	ctx = setContextOp(ctx, pgq.ctx, "All")
+	ctx = setContextOp(ctx, pgq.ctx, ent.OpQueryAll)
 	if err := pgq.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
@@ -207,7 +208,7 @@ func (pgq *PermissionGroupQuery) IDs(ctx context.Context) (ids []string, err err
 	if pgq.ctx.Unique == nil && pgq.path != nil {
 		pgq.Unique(true)
 	}
-	ctx = setContextOp(ctx, pgq.ctx, "IDs")
+	ctx = setContextOp(ctx, pgq.ctx, ent.OpQueryIDs)
 	if err = pgq.Select(permissiongroup.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -225,7 +226,7 @@ func (pgq *PermissionGroupQuery) IDsX(ctx context.Context) []string {
 
 // Count returns the count of the given query.
 func (pgq *PermissionGroupQuery) Count(ctx context.Context) (int, error) {
-	ctx = setContextOp(ctx, pgq.ctx, "Count")
+	ctx = setContextOp(ctx, pgq.ctx, ent.OpQueryCount)
 	if err := pgq.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
@@ -243,7 +244,7 @@ func (pgq *PermissionGroupQuery) CountX(ctx context.Context) int {
 
 // Exist returns true if the query has elements in the graph.
 func (pgq *PermissionGroupQuery) Exist(ctx context.Context) (bool, error) {
-	ctx = setContextOp(ctx, pgq.ctx, "Exist")
+	ctx = setContextOp(ctx, pgq.ctx, ent.OpQueryExist)
 	switch _, err := pgq.FirstID(ctx); {
 	case IsNotFound(err):
 		return false, nil
@@ -277,8 +278,9 @@ func (pgq *PermissionGroupQuery) Clone() *PermissionGroupQuery {
 		predicates:      append([]predicate.PermissionGroup{}, pgq.predicates...),
 		withPermissions: pgq.withPermissions.Clone(),
 		// clone intermediate query.
-		sql:  pgq.sql.Clone(),
-		path: pgq.path,
+		sql:       pgq.sql.Clone(),
+		path:      pgq.path,
+		modifiers: append([]func(*sql.Selector){}, pgq.modifiers...),
 	}
 }
 
@@ -544,7 +546,7 @@ func (pggb *PermissionGroupGroupBy) Aggregate(fns ...AggregateFunc) *PermissionG
 
 // Scan applies the selector query and scans the result into the given value.
 func (pggb *PermissionGroupGroupBy) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, pggb.build.ctx, "GroupBy")
+	ctx = setContextOp(ctx, pggb.build.ctx, ent.OpQueryGroupBy)
 	if err := pggb.build.prepareQuery(ctx); err != nil {
 		return err
 	}
@@ -592,7 +594,7 @@ func (pgs *PermissionGroupSelect) Aggregate(fns ...AggregateFunc) *PermissionGro
 
 // Scan applies the selector query and scans the result into the given value.
 func (pgs *PermissionGroupSelect) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, pgs.ctx, "Select")
+	ctx = setContextOp(ctx, pgs.ctx, ent.OpQuerySelect)
 	if err := pgs.prepareQuery(ctx); err != nil {
 		return err
 	}

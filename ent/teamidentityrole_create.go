@@ -125,7 +125,7 @@ func (tirc *TeamIdentityRoleCreate) check() error {
 	if _, ok := tirc.mutation.RoleID(); !ok {
 		return &ValidationError{Name: "role_id", err: errors.New(`ent: missing required field "TeamIdentityRole.role_id"`)}
 	}
-	if _, ok := tirc.mutation.RoleID(); !ok {
+	if len(tirc.mutation.RoleIDs()) == 0 {
 		return &ValidationError{Name: "role", err: errors.New(`ent: missing required edge "TeamIdentityRole.role"`)}
 	}
 	return nil

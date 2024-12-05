@@ -154,7 +154,7 @@ func (pc *PermissionCreate) check() error {
 			return &ValidationError{Name: "app_id", err: fmt.Errorf(`ent: validator failed for field "Permission.app_id": %w`, err)}
 		}
 	}
-	if _, ok := pc.mutation.GroupID(); !ok {
+	if len(pc.mutation.GroupIDs()) == 0 {
 		return &ValidationError{Name: "group", err: errors.New(`ent: missing required edge "Permission.group"`)}
 	}
 	return nil

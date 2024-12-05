@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"gitlab.calendaria.team/services/rbac/ent"
+	"gitlab.calendaria.team/services/rbac/ent/permission"
 	"gitlab.calendaria.team/services/rbac/ent/role"
 	"gitlab.calendaria.team/services/rbac/ent/rolepermission"
 )
@@ -23,7 +24,7 @@ type RoleRepo interface {
 		dto CreateRolePermissionDto,
 	) error
 	RemovePermissionFromRole(ctx context.Context, tenantID, roleID int64, permission *ent.Permission) error
-	ListRolePermissions(ctx context.Context, tenantID, roleID int64) ([]*ent.RolePermission, error)
+	ListRolePermissions(ctx context.Context, tenantID, roleID int64, appIDs []string) ([]*ent.RolePermission, error)
 	ListRolesPermissions(ctx context.Context, filter FilterRolePermissions) ([]*ent.RolePermission, error)
 }
 
@@ -317,13 +318,17 @@ func (r *roleRepo) RemovePermissionFromRole(
 	return err
 }
 
-func (r *roleRepo) ListRolePermissions(ctx context.Context, tenantID, roleID int64) ([]*ent.RolePermission, error) {
+func (r *roleRepo) ListRolePermissions(
+	ctx context.Context, tenantID, roleID int64, appIDs []string,
+) ([]*ent.RolePermission, error) {
 	return r.db.RolePermission.Query().
 		Where(
 			rolepermission.TenantID(tenantID),
 			rolepermission.RoleID(roleID),
-		).
-		All(ctx)
+			rolepermission.HasPermissionWith(
+				permission.AppIDIn(appIDs...),
+			),
+		).All(ctx)
 }
 
 func (r *roleRepo) ListRolesPermissions(
@@ -336,6 +341,13 @@ func (r *roleRepo) ListRolesPermissions(
 			rolepermission.RoleIDIn(filter.RoleIDs...),
 			rolepermission.TenantIDIn(filter.TenantID, 0),
 		)
+
+	if len(filter.AppIDs) > 0 {
+		query.Where(
+			rolepermission.HasPermissionWith(
+				permission.AppIDIn(filter.AppIDs...),
+			))
+	}
 
 	if len(filter.Permissions) != 0 {
 		query.Where(rolepermission.PermissionIDIn(filter.Permissions...))

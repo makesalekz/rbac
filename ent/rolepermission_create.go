@@ -69,6 +69,20 @@ func (rpc *RolePermissionCreate) SetFields(s []string) *RolePermissionCreate {
 	return rpc
 }
 
+// SetValue sets the "value" field.
+func (rpc *RolePermissionCreate) SetValue(i int64) *RolePermissionCreate {
+	rpc.mutation.SetValue(i)
+	return rpc
+}
+
+// SetNillableValue sets the "value" field if the given value is not nil.
+func (rpc *RolePermissionCreate) SetNillableValue(i *int64) *RolePermissionCreate {
+	if i != nil {
+		rpc.SetValue(*i)
+	}
+	return rpc
+}
+
 // SetRole sets the "role" edge to the Role entity.
 func (rpc *RolePermissionCreate) SetRole(r *Role) *RolePermissionCreate {
 	return rpc.SetRoleID(r.ID)
@@ -122,6 +136,10 @@ func (rpc *RolePermissionCreate) defaults() {
 		v := rolepermission.DefaultDeny
 		rpc.mutation.SetDeny(v)
 	}
+	if _, ok := rpc.mutation.Value(); !ok {
+		v := rolepermission.DefaultValue
+		rpc.mutation.SetValue(v)
+	}
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -141,10 +159,10 @@ func (rpc *RolePermissionCreate) check() error {
 	if _, ok := rpc.mutation.GetFields(); !ok {
 		return &ValidationError{Name: "fields", err: errors.New(`ent: missing required field "RolePermission.fields"`)}
 	}
-	if _, ok := rpc.mutation.RoleID(); !ok {
+	if len(rpc.mutation.RoleIDs()) == 0 {
 		return &ValidationError{Name: "role", err: errors.New(`ent: missing required edge "RolePermission.role"`)}
 	}
-	if _, ok := rpc.mutation.PermissionID(); !ok {
+	if len(rpc.mutation.PermissionIDs()) == 0 {
 		return &ValidationError{Name: "permission", err: errors.New(`ent: missing required edge "RolePermission.permission"`)}
 	}
 	return nil
@@ -185,6 +203,10 @@ func (rpc *RolePermissionCreate) createSpec() (*RolePermission, *sqlgraph.Create
 	if value, ok := rpc.mutation.GetFields(); ok {
 		_spec.SetField(rolepermission.FieldFields, field.TypeJSON, value)
 		_node.Fields = value
+	}
+	if value, ok := rpc.mutation.Value(); ok {
+		_spec.SetField(rolepermission.FieldValue, field.TypeInt64, value)
+		_node.Value = value
 	}
 	if nodes := rpc.mutation.RoleIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -296,6 +318,30 @@ func (u *RolePermissionUpsert) UpdateFields() *RolePermissionUpsert {
 	return u
 }
 
+// SetValue sets the "value" field.
+func (u *RolePermissionUpsert) SetValue(v int64) *RolePermissionUpsert {
+	u.Set(rolepermission.FieldValue, v)
+	return u
+}
+
+// UpdateValue sets the "value" field to the value that was provided on create.
+func (u *RolePermissionUpsert) UpdateValue() *RolePermissionUpsert {
+	u.SetExcluded(rolepermission.FieldValue)
+	return u
+}
+
+// AddValue adds v to the "value" field.
+func (u *RolePermissionUpsert) AddValue(v int64) *RolePermissionUpsert {
+	u.Add(rolepermission.FieldValue, v)
+	return u
+}
+
+// ClearValue clears the value of the "value" field.
+func (u *RolePermissionUpsert) ClearValue() *RolePermissionUpsert {
+	u.SetNull(rolepermission.FieldValue)
+	return u
+}
+
 // UpdateNewValues updates the mutable fields using the new values that were set on create.
 // Using this option is equivalent to using:
 //
@@ -372,6 +418,34 @@ func (u *RolePermissionUpsertOne) SetFields(v []string) *RolePermissionUpsertOne
 func (u *RolePermissionUpsertOne) UpdateFields() *RolePermissionUpsertOne {
 	return u.Update(func(s *RolePermissionUpsert) {
 		s.UpdateFields()
+	})
+}
+
+// SetValue sets the "value" field.
+func (u *RolePermissionUpsertOne) SetValue(v int64) *RolePermissionUpsertOne {
+	return u.Update(func(s *RolePermissionUpsert) {
+		s.SetValue(v)
+	})
+}
+
+// AddValue adds v to the "value" field.
+func (u *RolePermissionUpsertOne) AddValue(v int64) *RolePermissionUpsertOne {
+	return u.Update(func(s *RolePermissionUpsert) {
+		s.AddValue(v)
+	})
+}
+
+// UpdateValue sets the "value" field to the value that was provided on create.
+func (u *RolePermissionUpsertOne) UpdateValue() *RolePermissionUpsertOne {
+	return u.Update(func(s *RolePermissionUpsert) {
+		s.UpdateValue()
+	})
+}
+
+// ClearValue clears the value of the "value" field.
+func (u *RolePermissionUpsertOne) ClearValue() *RolePermissionUpsertOne {
+	return u.Update(func(s *RolePermissionUpsert) {
+		s.ClearValue()
 	})
 }
 
@@ -617,6 +691,34 @@ func (u *RolePermissionUpsertBulk) SetFields(v []string) *RolePermissionUpsertBu
 func (u *RolePermissionUpsertBulk) UpdateFields() *RolePermissionUpsertBulk {
 	return u.Update(func(s *RolePermissionUpsert) {
 		s.UpdateFields()
+	})
+}
+
+// SetValue sets the "value" field.
+func (u *RolePermissionUpsertBulk) SetValue(v int64) *RolePermissionUpsertBulk {
+	return u.Update(func(s *RolePermissionUpsert) {
+		s.SetValue(v)
+	})
+}
+
+// AddValue adds v to the "value" field.
+func (u *RolePermissionUpsertBulk) AddValue(v int64) *RolePermissionUpsertBulk {
+	return u.Update(func(s *RolePermissionUpsert) {
+		s.AddValue(v)
+	})
+}
+
+// UpdateValue sets the "value" field to the value that was provided on create.
+func (u *RolePermissionUpsertBulk) UpdateValue() *RolePermissionUpsertBulk {
+	return u.Update(func(s *RolePermissionUpsert) {
+		s.UpdateValue()
+	})
+}
+
+// ClearValue clears the value of the "value" field.
+func (u *RolePermissionUpsertBulk) ClearValue() *RolePermissionUpsertBulk {
+	return u.Update(func(s *RolePermissionUpsert) {
+		s.ClearValue()
 	})
 }
 

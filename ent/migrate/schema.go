@@ -134,6 +134,7 @@ var (
 		{Name: "tenant_id", Type: field.TypeInt64, Default: 0},
 		{Name: "deny", Type: field.TypeBool, Default: false},
 		{Name: "fields", Type: field.TypeJSON},
+		{Name: "value", Type: field.TypeInt64, Nullable: true, Default: 0},
 		{Name: "permission_id", Type: field.TypeString},
 		{Name: "role_id", Type: field.TypeInt64},
 	}
@@ -145,13 +146,13 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "role_permissions_permissions_roles",
-				Columns:    []*schema.Column{RolePermissionsColumns[4]},
+				Columns:    []*schema.Column{RolePermissionsColumns[5]},
 				RefColumns: []*schema.Column{PermissionsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
 				Symbol:     "role_permissions_roles_permissions",
-				Columns:    []*schema.Column{RolePermissionsColumns[5]},
+				Columns:    []*schema.Column{RolePermissionsColumns[6]},
 				RefColumns: []*schema.Column{RolesColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
@@ -160,7 +161,7 @@ var (
 			{
 				Name:    "rolepermission_role_id_permission_id",
 				Unique:  true,
-				Columns: []*schema.Column{RolePermissionsColumns[5], RolePermissionsColumns[4]},
+				Columns: []*schema.Column{RolePermissionsColumns[6], RolePermissionsColumns[5]},
 			},
 		},
 	}

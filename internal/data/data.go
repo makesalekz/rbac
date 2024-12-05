@@ -32,12 +32,12 @@ var ProviderSet = wire.NewSet(
 	NewNatsClient,
 	u_config.NewConfig,
 	u_jwt.NewJwtProcessor,
-	u_tracing.NewTracer,
 	u_nats.NewQueueManager,
 	NewRoleRepo,
 	NewTeamsRepo,
 	NewPermissionRepo,
 	NewAssignedRolesRepo,
+	u_tracing.NewTracer,
 )
 
 // Data .

@@ -555,6 +555,8 @@ func TestRolesService_ListRolePermissions(t *testing.T) {
 	service := createRolesService(t, qm, permissionRepo, assignedRepo, roleRepo, teamsRepo)
 
 	tenantID := int64(1234)
+	appID := "app-id"
+
 	ctx := mockTenantServerContext(tenantID)
 
 	req := &v1.RoleRequest{
@@ -571,7 +573,8 @@ func TestRolesService_ListRolePermissions(t *testing.T) {
 			PermissionID: "some.group.permission2",
 		},
 	}
-	roleRepo.EXPECT().ListRolePermissions(ctx, tenantID, req.GetRoleId()).Return(roles, nil)
+	roleRepo.EXPECT().ListRolePermissions(ctx, tenantID, req.GetRoleId(),
+		[]string{appID, "common", "admin"}).Return(roles, nil)
 
 	expect := &v1.RolePermission{
 		Id:     permission.PermissionID,

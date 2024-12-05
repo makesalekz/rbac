@@ -80,6 +80,21 @@ func (mr *MockAssignedRolesRepoMockRecorder) GetAssignedRoleByID(ctx, tenantID, 
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAssignedRoleByID", reflect.TypeOf((*MockAssignedRolesRepo)(nil).GetAssignedRoleByID), ctx, tenantID, assignID)
 }
 
+// GetAssignedRolesByRoleID mocks base method.
+func (m *MockAssignedRolesRepo) GetAssignedRolesByRoleID(ctx context.Context, tenantID, roleId int64) ([]*ent.ResourceAccess, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetAssignedRolesByRoleID", ctx, tenantID, roleId)
+	ret0, _ := ret[0].([]*ent.ResourceAccess)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetAssignedRolesByRoleID indicates an expected call of GetAssignedRolesByRoleID.
+func (mr *MockAssignedRolesRepoMockRecorder) GetAssignedRolesByRoleID(ctx, tenantID, roleId interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAssignedRolesByRoleID", reflect.TypeOf((*MockAssignedRolesRepo)(nil).GetAssignedRolesByRoleID), ctx, tenantID, roleId)
+}
+
 // ListAssignedRoles mocks base method.
 func (m *MockAssignedRolesRepo) ListAssignedRoles(ctx context.Context, dto data.ListRolesDto) ([]*ent.ResourceAccess, error) {
 	m.ctrl.T.Helper()

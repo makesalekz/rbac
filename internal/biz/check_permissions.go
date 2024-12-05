@@ -78,7 +78,7 @@ func (u *CheckPermissionsUsecase) appendTeamParents(
 }
 
 func (u *CheckPermissionsUsecase) getPermissionFields(
-	rolePermissions []*ent.RolePermission,
+	rolePermissions []*ent.RolePermission, value int64,
 ) map[string]*v1.ListOfFields {
 	result := make(map[string]*v1.ListOfFields)
 	for _, rolePermission := range rolePermissions {
@@ -95,7 +95,7 @@ func (u *CheckPermissionsUsecase) getPermissionFields(
 	}
 
 	for _, rolePermission := range rolePermissions {
-		if rolePermission.Deny {
+		if rolePermission.Deny && value >= rolePermission.Value {
 			delete(result, rolePermission.PermissionID)
 		}
 	}
@@ -104,11 +104,9 @@ func (u *CheckPermissionsUsecase) getPermissionFields(
 }
 
 func (u *CheckPermissionsUsecase) CheckPermissions(
-	ctx context.Context,
-	tenantID int64,
-	identities []string,
-	permissions []string,
-	resources []*v1.Resource,
+	ctx context.Context, tenantID int64, appID string,
+	identities []string, permissions []string, resources []*v1.Resource,
+	value int64,
 ) (map[string]*v1.ListOfFields, error) {
 	allResources, err := u.appendTeamParents(ctx, tenantID, resources)
 	if err != nil {
@@ -129,21 +127,22 @@ func (u *CheckPermissionsUsecase) CheckPermissions(
 		TenantID:    tenantID,
 		RoleIDs:     roleIDs,
 		Permissions: permissions,
+		AppIDs:      []string{appID, "common", "admin"},
 	})
 	if err != nil {
 		return nil, err
 	}
 
-	return u.getPermissionFields(rolePermissions), nil
+	return u.getPermissionFields(rolePermissions, value), nil
 }
 
 func (u *CheckPermissionsUsecase) HasPermission(
-	ctx context.Context,
-	tenantID int64,
-	identities []string,
-	permission string,
+	ctx context.Context, tenantID int64, appID string,
+	identities []string, permission string,
 ) (*v1.ListOfFields, error) {
-	permissionsMap, err := u.CheckPermissions(ctx, tenantID, identities, []string{permission}, nil)
+	permissionsMap, err := u.CheckPermissions(ctx, tenantID, appID,
+		identities, []string{permission}, nil,
+		0)
 	if err != nil {
 		return nil, err
 	}

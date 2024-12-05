@@ -17,6 +17,7 @@ import (
 	"gitlab.calendaria.team/services/utils/v1/config"
 	"gitlab.calendaria.team/services/utils/v2/jwt"
 	"gitlab.calendaria.team/services/utils/v2/nats"
+	"gitlab.calendaria.team/services/utils/v2/tracing"
 )
 
 import (
@@ -35,6 +36,7 @@ func wireApp(bootstrap *conf.Bootstrap, logger log.Logger) (*kratos.App, func(),
 	if err != nil {
 		return nil, nil, err
 	}
+	tracer := tracing.NewTracer(configConfig)
 	dataData, cleanup, err := data.NewData(bootstrap, configConfig, logger)
 	if err != nil {
 		return nil, nil, err
@@ -82,9 +84,11 @@ func wireApp(bootstrap *conf.Bootstrap, logger log.Logger) (*kratos.App, func(),
 	teamsService := service.NewTeamsService(serviceHelper, teamsUsecase)
 	assignsService := service.NewAssignsService(rolesUsecase, teamsUsecase, assignedRolesUsecase, serviceHelper)
 	checkPermissionsService := service.NewCheckPermissionsService(checkPermissionsUsecase)
-	grpcServer := server.NewGRPCServer(bootstrap, iJwtProcessor, rolesService, permissionsService, teamsService, assignsService, checkPermissionsService)
+	grpcServer := server.NewGRPCServer(bootstrap, iJwtProcessor, tracer, rolesService, permissionsService, teamsService, assignsService, checkPermissionsService)
 	httpServer := server.NewHTTPServer(bootstrap, iJwtProcessor)
-	app := newApp(logger, configConfig, grpcServer, httpServer)
+	paidContent := biz.NewPaidContent(iQueueManager, assignedRolesRepo, logger)
+	backgroundServer := server.NewBackgroundServer(logger, paidContent)
+	app := newApp(logger, configConfig, grpcServer, httpServer, backgroundServer)
 	return app, func() {
 		cleanup2()
 		cleanup()

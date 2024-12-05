@@ -55,7 +55,7 @@ func (s *PermissionsService) CreatePermission(
 
 	permission, err := s.uc.CreatePermission(ctx, dto)
 	if err != nil {
-		return nil, v1.ErrorDatabaseQuery("%s", err.Error())
+		return nil, v1.ErrorDatabaseQuery("failed to create permission, error: %s", err.Error())
 	}
 	return &v1.PermissionReply{
 		Permission: s.permissionReply(permission),
@@ -131,12 +131,17 @@ func (s *PermissionsService) ListPermissions(
 		return nil, v1.ErrorEmptyActorId("empty tenant id")
 	}
 
+	appID := auth.GetAppIdFromContext(ctx)
+	if appID == "" {
+		return nil, v1.ErrorEmptyAppId("empty app id")
+	}
+
 	identities := auth.GetIdentitiesFromContext(ctx)
 	if len(identities) == 0 {
 		return nil, v1.ErrorEmptyActorId("empty identities")
 	}
 
-	fields, err := s.check.HasPermission(ctx, tenantID, identities, "admin.permission.read")
+	fields, err := s.check.HasPermission(ctx, tenantID, appID, identities, "admin.permission.read")
 	if err != nil {
 		return nil, err
 	}
@@ -145,10 +150,8 @@ func (s *PermissionsService) ListPermissions(
 	}
 
 	groups, err := s.uc.GetGroupedPermissions(
-		ctx,
-		tenantID,
-		identities,
-		data.FilterPermissions{
+		ctx, tenantID, appID,
+		identities, data.FilterPermissions{
 			AppsIDs: req.GetAppsIds(),
 		})
 	if err != nil {

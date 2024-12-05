@@ -55,6 +55,33 @@ func (rpu *RolePermissionUpdate) AppendFields(s []string) *RolePermissionUpdate 
 	return rpu
 }
 
+// SetValue sets the "value" field.
+func (rpu *RolePermissionUpdate) SetValue(i int64) *RolePermissionUpdate {
+	rpu.mutation.ResetValue()
+	rpu.mutation.SetValue(i)
+	return rpu
+}
+
+// SetNillableValue sets the "value" field if the given value is not nil.
+func (rpu *RolePermissionUpdate) SetNillableValue(i *int64) *RolePermissionUpdate {
+	if i != nil {
+		rpu.SetValue(*i)
+	}
+	return rpu
+}
+
+// AddValue adds i to the "value" field.
+func (rpu *RolePermissionUpdate) AddValue(i int64) *RolePermissionUpdate {
+	rpu.mutation.AddValue(i)
+	return rpu
+}
+
+// ClearValue clears the value of the "value" field.
+func (rpu *RolePermissionUpdate) ClearValue() *RolePermissionUpdate {
+	rpu.mutation.ClearValue()
+	return rpu
+}
+
 // Mutation returns the RolePermissionMutation object of the builder.
 func (rpu *RolePermissionUpdate) Mutation() *RolePermissionMutation {
 	return rpu.mutation
@@ -89,10 +116,10 @@ func (rpu *RolePermissionUpdate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (rpu *RolePermissionUpdate) check() error {
-	if _, ok := rpu.mutation.RoleID(); rpu.mutation.RoleCleared() && !ok {
+	if rpu.mutation.RoleCleared() && len(rpu.mutation.RoleIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "RolePermission.role"`)
 	}
-	if _, ok := rpu.mutation.PermissionID(); rpu.mutation.PermissionCleared() && !ok {
+	if rpu.mutation.PermissionCleared() && len(rpu.mutation.PermissionIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "RolePermission.permission"`)
 	}
 	return nil
@@ -126,6 +153,15 @@ func (rpu *RolePermissionUpdate) sqlSave(ctx context.Context) (n int, err error)
 		_spec.AddModifier(func(u *sql.UpdateBuilder) {
 			sqljson.Append(u, rolepermission.FieldFields, value)
 		})
+	}
+	if value, ok := rpu.mutation.Value(); ok {
+		_spec.SetField(rolepermission.FieldValue, field.TypeInt64, value)
+	}
+	if value, ok := rpu.mutation.AddedValue(); ok {
+		_spec.AddField(rolepermission.FieldValue, field.TypeInt64, value)
+	}
+	if rpu.mutation.ValueCleared() {
+		_spec.ClearField(rolepermission.FieldValue, field.TypeInt64)
 	}
 	_spec.AddModifiers(rpu.modifiers...)
 	if n, err = sqlgraph.UpdateNodes(ctx, rpu.driver, _spec); err != nil {
@@ -172,6 +208,33 @@ func (rpuo *RolePermissionUpdateOne) SetFields(s []string) *RolePermissionUpdate
 // AppendFields appends s to the "fields" field.
 func (rpuo *RolePermissionUpdateOne) AppendFields(s []string) *RolePermissionUpdateOne {
 	rpuo.mutation.AppendFields(s)
+	return rpuo
+}
+
+// SetValue sets the "value" field.
+func (rpuo *RolePermissionUpdateOne) SetValue(i int64) *RolePermissionUpdateOne {
+	rpuo.mutation.ResetValue()
+	rpuo.mutation.SetValue(i)
+	return rpuo
+}
+
+// SetNillableValue sets the "value" field if the given value is not nil.
+func (rpuo *RolePermissionUpdateOne) SetNillableValue(i *int64) *RolePermissionUpdateOne {
+	if i != nil {
+		rpuo.SetValue(*i)
+	}
+	return rpuo
+}
+
+// AddValue adds i to the "value" field.
+func (rpuo *RolePermissionUpdateOne) AddValue(i int64) *RolePermissionUpdateOne {
+	rpuo.mutation.AddValue(i)
+	return rpuo
+}
+
+// ClearValue clears the value of the "value" field.
+func (rpuo *RolePermissionUpdateOne) ClearValue() *RolePermissionUpdateOne {
+	rpuo.mutation.ClearValue()
 	return rpuo
 }
 
@@ -222,10 +285,10 @@ func (rpuo *RolePermissionUpdateOne) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (rpuo *RolePermissionUpdateOne) check() error {
-	if _, ok := rpuo.mutation.RoleID(); rpuo.mutation.RoleCleared() && !ok {
+	if rpuo.mutation.RoleCleared() && len(rpuo.mutation.RoleIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "RolePermission.role"`)
 	}
-	if _, ok := rpuo.mutation.PermissionID(); rpuo.mutation.PermissionCleared() && !ok {
+	if rpuo.mutation.PermissionCleared() && len(rpuo.mutation.PermissionIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "RolePermission.permission"`)
 	}
 	return nil
@@ -276,6 +339,15 @@ func (rpuo *RolePermissionUpdateOne) sqlSave(ctx context.Context) (_node *RolePe
 		_spec.AddModifier(func(u *sql.UpdateBuilder) {
 			sqljson.Append(u, rolepermission.FieldFields, value)
 		})
+	}
+	if value, ok := rpuo.mutation.Value(); ok {
+		_spec.SetField(rolepermission.FieldValue, field.TypeInt64, value)
+	}
+	if value, ok := rpuo.mutation.AddedValue(); ok {
+		_spec.AddField(rolepermission.FieldValue, field.TypeInt64, value)
+	}
+	if rpuo.mutation.ValueCleared() {
+		_spec.ClearField(rolepermission.FieldValue, field.TypeInt64)
 	}
 	_spec.AddModifiers(rpuo.modifiers...)
 	_node = &RolePermission{config: rpuo.config}
