@@ -21,4 +21,4 @@ INSERT INTO "permissions" ("id", "group_id", "name", "description", "app_id", "f
 VALUES ('qalai.limits.media', 'qalai.limits', 'Limits for Media Size', '', 'calendaria', '[]');
 
 INSERT INTO "role_permissions" ("role_id", "permission_id", "deny", "fields", "value")
-VALUES (7, 'qalai.limits.media', TRUE, '[]', 100 * 10e6);
+VALUES (7, 'qalai.limits.media', TRUE, '[]', 100 * 1000 * 1000);
