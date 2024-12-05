@@ -1,7 +1,7 @@
 package data
 
 import (
-	nats "github.com/nats-io/nats.go"
+	"github.com/nats-io/nats.go"
 	"gitlab.calendaria.team/services/rbac/internal/conf"
 )
 
@@ -12,16 +12,9 @@ func NewNatsClient(conf *conf.Bootstrap) (*nats.Conn, func(), error) {
 		return nil, nil, err
 	}
 
-	ec, err := nats.NewEncodedConn(nc, nats.JSON_ENCODER)
-	if err != nil {
-		nc.Close()
-		return nil, nil, err
-	}
-
 	cleanup := func() {
-		ec.Close()
 		nc.Close()
 	}
 
-	return ec.Conn, cleanup, nil
+	return nc, cleanup, nil
 }

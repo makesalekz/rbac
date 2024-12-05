@@ -48,6 +48,7 @@ message RoleRequest {
 
 message ListRolesRequest {
   string search = 1;
+  bool includeSystem = 2;
 }
 
 message ListRolesReply {

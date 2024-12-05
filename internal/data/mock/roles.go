@@ -96,18 +96,18 @@ func (mr *MockRoleRepoMockRecorder) GetRolesByID(ctx, tenantID, roleIDs interfac
 }
 
 // GetRolesList mocks base method.
-func (m *MockRoleRepo) GetRolesList(ctx context.Context, tenantID int64, search string) ([]*ent.Role, error) {
+func (m *MockRoleRepo) GetRolesList(ctx context.Context, tenantID int64, search string, includeSystemRoles bool) ([]*ent.Role, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetRolesList", ctx, tenantID, search)
+	ret := m.ctrl.Call(m, "GetRolesList", ctx, tenantID, search, includeSystemRoles)
 	ret0, _ := ret[0].([]*ent.Role)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetRolesList indicates an expected call of GetRolesList.
-func (mr *MockRoleRepoMockRecorder) GetRolesList(ctx, tenantID, search interface{}) *gomock.Call {
+func (mr *MockRoleRepoMockRecorder) GetRolesList(ctx, tenantID, search interface{}, includeSystemRoles bool) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRolesList", reflect.TypeOf((*MockRoleRepo)(nil).GetRolesList), ctx, tenantID, search)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRolesList", reflect.TypeOf((*MockRoleRepo)(nil).GetRolesList), ctx, tenantID, search, includeSystemRoles)
 }
 
 // ListRolePermissions mocks base method.
