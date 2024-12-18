@@ -2,8 +2,8 @@ package server
 
 import (
 	"gitlab.calendaria.team/services/rbac/internal/conf"
-	"gitlab.calendaria.team/services/utils/v1/jwt"
 	"gitlab.calendaria.team/services/utils/v1/middlewares/metrics"
+	"gitlab.calendaria.team/services/utils/v2/jwt"
 	"gitlab.calendaria.team/services/utils/v2/middlewares/auth"
 
 	prom "github.com/go-kratos/kratos/contrib/metrics/prometheus/v2"
@@ -14,6 +14,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
+//nolint:gochecknoglobals,promlinter // global variable, used for metrics
 var _metricSeconds = prometheus.NewHistogramVec(prometheus.HistogramOpts{
 	Namespace: "server",
 	Subsystem: "requests",
@@ -22,6 +23,7 @@ var _metricSeconds = prometheus.NewHistogramVec(prometheus.HistogramOpts{
 	Buckets:   []float64{0.005, 0.01, 0.025, 0.05, 0.1, 0.250, 0.5, 1},
 }, []string{"kind", "operation"})
 
+//nolint:gochecknoglobals // global variable, used for metrics
 var _metricRequests = prometheus.NewCounterVec(prometheus.CounterOpts{
 	Namespace: "server",
 	Subsystem: "requests",
@@ -29,6 +31,7 @@ var _metricRequests = prometheus.NewCounterVec(prometheus.CounterOpts{
 	Help:      "The total number of processed requests",
 }, []string{"kind", "operation", "code", "reason"})
 
+//nolint:gochecknoglobals // global variable, used for metrics
 var _activeRequests = prometheus.NewGaugeVec(prometheus.GaugeOpts{
 	Namespace: "server",
 	Subsystem: "requests",
@@ -39,7 +42,7 @@ var _activeRequests = prometheus.NewGaugeVec(prometheus.GaugeOpts{
 // NewHTTPServer new an HTTP server.
 func NewHTTPServer(
 	c *conf.Bootstrap,
-	jwtp *jwt.JwtProcessor,
+	jwtp jwt.IJwtProcessor,
 ) *khttp.Server {
 	var opts = []khttp.ServerOption{
 		khttp.Middleware(
@@ -53,14 +56,14 @@ func NewHTTPServer(
 			),
 		),
 	}
-	if c.Server.Http.Network != "" {
-		opts = append(opts, khttp.Network(c.Server.Http.Network))
+	if c.GetServer().GetHttp().GetNetwork() != "" {
+		opts = append(opts, khttp.Network(c.GetServer().GetHttp().GetNetwork()))
 	}
-	if c.Server.Http.Addr != "" {
-		opts = append(opts, khttp.Address(c.Server.Http.Addr))
+	if c.GetServer().GetHttp().GetAddr() != "" {
+		opts = append(opts, khttp.Address(c.GetServer().GetHttp().GetAddr()))
 	}
-	if c.Server.Http.Timeout != nil {
-		opts = append(opts, khttp.Timeout(c.Server.Http.Timeout.AsDuration()))
+	if c.GetServer().GetHttp().GetTimeout() != nil {
+		opts = append(opts, khttp.Timeout(c.GetServer().GetHttp().GetTimeout().AsDuration()))
 	}
 	srv := khttp.NewServer(opts...)
 

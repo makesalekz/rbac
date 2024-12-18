@@ -29,6 +29,8 @@ type RolePermission struct {
 	Deny bool `json:"deny,omitempty"`
 	// Fields holds the value of the "fields" field.
 	Fields []string `json:"fields,omitempty"`
+	// Value holds the value of the "value" field.
+	Value int64 `json:"value,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the RolePermissionQuery when eager-loading is set.
 	Edges        RolePermissionEdges `json:"edges"`
@@ -49,12 +51,10 @@ type RolePermissionEdges struct {
 // RoleOrErr returns the Role value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e RolePermissionEdges) RoleOrErr() (*Role, error) {
-	if e.loadedTypes[0] {
-		if e.Role == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: role.Label}
-		}
+	if e.Role != nil {
 		return e.Role, nil
+	} else if e.loadedTypes[0] {
+		return nil, &NotFoundError{label: role.Label}
 	}
 	return nil, &NotLoadedError{edge: "role"}
 }
@@ -62,12 +62,10 @@ func (e RolePermissionEdges) RoleOrErr() (*Role, error) {
 // PermissionOrErr returns the Permission value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e RolePermissionEdges) PermissionOrErr() (*Permission, error) {
-	if e.loadedTypes[1] {
-		if e.Permission == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: permission.Label}
-		}
+	if e.Permission != nil {
 		return e.Permission, nil
+	} else if e.loadedTypes[1] {
+		return nil, &NotFoundError{label: permission.Label}
 	}
 	return nil, &NotLoadedError{edge: "permission"}
 }
@@ -81,7 +79,7 @@ func (*RolePermission) scanValues(columns []string) ([]any, error) {
 			values[i] = new([]byte)
 		case rolepermission.FieldDeny:
 			values[i] = new(sql.NullBool)
-		case rolepermission.FieldID, rolepermission.FieldTenantID, rolepermission.FieldRoleID:
+		case rolepermission.FieldID, rolepermission.FieldTenantID, rolepermission.FieldRoleID, rolepermission.FieldValue:
 			values[i] = new(sql.NullInt64)
 		case rolepermission.FieldPermissionID:
 			values[i] = new(sql.NullString)
@@ -138,6 +136,12 @@ func (rp *RolePermission) assignValues(columns []string, values []any) error {
 					return fmt.Errorf("unmarshal field fields: %w", err)
 				}
 			}
+		case rolepermission.FieldValue:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field value", values[i])
+			} else if value.Valid {
+				rp.Value = value.Int64
+			}
 		default:
 			rp.selectValues.Set(columns[i], values[i])
 		}
@@ -145,9 +149,9 @@ func (rp *RolePermission) assignValues(columns []string, values []any) error {
 	return nil
 }
 
-// Value returns the ent.Value that was dynamically selected and assigned to the RolePermission.
+// GetValue returns the ent.Value that was dynamically selected and assigned to the RolePermission.
 // This includes values selected through modifiers, order, etc.
-func (rp *RolePermission) Value(name string) (ent.Value, error) {
+func (rp *RolePermission) GetValue(name string) (ent.Value, error) {
 	return rp.selectValues.Get(name)
 }
 
@@ -198,6 +202,9 @@ func (rp *RolePermission) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("fields=")
 	builder.WriteString(fmt.Sprintf("%v", rp.Fields))
+	builder.WriteString(", ")
+	builder.WriteString("value=")
+	builder.WriteString(fmt.Sprintf("%v", rp.Value))
 	builder.WriteByte(')')
 	return builder.String()
 }

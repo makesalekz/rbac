@@ -57,12 +57,10 @@ func (e PermissionEdges) RolesOrErr() ([]*RolePermission, error) {
 // GroupOrErr returns the Group value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e PermissionEdges) GroupOrErr() (*PermissionGroup, error) {
-	if e.loadedTypes[1] {
-		if e.Group == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: permissiongroup.Label}
-		}
+	if e.Group != nil {
 		return e.Group, nil
+	} else if e.loadedTypes[1] {
+		return nil, &NotFoundError{label: permissiongroup.Label}
 	}
 	return nil, &NotLoadedError{edge: "group"}
 }

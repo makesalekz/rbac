@@ -12,8 +12,8 @@ import (
 	"gitlab.calendaria.team/services/rbac/internal/data"
 	"gitlab.calendaria.team/services/rbac/internal/data/mock"
 	"gitlab.calendaria.team/services/rbac/internal/service"
-	u_nats "gitlab.calendaria.team/services/utils/v1/nats"
-	u_nats_mock "gitlab.calendaria.team/services/utils/v1/nats/mock"
+	u_nats "gitlab.calendaria.team/services/utils/v2/nats"
+	u_nats_mock "gitlab.calendaria.team/services/utils/v2/nats/mock"
 	u_zap "gitlab.calendaria.team/services/utils/v2/zap"
 
 	"github.com/go-kratos/kratos/v2/metadata"
@@ -555,6 +555,8 @@ func TestRolesService_ListRolePermissions(t *testing.T) {
 	service := createRolesService(t, qm, permissionRepo, assignedRepo, roleRepo, teamsRepo)
 
 	tenantID := int64(1234)
+	appID := "app-id"
+
 	ctx := mockTenantServerContext(tenantID)
 
 	req := &v1.RoleRequest{
@@ -571,7 +573,8 @@ func TestRolesService_ListRolePermissions(t *testing.T) {
 			PermissionID: "some.group.permission2",
 		},
 	}
-	roleRepo.EXPECT().ListRolePermissions(ctx, tenantID, req.GetRoleId()).Return(roles, nil)
+	roleRepo.EXPECT().ListRolePermissions(ctx, tenantID, req.GetRoleId(),
+		[]string{appID, "common", "admin"}).Return(roles, nil)
 
 	expect := &v1.RolePermission{
 		Id:     permission.PermissionID,

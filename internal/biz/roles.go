@@ -80,10 +80,11 @@ func (uc *RolesUsecase) RemovePermissionFromRole(
 }
 
 func (uc *RolesUsecase) ListRolePermissions(
-	ctx context.Context,
-	tenantID, roleID int64,
+	ctx context.Context, tenantID int64, appID string, roleID int64,
 ) ([]*ent.RolePermission, error) {
-	return uc.repo.ListRolePermissions(ctx, tenantID, roleID)
+	appIDs := []string{appID, "common", "admin"}
+
+	return uc.repo.ListRolePermissions(ctx, tenantID, roleID, appIDs)
 }
 
 func validateFields(sourceFields []string, targetFields []string) bool {

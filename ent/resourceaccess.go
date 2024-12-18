@@ -48,12 +48,10 @@ type ResourceAccessEdges struct {
 // RoleOrErr returns the Role value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e ResourceAccessEdges) RoleOrErr() (*Role, error) {
-	if e.loadedTypes[0] {
-		if e.Role == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: role.Label}
-		}
+	if e.Role != nil {
 		return e.Role, nil
+	} else if e.loadedTypes[0] {
+		return nil, &NotFoundError{label: role.Label}
 	}
 	return nil, &NotLoadedError{edge: "role"}
 }
@@ -61,12 +59,10 @@ func (e ResourceAccessEdges) RoleOrErr() (*Role, error) {
 // TypeOrErr returns the Type value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e ResourceAccessEdges) TypeOrErr() (*ResourceType, error) {
-	if e.loadedTypes[1] {
-		if e.Type == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: resourcetype.Label}
-		}
+	if e.Type != nil {
 		return e.Type, nil
+	} else if e.loadedTypes[1] {
+		return nil, &NotFoundError{label: resourcetype.Label}
 	}
 	return nil, &NotLoadedError{edge: "type"}
 }

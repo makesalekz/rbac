@@ -96,6 +96,7 @@ type CreateRolePermissionDto struct {
 }
 
 type FilterRolePermissions struct {
+	AppIDs      []string
 	TenantID    int64
 	RoleIDs     []int64
 	Permissions []string

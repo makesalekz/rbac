@@ -123,6 +123,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			rolepermission.FieldPermissionID: {Type: field.TypeString, Column: rolepermission.FieldPermissionID},
 			rolepermission.FieldDeny:         {Type: field.TypeBool, Column: rolepermission.FieldDeny},
 			rolepermission.FieldFields:       {Type: field.TypeJSON, Column: rolepermission.FieldFields},
+			rolepermission.FieldValue:        {Type: field.TypeInt64, Column: rolepermission.FieldValue},
 		},
 	}
 	graph.Nodes[6] = &sqlgraph.Node{
@@ -789,6 +790,11 @@ func (f *RolePermissionFilter) WhereDeny(p entql.BoolP) {
 // WhereFields applies the entql json.RawMessage predicate on the fields field.
 func (f *RolePermissionFilter) WhereFields(p entql.BytesP) {
 	f.Where(p.Field(rolepermission.FieldFields))
+}
+
+// WhereValue applies the entql int64 predicate on the value field.
+func (f *RolePermissionFilter) WhereValue(p entql.Int64P) {
+	f.Where(p.Field(rolepermission.FieldValue))
 }
 
 // WhereHasRole applies a predicate to check if query has an edge role.

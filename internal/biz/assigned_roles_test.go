@@ -9,7 +9,7 @@ import (
 	"gitlab.calendaria.team/services/rbac/internal/biz"
 	"gitlab.calendaria.team/services/rbac/internal/data"
 	"gitlab.calendaria.team/services/rbac/internal/data/mock"
-	u_nats_mock "gitlab.calendaria.team/services/utils/v1/nats/mock"
+	u_nats_mock "gitlab.calendaria.team/services/utils/v2/nats/mock"
 	"gitlab.calendaria.team/services/utils/v2/zap"
 
 	"github.com/golang/mock/gomock"

@@ -20,6 +20,7 @@ func (RolePermission) Fields() []ent.Field {
 		field.String("permission_id").Immutable(),
 		field.Bool("deny").Default(false),
 		field.JSON("fields", []string{}),
+		field.Int64("value").Optional().Default(0),
 	}
 }
 

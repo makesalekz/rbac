@@ -53,6 +53,7 @@ func TestRolesService_CheckPermissions(t *testing.T) {
 		TenantID:    tenantID,
 		RoleIDs:     []int64{1, 2},
 		Permissions: req.GetPermissions(),
+		AppIDs:      []string{"app-id", "common", "admin"},
 	}
 	rp1 := &ent.RolePermission{
 		ID:           1,
@@ -139,6 +140,7 @@ func TestRolesService_CheckPermissionsResources(t *testing.T) {
 		TenantID:    tenantID,
 		RoleIDs:     []int64{1, 2},
 		Permissions: req.GetPermissions(),
+		AppIDs:      []string{"app-id", "common", "admin"},
 	}
 	rp1 := &ent.RolePermission{
 		ID:           1,
@@ -210,6 +212,7 @@ func TestRolesService_CheckPermissionsMeta(t *testing.T) {
 		TenantID:    tenantID,
 		RoleIDs:     []int64{1, 2},
 		Permissions: req.GetPermissions(),
+		AppIDs:      []string{"app-id", "common", "admin"},
 	}
 	rp1 := &ent.RolePermission{
 		ID:           1,

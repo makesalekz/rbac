@@ -72,6 +72,7 @@ func (uc *PermissionsUsecase) GetPermissions(
 func (uc *PermissionsUsecase) GetDeniedPermissions(
 	ctx context.Context,
 	tenantID int64,
+	appID string,
 	identities []string,
 ) (map[string]bool, error) {
 	assignedRoles, err := uc.assignedRepo.ListAssignedRoles(ctx, data.ListRolesDto{
@@ -91,6 +92,7 @@ func (uc *PermissionsUsecase) GetDeniedPermissions(
 		TenantID:   tenantID,
 		RoleIDs:    rolesIDs,
 		DeniedOnly: true,
+		AppIDs:     []string{appID, "common", "admin"},
 	})
 	if err != nil {
 		return nil, err
@@ -107,6 +109,7 @@ func (uc *PermissionsUsecase) GetDeniedPermissions(
 func (uc *PermissionsUsecase) GetGroupedPermissions(
 	ctx context.Context,
 	tenantID int64,
+	appID string,
 	identities []string,
 	filter data.FilterPermissions,
 ) ([]*ent.PermissionGroup, error) {
@@ -116,7 +119,7 @@ func (uc *PermissionsUsecase) GetGroupedPermissions(
 	}
 
 	if !filter.WithDenied {
-		excludePermissions, err := uc.GetDeniedPermissions(ctx, tenantID, identities)
+		excludePermissions, err := uc.GetDeniedPermissions(ctx, tenantID, appID, identities)
 		if err != nil {
 			return nil, err
 		}

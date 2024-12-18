@@ -17,6 +17,7 @@ message CheckPermissionsRequest {
   repeated string permissions = 3;
   repeated string identities = 4;
   repeated Resource resources = 5;
+  int64 value = 6;
 }
 
 message CheckPermissionsReply {

@@ -7,7 +7,7 @@ import (
 	v1 "gitlab.calendaria.team/services/rbac/api/rbac/v1"
 	"gitlab.calendaria.team/services/rbac/ent"
 	"gitlab.calendaria.team/services/rbac/internal/data"
-	u_nats "gitlab.calendaria.team/services/utils/v1/nats"
+	u_nats "gitlab.calendaria.team/services/utils/v2/nats"
 )
 
 type AssignRoleMessage struct {

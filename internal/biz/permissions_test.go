@@ -177,6 +177,7 @@ func TestPermissionsUsecase_GetGroupedPermissions(t *testing.T) {
 
 	ctx := context.Background()
 	tenantID := int64(1)
+	appID := "calendaria"
 	permission1 := &ent.Permission{
 		ID:   "permission.one",
 		Name: "Permission One",
@@ -233,6 +234,7 @@ func TestPermissionsUsecase_GetGroupedPermissions(t *testing.T) {
 	filterRolePermissions := data.FilterRolePermissions{
 		TenantID:   tenantID,
 		RoleIDs:    []int64{1, 2},
+		AppIDs:     []string{appID, "common", "admin"},
 		DeniedOnly: true,
 	}
 	permissionGroups2 := []*ent.PermissionGroup{
@@ -266,11 +268,11 @@ func TestPermissionsUsecase_GetGroupedPermissions(t *testing.T) {
 		},
 	}, nil)
 
-	pg, err := uc.GetGroupedPermissions(ctx, tenantID, identities, filter)
+	pg, err := uc.GetGroupedPermissions(ctx, tenantID, appID, identities, filter)
 	require.NoError(t, err)
 	require.Equal(t, permissionGroups, pg)
 
-	pg, err = uc.GetGroupedPermissions(ctx, tenantID, identities, filter2)
+	pg, err = uc.GetGroupedPermissions(ctx, tenantID, appID, identities, filter2)
 	require.NoError(t, err)
 	require.Equal(t, permissionGroups2, pg)
 }

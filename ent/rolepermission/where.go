@@ -73,6 +73,11 @@ func Deny(v bool) predicate.RolePermission {
 	return predicate.RolePermission(sql.FieldEQ(FieldDeny, v))
 }
 
+// Value applies equality check predicate on the "value" field. It's identical to ValueEQ.
+func Value(v int64) predicate.RolePermission {
+	return predicate.RolePermission(sql.FieldEQ(FieldValue, v))
+}
+
 // TenantIDEQ applies the EQ predicate on the "tenant_id" field.
 func TenantIDEQ(v int64) predicate.RolePermission {
 	return predicate.RolePermission(sql.FieldEQ(FieldTenantID, v))
@@ -206,6 +211,56 @@ func DenyEQ(v bool) predicate.RolePermission {
 // DenyNEQ applies the NEQ predicate on the "deny" field.
 func DenyNEQ(v bool) predicate.RolePermission {
 	return predicate.RolePermission(sql.FieldNEQ(FieldDeny, v))
+}
+
+// ValueEQ applies the EQ predicate on the "value" field.
+func ValueEQ(v int64) predicate.RolePermission {
+	return predicate.RolePermission(sql.FieldEQ(FieldValue, v))
+}
+
+// ValueNEQ applies the NEQ predicate on the "value" field.
+func ValueNEQ(v int64) predicate.RolePermission {
+	return predicate.RolePermission(sql.FieldNEQ(FieldValue, v))
+}
+
+// ValueIn applies the In predicate on the "value" field.
+func ValueIn(vs ...int64) predicate.RolePermission {
+	return predicate.RolePermission(sql.FieldIn(FieldValue, vs...))
+}
+
+// ValueNotIn applies the NotIn predicate on the "value" field.
+func ValueNotIn(vs ...int64) predicate.RolePermission {
+	return predicate.RolePermission(sql.FieldNotIn(FieldValue, vs...))
+}
+
+// ValueGT applies the GT predicate on the "value" field.
+func ValueGT(v int64) predicate.RolePermission {
+	return predicate.RolePermission(sql.FieldGT(FieldValue, v))
+}
+
+// ValueGTE applies the GTE predicate on the "value" field.
+func ValueGTE(v int64) predicate.RolePermission {
+	return predicate.RolePermission(sql.FieldGTE(FieldValue, v))
+}
+
+// ValueLT applies the LT predicate on the "value" field.
+func ValueLT(v int64) predicate.RolePermission {
+	return predicate.RolePermission(sql.FieldLT(FieldValue, v))
+}
+
+// ValueLTE applies the LTE predicate on the "value" field.
+func ValueLTE(v int64) predicate.RolePermission {
+	return predicate.RolePermission(sql.FieldLTE(FieldValue, v))
+}
+
+// ValueIsNil applies the IsNil predicate on the "value" field.
+func ValueIsNil() predicate.RolePermission {
+	return predicate.RolePermission(sql.FieldIsNull(FieldValue))
+}
+
+// ValueNotNil applies the NotNil predicate on the "value" field.
+func ValueNotNil() predicate.RolePermission {
+	return predicate.RolePermission(sql.FieldNotNull(FieldValue))
 }
 
 // HasRole applies the HasEdge predicate on the "role" edge.

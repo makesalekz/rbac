@@ -4,9 +4,10 @@ import (
 	v1 "gitlab.calendaria.team/services/rbac/api/rbac/v1"
 	"gitlab.calendaria.team/services/rbac/internal/conf"
 	"gitlab.calendaria.team/services/rbac/internal/service"
-	"gitlab.calendaria.team/services/utils/v1/jwt"
 	"gitlab.calendaria.team/services/utils/v1/middlewares/metrics"
+	"gitlab.calendaria.team/services/utils/v2/jwt"
 	"gitlab.calendaria.team/services/utils/v2/middlewares/auth"
+	u_tracing "gitlab.calendaria.team/services/utils/v2/tracing"
 
 	prom "github.com/go-kratos/kratos/contrib/metrics/prometheus/v2"
 	"github.com/go-kratos/kratos/v2/middleware/metadata"
@@ -17,13 +18,19 @@ import (
 // NewGRPCServer new a gRPC server.
 func NewGRPCServer(
 	c *conf.Bootstrap,
-	jwtp *jwt.JwtProcessor,
+	jwtp jwt.IJwtProcessor,
+	tracer *u_tracing.Tracer,
 	roleSrvc *service.RolesService,
 	permissionsSrvc *service.PermissionsService,
 	teamSrvc *service.TeamsService,
 	teamIdentityRolesSrvc *service.AssignsService,
 	checkPermissionSrvc *service.CheckPermissionsService,
 ) *grpc.Server {
+	err := tracer.Initialize()
+	if err != nil {
+		panic(err)
+	}
+
 	var opts = []grpc.ServerOption{
 		grpc.Middleware(
 			recovery.Recovery(),
@@ -36,14 +43,14 @@ func NewGRPCServer(
 			),
 		),
 	}
-	if c.Server.Grpc.Network != "" {
-		opts = append(opts, grpc.Network(c.Server.Grpc.Network))
+	if c.GetServer().GetGrpc().GetNetwork() != "" {
+		opts = append(opts, grpc.Network(c.GetServer().GetGrpc().GetNetwork()))
 	}
-	if c.Server.Grpc.Addr != "" {
-		opts = append(opts, grpc.Address(c.Server.Grpc.Addr))
+	if c.GetServer().GetGrpc().GetAddr() != "" {
+		opts = append(opts, grpc.Address(c.GetServer().GetGrpc().GetAddr()))
 	}
-	if c.Server.Grpc.Timeout != nil {
-		opts = append(opts, grpc.Timeout(c.Server.Grpc.Timeout.AsDuration()))
+	if c.GetServer().GetGrpc().GetTimeout() != nil {
+		opts = append(opts, grpc.Timeout(c.GetServer().GetGrpc().GetTimeout().AsDuration()))
 	}
 	srv := grpc.NewServer(opts...)
 

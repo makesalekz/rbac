@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"math"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -109,7 +110,7 @@ func (raq *ResourceAccessQuery) QueryType() *ResourceTypeQuery {
 // First returns the first ResourceAccess entity from the query.
 // Returns a *NotFoundError when no ResourceAccess was found.
 func (raq *ResourceAccessQuery) First(ctx context.Context) (*ResourceAccess, error) {
-	nodes, err := raq.Limit(1).All(setContextOp(ctx, raq.ctx, "First"))
+	nodes, err := raq.Limit(1).All(setContextOp(ctx, raq.ctx, ent.OpQueryFirst))
 	if err != nil {
 		return nil, err
 	}
@@ -132,7 +133,7 @@ func (raq *ResourceAccessQuery) FirstX(ctx context.Context) *ResourceAccess {
 // Returns a *NotFoundError when no ResourceAccess ID was found.
 func (raq *ResourceAccessQuery) FirstID(ctx context.Context) (id int64, err error) {
 	var ids []int64
-	if ids, err = raq.Limit(1).IDs(setContextOp(ctx, raq.ctx, "FirstID")); err != nil {
+	if ids, err = raq.Limit(1).IDs(setContextOp(ctx, raq.ctx, ent.OpQueryFirstID)); err != nil {
 		return
 	}
 	if len(ids) == 0 {
@@ -155,7 +156,7 @@ func (raq *ResourceAccessQuery) FirstIDX(ctx context.Context) int64 {
 // Returns a *NotSingularError when more than one ResourceAccess entity is found.
 // Returns a *NotFoundError when no ResourceAccess entities are found.
 func (raq *ResourceAccessQuery) Only(ctx context.Context) (*ResourceAccess, error) {
-	nodes, err := raq.Limit(2).All(setContextOp(ctx, raq.ctx, "Only"))
+	nodes, err := raq.Limit(2).All(setContextOp(ctx, raq.ctx, ent.OpQueryOnly))
 	if err != nil {
 		return nil, err
 	}
@@ -183,7 +184,7 @@ func (raq *ResourceAccessQuery) OnlyX(ctx context.Context) *ResourceAccess {
 // Returns a *NotFoundError when no entities are found.
 func (raq *ResourceAccessQuery) OnlyID(ctx context.Context) (id int64, err error) {
 	var ids []int64
-	if ids, err = raq.Limit(2).IDs(setContextOp(ctx, raq.ctx, "OnlyID")); err != nil {
+	if ids, err = raq.Limit(2).IDs(setContextOp(ctx, raq.ctx, ent.OpQueryOnlyID)); err != nil {
 		return
 	}
 	switch len(ids) {
@@ -208,7 +209,7 @@ func (raq *ResourceAccessQuery) OnlyIDX(ctx context.Context) int64 {
 
 // All executes the query and returns a list of ResourceAccesses.
 func (raq *ResourceAccessQuery) All(ctx context.Context) ([]*ResourceAccess, error) {
-	ctx = setContextOp(ctx, raq.ctx, "All")
+	ctx = setContextOp(ctx, raq.ctx, ent.OpQueryAll)
 	if err := raq.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
@@ -230,7 +231,7 @@ func (raq *ResourceAccessQuery) IDs(ctx context.Context) (ids []int64, err error
 	if raq.ctx.Unique == nil && raq.path != nil {
 		raq.Unique(true)
 	}
-	ctx = setContextOp(ctx, raq.ctx, "IDs")
+	ctx = setContextOp(ctx, raq.ctx, ent.OpQueryIDs)
 	if err = raq.Select(resourceaccess.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -248,7 +249,7 @@ func (raq *ResourceAccessQuery) IDsX(ctx context.Context) []int64 {
 
 // Count returns the count of the given query.
 func (raq *ResourceAccessQuery) Count(ctx context.Context) (int, error) {
-	ctx = setContextOp(ctx, raq.ctx, "Count")
+	ctx = setContextOp(ctx, raq.ctx, ent.OpQueryCount)
 	if err := raq.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
@@ -266,7 +267,7 @@ func (raq *ResourceAccessQuery) CountX(ctx context.Context) int {
 
 // Exist returns true if the query has elements in the graph.
 func (raq *ResourceAccessQuery) Exist(ctx context.Context) (bool, error) {
-	ctx = setContextOp(ctx, raq.ctx, "Exist")
+	ctx = setContextOp(ctx, raq.ctx, ent.OpQueryExist)
 	switch _, err := raq.FirstID(ctx); {
 	case IsNotFound(err):
 		return false, nil
@@ -301,8 +302,9 @@ func (raq *ResourceAccessQuery) Clone() *ResourceAccessQuery {
 		withRole:   raq.withRole.Clone(),
 		withType:   raq.withType.Clone(),
 		// clone intermediate query.
-		sql:  raq.sql.Clone(),
-		path: raq.path,
+		sql:       raq.sql.Clone(),
+		path:      raq.path,
+		modifiers: append([]func(*sql.Selector){}, raq.modifiers...),
 	}
 }
 
@@ -622,7 +624,7 @@ func (ragb *ResourceAccessGroupBy) Aggregate(fns ...AggregateFunc) *ResourceAcce
 
 // Scan applies the selector query and scans the result into the given value.
 func (ragb *ResourceAccessGroupBy) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, ragb.build.ctx, "GroupBy")
+	ctx = setContextOp(ctx, ragb.build.ctx, ent.OpQueryGroupBy)
 	if err := ragb.build.prepareQuery(ctx); err != nil {
 		return err
 	}
@@ -670,7 +672,7 @@ func (ras *ResourceAccessSelect) Aggregate(fns ...AggregateFunc) *ResourceAccess
 
 // Scan applies the selector query and scans the result into the given value.
 func (ras *ResourceAccessSelect) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, ras.ctx, "Select")
+	ctx = setContextOp(ctx, ras.ctx, ent.OpQuerySelect)
 	if err := ras.prepareQuery(ctx); err != nil {
 		return err
 	}

@@ -153,7 +153,7 @@ func (rac *ResourceAccessCreate) check() error {
 	if _, ok := rac.mutation.RoleID(); !ok {
 		return &ValidationError{Name: "role_id", err: errors.New(`ent: missing required field "ResourceAccess.role_id"`)}
 	}
-	if _, ok := rac.mutation.RoleID(); !ok {
+	if len(rac.mutation.RoleIDs()) == 0 {
 		return &ValidationError{Name: "role", err: errors.New(`ent: missing required edge "ResourceAccess.role"`)}
 	}
 	return nil
