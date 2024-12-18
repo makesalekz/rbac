@@ -22,7 +22,6 @@ message CheckPermissionsRequest {
 
 message CheckPermissionsReply {
   map<string, ListOfFields> permissions = 1;
-  string metadata = 2;
 }
 
 message ListOfFields {

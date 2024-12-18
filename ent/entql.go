@@ -71,7 +71,6 @@ var schemaGraph = func() *sqlgraph.Schema {
 			resourceaccess.FieldResourceID:   {Type: field.TypeInt64, Column: resourceaccess.FieldResourceID},
 			resourceaccess.FieldIdentityID:   {Type: field.TypeString, Column: resourceaccess.FieldIdentityID},
 			resourceaccess.FieldRoleID:       {Type: field.TypeInt64, Column: resourceaccess.FieldRoleID},
-			resourceaccess.FieldMetadata:     {Type: field.TypeString, Column: resourceaccess.FieldMetadata},
 		},
 	}
 	graph.Nodes[3] = &sqlgraph.Node{
@@ -550,11 +549,6 @@ func (f *ResourceAccessFilter) WhereIdentityID(p entql.StringP) {
 // WhereRoleID applies the entql int64 predicate on the role_id field.
 func (f *ResourceAccessFilter) WhereRoleID(p entql.Int64P) {
 	f.Where(p.Field(resourceaccess.FieldRoleID))
-}
-
-// WhereMetadata applies the entql string predicate on the metadata field.
-func (f *ResourceAccessFilter) WhereMetadata(p entql.StringP) {
-	f.Where(p.Field(resourceaccess.FieldMetadata))
 }
 
 // WhereHasRole applies a predicate to check if query has an edge role.

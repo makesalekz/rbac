@@ -28,8 +28,6 @@ type ResourceAccess struct {
 	IdentityID string `json:"identity_id,omitempty"`
 	// RoleID holds the value of the "role_id" field.
 	RoleID int64 `json:"role_id,omitempty"`
-	// Metadata holds the value of the "metadata" field.
-	Metadata string `json:"metadata,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ResourceAccessQuery when eager-loading is set.
 	Edges        ResourceAccessEdges `json:"edges"`
@@ -76,7 +74,7 @@ func (*ResourceAccess) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case resourceaccess.FieldID, resourceaccess.FieldTenantID, resourceaccess.FieldResourceID, resourceaccess.FieldRoleID:
 			values[i] = new(sql.NullInt64)
-		case resourceaccess.FieldResourceType, resourceaccess.FieldIdentityID, resourceaccess.FieldMetadata:
+		case resourceaccess.FieldResourceType, resourceaccess.FieldIdentityID:
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -130,12 +128,6 @@ func (ra *ResourceAccess) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field role_id", values[i])
 			} else if value.Valid {
 				ra.RoleID = value.Int64
-			}
-		case resourceaccess.FieldMetadata:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field metadata", values[i])
-			} else if value.Valid {
-				ra.Metadata = value.String
 			}
 		default:
 			ra.selectValues.Set(columns[i], values[i])
@@ -201,9 +193,6 @@ func (ra *ResourceAccess) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("role_id=")
 	builder.WriteString(fmt.Sprintf("%v", ra.RoleID))
-	builder.WriteString(", ")
-	builder.WriteString("metadata=")
-	builder.WriteString(ra.Metadata)
 	builder.WriteByte(')')
 	return builder.String()
 }

@@ -82,10 +82,6 @@ func init() {
 	resourceaccessDescIdentityID := resourceaccessFields[3].Descriptor()
 	// resourceaccess.DefaultIdentityID holds the default value on creation for the identity_id field.
 	resourceaccess.DefaultIdentityID = resourceaccessDescIdentityID.Default.(string)
-	// resourceaccessDescMetadata is the schema descriptor for metadata field.
-	resourceaccessDescMetadata := resourceaccessFields[5].Descriptor()
-	// resourceaccess.DefaultMetadata holds the default value on creation for the metadata field.
-	resourceaccess.DefaultMetadata = resourceaccessDescMetadata.Default.(string)
 	resourcetypeFields := schema.ResourceType{}.Fields()
 	_ = resourcetypeFields
 	// resourcetypeDescDescription is the schema descriptor for description field.

@@ -77,20 +77,6 @@ func (rac *ResourceAccessCreate) SetRoleID(i int64) *ResourceAccessCreate {
 	return rac
 }
 
-// SetMetadata sets the "metadata" field.
-func (rac *ResourceAccessCreate) SetMetadata(s string) *ResourceAccessCreate {
-	rac.mutation.SetMetadata(s)
-	return rac
-}
-
-// SetNillableMetadata sets the "metadata" field if the given value is not nil.
-func (rac *ResourceAccessCreate) SetNillableMetadata(s *string) *ResourceAccessCreate {
-	if s != nil {
-		rac.SetMetadata(*s)
-	}
-	return rac
-}
-
 // SetRole sets the "role" edge to the Role entity.
 func (rac *ResourceAccessCreate) SetRole(r *Role) *ResourceAccessCreate {
 	return rac.SetRoleID(r.ID)
@@ -154,10 +140,6 @@ func (rac *ResourceAccessCreate) defaults() {
 		v := resourceaccess.DefaultIdentityID
 		rac.mutation.SetIdentityID(v)
 	}
-	if _, ok := rac.mutation.Metadata(); !ok {
-		v := resourceaccess.DefaultMetadata
-		rac.mutation.SetMetadata(v)
-	}
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -170,9 +152,6 @@ func (rac *ResourceAccessCreate) check() error {
 	}
 	if _, ok := rac.mutation.RoleID(); !ok {
 		return &ValidationError{Name: "role_id", err: errors.New(`ent: missing required field "ResourceAccess.role_id"`)}
-	}
-	if _, ok := rac.mutation.Metadata(); !ok {
-		return &ValidationError{Name: "metadata", err: errors.New(`ent: missing required field "ResourceAccess.metadata"`)}
 	}
 	if len(rac.mutation.RoleIDs()) == 0 {
 		return &ValidationError{Name: "role", err: errors.New(`ent: missing required edge "ResourceAccess.role"`)}
@@ -215,10 +194,6 @@ func (rac *ResourceAccessCreate) createSpec() (*ResourceAccess, *sqlgraph.Create
 	if value, ok := rac.mutation.IdentityID(); ok {
 		_spec.SetField(resourceaccess.FieldIdentityID, field.TypeString, value)
 		_node.IdentityID = value
-	}
-	if value, ok := rac.mutation.Metadata(); ok {
-		_spec.SetField(resourceaccess.FieldMetadata, field.TypeString, value)
-		_node.Metadata = value
 	}
 	if nodes := rac.mutation.RoleIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -306,18 +281,6 @@ type (
 	}
 )
 
-// SetMetadata sets the "metadata" field.
-func (u *ResourceAccessUpsert) SetMetadata(v string) *ResourceAccessUpsert {
-	u.Set(resourceaccess.FieldMetadata, v)
-	return u
-}
-
-// UpdateMetadata sets the "metadata" field to the value that was provided on create.
-func (u *ResourceAccessUpsert) UpdateMetadata() *ResourceAccessUpsert {
-	u.SetExcluded(resourceaccess.FieldMetadata)
-	return u
-}
-
 // UpdateNewValues updates the mutable fields using the new values that were set on create.
 // Using this option is equivalent to using:
 //
@@ -373,20 +336,6 @@ func (u *ResourceAccessUpsertOne) Update(set func(*ResourceAccessUpsert)) *Resou
 		set(&ResourceAccessUpsert{UpdateSet: update})
 	}))
 	return u
-}
-
-// SetMetadata sets the "metadata" field.
-func (u *ResourceAccessUpsertOne) SetMetadata(v string) *ResourceAccessUpsertOne {
-	return u.Update(func(s *ResourceAccessUpsert) {
-		s.SetMetadata(v)
-	})
-}
-
-// UpdateMetadata sets the "metadata" field to the value that was provided on create.
-func (u *ResourceAccessUpsertOne) UpdateMetadata() *ResourceAccessUpsertOne {
-	return u.Update(func(s *ResourceAccessUpsert) {
-		s.UpdateMetadata()
-	})
 }
 
 // Exec executes the query.
@@ -610,20 +559,6 @@ func (u *ResourceAccessUpsertBulk) Update(set func(*ResourceAccessUpsert)) *Reso
 		set(&ResourceAccessUpsert{UpdateSet: update})
 	}))
 	return u
-}
-
-// SetMetadata sets the "metadata" field.
-func (u *ResourceAccessUpsertBulk) SetMetadata(v string) *ResourceAccessUpsertBulk {
-	return u.Update(func(s *ResourceAccessUpsert) {
-		s.SetMetadata(v)
-	})
-}
-
-// UpdateMetadata sets the "metadata" field to the value that was provided on create.
-func (u *ResourceAccessUpsertBulk) UpdateMetadata() *ResourceAccessUpsertBulk {
-	return u.Update(func(s *ResourceAccessUpsert) {
-		s.UpdateMetadata()
-	})
 }
 
 // Exec executes the query.

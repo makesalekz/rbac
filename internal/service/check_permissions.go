@@ -53,7 +53,6 @@ func (s *CheckPermissionsService) CheckPermissions(
 	}
 
 	return &v1.CheckPermissionsReply{
-		Permissions: permissionsMap.GetPermissions(),
-		Metadata:    permissionsMap.GetMetadata(),
+		Permissions: permissionsMap,
 	}, nil
 }

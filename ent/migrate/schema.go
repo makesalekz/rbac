@@ -50,7 +50,6 @@ var (
 		{Name: "tenant_id", Type: field.TypeInt64},
 		{Name: "resource_id", Type: field.TypeInt64, Nullable: true},
 		{Name: "identity_id", Type: field.TypeString, Default: ""},
-		{Name: "metadata", Type: field.TypeString, Default: ""},
 		{Name: "role_id", Type: field.TypeInt64},
 		{Name: "resource_type", Type: field.TypeString, Nullable: true},
 	}
@@ -62,13 +61,13 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "resource_accesses_roles_role",
-				Columns:    []*schema.Column{ResourceAccessesColumns[5]},
+				Columns:    []*schema.Column{ResourceAccessesColumns[4]},
 				RefColumns: []*schema.Column{RolesColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
 				Symbol:     "resource_accesses_resource_types_type",
-				Columns:    []*schema.Column{ResourceAccessesColumns[6]},
+				Columns:    []*schema.Column{ResourceAccessesColumns[5]},
 				RefColumns: []*schema.Column{ResourceTypesColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
@@ -77,7 +76,7 @@ var (
 			{
 				Name:    "resourceaccess_tenant_id_role_id_identity_id_resource_type_resource_id",
 				Unique:  true,
-				Columns: []*schema.Column{ResourceAccessesColumns[1], ResourceAccessesColumns[5], ResourceAccessesColumns[3], ResourceAccessesColumns[6], ResourceAccessesColumns[2]},
+				Columns: []*schema.Column{ResourceAccessesColumns[1], ResourceAccessesColumns[4], ResourceAccessesColumns[3], ResourceAccessesColumns[5], ResourceAccessesColumns[2]},
 				Annotation: &entsql.IndexAnnotation{
 					Where: "resource_id IS NOT NULL",
 				},
@@ -85,7 +84,7 @@ var (
 			{
 				Name:    "resourceaccess_tenant_id_role_id_identity_id",
 				Unique:  true,
-				Columns: []*schema.Column{ResourceAccessesColumns[1], ResourceAccessesColumns[5], ResourceAccessesColumns[3]},
+				Columns: []*schema.Column{ResourceAccessesColumns[1], ResourceAccessesColumns[4], ResourceAccessesColumns[3]},
 				Annotation: &entsql.IndexAnnotation{
 					Where: "resource_id IS NULL",
 				},

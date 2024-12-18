@@ -28,20 +28,6 @@ func (rau *ResourceAccessUpdate) Where(ps ...predicate.ResourceAccess) *Resource
 	return rau
 }
 
-// SetMetadata sets the "metadata" field.
-func (rau *ResourceAccessUpdate) SetMetadata(s string) *ResourceAccessUpdate {
-	rau.mutation.SetMetadata(s)
-	return rau
-}
-
-// SetNillableMetadata sets the "metadata" field if the given value is not nil.
-func (rau *ResourceAccessUpdate) SetNillableMetadata(s *string) *ResourceAccessUpdate {
-	if s != nil {
-		rau.SetMetadata(*s)
-	}
-	return rau
-}
-
 // Mutation returns the ResourceAccessMutation object of the builder.
 func (rau *ResourceAccessUpdate) Mutation() *ResourceAccessMutation {
 	return rau.mutation
@@ -103,9 +89,6 @@ func (rau *ResourceAccessUpdate) sqlSave(ctx context.Context) (n int, err error)
 	if rau.mutation.ResourceIDCleared() {
 		_spec.ClearField(resourceaccess.FieldResourceID, field.TypeInt64)
 	}
-	if value, ok := rau.mutation.Metadata(); ok {
-		_spec.SetField(resourceaccess.FieldMetadata, field.TypeString, value)
-	}
 	_spec.AddModifiers(rau.modifiers...)
 	if n, err = sqlgraph.UpdateNodes(ctx, rau.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -126,20 +109,6 @@ type ResourceAccessUpdateOne struct {
 	hooks     []Hook
 	mutation  *ResourceAccessMutation
 	modifiers []func(*sql.UpdateBuilder)
-}
-
-// SetMetadata sets the "metadata" field.
-func (rauo *ResourceAccessUpdateOne) SetMetadata(s string) *ResourceAccessUpdateOne {
-	rauo.mutation.SetMetadata(s)
-	return rauo
-}
-
-// SetNillableMetadata sets the "metadata" field if the given value is not nil.
-func (rauo *ResourceAccessUpdateOne) SetNillableMetadata(s *string) *ResourceAccessUpdateOne {
-	if s != nil {
-		rauo.SetMetadata(*s)
-	}
-	return rauo
 }
 
 // Mutation returns the ResourceAccessMutation object of the builder.
@@ -232,9 +201,6 @@ func (rauo *ResourceAccessUpdateOne) sqlSave(ctx context.Context) (_node *Resour
 	}
 	if rauo.mutation.ResourceIDCleared() {
 		_spec.ClearField(resourceaccess.FieldResourceID, field.TypeInt64)
-	}
-	if value, ok := rauo.mutation.Metadata(); ok {
-		_spec.SetField(resourceaccess.FieldMetadata, field.TypeString, value)
 	}
 	_spec.AddModifiers(rauo.modifiers...)
 	_node = &ResourceAccess{config: rauo.config}

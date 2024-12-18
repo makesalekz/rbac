@@ -90,13 +90,13 @@ func TestCheckPermissionsUsecase_CheckPermissions(t *testing.T) {
 
 	permissionsMap, err := uc.CheckPermissions(ctx, tenantID, appID, identities, permissions, resources, 0)
 	require.NoError(t, err)
-	require.Len(t, permissionsMap.GetPermissions(), 2)
+	require.Len(t, permissionsMap, 2)
 
 	require.Equal(t, &v1.ListOfFields{
 		Fields: []string{"field1", "field2"},
-	}, permissionsMap.GetPermissions()["permission.one"])
+	}, permissionsMap["permission.one"])
 
 	require.Equal(t, &v1.ListOfFields{
 		Fields: []string{"field3", "field4"},
-	}, permissionsMap.GetPermissions()["permission.two"])
+	}, permissionsMap["permission.two"])
 }

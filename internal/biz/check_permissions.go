@@ -2,7 +2,6 @@ package biz
 
 import (
 	"context"
-	"strings"
 
 	v1 "gitlab.calendaria.team/services/rbac/api/rbac/v1"
 	"gitlab.calendaria.team/services/rbac/ent"
@@ -108,7 +107,7 @@ func (u *CheckPermissionsUsecase) CheckPermissions(
 	ctx context.Context, tenantID int64, appID string,
 	identities []string, permissions []string, resources []*v1.Resource,
 	value int64,
-) (*v1.CheckPermissionsReply, error) {
+) (map[string]*v1.ListOfFields, error) {
 	allResources, err := u.appendTeamParents(ctx, tenantID, resources)
 	if err != nil {
 		return nil, err
@@ -123,9 +122,6 @@ func (u *CheckPermissionsUsecase) CheckPermissions(
 		return nil, err
 	}
 
-	metadata := data.ExtractUnique(assignedRoles,
-		func(e *ent.ResourceAccess) (string, bool) { return e.Metadata, true })
-
 	roleIDs := data.ExtractUnique(assignedRoles, func(e *ent.ResourceAccess) (int64, bool) { return e.RoleID, true })
 
 	rolePermissions, err := u.roleRepo.ListRolesPermissions(ctx, data.FilterRolePermissions{
@@ -138,10 +134,7 @@ func (u *CheckPermissionsUsecase) CheckPermissions(
 		return nil, err
 	}
 
-	return &v1.CheckPermissionsReply{
-		Permissions: u.getPermissionFields(rolePermissions, value),
-		Metadata:    strings.Join(data.Filter(metadata, func(s string) bool { return s != "" }), ";"),
-	}, nil
+	return u.getPermissionFields(rolePermissions, value), nil
 }
 
 func (u *CheckPermissionsUsecase) HasPermission(
@@ -155,11 +148,11 @@ func (u *CheckPermissionsUsecase) HasPermission(
 		return nil, err
 	}
 
-	if len(permissions.GetPermissions()) == 0 {
+	if len(permissions) == 0 {
 		return &v1.ListOfFields{}, nil
 	}
 
-	return permissions.GetPermissions()[permission], nil
+	return permissions[permission], nil
 }
 
 func mergeFields(fields1 []string, fields2 []string) []string {
