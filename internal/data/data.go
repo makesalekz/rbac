@@ -179,3 +179,14 @@ func Diff[T comparable, S ~[]T](slice S, other S) []T {
 	}
 	return result
 }
+
+func Filter[S ~[]E, E any](slice S, filter func(E) bool) S {
+	var result []E
+	for _, item := range slice {
+		if filter(item) {
+			result = append(result, item)
+		}
+	}
+
+	return result
+}
