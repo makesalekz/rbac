@@ -13,6 +13,7 @@ type AssignRoleDto struct {
 	RoleID     int64
 	TeamID     int64
 	Resource   *v1.Resource
+	Metadata   string
 }
 
 type ListRolesDto struct {

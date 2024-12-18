@@ -46,4 +46,5 @@ message AssignedRole {
   Role role = 1;
   optional string identityId = 2;
   optional Resource resource = 5;
+  string metadata = 6;
 }

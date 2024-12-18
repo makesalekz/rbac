@@ -22,6 +22,8 @@ const (
 	FieldIdentityID = "identity_id"
 	// FieldRoleID holds the string denoting the role_id field in the database.
 	FieldRoleID = "role_id"
+	// FieldMetadata holds the string denoting the metadata field in the database.
+	FieldMetadata = "metadata"
 	// EdgeRole holds the string denoting the role edge name in mutations.
 	EdgeRole = "role"
 	// EdgeType holds the string denoting the type edge name in mutations.
@@ -52,6 +54,7 @@ var Columns = []string{
 	FieldResourceID,
 	FieldIdentityID,
 	FieldRoleID,
+	FieldMetadata,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -67,6 +70,8 @@ func ValidColumn(column string) bool {
 var (
 	// DefaultIdentityID holds the default value on creation for the "identity_id" field.
 	DefaultIdentityID string
+	// DefaultMetadata holds the default value on creation for the "metadata" field.
+	DefaultMetadata string
 )
 
 // OrderOption defines the ordering options for the ResourceAccess queries.
@@ -100,6 +105,11 @@ func ByIdentityID(opts ...sql.OrderTermOption) OrderOption {
 // ByRoleID orders the results by the role_id field.
 func ByRoleID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldRoleID, opts...).ToFunc()
+}
+
+// ByMetadata orders the results by the metadata field.
+func ByMetadata(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldMetadata, opts...).ToFunc()
 }
 
 // ByRoleField orders the results by role field.

@@ -21,6 +21,7 @@ func (ResourceAccess) Fields() []ent.Field {
 		field.Int64("resource_id").Immutable().Nillable().Optional(),
 		field.String("identity_id").Immutable().Default(""),
 		field.Int64("role_id").Immutable(),
+		field.String("metadata").Default(""),
 	}
 }
 

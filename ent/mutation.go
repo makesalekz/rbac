@@ -1277,6 +1277,7 @@ type ResourceAccessMutation struct {
 	resource_id    *int64
 	addresource_id *int64
 	identity_id    *string
+	metadata       *string
 	clearedFields  map[string]struct{}
 	role           *int64
 	clearedrole    bool
@@ -1632,6 +1633,42 @@ func (m *ResourceAccessMutation) ResetRoleID() {
 	m.role = nil
 }
 
+// SetMetadata sets the "metadata" field.
+func (m *ResourceAccessMutation) SetMetadata(s string) {
+	m.metadata = &s
+}
+
+// Metadata returns the value of the "metadata" field in the mutation.
+func (m *ResourceAccessMutation) Metadata() (r string, exists bool) {
+	v := m.metadata
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldMetadata returns the old "metadata" field's value of the ResourceAccess entity.
+// If the ResourceAccess object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ResourceAccessMutation) OldMetadata(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldMetadata is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldMetadata requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldMetadata: %w", err)
+	}
+	return oldValue.Metadata, nil
+}
+
+// ResetMetadata resets all changes to the "metadata" field.
+func (m *ResourceAccessMutation) ResetMetadata() {
+	m.metadata = nil
+}
+
 // ClearRole clears the "role" edge to the Role entity.
 func (m *ResourceAccessMutation) ClearRole() {
 	m.clearedrole = true
@@ -1733,7 +1770,7 @@ func (m *ResourceAccessMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ResourceAccessMutation) Fields() []string {
-	fields := make([]string, 0, 5)
+	fields := make([]string, 0, 6)
 	if m.tenant_id != nil {
 		fields = append(fields, resourceaccess.FieldTenantID)
 	}
@@ -1748,6 +1785,9 @@ func (m *ResourceAccessMutation) Fields() []string {
 	}
 	if m.role != nil {
 		fields = append(fields, resourceaccess.FieldRoleID)
+	}
+	if m.metadata != nil {
+		fields = append(fields, resourceaccess.FieldMetadata)
 	}
 	return fields
 }
@@ -1767,6 +1807,8 @@ func (m *ResourceAccessMutation) Field(name string) (ent.Value, bool) {
 		return m.IdentityID()
 	case resourceaccess.FieldRoleID:
 		return m.RoleID()
+	case resourceaccess.FieldMetadata:
+		return m.Metadata()
 	}
 	return nil, false
 }
@@ -1786,6 +1828,8 @@ func (m *ResourceAccessMutation) OldField(ctx context.Context, name string) (ent
 		return m.OldIdentityID(ctx)
 	case resourceaccess.FieldRoleID:
 		return m.OldRoleID(ctx)
+	case resourceaccess.FieldMetadata:
+		return m.OldMetadata(ctx)
 	}
 	return nil, fmt.Errorf("unknown ResourceAccess field %s", name)
 }
@@ -1829,6 +1873,13 @@ func (m *ResourceAccessMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetRoleID(v)
+		return nil
+	case resourceaccess.FieldMetadata:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetMetadata(v)
 		return nil
 	}
 	return fmt.Errorf("unknown ResourceAccess field %s", name)
@@ -1935,6 +1986,9 @@ func (m *ResourceAccessMutation) ResetField(name string) error {
 		return nil
 	case resourceaccess.FieldRoleID:
 		m.ResetRoleID()
+		return nil
+	case resourceaccess.FieldMetadata:
+		m.ResetMetadata()
 		return nil
 	}
 	return fmt.Errorf("unknown ResourceAccess field %s", name)
