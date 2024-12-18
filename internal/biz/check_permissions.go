@@ -155,11 +155,11 @@ func (u *CheckPermissionsUsecase) HasPermission(
 		return nil, err
 	}
 
-	if len(permissions.Permissions) == 0 {
+	if len(permissions.GetPermissions()) == 0 {
 		return &v1.ListOfFields{}, nil
 	}
 
-	return permissions.Permissions[permission], nil
+	return permissions.GetPermissions()[permission], nil
 }
 
 func mergeFields(fields1 []string, fields2 []string) []string {
