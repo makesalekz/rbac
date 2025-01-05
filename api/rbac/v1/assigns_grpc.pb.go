@@ -24,6 +24,7 @@ const (
 	Assigns_AssignRoles_FullMethodName  = "/rbac.v1.Assigns/AssignRoles"
 	Assigns_UnassignRole_FullMethodName = "/rbac.v1.Assigns/UnassignRole"
 	Assigns_ListAssigns_FullMethodName  = "/rbac.v1.Assigns/ListAssigns"
+	Assigns_GetAssign_FullMethodName    = "/rbac.v1.Assigns/GetAssign"
 )
 
 // AssignsClient is the client API for Assigns service.
@@ -34,6 +35,7 @@ type AssignsClient interface {
 	AssignRoles(ctx context.Context, in *AssignRolesRequest, opts ...grpc.CallOption) (*v1.EmptyReply, error)
 	UnassignRole(ctx context.Context, in *AssignRequest, opts ...grpc.CallOption) (*v1.EmptyReply, error)
 	ListAssigns(ctx context.Context, in *ListAssignsRequest, opts ...grpc.CallOption) (*ListAssignsReply, error)
+	GetAssign(ctx context.Context, in *AssignRequest, opts ...grpc.CallOption) (*AssignedRole, error)
 }
 
 type assignsClient struct {
@@ -84,6 +86,16 @@ func (c *assignsClient) ListAssigns(ctx context.Context, in *ListAssignsRequest,
 	return out, nil
 }
 
+func (c *assignsClient) GetAssign(ctx context.Context, in *AssignRequest, opts ...grpc.CallOption) (*AssignedRole, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(AssignedRole)
+	err := c.cc.Invoke(ctx, Assigns_GetAssign_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AssignsServer is the server API for Assigns service.
 // All implementations must embed UnimplementedAssignsServer
 // for forward compatibility.
@@ -92,6 +104,7 @@ type AssignsServer interface {
 	AssignRoles(context.Context, *AssignRolesRequest) (*v1.EmptyReply, error)
 	UnassignRole(context.Context, *AssignRequest) (*v1.EmptyReply, error)
 	ListAssigns(context.Context, *ListAssignsRequest) (*ListAssignsReply, error)
+	GetAssign(context.Context, *AssignRequest) (*AssignedRole, error)
 	mustEmbedUnimplementedAssignsServer()
 }
 
@@ -113,6 +126,9 @@ func (UnimplementedAssignsServer) UnassignRole(context.Context, *AssignRequest) 
 }
 func (UnimplementedAssignsServer) ListAssigns(context.Context, *ListAssignsRequest) (*ListAssignsReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListAssigns not implemented")
+}
+func (UnimplementedAssignsServer) GetAssign(context.Context, *AssignRequest) (*AssignedRole, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAssign not implemented")
 }
 func (UnimplementedAssignsServer) mustEmbedUnimplementedAssignsServer() {}
 func (UnimplementedAssignsServer) testEmbeddedByValue()                 {}
@@ -207,6 +223,24 @@ func _Assigns_ListAssigns_Handler(srv interface{}, ctx context.Context, dec func
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Assigns_GetAssign_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AssignRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AssignsServer).GetAssign(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Assigns_GetAssign_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AssignsServer).GetAssign(ctx, req.(*AssignRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Assigns_ServiceDesc is the grpc.ServiceDesc for Assigns service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -229,6 +263,10 @@ var Assigns_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListAssigns",
 			Handler:    _Assigns_ListAssigns_Handler,
+		},
+		{
+			MethodName: "GetAssign",
+			Handler:    _Assigns_GetAssign_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -137,6 +137,12 @@ func (u *AssignedRolesUsecase) AssignRole(ctx context.Context, tenantID int64, d
 	return nil
 }
 
+func (u *AssignedRolesUsecase) GetAssignedRoleByID(ctx context.Context, tenantID, assignID int64) (
+	*ent.ResourceAccess, error,
+) {
+	return u.repo.GetAssignedRoleByID(ctx, tenantID, assignID)
+}
+
 func (u *AssignedRolesUsecase) UnassignRole(ctx context.Context, tenantID, assignID int64) error {
 	assignedRole, err := u.repo.GetAssignedRoleByID(ctx, tenantID, assignID)
 	if err != nil {
