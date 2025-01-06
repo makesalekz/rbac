@@ -16,7 +16,7 @@ INSERT INTO "role_permissions" ("role_id", "permission_id", "deny", "fields", "v
 VALUES (9, 'basqaru.limits.media', TRUE, '[]', 20 * 1000 * 1000);
 
 INSERT INTO resource_accesses(tenant_id, resource_id, identity_id, role_id, resource_type)
-SELECT tenant_id, null, '', 7, null
+SELECT tenant_id, null, '', 9, null
 FROM resource_accesses
 GROUP BY tenant_id
 HAVING SUM(CASE WHEN role_id = 9 THEN 1 ELSE 0 END) = 0;
