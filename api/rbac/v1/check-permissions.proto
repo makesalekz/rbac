@@ -26,4 +26,5 @@ message CheckPermissionsReply {
 
 message ListOfFields {
   repeated string fields = 1;
+  repeated Resource resources = 2;
 }

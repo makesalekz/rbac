@@ -78,7 +78,7 @@ func (u *CheckPermissionsUsecase) appendTeamParents(
 }
 
 func (u *CheckPermissionsUsecase) getPermissionFields(
-	rolePermissions []*ent.RolePermission, value int64,
+	rolePermissions []*ent.RolePermission, assignedRoles map[int64]*ent.ResourceAccess, value int64,
 ) map[string]*v1.ListOfFields {
 	result := make(map[string]*v1.ListOfFields)
 	for _, rolePermission := range rolePermissions {
@@ -91,6 +91,31 @@ func (u *CheckPermissionsUsecase) getPermissionFields(
 				result[rolePermission.PermissionID].GetFields(),
 				rolePermission.Fields,
 			)
+		}
+
+		if _, ok := assignedRoles[rolePermission.RoleID]; ok {
+			var resource *v1.Resource
+			if assignedRoles[rolePermission.RoleID].ResourceType == nil ||
+				*assignedRoles[rolePermission.RoleID].ResourceType == "" {
+				resource = &v1.Resource{
+					Type: "",
+					Id:   0,
+				}
+			} else if assignedRoles[rolePermission.RoleID].ResourceID == nil ||
+				*assignedRoles[rolePermission.RoleID].ResourceID == 0 {
+				resource = &v1.Resource{
+					Type: *assignedRoles[rolePermission.RoleID].ResourceType,
+					Id:   0,
+				}
+			} else {
+				resource = &v1.Resource{
+					Type: *assignedRoles[rolePermission.RoleID].ResourceType,
+					Id:   *assignedRoles[rolePermission.RoleID].ResourceID,
+				}
+			}
+
+			result[rolePermission.PermissionID].Resources = append(result[rolePermission.PermissionID].Resources,
+				resource)
 		}
 	}
 
@@ -134,7 +159,9 @@ func (u *CheckPermissionsUsecase) CheckPermissions(
 		return nil, err
 	}
 
-	return u.getPermissionFields(rolePermissions, value), nil
+	assignedRoleMap := make(map[int64]*ent.ResourceAccess)
+
+	return u.getPermissionFields(rolePermissions, assignedRoleMap, value), nil
 }
 
 func (u *CheckPermissionsUsecase) HasPermission(

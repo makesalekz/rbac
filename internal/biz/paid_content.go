@@ -19,7 +19,7 @@ const (
 	QalaiExpiredSubscriptionQueue = "qalai-premium-features_revoke"
 )
 
-type PaidContent struct {
+type ъPaidContent struct {
 	log           *log.Helper
 	assignedRoles data.AssignedRolesRepo
 	qm            u_nats.IQueueManager
