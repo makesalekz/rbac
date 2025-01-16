@@ -188,8 +188,9 @@ func (u *CheckPermissionsUsecase) HasPermission(
 		return nil, err
 	}
 
+	var nilAccess *v1.ListOfFields
 	if len(permissions) == 0 {
-		return nil, nil
+		return nilAccess, nil
 	}
 
 	return permissions[permission], nil
