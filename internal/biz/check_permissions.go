@@ -78,50 +78,61 @@ func (u *CheckPermissionsUsecase) appendTeamParents(
 }
 
 func (u *CheckPermissionsUsecase) getPermissionFields(
-	rolePermissions []*ent.RolePermission, assignedRoles map[int64]*ent.ResourceAccess, value int64,
-) map[string]*v1.ListOfFields {
-	result := make(map[string]*v1.ListOfFields)
+	rolePermissions []*ent.RolePermission, value int64,
+) map[string][]string {
+	result := make(map[string][]string)
 	for _, rolePermission := range rolePermissions {
 		if _, ok := result[rolePermission.PermissionID]; !ok {
-			result[rolePermission.PermissionID] = &v1.ListOfFields{
-				Fields: rolePermission.Fields,
-			}
+			result[rolePermission.PermissionID] = rolePermission.Fields
 		} else {
-			result[rolePermission.PermissionID].Fields = mergeFields(
-				result[rolePermission.PermissionID].GetFields(),
+			result[rolePermission.PermissionID] = mergeFields(
+				result[rolePermission.PermissionID],
 				rolePermission.Fields,
 			)
-		}
-
-		if _, ok := assignedRoles[rolePermission.RoleID]; ok {
-			var resource *v1.Resource
-			if assignedRoles[rolePermission.RoleID].ResourceType == nil ||
-				*assignedRoles[rolePermission.RoleID].ResourceType == "" {
-				resource = &v1.Resource{
-					Type: "",
-					Id:   0,
-				}
-			} else if assignedRoles[rolePermission.RoleID].ResourceID == nil ||
-				*assignedRoles[rolePermission.RoleID].ResourceID == 0 {
-				resource = &v1.Resource{
-					Type: *assignedRoles[rolePermission.RoleID].ResourceType,
-					Id:   0,
-				}
-			} else {
-				resource = &v1.Resource{
-					Type: *assignedRoles[rolePermission.RoleID].ResourceType,
-					Id:   *assignedRoles[rolePermission.RoleID].ResourceID,
-				}
-			}
-
-			result[rolePermission.PermissionID].Resources = append(result[rolePermission.PermissionID].Resources,
-				resource)
 		}
 	}
 
 	for _, rolePermission := range rolePermissions {
 		if rolePermission.Deny && value >= rolePermission.Value {
 			delete(result, rolePermission.PermissionID)
+		}
+	}
+
+	return result
+}
+
+func (u *CheckPermissionsUsecase) getPermissionResources(
+	rolePermissions []*ent.RolePermission, assignedRoles []*ent.ResourceAccess,
+) map[string][]*v1.Resource {
+	result := make(map[string][]*v1.Resource)
+
+	roleMap := make(map[int64][]*ent.ResourceAccess)
+
+	for _, role := range assignedRoles {
+		roleMap[role.RoleID] = append(roleMap[role.RoleID], role)
+	}
+
+	for _, permission := range rolePermissions {
+		for _, role := range roleMap[permission.RoleID] {
+			var resource *v1.Resource
+			if role.ResourceType == nil || *role.ResourceType == "" {
+				resource = &v1.Resource{
+					Type: "*",
+					Id:   0,
+				}
+			} else if role.ResourceID == nil || *role.ResourceID == 0 {
+				resource = &v1.Resource{
+					Type: *role.ResourceType,
+					Id:   0,
+				}
+			} else {
+				resource = &v1.Resource{
+					Type: *role.ResourceType,
+					Id:   *role.ResourceID,
+				}
+			}
+
+			result[permission.PermissionID] = append(result[permission.PermissionID], resource)
 		}
 	}
 
@@ -159,9 +170,10 @@ func (u *CheckPermissionsUsecase) CheckPermissions(
 		return nil, err
 	}
 
-	assignedRoleMap := make(map[int64]*ent.ResourceAccess)
+	fields := u.getPermissionFields(rolePermissions, value)
+	allowedResources := u.getPermissionResources(rolePermissions, assignedRoles)
 
-	return u.getPermissionFields(rolePermissions, assignedRoleMap, value), nil
+	return buildCheckPermissionsReply(fields, allowedResources), nil
 }
 
 func (u *CheckPermissionsUsecase) HasPermission(
@@ -201,4 +213,42 @@ func contains(fields []string, field string) bool {
 		}
 	}
 	return false
+}
+
+func buildCheckPermissionsReply(
+	fields map[string][]string, resources map[string][]*v1.Resource,
+) map[string]*v1.ListOfFields {
+	result := make(map[string]*v1.ListOfFields)
+
+	for permissionID, field := range fields {
+		if _, ok := result[permissionID]; !ok {
+			result[permissionID] = &v1.ListOfFields{
+				Fields: field,
+			}
+
+			continue
+		}
+
+		result[permissionID].Fields = append(result[permissionID].Fields, field...)
+	}
+
+	for permissionID, resource := range resources {
+		if _, ok := result[permissionID]; !ok {
+			result[permissionID] = &v1.ListOfFields{
+				Resources: resource,
+			}
+
+			continue
+		}
+
+		result[permissionID].Resources = append(result[permissionID].Resources, resource...)
+	}
+
+	for permissionID, accesses := range result {
+		if len(accesses.Resources) == 0 {
+			delete(result, permissionID)
+		}
+	}
+
+	return result
 }

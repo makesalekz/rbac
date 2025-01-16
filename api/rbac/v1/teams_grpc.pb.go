@@ -24,6 +24,7 @@ const (
 	Teams_UpdateTeam_FullMethodName = "/rbac.v1.Teams/UpdateTeam"
 	Teams_DeleteTeam_FullMethodName = "/rbac.v1.Teams/DeleteTeam"
 	Teams_GetTeam_FullMethodName    = "/rbac.v1.Teams/GetTeam"
+	Teams_GetTeams_FullMethodName   = "/rbac.v1.Teams/GetTeams"
 	Teams_ListTeams_FullMethodName  = "/rbac.v1.Teams/ListTeams"
 )
 
@@ -35,6 +36,7 @@ type TeamsClient interface {
 	UpdateTeam(ctx context.Context, in *UpdateTeamRequest, opts ...grpc.CallOption) (*TeamReply, error)
 	DeleteTeam(ctx context.Context, in *TeamRequest, opts ...grpc.CallOption) (*v1.EmptyReply, error)
 	GetTeam(ctx context.Context, in *TeamRequest, opts ...grpc.CallOption) (*TeamReply, error)
+	GetTeams(ctx context.Context, in *GetTeamsRequest, opts ...grpc.CallOption) (*GetTeamsReply, error)
 	ListTeams(ctx context.Context, in *ListTeamsRequest, opts ...grpc.CallOption) (*ListTeamsReply, error)
 }
 
@@ -86,6 +88,16 @@ func (c *teamsClient) GetTeam(ctx context.Context, in *TeamRequest, opts ...grpc
 	return out, nil
 }
 
+func (c *teamsClient) GetTeams(ctx context.Context, in *GetTeamsRequest, opts ...grpc.CallOption) (*GetTeamsReply, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetTeamsReply)
+	err := c.cc.Invoke(ctx, Teams_GetTeams_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *teamsClient) ListTeams(ctx context.Context, in *ListTeamsRequest, opts ...grpc.CallOption) (*ListTeamsReply, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ListTeamsReply)
@@ -104,6 +116,7 @@ type TeamsServer interface {
 	UpdateTeam(context.Context, *UpdateTeamRequest) (*TeamReply, error)
 	DeleteTeam(context.Context, *TeamRequest) (*v1.EmptyReply, error)
 	GetTeam(context.Context, *TeamRequest) (*TeamReply, error)
+	GetTeams(context.Context, *GetTeamsRequest) (*GetTeamsReply, error)
 	ListTeams(context.Context, *ListTeamsRequest) (*ListTeamsReply, error)
 	mustEmbedUnimplementedTeamsServer()
 }
@@ -126,6 +139,9 @@ func (UnimplementedTeamsServer) DeleteTeam(context.Context, *TeamRequest) (*v1.E
 }
 func (UnimplementedTeamsServer) GetTeam(context.Context, *TeamRequest) (*TeamReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetTeam not implemented")
+}
+func (UnimplementedTeamsServer) GetTeams(context.Context, *GetTeamsRequest) (*GetTeamsReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetTeams not implemented")
 }
 func (UnimplementedTeamsServer) ListTeams(context.Context, *ListTeamsRequest) (*ListTeamsReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListTeams not implemented")
@@ -223,6 +239,24 @@ func _Teams_GetTeam_Handler(srv interface{}, ctx context.Context, dec func(inter
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Teams_GetTeams_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetTeamsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TeamsServer).GetTeams(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Teams_GetTeams_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TeamsServer).GetTeams(ctx, req.(*GetTeamsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _Teams_ListTeams_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ListTeamsRequest)
 	if err := dec(in); err != nil {
@@ -263,6 +297,10 @@ var Teams_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetTeam",
 			Handler:    _Teams_GetTeam_Handler,
+		},
+		{
+			MethodName: "GetTeams",
+			Handler:    _Teams_GetTeams_Handler,
 		},
 		{
 			MethodName: "ListTeams",
