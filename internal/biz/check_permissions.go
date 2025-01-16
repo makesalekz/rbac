@@ -115,6 +115,7 @@ func (u *CheckPermissionsUsecase) getPermissionResources(
 	for _, permission := range rolePermissions {
 		for _, role := range roleMap[permission.RoleID] {
 			var resource *v1.Resource
+			//nolint: gocritic // it suggest rewriting to switch, which is not the case
 			if role.ResourceType == nil || *role.ResourceType == "" {
 				resource = &v1.Resource{
 					Type: "*",
@@ -245,7 +246,7 @@ func buildCheckPermissionsReply(
 	}
 
 	for permissionID, accesses := range result {
-		if len(accesses.Resources) == 0 {
+		if len(accesses.GetResources()) == 0 {
 			delete(result, permissionID)
 		}
 	}
