@@ -29,10 +29,11 @@ func mockServerContext() context.Context {
 
 func mockRolePermissions(ids ...string) []*ent.RolePermission {
 	var roles []*ent.RolePermission
-	for _, id := range ids {
+	for i, id := range ids {
 		roles = append(roles, &ent.RolePermission{
 			PermissionID: id,
 			Fields:       []string{},
+			RoleID:       int64(i + 1),
 		})
 	}
 	return roles
@@ -88,7 +89,8 @@ func TestPermissionsService_CreatePermission(t *testing.T) {
 		Fields:      req.GetFields(),
 	}
 	assignedRepo.EXPECT().CheckRoles(ctx, gomock.Any()).Return(mockAccess(), nil)
-	roleRepo.EXPECT().ListRolesPermissions(ctx, gomock.Any()).Return(mockRolePermissions("admin.permission.create"), nil)
+	roleRepo.EXPECT().ListRolesPermissions(ctx, gomock.Any()).Return(mockRolePermissions("admin.permission.create"),
+		nil)
 	permissionRepo.EXPECT().CreatePermission(ctx, gomock.Any()).Return(permission, nil)
 
 	expect := &v1.Permission{
@@ -174,7 +176,8 @@ func TestPermissionsService_CreatePermissionEmptyID(t *testing.T) {
 		Fields:      []string{"field1", "field2"},
 	}
 	assignedRepo.EXPECT().CheckRoles(ctx, gomock.Any()).Return(mockAccess(), nil)
-	roleRepo.EXPECT().ListRolesPermissions(ctx, gomock.Any()).Return(mockRolePermissions("admin.permission.create"), nil)
+	roleRepo.EXPECT().ListRolesPermissions(ctx, gomock.Any()).Return(mockRolePermissions("admin.permission.create"),
+		nil)
 
 	reply, err := service.CreatePermission(ctx, req)
 	require.Error(t, err)
@@ -212,7 +215,8 @@ func TestPermissionsService_CreatePermissionEmptyName(t *testing.T) {
 		Fields:      []string{"field1", "field2"},
 	}
 	assignedRepo.EXPECT().CheckRoles(ctx, gomock.Any()).Return(mockAccess(), nil)
-	roleRepo.EXPECT().ListRolesPermissions(ctx, gomock.Any()).Return(mockRolePermissions("admin.permission.create"), nil)
+	roleRepo.EXPECT().ListRolesPermissions(ctx, gomock.Any()).Return(mockRolePermissions("admin.permission.create"),
+		nil)
 
 	reply, err := service.CreatePermission(ctx, req)
 	require.Error(t, err)
@@ -250,7 +254,8 @@ func TestPermissionsService_CreatePermissionEmptyGroup(t *testing.T) {
 		Fields:      []string{"field1", "field2"},
 	}
 	assignedRepo.EXPECT().CheckRoles(ctx, gomock.Any()).Return(mockAccess(), nil)
-	roleRepo.EXPECT().ListRolesPermissions(ctx, gomock.Any()).Return(mockRolePermissions("admin.permission.create"), nil)
+	roleRepo.EXPECT().ListRolesPermissions(ctx, gomock.Any()).Return(mockRolePermissions("admin.permission.create"),
+		nil)
 
 	reply, err := service.CreatePermission(ctx, req)
 	require.Error(t, err)
@@ -289,7 +294,8 @@ func TestPermissionsService_CreatePermissionInvalidGroup(t *testing.T) {
 		Fields:      []string{"field1", "field2"},
 	}
 	assignedRepo.EXPECT().CheckRoles(ctx, gomock.Any()).Return(mockAccess(), nil)
-	roleRepo.EXPECT().ListRolesPermissions(ctx, gomock.Any()).Return(mockRolePermissions("admin.permission.create"), nil)
+	roleRepo.EXPECT().ListRolesPermissions(ctx, gomock.Any()).Return(mockRolePermissions("admin.permission.create"),
+		nil)
 
 	reply, err := service.CreatePermission(ctx, req)
 	require.Error(t, err)
@@ -327,7 +333,8 @@ func TestPermissionsService_CreatePermissionEmptyAppID(t *testing.T) {
 		Fields:      []string{"field1", "field2"},
 	}
 	assignedRepo.EXPECT().CheckRoles(ctx, gomock.Any()).Return(mockAccess(), nil)
-	roleRepo.EXPECT().ListRolesPermissions(ctx, gomock.Any()).Return(mockRolePermissions("admin.permission.create"), nil)
+	roleRepo.EXPECT().ListRolesPermissions(ctx, gomock.Any()).Return(mockRolePermissions("admin.permission.create"),
+		nil)
 
 	reply, err := service.CreatePermission(ctx, req)
 	require.Error(t, err)
@@ -372,7 +379,8 @@ func TestPermissionsService_UpdatePermission(t *testing.T) {
 		Fields:      []string{"field1", "field2"},
 	}
 	assignedRepo.EXPECT().CheckRoles(ctx, gomock.Any()).Return(mockAccess(), nil)
-	roleRepo.EXPECT().ListRolesPermissions(ctx, gomock.Any()).Return(mockRolePermissions("admin.permission.update"), nil)
+	roleRepo.EXPECT().ListRolesPermissions(ctx, gomock.Any()).Return(mockRolePermissions("admin.permission.update"),
+		nil)
 	permissionRepo.EXPECT().UpdatePermission(ctx, req.GetPermissionId(), gomock.Any()).Return(permission, nil)
 
 	expect := &v1.Permission{
@@ -450,7 +458,8 @@ func TestPermissionsService_UpdatePermissionEmptyID(t *testing.T) {
 		Name: "testNewName",
 	}
 	assignedRepo.EXPECT().CheckRoles(ctx, gomock.Any()).Return(mockAccess(), nil)
-	roleRepo.EXPECT().ListRolesPermissions(ctx, gomock.Any()).Return(mockRolePermissions("admin.permission.update"), nil)
+	roleRepo.EXPECT().ListRolesPermissions(ctx, gomock.Any()).Return(mockRolePermissions("admin.permission.update"),
+		nil)
 
 	reply, err := service.UpdatePermission(ctx, req)
 	require.Error(t, err)
@@ -486,7 +495,8 @@ func TestPermissionsService_DeletePermission(t *testing.T) {
 		PermissionId: "some.group.permission",
 	}
 	assignedRepo.EXPECT().CheckRoles(ctx, gomock.Any()).Return(mockAccess(), nil)
-	roleRepo.EXPECT().ListRolesPermissions(ctx, gomock.Any()).Return(mockRolePermissions("admin.permission.delete"), nil)
+	roleRepo.EXPECT().ListRolesPermissions(ctx, gomock.Any()).Return(mockRolePermissions("admin.permission.delete"),
+		nil)
 	permissionRepo.EXPECT().DeletePermission(ctx, req.GetPermissionId()).Return(nil)
 
 	_, err = service.DeletePermission(ctx, req)

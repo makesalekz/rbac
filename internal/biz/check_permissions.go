@@ -118,7 +118,7 @@ func (u *CheckPermissionsUsecase) getPermissionResources(
 			//nolint: gocritic // it suggest rewriting to switch, which is not the case
 			if role.ResourceType == nil || *role.ResourceType == "" {
 				resource = &v1.Resource{
-					Type: "*",
+					Type: "",
 					Id:   0,
 				}
 			} else if role.ResourceID == nil || *role.ResourceID == 0 {
@@ -189,7 +189,7 @@ func (u *CheckPermissionsUsecase) HasPermission(
 	}
 
 	if len(permissions) == 0 {
-		return &v1.ListOfFields{}, nil
+		return nil, nil
 	}
 
 	return permissions[permission], nil
