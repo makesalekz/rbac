@@ -105,7 +105,7 @@ func (m *MockRoleRepo) GetRolesList(ctx context.Context, tenantID int64, search 
 }
 
 // GetRolesList indicates an expected call of GetRolesList.
-func (mr *MockRoleRepoMockRecorder) GetRolesList(ctx, tenantID, search interface{}, includeSystemRoles bool) *gomock.Call {
+func (mr *MockRoleRepoMockRecorder) GetRolesList(ctx, tenantID, search, includeSystemRoles interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRolesList", reflect.TypeOf((*MockRoleRepo)(nil).GetRolesList), ctx, tenantID, search, includeSystemRoles)
 }

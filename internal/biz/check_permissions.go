@@ -121,6 +121,7 @@ func (u *CheckPermissionsUsecase) CheckPermissions(
 	if err != nil {
 		return nil, err
 	}
+
 	roleIDs := data.ExtractUnique(assignedRoles, func(e *ent.ResourceAccess) (int64, bool) { return e.RoleID, true })
 
 	rolePermissions, err := u.roleRepo.ListRolesPermissions(ctx, data.FilterRolePermissions{
@@ -140,18 +141,18 @@ func (u *CheckPermissionsUsecase) HasPermission(
 	ctx context.Context, tenantID int64, appID string,
 	identities []string, permission string,
 ) (*v1.ListOfFields, error) {
-	permissionsMap, err := u.CheckPermissions(ctx, tenantID, appID,
+	permissions, err := u.CheckPermissions(ctx, tenantID, appID,
 		identities, []string{permission}, nil,
 		0)
 	if err != nil {
 		return nil, err
 	}
 
-	if len(permissionsMap) == 0 {
+	if len(permissions) == 0 {
 		return &v1.ListOfFields{}, nil
 	}
 
-	return permissionsMap[permission], nil
+	return permissions[permission], nil
 }
 
 func mergeFields(fields1 []string, fields2 []string) []string {
