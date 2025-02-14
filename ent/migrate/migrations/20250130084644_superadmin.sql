@@ -7,7 +7,14 @@ VALUES (10, 'Administrator', 'System configuration, management, monitoring', TRU
 
 -- Add permissions for organizations
 INSERT INTO "permission_groups" ("id", "name", "app_id")
-VALUES ('admin.organization', 'Organization', 'admin');
+VALUES ('admin.organization', 'Organization', 'admin'),
+         ('explore.events', 'Events', 'common'),
+         ('explore.category', 'Category', 'common'),
+         ('explore.city', 'City', 'common'),
+         ('explore.event_group', 'Event Group', 'common'),
+         ('explore.event_schedule', 'Event Schedule', 'common'),
+         ('explore.participant', 'Participant', 'common');
+         
 
 INSERT INTO "permissions" ("id", "group_id", "name", "description", "app_id", "fields")
 VALUES ('admin.organization.create', 'admin.organization', 'Create organization', '', 'admin', '[]'),
@@ -21,22 +28,70 @@ VALUES ('admin.organization.create', 'admin.organization', 'Create organization'
        ('admin.legal_contact.create', 'admin.organization', 'Create legal contact', '', 'admin', '[]'),
        ('admin.legal_contact.update', 'admin.organization', 'Update legal contact', '', 'admin', '[]'),
        ('admin.legal_contact.delete', 'admin.organization', 'Delete legal contact', '', 'admin', '[]'),
-       ('admin.legal_contact.read', 'admin.organization', 'Delete legal contact', '', 'admin', '[]');
+       ('admin.legal_contact.read', 'admin.organization', 'Delete legal contact', '', 'admin', '[]'),
+       ('explore.events.create', 'explore.events', 'Create event', '', 'common', '[]'),
+       ('explore.events.update', 'explore.events', 'Update event', '', 'common', '[]'),
+       ('explore.events.delete', 'explore.events', 'Delete event', '', 'common', '[]'),
+       ('explore.events.read', 'explore.events', 'Get event', '', 'common', '[]'),
+    ('explore.category.create', 'explore.category', 'Create category', '', 'common', '[]'),
+    ('explore.category.update', 'explore.category', 'Update category', '', 'common', '[]'),
+    ('explore.category.delete', 'explore.category', 'Delete category', '', 'common', '[]'),
+    ('explore.category.read', 'explore.category', 'Get category', '', 'common', '[]'),
+    ('explore.city.create', 'explore.city', 'Create city', '', 'common', '[]'),
+    ('explore.city.update', 'explore.city', 'Update city', '', 'common', '[]'),
+    ('explore.city.delete', 'explore.city', 'Delete city', '', 'common', '[]'),
+    ('explore.city.read', 'explore.city', 'Get city', '', 'common', '[]'),
+    ('explore.event_group.create', 'explore.event_group', 'Create event group', '', 'common', '[]'),
+    ('explore.event_group.update', 'explore.event_group', 'Update event group', '', 'common', '[]'),
+    ('explore.event_group.delete', 'explore.event_group', 'Delete event group', '', 'common', '[]'),
+    ('explore.event_group.read', 'explore.event_group', 'Get event group', '', 'common', '[]'),
+    ('explore.event_schedule.create', 'explore.event_schedule', 'Create event schedule', '', 'common', '[]'),
+    ('explore.event_schedule.update', 'explore.event_schedule', 'Update event schedule', '', 'common', '[]'),
+    ('explore.event_schedule.delete', 'explore.event_schedule', 'Delete event schedule', '', 'common', '[]'),
+    ('explore.event_schedule.read', 'explore.event_schedule', 'Get event schedule', '', 'common', '[]'),
+    ('explore.participant.create', 'explore.participant', 'Create participant', '', 'common', '[]'),
+    ('explore.participant.update', 'explore.participant', 'Update participant', '', 'common', '[]'),
+    ('explore.participant.delete', 'explore.participant', 'Delete participant', '', 'common', '[]'),
+    ('explore.participant.read', 'explore.participant', 'Get participant', '', 'common', '[]');
 
 --  Give permissions to the admin role
 insert into role_permissions (role_id, permission_id, deny, fields, value)
         (1, 'admin.organization.create', FALSE, '[]', 0),
     (1, 'admin.organization.update', FALSE, '[]', 0),
     (1, 'admin.organization.delete', FALSE, '[]', 0),
-    (1, 'admin.organization.get', FALSE, '[]', 0),
+    (1, 'admin.organization.read', FALSE, '[]', 0),
     (1, 'admin.legal.create', FALSE, '[]', 0),
     (1, 'admin.legal.update', FALSE, '[]', 0),
     (1, 'admin.legal.delete', FALSE, '[]', 0),
-    (1, 'admin.legal.get', FALSE, '[]', 0),
+    (1, 'admin.legal.read', FALSE, '[]', 0),
     (1, 'admin.legal_contact.create', FALSE, '[]', 0),
     (1, 'admin.legal_contact.update', FALSE, '[]', 0),
     (1, 'admin.legal_contact.delete', FALSE, '[]', 0),
-    (1, 'admin.legal_contact.get', FALSE, '[]', 0);
+    (1, 'admin.legal_contact.read', FALSE, '[]', 0),
+    (1, 'explore.events.create', FALSE, '[]', 0),
+    (1, 'explore.events.update', FALSE, '[]', 0),
+    (1, 'explore.events.delete', FALSE, '[]', 0),
+    (1, 'explore.events.read', FALSE, '[]', 0),
+    (1, 'explore.category.create', FALSE, '[]', 0),
+    (1, 'explore.category.update', FALSE, '[]', 0),
+    (1, 'explore.category.delete', FALSE, '[]', 0),
+    (1, 'explore.category.read', FALSE, '[]', 0),
+    (1, 'explore.city.create', FALSE, '[]', 0),
+    (1, 'explore.city.update', FALSE, '[]', 0),
+    (1, 'explore.city.delete', FALSE, '[]', 0),
+    (1, 'explore.city.read', FALSE, '[]', 0),
+    (1, 'explore.event_group.create', FALSE, '[]', 0),
+    (1, 'explore.event_group.update', FALSE, '[]', 0),
+    (1, 'explore.event_group.delete', FALSE, '[]', 0),
+    (1, 'explore.event_group.read', FALSE, '[]', 0),
+    (1, 'explore.event_schedule.create', FALSE, '[]', 0),
+    (1, 'explore.event_schedule.update', FALSE, '[]', 0),
+    (1, 'explore.event_schedule.delete', FALSE, '[]', 0),
+    (1, 'explore.event_schedule.read', FALSE, '[]', 0),
+    (1, 'explore.participant.create', FALSE, '[]', 0),
+    (1, 'explore.participant.update', FALSE, '[]', 0),
+    (1, 'explore.participant.delete', FALSE, '[]', 0),
+    (1, 'explore.participant.read', FALSE, '[]', 0);
 
 -- Copy permissions from the admin role to the superadmin role
 insert into role_permissions (role_id, permission_id, deny, fields, value)
