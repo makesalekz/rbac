@@ -13,8 +13,11 @@ VALUES ('admin.organization', 'Organization', 'admin'),
          ('explore.city', 'City', 'common'),
          ('explore.event_group', 'Event Group', 'common'),
          ('explore.event_schedule', 'Event Schedule', 'common'),
-         ('explore.participant', 'Participant', 'common');
-         
+         ('explore.participant', 'Participant', 'common'),
+         ('billing.product', 'Products', 'common'),
+         ('billing.bundle', 'Product bundle', 'common'),
+         ('billing.item', 'Bundle items', 'common'),
+         ('billing.invoice', 'Invoices', 'common');
 
 INSERT INTO "permissions" ("id", "group_id", "name", "description", "app_id", "fields")
 VALUES ('admin.organization.create', 'admin.organization', 'Create organization', '', 'admin', '[]'),
@@ -52,7 +55,23 @@ VALUES ('admin.organization.create', 'admin.organization', 'Create organization'
     ('explore.participant.create', 'explore.participant', 'Create participant', '', 'common', '[]'),
     ('explore.participant.update', 'explore.participant', 'Update participant', '', 'common', '[]'),
     ('explore.participant.delete', 'explore.participant', 'Delete participant', '', 'common', '[]'),
-    ('explore.participant.read', 'explore.participant', 'Get participant', '', 'common', '[]');
+    ('explore.participant.read', 'explore.participant', 'Get participant', '', 'common', '[]'),
+    ('billing.product.create', 'billing.product', 'Create product', '', 'common', '[]'),
+    ('billing.product.update', 'billing.product', 'Update product', '', 'common', '[]'),
+    ('billing.product.delete', 'billing.product', 'Delete product', '', 'common', '[]'),
+    ('billing.product.read', 'billing.product', 'Get product', '', 'common', '[]'),
+    ('billing.bundle.create', 'billing.bundle', 'Create bundle', '', 'common', '[]'),
+    ('billing.bundle.update', 'billing.bundle', 'Update bundle', '', 'common', '[]'),
+    ('billing.bundle.delete', 'billing.bundle', 'Delete bundle', '', 'common', '[]'),
+    ('billing.bundle.read', 'billing.bundle', 'Get bundle', '', 'common', '[]'),
+    ('billing.item.create', 'billing.item', 'Create item', '', 'common', '[]'),
+    ('billing.item.update', 'billing.item', 'Update item', '', 'common', '[]'),
+    ('billing.item.delete', 'billing.item', 'Delete item', '', 'common', '[]'),
+    ('billing.item.read', 'billing.item', 'Get item', '', 'common', '[]'),
+    ('billing.invoice.create', 'billing.invoice', 'Create invoice', '', 'common', '[]'),
+    ('billing.invoice.update', 'billing.invoice', 'Update invoice', '', 'common', '[]'),
+    ('billing.invoice.delete', 'billing.invoice', 'Delete invoice', '', 'common', '[]'),
+    ('billing.invoice.read', 'billing.invoice', 'Get invoice', '', 'common', '[]');
 
 --  Give permissions to the admin role
 insert into role_permissions (role_id, permission_id, deny, fields, value)
@@ -91,7 +110,23 @@ insert into role_permissions (role_id, permission_id, deny, fields, value)
     (1, 'explore.participant.create', FALSE, '[]', 0),
     (1, 'explore.participant.update', FALSE, '[]', 0),
     (1, 'explore.participant.delete', FALSE, '[]', 0),
-    (1, 'explore.participant.read', FALSE, '[]', 0);
+    (1, 'explore.participant.read', FALSE, '[]', 0),
+    (1, 'billing.product.create', FALSE, '[]', 0),
+    (1, 'billing.product.update', FALSE, '[]', 0),
+    (1, 'billing.product.delete', FALSE, '[]', 0),
+    (1, 'billing.product.read', FALSE, '[]', 0),
+    (1, 'billing.bundle.create', FALSE, '[]', 0),
+    (1, 'billing.bundle.update', FALSE, '[]', 0),
+    (1, 'billing.bundle.delete', FALSE, '[]', 0),
+    (1, 'billing.bundle.read', FALSE, '[]', 0),
+    (1, 'billing.item.create', FALSE, '[]', 0),
+    (1, 'billing.item.update', FALSE, '[]', 0),
+    (1, 'billing.item.delete', FALSE, '[]', 0),
+    (1, 'billing.item.read', FALSE, '[]', 0),
+    (1, 'billing.invoice.create', FALSE, '[]', 0),
+    (1, 'billing.invoice.update', FALSE, '[]', 0),
+    (1, 'billing.invoice.delete', FALSE, '[]', 0),
+    (1, 'billing.invoice.read', FALSE, '[]', 0);
 
 -- Copy permissions from the admin role to the superadmin role
 insert into role_permissions (role_id, permission_id, deny, fields, value)
