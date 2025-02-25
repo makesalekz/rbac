@@ -1,6 +1,7 @@
 package server
 
 import (
+	"github.com/go-kratos/kratos/v2/middleware/tracing"
 	v1 "gitlab.calendaria.team/services/rbac/api/rbac/v1"
 	"gitlab.calendaria.team/services/rbac/internal/conf"
 	"gitlab.calendaria.team/services/rbac/internal/service"
@@ -35,6 +36,7 @@ func NewGRPCServer(
 		grpc.Middleware(
 			recovery.Recovery(),
 			metadata.Server(),
+			tracing.Server(),
 			auth.Server(jwtp),
 			metrics.Server(
 				metrics.WithSeconds(prom.NewHistogram(_metricSeconds)),

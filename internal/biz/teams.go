@@ -78,6 +78,15 @@ func (uc *TeamsUsecase) GetTeam(ctx context.Context, tenantID, teamID int64, get
 	return team, nil
 }
 
+func (uc *TeamsUsecase) GetTeams(ctx context.Context, tenantID int64, teamsIDs []int64) ([]*ent.Team, error) {
+	teams, err := uc.repo.GetTeams(ctx, tenantID, teamsIDs)
+	if err != nil {
+		return nil, v1.ErrorDatabaseQuery("faield to get teams: %s", err.Error())
+	}
+
+	return teams, nil
+}
+
 func (uc *TeamsUsecase) ListTeams(
 	ctx context.Context,
 	filter data.TeamsListFilter,

@@ -94,9 +94,15 @@ func TestCheckPermissionsUsecase_CheckPermissions(t *testing.T) {
 
 	require.Equal(t, &v1.ListOfFields{
 		Fields: []string{"field1", "field2"},
+		Resources: []*v1.Resource{
+			{Type: "", Id: 0},
+		},
 	}, permissionsMap["permission.one"])
 
 	require.Equal(t, &v1.ListOfFields{
 		Fields: []string{"field3", "field4"},
+		Resources: []*v1.Resource{
+			{Type: "", Id: 0},
+		},
 	}, permissionsMap["permission.two"])
 }

@@ -53,10 +53,12 @@ func (u *CheckPermissionsUsecase) appendTeamParents(
 
 	// append teams & their parents to resources
 	for _, team := range teams {
-		resources = append(resources, &v1.Resource{
-			Id:   team.ID,
-			Type: data.ResourceTypeTeam,
-		})
+		resources = append(
+			resources, &v1.Resource{
+				Id:   team.ID,
+				Type: data.ResourceTypeTeam,
+			},
+		)
 
 		if team.ParentsIds != nil {
 			var parentIDs []int64
@@ -66,10 +68,12 @@ func (u *CheckPermissionsUsecase) appendTeamParents(
 			}
 
 			for _, parentID := range parentIDs {
-				resources = append(resources, &v1.Resource{
-					Id:   parentID,
-					Type: data.ResourceTypeTeam,
-				})
+				resources = append(
+					resources, &v1.Resource{
+						Id:   parentID,
+						Type: data.ResourceTypeTeam,
+					},
+				)
 			}
 		}
 	}
@@ -79,16 +83,14 @@ func (u *CheckPermissionsUsecase) appendTeamParents(
 
 func (u *CheckPermissionsUsecase) getPermissionFields(
 	rolePermissions []*ent.RolePermission, value int64,
-) map[string]*v1.ListOfFields {
-	result := make(map[string]*v1.ListOfFields)
+) map[string][]string {
+	result := make(map[string][]string)
 	for _, rolePermission := range rolePermissions {
 		if _, ok := result[rolePermission.PermissionID]; !ok {
-			result[rolePermission.PermissionID] = &v1.ListOfFields{
-				Fields: rolePermission.Fields,
-			}
+			result[rolePermission.PermissionID] = rolePermission.Fields
 		} else {
-			result[rolePermission.PermissionID].Fields = mergeFields(
-				result[rolePermission.PermissionID].GetFields(),
+			result[rolePermission.PermissionID] = mergeFields(
+				result[rolePermission.PermissionID],
 				rolePermission.Fields,
 			)
 		}
@@ -97,6 +99,45 @@ func (u *CheckPermissionsUsecase) getPermissionFields(
 	for _, rolePermission := range rolePermissions {
 		if rolePermission.Deny && value >= rolePermission.Value {
 			delete(result, rolePermission.PermissionID)
+		}
+	}
+
+	return result
+}
+
+func (u *CheckPermissionsUsecase) getPermissionResources(
+	rolePermissions []*ent.RolePermission, assignedRoles []*ent.ResourceAccess,
+) map[string][]*v1.Resource {
+	result := make(map[string][]*v1.Resource)
+
+	roleMap := make(map[int64][]*ent.ResourceAccess)
+
+	for _, role := range assignedRoles {
+		roleMap[role.RoleID] = append(roleMap[role.RoleID], role)
+	}
+
+	for _, permission := range rolePermissions {
+		for _, role := range roleMap[permission.RoleID] {
+			var resource *v1.Resource
+			//nolint:gocritic // it suggest rewriting to switch, which is not the case
+			if role.ResourceType == nil || *role.ResourceType == "" {
+				resource = &v1.Resource{
+					Type: "",
+					Id:   0,
+				}
+			} else if role.ResourceID == nil || *role.ResourceID == 0 {
+				resource = &v1.Resource{
+					Type: *role.ResourceType,
+					Id:   0,
+				}
+			} else {
+				resource = &v1.Resource{
+					Type: *role.ResourceType,
+					Id:   *role.ResourceID,
+				}
+			}
+
+			result[permission.PermissionID] = append(result[permission.PermissionID], resource)
 		}
 	}
 
@@ -113,43 +154,53 @@ func (u *CheckPermissionsUsecase) CheckPermissions(
 		return nil, err
 	}
 
-	assignedRoles, err := u.repo.CheckRoles(ctx, data.ListRolesDto{
-		TenantID:    tenantID,
-		IdentityIDs: identities,
-		Resources:   allResources,
-	})
+	assignedRoles, err := u.repo.CheckRoles(
+		ctx, data.ListRolesDto{
+			TenantID:    tenantID,
+			IdentityIDs: identities,
+			Resources:   allResources,
+		},
+	)
 	if err != nil {
 		return nil, err
 	}
 
 	roleIDs := data.ExtractUnique(assignedRoles, func(e *ent.ResourceAccess) (int64, bool) { return e.RoleID, true })
 
-	rolePermissions, err := u.roleRepo.ListRolesPermissions(ctx, data.FilterRolePermissions{
-		TenantID:    tenantID,
-		RoleIDs:     roleIDs,
-		Permissions: permissions,
-		AppIDs:      []string{appID, "common", "admin"},
-	})
+	rolePermissions, err := u.roleRepo.ListRolesPermissions(
+		ctx, data.FilterRolePermissions{
+			TenantID:    tenantID,
+			RoleIDs:     roleIDs,
+			Permissions: permissions,
+			AppIDs:      []string{appID, "common", "admin"},
+		},
+	)
 	if err != nil {
 		return nil, err
 	}
 
-	return u.getPermissionFields(rolePermissions, value), nil
+	fields := u.getPermissionFields(rolePermissions, value)
+	allowedResources := u.getPermissionResources(rolePermissions, assignedRoles)
+
+	return buildCheckPermissionsReply(fields, allowedResources), nil
 }
 
 func (u *CheckPermissionsUsecase) HasPermission(
 	ctx context.Context, tenantID int64, appID string,
 	identities []string, permission string,
 ) (*v1.ListOfFields, error) {
-	permissions, err := u.CheckPermissions(ctx, tenantID, appID,
+	permissions, err := u.CheckPermissions(
+		ctx, tenantID, appID,
 		identities, []string{permission}, nil,
-		0)
+		0,
+	)
 	if err != nil {
 		return nil, err
 	}
 
+	var nilAccess *v1.ListOfFields
 	if len(permissions) == 0 {
-		return &v1.ListOfFields{}, nil
+		return nilAccess, nil
 	}
 
 	return permissions[permission], nil
@@ -174,4 +225,42 @@ func contains(fields []string, field string) bool {
 		}
 	}
 	return false
+}
+
+func buildCheckPermissionsReply(
+	fields map[string][]string, resources map[string][]*v1.Resource,
+) map[string]*v1.ListOfFields {
+	result := make(map[string]*v1.ListOfFields)
+
+	for permissionID, field := range fields {
+		if _, ok := result[permissionID]; !ok {
+			result[permissionID] = &v1.ListOfFields{
+				Fields: field,
+			}
+
+			continue
+		}
+
+		result[permissionID].Fields = append(result[permissionID].Fields, field...)
+	}
+
+	for permissionID, resource := range resources {
+		if _, ok := result[permissionID]; !ok {
+			result[permissionID] = &v1.ListOfFields{
+				Resources: resource,
+			}
+
+			continue
+		}
+
+		result[permissionID].Resources = append(result[permissionID].Resources, resource...)
+	}
+
+	for permissionID, accesses := range result {
+		if len(accesses.GetResources()) == 0 {
+			delete(result, permissionID)
+		}
+	}
+
+	return result
 }
