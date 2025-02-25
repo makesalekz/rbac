@@ -53,10 +53,12 @@ func (u *CheckPermissionsUsecase) appendTeamParents(
 
 	// append teams & their parents to resources
 	for _, team := range teams {
-		resources = append(resources, &v1.Resource{
-			Id:   team.ID,
-			Type: data.ResourceTypeTeam,
-		})
+		resources = append(
+			resources, &v1.Resource{
+				Id:   team.ID,
+				Type: data.ResourceTypeTeam,
+			},
+		)
 
 		if team.ParentsIds != nil {
 			var parentIDs []int64
@@ -66,10 +68,12 @@ func (u *CheckPermissionsUsecase) appendTeamParents(
 			}
 
 			for _, parentID := range parentIDs {
-				resources = append(resources, &v1.Resource{
-					Id:   parentID,
-					Type: data.ResourceTypeTeam,
-				})
+				resources = append(
+					resources, &v1.Resource{
+						Id:   parentID,
+						Type: data.ResourceTypeTeam,
+					},
+				)
 			}
 		}
 	}
@@ -115,7 +119,7 @@ func (u *CheckPermissionsUsecase) getPermissionResources(
 	for _, permission := range rolePermissions {
 		for _, role := range roleMap[permission.RoleID] {
 			var resource *v1.Resource
-			//nolint: gocritic // it suggest rewriting to switch, which is not the case
+			//nolint:gocritic // it suggest rewriting to switch, which is not the case
 			if role.ResourceType == nil || *role.ResourceType == "" {
 				resource = &v1.Resource{
 					Type: "",
@@ -150,23 +154,27 @@ func (u *CheckPermissionsUsecase) CheckPermissions(
 		return nil, err
 	}
 
-	assignedRoles, err := u.repo.CheckRoles(ctx, data.ListRolesDto{
-		TenantID:    tenantID,
-		IdentityIDs: identities,
-		Resources:   allResources,
-	})
+	assignedRoles, err := u.repo.CheckRoles(
+		ctx, data.ListRolesDto{
+			TenantID:    tenantID,
+			IdentityIDs: identities,
+			Resources:   allResources,
+		},
+	)
 	if err != nil {
 		return nil, err
 	}
 
 	roleIDs := data.ExtractUnique(assignedRoles, func(e *ent.ResourceAccess) (int64, bool) { return e.RoleID, true })
 
-	rolePermissions, err := u.roleRepo.ListRolesPermissions(ctx, data.FilterRolePermissions{
-		TenantID:    tenantID,
-		RoleIDs:     roleIDs,
-		Permissions: permissions,
-		AppIDs:      []string{appID, "common", "admin"},
-	})
+	rolePermissions, err := u.roleRepo.ListRolesPermissions(
+		ctx, data.FilterRolePermissions{
+			TenantID:    tenantID,
+			RoleIDs:     roleIDs,
+			Permissions: permissions,
+			AppIDs:      []string{appID, "common", "admin"},
+		},
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -181,9 +189,11 @@ func (u *CheckPermissionsUsecase) HasPermission(
 	ctx context.Context, tenantID int64, appID string,
 	identities []string, permission string,
 ) (*v1.ListOfFields, error) {
-	permissions, err := u.CheckPermissions(ctx, tenantID, appID,
+	permissions, err := u.CheckPermissions(
+		ctx, tenantID, appID,
 		identities, []string{permission}, nil,
-		0)
+		0,
+	)
 	if err != nil {
 		return nil, err
 	}
