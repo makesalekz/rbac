@@ -137,5 +137,4 @@ INSERT INTO role_permissions (role_id, permission_id, deny, fields, value)
           AND id <> 'admin.tenant.delete'
           AND id NOT LIKE '%.role_system.%'
           AND id NOT LIKE '%role%');
-);
 
