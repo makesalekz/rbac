@@ -65,6 +65,8 @@ func TestRolesService_CreateRole(t *testing.T) {
 	defer ctrl.Finish()
 
 	qm := u_nats_mock.NewMockIQueueManager(ctrl)
+	qm.EXPECT().AddConsumer(biz.QueueRoleAssignHandler, gomock.Any())
+	qm.EXPECT().AddConsumer(biz.QueueRoleUnassignHandler, gomock.Any())
 	permissionRepo := mock.NewMockPermissionRepo(ctrl)
 	roleRepo := mock.NewMockRoleRepo(ctrl)
 	assignedRepo := mock.NewMockAssignedRolesRepo(ctrl)
@@ -105,6 +107,8 @@ func TestRolesService_CreateRoleEmptyName(t *testing.T) {
 	defer ctrl.Finish()
 
 	qm := u_nats_mock.NewMockIQueueManager(ctrl)
+	qm.EXPECT().AddConsumer(biz.QueueRoleAssignHandler, gomock.Any())
+	qm.EXPECT().AddConsumer(biz.QueueRoleUnassignHandler, gomock.Any())
 	permissionRepo := mock.NewMockPermissionRepo(ctrl)
 	roleRepo := mock.NewMockRoleRepo(ctrl)
 	assignedRepo := mock.NewMockAssignedRolesRepo(ctrl)
@@ -128,6 +132,8 @@ func TestRolesService_UpdateRole(t *testing.T) {
 	defer ctrl.Finish()
 
 	qm := u_nats_mock.NewMockIQueueManager(ctrl)
+	qm.EXPECT().AddConsumer(biz.QueueRoleAssignHandler, gomock.Any())
+	qm.EXPECT().AddConsumer(biz.QueueRoleUnassignHandler, gomock.Any())
 	permissionRepo := mock.NewMockPermissionRepo(ctrl)
 	roleRepo := mock.NewMockRoleRepo(ctrl)
 	assignedRepo := mock.NewMockAssignedRolesRepo(ctrl)
@@ -170,6 +176,8 @@ func TestRolesService_UpdateRoleEmptyId(t *testing.T) {
 	defer ctrl.Finish()
 
 	qm := u_nats_mock.NewMockIQueueManager(ctrl)
+	qm.EXPECT().AddConsumer(biz.QueueRoleAssignHandler, gomock.Any())
+	qm.EXPECT().AddConsumer(biz.QueueRoleUnassignHandler, gomock.Any())
 	permissionRepo := mock.NewMockPermissionRepo(ctrl)
 	roleRepo := mock.NewMockRoleRepo(ctrl)
 	assignedRepo := mock.NewMockAssignedRolesRepo(ctrl)
@@ -197,6 +205,8 @@ func TestRolesService_DeleteRole(t *testing.T) {
 	defer ctrl.Finish()
 
 	qm := u_nats_mock.NewMockIQueueManager(ctrl)
+	qm.EXPECT().AddConsumer(biz.QueueRoleAssignHandler, gomock.Any())
+	qm.EXPECT().AddConsumer(biz.QueueRoleUnassignHandler, gomock.Any())
 	permissionRepo := mock.NewMockPermissionRepo(ctrl)
 	roleRepo := mock.NewMockRoleRepo(ctrl)
 	assignedRepo := mock.NewMockAssignedRolesRepo(ctrl)
@@ -221,6 +231,8 @@ func TestRolesService_DeleteRoleEmptyId(t *testing.T) {
 	defer ctrl.Finish()
 
 	qm := u_nats_mock.NewMockIQueueManager(ctrl)
+	qm.EXPECT().AddConsumer(biz.QueueRoleAssignHandler, gomock.Any())
+	qm.EXPECT().AddConsumer(biz.QueueRoleUnassignHandler, gomock.Any())
 	permissionRepo := mock.NewMockPermissionRepo(ctrl)
 	roleRepo := mock.NewMockRoleRepo(ctrl)
 	assignedRepo := mock.NewMockAssignedRolesRepo(ctrl)
@@ -246,6 +258,8 @@ func TestRolesService_GetRole(t *testing.T) {
 	defer ctrl.Finish()
 
 	qm := u_nats_mock.NewMockIQueueManager(ctrl)
+	qm.EXPECT().AddConsumer(biz.QueueRoleAssignHandler, gomock.Any())
+	qm.EXPECT().AddConsumer(biz.QueueRoleUnassignHandler, gomock.Any())
 	permissionRepo := mock.NewMockPermissionRepo(ctrl)
 	roleRepo := mock.NewMockRoleRepo(ctrl)
 	assignedRepo := mock.NewMockAssignedRolesRepo(ctrl)
@@ -290,6 +304,8 @@ func TestRolesService_GetRoleEmptyId(t *testing.T) {
 	defer ctrl.Finish()
 
 	qm := u_nats_mock.NewMockIQueueManager(ctrl)
+	qm.EXPECT().AddConsumer(biz.QueueRoleAssignHandler, gomock.Any())
+	qm.EXPECT().AddConsumer(biz.QueueRoleUnassignHandler, gomock.Any())
 	permissionRepo := mock.NewMockPermissionRepo(ctrl)
 	roleRepo := mock.NewMockRoleRepo(ctrl)
 	assignedRepo := mock.NewMockAssignedRolesRepo(ctrl)
@@ -315,6 +331,8 @@ func TestRolesService_ListRoles(t *testing.T) {
 	defer ctrl.Finish()
 
 	qm := u_nats_mock.NewMockIQueueManager(ctrl)
+	qm.EXPECT().AddConsumer(biz.QueueRoleAssignHandler, gomock.Any())
+	qm.EXPECT().AddConsumer(biz.QueueRoleUnassignHandler, gomock.Any())
 	permissionRepo := mock.NewMockPermissionRepo(ctrl)
 	roleRepo := mock.NewMockRoleRepo(ctrl)
 	assignedRepo := mock.NewMockAssignedRolesRepo(ctrl)
@@ -374,6 +392,8 @@ func TestRolesService_AddPermissionToRole(t *testing.T) {
 	defer ctrl.Finish()
 
 	qm := u_nats_mock.NewMockIQueueManager(ctrl)
+	qm.EXPECT().AddConsumer(biz.QueueRoleAssignHandler, gomock.Any())
+	qm.EXPECT().AddConsumer(biz.QueueRoleUnassignHandler, gomock.Any())
 	permissionRepo := mock.NewMockPermissionRepo(ctrl)
 	roleRepo := mock.NewMockRoleRepo(ctrl)
 	assignedRepo := mock.NewMockAssignedRolesRepo(ctrl)
@@ -409,6 +429,8 @@ func TestRolesService_AddPermissionToRoleEmptyRoleId(t *testing.T) {
 	defer ctrl.Finish()
 
 	qm := u_nats_mock.NewMockIQueueManager(ctrl)
+	qm.EXPECT().AddConsumer(biz.QueueRoleAssignHandler, gomock.Any())
+	qm.EXPECT().AddConsumer(biz.QueueRoleUnassignHandler, gomock.Any())
 	permissionRepo := mock.NewMockPermissionRepo(ctrl)
 	roleRepo := mock.NewMockRoleRepo(ctrl)
 	assignedRepo := mock.NewMockAssignedRolesRepo(ctrl)
@@ -434,6 +456,8 @@ func TestRolesService_AddPermissionToRoleEmptyPermissionId(t *testing.T) {
 	defer ctrl.Finish()
 
 	qm := u_nats_mock.NewMockIQueueManager(ctrl)
+	qm.EXPECT().AddConsumer(biz.QueueRoleAssignHandler, gomock.Any())
+	qm.EXPECT().AddConsumer(biz.QueueRoleUnassignHandler, gomock.Any())
 	permissionRepo := mock.NewMockPermissionRepo(ctrl)
 	roleRepo := mock.NewMockRoleRepo(ctrl)
 	assignedRepo := mock.NewMockAssignedRolesRepo(ctrl)
@@ -461,6 +485,8 @@ func TestRolesService_RemovePermissionFromRole(t *testing.T) {
 	defer ctrl.Finish()
 
 	qm := u_nats_mock.NewMockIQueueManager(ctrl)
+	qm.EXPECT().AddConsumer(biz.QueueRoleAssignHandler, gomock.Any())
+	qm.EXPECT().AddConsumer(biz.QueueRoleUnassignHandler, gomock.Any())
 	permissionRepo := mock.NewMockPermissionRepo(ctrl)
 	roleRepo := mock.NewMockRoleRepo(ctrl)
 	assignedRepo := mock.NewMockAssignedRolesRepo(ctrl)
@@ -495,6 +521,8 @@ func TestRolesService_RemovePermissionFromRoleEmptyRoleId(t *testing.T) {
 	defer ctrl.Finish()
 
 	qm := u_nats_mock.NewMockIQueueManager(ctrl)
+	qm.EXPECT().AddConsumer(biz.QueueRoleAssignHandler, gomock.Any())
+	qm.EXPECT().AddConsumer(biz.QueueRoleUnassignHandler, gomock.Any())
 	permissionRepo := mock.NewMockPermissionRepo(ctrl)
 	roleRepo := mock.NewMockRoleRepo(ctrl)
 	assignedRepo := mock.NewMockAssignedRolesRepo(ctrl)
@@ -520,6 +548,8 @@ func TestRolesService_RemovePermissionFromRoleEmptyPermissionId(t *testing.T) {
 	defer ctrl.Finish()
 
 	qm := u_nats_mock.NewMockIQueueManager(ctrl)
+	qm.EXPECT().AddConsumer(biz.QueueRoleAssignHandler, gomock.Any())
+	qm.EXPECT().AddConsumer(biz.QueueRoleUnassignHandler, gomock.Any())
 	permissionRepo := mock.NewMockPermissionRepo(ctrl)
 	roleRepo := mock.NewMockRoleRepo(ctrl)
 	assignedRepo := mock.NewMockAssignedRolesRepo(ctrl)
@@ -547,6 +577,8 @@ func TestRolesService_ListRolePermissions(t *testing.T) {
 	defer ctrl.Finish()
 
 	qm := u_nats_mock.NewMockIQueueManager(ctrl)
+	qm.EXPECT().AddConsumer(biz.QueueRoleAssignHandler, gomock.Any())
+	qm.EXPECT().AddConsumer(biz.QueueRoleUnassignHandler, gomock.Any())
 	permissionRepo := mock.NewMockPermissionRepo(ctrl)
 	roleRepo := mock.NewMockRoleRepo(ctrl)
 	assignedRepo := mock.NewMockAssignedRolesRepo(ctrl)
@@ -573,8 +605,10 @@ func TestRolesService_ListRolePermissions(t *testing.T) {
 			PermissionID: "some.group.permission2",
 		},
 	}
-	roleRepo.EXPECT().ListRolePermissions(ctx, tenantID, req.GetRoleId(),
-		[]string{appID, "common", "admin"}).Return(roles, nil)
+	roleRepo.EXPECT().ListRolePermissions(
+		ctx, tenantID, req.GetRoleId(),
+		[]string{appID, "common", "admin"},
+	).Return(roles, nil)
 
 	expect := &v1.RolePermission{
 		Id:     permission.PermissionID,

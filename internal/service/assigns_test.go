@@ -51,6 +51,8 @@ func TestRolesService_AssignRoles(t *testing.T) {
 	defer ctrl.Finish()
 
 	qm := u_nats_mock.NewMockIQueueManager(ctrl)
+	qm.EXPECT().AddConsumer(biz.QueueRoleAssignHandler, gomock.Any())
+	qm.EXPECT().AddConsumer(biz.QueueRoleUnassignHandler, gomock.Any())
 	queue := u_nats_mock.NewMockIQueue(ctrl)
 	roleRepo := mock.NewMockRoleRepo(ctrl)
 	assignedRepo := mock.NewMockAssignedRolesRepo(ctrl)
@@ -89,14 +91,18 @@ func TestRolesService_AssignRoles(t *testing.T) {
 	assignedRepo.EXPECT().AssignRoles(ctx, tenantID, dtos).Return(nil)
 
 	qm.EXPECT().GetLocal(biz.QueueRoleAssign).Return(queue)
-	queue.EXPECT().Pub(biz.AssignRoleMessage{
-		AssignRoleDto: dtos[0],
-		TenantID:      tenantID,
-	})
-	queue.EXPECT().Pub(biz.AssignRoleMessage{
-		AssignRoleDto: dtos[1],
-		TenantID:      tenantID,
-	})
+	queue.EXPECT().Pub(
+		biz.AssignRoleMessage{
+			AssignRoleDto: dtos[0],
+			TenantID:      tenantID,
+		},
+	)
+	queue.EXPECT().Pub(
+		biz.AssignRoleMessage{
+			AssignRoleDto: dtos[1],
+			TenantID:      tenantID,
+		},
+	)
 
 	_, err := service.AssignRoles(ctx, req)
 	require.NoError(t, err)
@@ -107,6 +113,8 @@ func TestRolesService_AssignRolesEmptyRole(t *testing.T) {
 	defer ctrl.Finish()
 
 	qm := u_nats_mock.NewMockIQueueManager(ctrl)
+	qm.EXPECT().AddConsumer(biz.QueueRoleAssignHandler, gomock.Any())
+	qm.EXPECT().AddConsumer(biz.QueueRoleUnassignHandler, gomock.Any())
 	roleRepo := mock.NewMockRoleRepo(ctrl)
 	assignedRepo := mock.NewMockAssignedRolesRepo(ctrl)
 	teamsRepo := mock.NewMockTeamsRepo(ctrl)
@@ -139,6 +147,8 @@ func TestRolesService_AssignRolesInvalidRole(t *testing.T) {
 	defer ctrl.Finish()
 
 	qm := u_nats_mock.NewMockIQueueManager(ctrl)
+	qm.EXPECT().AddConsumer(biz.QueueRoleAssignHandler, gomock.Any())
+	qm.EXPECT().AddConsumer(biz.QueueRoleUnassignHandler, gomock.Any())
 	roleRepo := mock.NewMockRoleRepo(ctrl)
 	assignedRepo := mock.NewMockAssignedRolesRepo(ctrl)
 	teamsRepo := mock.NewMockTeamsRepo(ctrl)
@@ -179,6 +189,8 @@ func TestRolesService_AssignRolesInvalidTeam(t *testing.T) {
 	defer ctrl.Finish()
 
 	qm := u_nats_mock.NewMockIQueueManager(ctrl)
+	qm.EXPECT().AddConsumer(biz.QueueRoleAssignHandler, gomock.Any())
+	qm.EXPECT().AddConsumer(biz.QueueRoleUnassignHandler, gomock.Any())
 	roleRepo := mock.NewMockRoleRepo(ctrl)
 	assignedRepo := mock.NewMockAssignedRolesRepo(ctrl)
 	teamsRepo := mock.NewMockTeamsRepo(ctrl)
@@ -227,6 +239,8 @@ func TestRolesService_AssignRolesAlreadyAssigned(t *testing.T) {
 	defer ctrl.Finish()
 
 	qm := u_nats_mock.NewMockIQueueManager(ctrl)
+	qm.EXPECT().AddConsumer(biz.QueueRoleAssignHandler, gomock.Any())
+	qm.EXPECT().AddConsumer(biz.QueueRoleUnassignHandler, gomock.Any())
 	roleRepo := mock.NewMockRoleRepo(ctrl)
 	assignedRepo := mock.NewMockAssignedRolesRepo(ctrl)
 	teamsRepo := mock.NewMockTeamsRepo(ctrl)
@@ -277,6 +291,8 @@ func TestRolesService_AssignRole(t *testing.T) {
 	defer ctrl.Finish()
 
 	qm := u_nats_mock.NewMockIQueueManager(ctrl)
+	qm.EXPECT().AddConsumer(biz.QueueRoleAssignHandler, gomock.Any())
+	qm.EXPECT().AddConsumer(biz.QueueRoleUnassignHandler, gomock.Any())
 	queue := u_nats_mock.NewMockIQueue(ctrl)
 	roleRepo := mock.NewMockRoleRepo(ctrl)
 	assignedRepo := mock.NewMockAssignedRolesRepo(ctrl)
@@ -307,10 +323,12 @@ func TestRolesService_AssignRole(t *testing.T) {
 	assignedRepo.EXPECT().AssignRoles(ctx, tenantID, dtos).Return(nil)
 
 	qm.EXPECT().GetLocal(biz.QueueRoleAssign).Return(queue)
-	queue.EXPECT().Pub(biz.AssignRoleMessage{
-		AssignRoleDto: dtos[0],
-		TenantID:      tenantID,
-	})
+	queue.EXPECT().Pub(
+		biz.AssignRoleMessage{
+			AssignRoleDto: dtos[0],
+			TenantID:      tenantID,
+		},
+	)
 
 	_, err := service.AssignRole(ctx, req)
 	require.NoError(t, err)
@@ -321,6 +339,8 @@ func TestRolesService_AssignRoleEmptyRole(t *testing.T) {
 	defer ctrl.Finish()
 
 	qm := u_nats_mock.NewMockIQueueManager(ctrl)
+	qm.EXPECT().AddConsumer(biz.QueueRoleAssignHandler, gomock.Any())
+	qm.EXPECT().AddConsumer(biz.QueueRoleUnassignHandler, gomock.Any())
 	roleRepo := mock.NewMockRoleRepo(ctrl)
 	assignedRepo := mock.NewMockAssignedRolesRepo(ctrl)
 	teamsRepo := mock.NewMockTeamsRepo(ctrl)
@@ -346,6 +366,8 @@ func TestRolesService_AssignRoleNotFoundRole(t *testing.T) {
 	defer ctrl.Finish()
 
 	qm := u_nats_mock.NewMockIQueueManager(ctrl)
+	qm.EXPECT().AddConsumer(biz.QueueRoleAssignHandler, gomock.Any())
+	qm.EXPECT().AddConsumer(biz.QueueRoleUnassignHandler, gomock.Any())
 	roleRepo := mock.NewMockRoleRepo(ctrl)
 	assignedRepo := mock.NewMockAssignedRolesRepo(ctrl)
 	teamsRepo := mock.NewMockTeamsRepo(ctrl)
@@ -373,6 +395,8 @@ func TestRolesService_AssignRoleNotFoundTeam(t *testing.T) {
 	defer ctrl.Finish()
 
 	qm := u_nats_mock.NewMockIQueueManager(ctrl)
+	qm.EXPECT().AddConsumer(biz.QueueRoleAssignHandler, gomock.Any())
+	qm.EXPECT().AddConsumer(biz.QueueRoleUnassignHandler, gomock.Any())
 	roleRepo := mock.NewMockRoleRepo(ctrl)
 	assignedRepo := mock.NewMockAssignedRolesRepo(ctrl)
 	teamsRepo := mock.NewMockTeamsRepo(ctrl)
@@ -402,6 +426,8 @@ func TestRolesService_AssignRoleAlreadyAssigned(t *testing.T) {
 	defer ctrl.Finish()
 
 	qm := u_nats_mock.NewMockIQueueManager(ctrl)
+	qm.EXPECT().AddConsumer(biz.QueueRoleAssignHandler, gomock.Any())
+	qm.EXPECT().AddConsumer(biz.QueueRoleUnassignHandler, gomock.Any())
 	roleRepo := mock.NewMockRoleRepo(ctrl)
 	assignedRepo := mock.NewMockAssignedRolesRepo(ctrl)
 	teamsRepo := mock.NewMockTeamsRepo(ctrl)
@@ -444,6 +470,8 @@ func TestRolesService_UnassignRole(t *testing.T) {
 	defer ctrl.Finish()
 
 	qm := u_nats_mock.NewMockIQueueManager(ctrl)
+	qm.EXPECT().AddConsumer(biz.QueueRoleAssignHandler, gomock.Any())
+	qm.EXPECT().AddConsumer(biz.QueueRoleUnassignHandler, gomock.Any())
 	queue := u_nats_mock.NewMockIQueue(ctrl)
 	roleRepo := mock.NewMockRoleRepo(ctrl)
 	assignedRepo := mock.NewMockAssignedRolesRepo(ctrl)
@@ -464,13 +492,15 @@ func TestRolesService_UnassignRole(t *testing.T) {
 	assignedRepo.EXPECT().UnassignRole(ctx, assignedRole).Return(nil)
 
 	qm.EXPECT().GetLocal(biz.QueueRoleUnassign).Return(queue)
-	queue.EXPECT().Pub(biz.AssignRoleMessage{
-		AssignRoleDto: data.AssignRoleDto{
-			IdentityID: assignedRole.IdentityID,
-			RoleID:     assignedRole.RoleID,
+	queue.EXPECT().Pub(
+		biz.AssignRoleMessage{
+			AssignRoleDto: data.AssignRoleDto{
+				IdentityID: assignedRole.IdentityID,
+				RoleID:     assignedRole.RoleID,
+			},
+			TenantID: tenantID,
 		},
-		TenantID: tenantID,
-	})
+	)
 
 	_, err := service.UnassignRole(ctx, req)
 	require.NoError(t, err)
@@ -481,6 +511,8 @@ func TestRolesService_UnassignRoleNotFound(t *testing.T) {
 	defer ctrl.Finish()
 
 	qm := u_nats_mock.NewMockIQueueManager(ctrl)
+	qm.EXPECT().AddConsumer(biz.QueueRoleAssignHandler, gomock.Any())
+	qm.EXPECT().AddConsumer(biz.QueueRoleUnassignHandler, gomock.Any())
 	roleRepo := mock.NewMockRoleRepo(ctrl)
 	assignedRepo := mock.NewMockAssignedRolesRepo(ctrl)
 	teamsRepo := mock.NewMockTeamsRepo(ctrl)
@@ -509,6 +541,8 @@ func TestRolesService_ListAssigns(t *testing.T) {
 	defer ctrl.Finish()
 
 	qm := u_nats_mock.NewMockIQueueManager(ctrl)
+	qm.EXPECT().AddConsumer(biz.QueueRoleAssignHandler, gomock.Any())
+	qm.EXPECT().AddConsumer(biz.QueueRoleUnassignHandler, gomock.Any())
 	roleRepo := mock.NewMockRoleRepo(ctrl)
 	assignedRepo := mock.NewMockAssignedRolesRepo(ctrl)
 	teamsRepo := mock.NewMockTeamsRepo(ctrl)
