@@ -23,6 +23,9 @@ func TestAssignedRolesUsecase_AssignRole(t *testing.T) {
 
 	qm := u_nats_mock.NewMockIQueueManager(ctrl)
 	queue := u_nats_mock.NewMockIQueue(ctrl)
+	qm.EXPECT().AddConsumer(biz.QueueRoleAssignHandler, gomock.Any())
+	qm.EXPECT().AddConsumer(biz.QueueRoleUnassignHandler, gomock.Any())
+
 	assignedRepo := mock.NewMockAssignedRolesRepo(ctrl)
 	roleRepo := mock.NewMockRoleRepo(ctrl)
 	teamRepo := mock.NewMockTeamsRepo(ctrl)
@@ -51,10 +54,12 @@ func TestAssignedRolesUsecase_AssignRole(t *testing.T) {
 	assignedRepo.EXPECT().AssignRoles(ctx, tenantID, []data.AssignRoleDto{dto}).Return(nil)
 
 	qm.EXPECT().GetLocal(biz.QueueRoleAssign).Return(queue)
-	queue.EXPECT().Pub(biz.AssignRoleMessage{
-		AssignRoleDto: dto,
-		TenantID:      tenantID,
-	})
+	queue.EXPECT().Pub(
+		biz.AssignRoleMessage{
+			AssignRoleDto: dto,
+			TenantID:      tenantID,
+		},
+	)
 
 	err = uc.AssignRole(ctx, tenantID, dto)
 	require.NoError(t, err)
@@ -62,10 +67,12 @@ func TestAssignedRolesUsecase_AssignRole(t *testing.T) {
 	// Negative case
 	roleRepo.EXPECT().GetRoleByID(ctx, tenantID, roleID2).Return(nil, &ent.NotFoundError{})
 
-	err = uc.AssignRole(ctx, tenantID, data.AssignRoleDto{
-		IdentityID: identityID,
-		RoleID:     roleID2,
-	})
+	err = uc.AssignRole(
+		ctx, tenantID, data.AssignRoleDto{
+			IdentityID: identityID,
+			RoleID:     roleID2,
+		},
+	)
 	require.Error(t, err)
 	require.Equal(t, v1.ErrorNotFound("role not found"), err)
 
@@ -73,11 +80,13 @@ func TestAssignedRolesUsecase_AssignRole(t *testing.T) {
 	roleRepo.EXPECT().GetRoleByID(ctx, tenantID, roleID).Return(role, nil)
 	teamRepo.EXPECT().GetTeam(ctx, tenantID, teamID, false).Return(nil, &ent.NotFoundError{})
 
-	err = uc.AssignRole(ctx, tenantID, data.AssignRoleDto{
-		IdentityID: identityID,
-		RoleID:     roleID,
-		TeamID:     teamID,
-	})
+	err = uc.AssignRole(
+		ctx, tenantID, data.AssignRoleDto{
+			IdentityID: identityID,
+			RoleID:     roleID,
+			TeamID:     teamID,
+		},
+	)
 	require.Error(t, err)
 	require.Equal(t, v1.ErrorNotFound("team not found"), err)
 }
@@ -88,6 +97,9 @@ func TestAssignedRolesUsecase_UnassignRole(t *testing.T) {
 	defer ctrl.Finish()
 
 	qm := u_nats_mock.NewMockIQueueManager(ctrl)
+	qm.EXPECT().AddConsumer(biz.QueueRoleAssignHandler, gomock.Any())
+	qm.EXPECT().AddConsumer(biz.QueueRoleUnassignHandler, gomock.Any())
+
 	queue := u_nats_mock.NewMockIQueue(ctrl)
 	assignedRepo := mock.NewMockAssignedRolesRepo(ctrl)
 	roleRepo := mock.NewMockRoleRepo(ctrl)
@@ -113,13 +125,15 @@ func TestAssignedRolesUsecase_UnassignRole(t *testing.T) {
 	assignedRepo.EXPECT().UnassignRole(ctx, assignedRole).Return(nil)
 
 	qm.EXPECT().GetLocal(biz.QueueRoleUnassign).Return(queue)
-	queue.EXPECT().Pub(biz.AssignRoleMessage{
-		AssignRoleDto: data.AssignRoleDto{
-			IdentityID: assignedRole.IdentityID,
-			RoleID:     assignedRole.RoleID,
+	queue.EXPECT().Pub(
+		biz.AssignRoleMessage{
+			AssignRoleDto: data.AssignRoleDto{
+				IdentityID: assignedRole.IdentityID,
+				RoleID:     assignedRole.RoleID,
+			},
+			TenantID: tenantID,
 		},
-		TenantID: tenantID,
-	})
+	)
 
 	err = uc.UnassignRole(ctx, tenantID, assignID)
 	require.NoError(t, err)
@@ -138,6 +152,8 @@ func TestAssignedRolesUsecase_ListAssignedRoles(t *testing.T) {
 	defer ctrl.Finish()
 
 	qm := u_nats_mock.NewMockIQueueManager(ctrl)
+	qm.EXPECT().AddConsumer(biz.QueueRoleAssignHandler, gomock.Any())
+	qm.EXPECT().AddConsumer(biz.QueueRoleUnassignHandler, gomock.Any())
 	assignedRepo := mock.NewMockAssignedRolesRepo(ctrl)
 	roleRepo := mock.NewMockRoleRepo(ctrl)
 	teamRepo := mock.NewMockTeamsRepo(ctrl)
