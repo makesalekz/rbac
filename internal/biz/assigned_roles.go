@@ -2,12 +2,15 @@ package biz
 
 import (
 	"context"
+	"encoding/json"
 
-	"github.com/go-kratos/kratos/v2/log"
 	v1 "gitlab.calendaria.team/services/rbac/api/rbac/v1"
 	"gitlab.calendaria.team/services/rbac/ent"
 	"gitlab.calendaria.team/services/rbac/internal/data"
 	u_nats "gitlab.calendaria.team/services/utils/v2/nats"
+
+	"github.com/go-kratos/kratos/v2/log"
+	"github.com/nats-io/nats.go/jetstream"
 )
 
 type AssignRoleMessage struct {
@@ -32,13 +35,18 @@ func NewAssignedRolesUsecase(
 	teamRepo data.TeamsRepo,
 	qm u_nats.IQueueManager,
 ) (*AssignedRolesUsecase, error) {
-	return &AssignedRolesUsecase{
+	uc := &AssignedRolesUsecase{
 		log:      log.NewHelper(log.With(logger, "module", "biz/rbac")),
 		repo:     repo,
 		roleRepo: roleRepo,
 		teamRepo: teamRepo,
 		qm:       qm,
-	}, nil
+	}
+
+	qm.AddConsumer(QueueRoleAssign, uc.handleRoleAssignEvent)
+	qm.AddConsumer(QueueRoleUnassign, uc.handleRoleUnassignEvent)
+
+	return uc, nil
 }
 
 // AssignRoles assigns multiple roles to identities.
@@ -62,12 +70,14 @@ func (u *AssignedRolesUsecase) AssignRoles(ctx context.Context, tenantID int64, 
 		return v1.ErrorBadRequest("invalid role ids %v", diff)
 	}
 
-	teamIDs := data.ExtractUnique(dtos, func(e data.AssignRoleDto) (int64, bool) {
-		if e.TeamID != 0 {
-			return e.TeamID, true
-		}
-		return 0, false
-	})
+	teamIDs := data.ExtractUnique(
+		dtos, func(e data.AssignRoleDto) (int64, bool) {
+			if e.TeamID != 0 {
+				return e.TeamID, true
+			}
+			return 0, false
+		},
+	)
 
 	// If there are team ids, get teams by ids, then check if the returned ids are equal to the input ids
 	if len(teamIDs) > 0 {
@@ -93,10 +103,12 @@ func (u *AssignedRolesUsecase) AssignRoles(ctx context.Context, tenantID int64, 
 
 	queue := u.qm.GetLocal(QueueRoleAssign)
 	for _, dto := range dtos {
-		queue.Pub(AssignRoleMessage{
-			AssignRoleDto: dto,
-			TenantID:      tenantID,
-		})
+		queue.Pub(
+			AssignRoleMessage{
+				AssignRoleDto: dto,
+				TenantID:      tenantID,
+			},
+		)
 	}
 
 	return nil
@@ -129,10 +141,12 @@ func (u *AssignedRolesUsecase) AssignRole(ctx context.Context, tenantID int64, d
 		return v1.ErrorDatabaseQuery("assign role failed: %v", err)
 	}
 
-	u.qm.GetLocal(QueueRoleAssign).Pub(AssignRoleMessage{
-		AssignRoleDto: dto,
-		TenantID:      tenantID,
-	})
+	u.qm.GetLocal(QueueRoleAssign).Pub(
+		AssignRoleMessage{
+			AssignRoleDto: dto,
+			TenantID:      tenantID,
+		},
+	)
 
 	return nil
 }
@@ -170,15 +184,17 @@ func (u *AssignedRolesUsecase) UnassignRole(ctx context.Context, tenantID, assig
 		}
 	}
 
-	u.qm.GetLocal(QueueRoleUnassign).Pub(AssignRoleMessage{
-		AssignRoleDto: data.AssignRoleDto{
-			IdentityID: assignedRole.IdentityID,
-			RoleID:     assignedRole.RoleID,
-			TeamID:     teamID,
-			Resource:   resource,
+	u.qm.GetLocal(QueueRoleUnassign).Pub(
+		AssignRoleMessage{
+			AssignRoleDto: data.AssignRoleDto{
+				IdentityID: assignedRole.IdentityID,
+				RoleID:     assignedRole.RoleID,
+				TeamID:     teamID,
+				Resource:   resource,
+			},
+			TenantID: tenantID,
 		},
-		TenantID: tenantID,
-	})
+	)
 
 	return nil
 }
@@ -188,4 +204,34 @@ func (u *AssignedRolesUsecase) ListAssignedRoles(
 	dto data.ListRolesDto,
 ) ([]*ent.ResourceAccess, error) {
 	return u.repo.ListAssignedRoles(ctx, dto)
+}
+
+func (u *AssignedRolesUsecase) handleRoleAssignEvent(ctx context.Context, m jetstream.Msg) bool {
+	var message AssignRoleMessage
+	if err := json.Unmarshal(m.Data(), &message); err != nil {
+		u.log.Errorf("Failed to unmarshal role assign message: %v", err)
+		return true // Подтверждаем сообщение, даже если не можем его обработать
+	}
+
+	u.log.Infof(
+		"Role assign event received: tenant=%d, identity=%d, role=%d",
+		message.TenantID, message.IdentityID, message.RoleID,
+	)
+
+	return true
+}
+
+func (u *AssignedRolesUsecase) handleRoleUnassignEvent(ctx context.Context, m jetstream.Msg) bool {
+	var message AssignRoleMessage
+	if err := json.Unmarshal(m.Data(), &message); err != nil {
+		u.log.Errorf("Failed to unmarshal role unassign message: %v", err)
+		return true // Подтверждаем сообщение, даже если не можем его обработать
+	}
+
+	u.log.Infof(
+		"Role unassign event received: tenant=%d, identity=%d, role=%d",
+		message.TenantID, message.IdentityID, message.RoleID,
+	)
+
+	return true
 }
