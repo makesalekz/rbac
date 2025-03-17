@@ -6,10 +6,8 @@ import (
 
 //nolint:gochecknoglobals // this global variables are required for queues
 var (
-	QueueRoleAssign          = "role_assign"
-	QueueRoleUnassign        = "role_unassign"
-	QueueRoleAssignHandler   = "rbac_role_assign"
-	QueueRoleUnassignHandler = "rbac_role_unassign"
+	QueueRoleAssign   = "role_assign"
+	QueueRoleUnassign = "role_unassign"
 )
 
 // ProviderSet is biz providers.

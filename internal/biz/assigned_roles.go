@@ -43,8 +43,8 @@ func NewAssignedRolesUsecase(
 		qm:       qm,
 	}
 
-	qm.AddConsumer(QueueRoleAssignHandler, uc.handleRoleAssignEvent)
-	qm.AddConsumer(QueueRoleUnassignHandler, uc.handleRoleUnassignEvent)
+	qm.AddConsumer(QueueRoleAssign, uc.handleRoleAssignEvent)
+	qm.AddConsumer(QueueRoleUnassign, uc.handleRoleUnassignEvent)
 
 	return uc, nil
 }
