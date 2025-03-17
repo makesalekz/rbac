@@ -23,8 +23,8 @@ func TestAssignedRolesUsecase_AssignRole(t *testing.T) {
 
 	qm := u_nats_mock.NewMockIQueueManager(ctrl)
 	queue := u_nats_mock.NewMockIQueue(ctrl)
-	qm.EXPECT().AddConsumer(biz.QueueRoleAssignHandler, gomock.Any())
-	qm.EXPECT().AddConsumer(biz.QueueRoleUnassignHandler, gomock.Any())
+	qm.EXPECT().AddConsumer(biz.QueueRoleAssign, gomock.Any())
+	qm.EXPECT().AddConsumer(biz.QueueRoleUnassign, gomock.Any())
 
 	assignedRepo := mock.NewMockAssignedRolesRepo(ctrl)
 	roleRepo := mock.NewMockRoleRepo(ctrl)
@@ -97,8 +97,8 @@ func TestAssignedRolesUsecase_UnassignRole(t *testing.T) {
 	defer ctrl.Finish()
 
 	qm := u_nats_mock.NewMockIQueueManager(ctrl)
-	qm.EXPECT().AddConsumer(biz.QueueRoleAssignHandler, gomock.Any())
-	qm.EXPECT().AddConsumer(biz.QueueRoleUnassignHandler, gomock.Any())
+	qm.EXPECT().AddConsumer(biz.QueueRoleAssign, gomock.Any())
+	qm.EXPECT().AddConsumer(biz.QueueRoleUnassign, gomock.Any())
 
 	queue := u_nats_mock.NewMockIQueue(ctrl)
 	assignedRepo := mock.NewMockAssignedRolesRepo(ctrl)
@@ -152,8 +152,8 @@ func TestAssignedRolesUsecase_ListAssignedRoles(t *testing.T) {
 	defer ctrl.Finish()
 
 	qm := u_nats_mock.NewMockIQueueManager(ctrl)
-	qm.EXPECT().AddConsumer(biz.QueueRoleAssignHandler, gomock.Any())
-	qm.EXPECT().AddConsumer(biz.QueueRoleUnassignHandler, gomock.Any())
+	qm.EXPECT().AddConsumer(biz.QueueRoleAssign, gomock.Any())
+	qm.EXPECT().AddConsumer(biz.QueueRoleUnassign, gomock.Any())
 	assignedRepo := mock.NewMockAssignedRolesRepo(ctrl)
 	roleRepo := mock.NewMockRoleRepo(ctrl)
 	teamRepo := mock.NewMockTeamsRepo(ctrl)
