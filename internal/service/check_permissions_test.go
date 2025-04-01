@@ -73,9 +73,15 @@ func TestRolesService_CheckPermissions(t *testing.T) {
 	expect := map[string]*v1.ListOfFields{
 		"permission1": {
 			Fields: rp1.Fields,
+			Resources: []*v1.Resource{
+				{Type: "", Id: 0},
+			},
 		},
 		"permission2": {
 			Fields: rp2.Fields,
+			Resources: []*v1.Resource{
+				{Type: "", Id: 0},
+			},
 		},
 	}
 
@@ -160,9 +166,15 @@ func TestRolesService_CheckPermissionsResources(t *testing.T) {
 	expect := map[string]*v1.ListOfFields{
 		"permission1": {
 			Fields: rp1.Fields,
+			Resources: []*v1.Resource{
+				{Type: "", Id: 0},
+			},
 		},
 		"permission2": {
 			Fields: rp2.Fields,
+			Resources: []*v1.Resource{
+				{Type: "", Id: 0},
+			},
 		},
 	}
 
@@ -232,9 +244,15 @@ func TestRolesService_CheckPermissionsMeta(t *testing.T) {
 	expect := map[string]*v1.ListOfFields{
 		"permission1": {
 			Fields: rp1.Fields,
+			Resources: []*v1.Resource{
+				{Type: "", Id: 0},
+			},
 		},
 		"permission2": {
 			Fields: rp2.Fields,
+			Resources: []*v1.Resource{
+				{Type: "", Id: 0},
+			},
 		},
 	}
 

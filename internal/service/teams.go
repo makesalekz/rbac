@@ -124,6 +124,20 @@ func (s *TeamsService) GetTeam(ctx context.Context, req *v1.TeamRequest) (*v1.Te
 	}, nil
 }
 
+func (s *TeamsService) GetTeams(ctx context.Context, req *v1.GetTeamsRequest) (*v1.GetTeamsReply, error) {
+	tenantID := auth.GetTenantIdFromContext(ctx)
+	if tenantID == 0 {
+		return nil, v1.ErrorEmptyActorId("empty tenant id")
+	}
+
+	teams, err := s.tu.GetTeams(ctx, tenantID, req.GetTeamIds())
+	if err != nil {
+		return nil, err
+	}
+
+	return &v1.GetTeamsReply{Teams: replyTeams(teams)}, nil
+}
+
 func (s *TeamsService) ListTeams(ctx context.Context, req *v1.ListTeamsRequest) (*v1.ListTeamsReply, error) {
 	tenantID := auth.GetTenantIdFromContext(ctx)
 	if tenantID == 0 {

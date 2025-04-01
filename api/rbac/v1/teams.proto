@@ -14,6 +14,7 @@ service Teams {
   rpc UpdateTeam(UpdateTeamRequest) returns (TeamReply);
   rpc DeleteTeam(TeamRequest) returns (utils.v1.EmptyReply);
   rpc GetTeam(TeamRequest) returns (TeamReply);
+  rpc GetTeams(GetTeamsRequest) returns (GetTeamsReply);
   rpc ListTeams(ListTeamsRequest) returns (ListTeamsReply);
 }
 
@@ -47,4 +48,12 @@ message ListTeamsRequest {
 message ListTeamsReply {
   repeated Team teams = 1;
   utils.v1.PaginateReply paginate = 2;
+}
+
+message GetTeamsRequest {
+  repeated int64 teamIds = 1;
+}
+
+message GetTeamsReply {
+  repeated Team teams = 1;
 }

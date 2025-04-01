@@ -105,6 +105,19 @@ func (s *AssignsService) ListAssigns(ctx context.Context, req *v1.ListAssignsReq
 		Roles: assignedRolesReply(assignedRoles),
 	}, nil
 }
+func (s *AssignsService) GetAssign(ctx context.Context, req *v1.AssignRequest) (*v1.AssignedRole, error) {
+	tenantID := auth.GetTenantIdFromContext(ctx)
+	if tenantID == 0 {
+		return nil, v1.ErrorEmptyActorId("empty tenant id")
+	}
+
+	assignedRole, err := s.uc.GetAssignedRoleByID(ctx, tenantID, req.GetAssignId())
+	if err != nil {
+		return nil, err
+	}
+
+	return assignedRoleReply(assignedRole), nil
+}
 
 func assignedRoleReply(assignedRole *ent.ResourceAccess) *v1.AssignedRole {
 	result := v1.AssignedRole{
