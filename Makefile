@@ -53,18 +53,19 @@ db-restore:
 	docker exec -i $(SERVICE_NAME)_db pg_dump -U me -d api > ./dump.sql
 	docker exec -i postgres_db psql $(DB_NAME) $(DB_USER) < ./dump.sql
 	rm ./dump.sql
-	docker compose down db
+	docker stop $(SERVICE_NAME)_db
+	docker rm $(SERVICE_NAME)_db
 
 .PHONY: start
 # start docker container locally
 start:
-	docker compose build --ssh rsa=$(HOME)/.ssh/id_rsa local-service && \
-	docker compose up -d local-service
+	docker compose -f docker-compose.local.yml build --ssh rsa=$(HOME)/.ssh/id_rsa service && \
+	docker compose -f docker-compose.local.yml up -d
 
 .PHONY: stop
 # stop docker container locally
 stop:
-	docker compose down local-service
+	docker compose -f docker-compose.local.yml down
 
 .PHONY: config
 # generate internal proto
@@ -87,13 +88,6 @@ migrations:
 		--to "ent://ent/schema" \
 		--dev-url "docker://postgres/15/test?search_path=public"
 
-.PHONY: migrate
-# apply migrations
-migrate:
-	atlas migrate apply \
-		--dir "file://ent/migrate/migrations" \
-		--url "postgres://$(DB_USER):$(DB_PASS)@localhost:$(DB_PORT)/$(DB_NAME)?search_path=public&sslmode=disable"
-
 .PHONY: hash
 # rehash migrations
 hash:
@@ -104,6 +98,7 @@ hash:
 proto:
 	go mod vendor;
 	find vendor/gitlab.calendaria.team -name 'models.proto' -exec sh -c 'f="{}"; d="third_party/api/$$(dirname "$$f" | awk -F/ "{print \$$(NF-1)\"/\"\$$NF}")"; mkdir -p "$$d"; rsync -a "$$f" "$$d"' \;
+	go mod tidy;
 
 .PHONY: api
 # generate api proto files
@@ -135,6 +130,7 @@ all:
 	make api;
 	make config;
 	make generate;
+	go mod tidy;
 
 .PHONY: hooks
 # install hooks
