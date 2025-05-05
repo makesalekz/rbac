@@ -28,6 +28,35 @@
 |---|---|---|---|---|---|---|---|
 | permissions | Permission | false   |         | O2M      | false  | true     |         |
 
+## ResourceAccess:
+
+|     Field     |  Type  | Unique | Optional | Nillable | Default | UpdateDefault | Immutable |           StructTag            | Validators | Comment |
+|---|---|---|---|---|---|---|---|---|---|---|
+| id            | int    | false  | false    | false    | false   | false         | false     | json:"id,omitempty"            |          0 |         |
+| tenant_id     | int64  | false  | false    | false    | false   | false         | true      | json:"tenant_id,omitempty"     |          0 |         |
+| resource_type | string | false  | true     | true     | false   | false         | true      | json:"resource_type,omitempty" |          0 |         |
+| resource_id   | int64  | false  | true     | true     | false   | false         | true      | json:"resource_id,omitempty"   |          0 |         |
+| identity_id   | string | false  | false    | false    | true    | false         | true      | json:"identity_id,omitempty"   |          0 |         |
+| role_id       | int64  | false  | false    | false    | false   | false         | true      | json:"role_id,omitempty"       |          0 |         |
+
+
+| Edge |     Type     | Inverse | BackRef | Relation | Unique | Optional | Comment |
+|---|---|---|---|---|---|---|---|
+| role | Role         | false   |         | M2O      | true   | false    |         |
+| type | ResourceType | false   |         | M2O      | true   | true     |         |
+
+## ResourceType:
+
+|    Field    |  Type  | Unique | Optional | Nillable | Default | UpdateDefault | Immutable |          StructTag           | Validators | Comment |
+|---|---|---|---|---|---|---|---|---|---|---|
+| id          | string | false  | false    | false    | false   | false         | true      | json:"id,omitempty"          |          0 |         |
+| description | string | false  | true     | false    | true    | false         | false     | json:"description,omitempty" |          0 |         |
+
+
+| Edge  | Type | Inverse | BackRef | Relation | Unique | Optional | Comment |
+|---|---|---|---|---|---|---|---|
+| roles | Role | false   |         | O2M      | false  | true     |         |
+
 ## Role:
 
 |    Field    |   Type    | Unique | Optional | Nillable | Default | UpdateDefault | Immutable |          StructTag           | Validators | Comment |
@@ -56,6 +85,7 @@
 | permission_id | string   | false  | false    | false    | false   | false         | true      | json:"permission_id,omitempty" |          0 |         |
 | deny          | bool     | false  | false    | false    | true    | false         | false     | json:"deny,omitempty"          |          0 |         |
 | fields        | []string | false  | false    | false    | false   | false         | false     | json:"fields,omitempty"        |          0 |         |
+| value         | int64    | false  | true     | false    | true    | false         | false     | json:"value,omitempty"         |          0 |         |
 
 
 |    Edge    |    Type    | Inverse |   BackRef   | Relation | Unique | Optional | Comment |
