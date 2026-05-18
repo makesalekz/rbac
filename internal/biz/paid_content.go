@@ -6,7 +6,7 @@ import (
 
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/nats-io/nats.go/jetstream"
-	billing_v1 "github.com/makesalekz/finance/billing/messages"
+	billing_v1 "github.com/makesalekz/billing/messages"
 	"github.com/makesalekz/rbac/ent"
 	"github.com/makesalekz/rbac/internal/data"
 	u_nats "github.com/makesalekz/utils/v2/nats"
