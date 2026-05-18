@@ -12,7 +12,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/jackc/pgtype"
-	"gitlab.calendaria.team/services/rbac/ent/team"
+	"github.com/makesalekz/rbac/ent/team"
 )
 
 // TeamCreate is the builder for creating a Team entity.

@@ -3,10 +3,10 @@ package data
 import (
 	"context"
 
-	"gitlab.calendaria.team/services/rbac/ent"
-	"gitlab.calendaria.team/services/rbac/ent/permission"
-	"gitlab.calendaria.team/services/rbac/ent/role"
-	"gitlab.calendaria.team/services/rbac/ent/rolepermission"
+	"github.com/makesalekz/rbac/ent"
+	"github.com/makesalekz/rbac/ent/permission"
+	"github.com/makesalekz/rbac/ent/role"
+	"github.com/makesalekz/rbac/ent/rolepermission"
 )
 
 // RoleRepo.

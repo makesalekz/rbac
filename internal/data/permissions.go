@@ -3,9 +3,9 @@ package data
 import (
 	"context"
 
-	"gitlab.calendaria.team/services/rbac/ent"
-	"gitlab.calendaria.team/services/rbac/ent/permission"
-	"gitlab.calendaria.team/services/rbac/ent/permissiongroup"
+	"github.com/makesalekz/rbac/ent"
+	"github.com/makesalekz/rbac/ent/permission"
+	"github.com/makesalekz/rbac/ent/permissiongroup"
 )
 
 // PermissionRepo.

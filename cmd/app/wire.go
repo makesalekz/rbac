@@ -9,11 +9,11 @@ import (
 	"github.com/go-kratos/kratos/v2"
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/google/wire"
-	"gitlab.calendaria.team/services/rbac/internal/biz"
-	"gitlab.calendaria.team/services/rbac/internal/conf"
-	"gitlab.calendaria.team/services/rbac/internal/data"
-	"gitlab.calendaria.team/services/rbac/internal/server"
-	"gitlab.calendaria.team/services/rbac/internal/service"
+	"github.com/makesalekz/rbac/internal/biz"
+	"github.com/makesalekz/rbac/internal/conf"
+	"github.com/makesalekz/rbac/internal/data"
+	"github.com/makesalekz/rbac/internal/server"
+	"github.com/makesalekz/rbac/internal/service"
 )
 
 // wireApp init kratos application.

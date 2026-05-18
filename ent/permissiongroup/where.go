@@ -5,7 +5,7 @@ package permissiongroup
 import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
-	"gitlab.calendaria.team/services/rbac/ent/predicate"
+	"github.com/makesalekz/rbac/ent/predicate"
 )
 
 // ID filters vertices based on their ID field.

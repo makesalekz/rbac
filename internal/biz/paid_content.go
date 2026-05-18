@@ -6,10 +6,10 @@ import (
 
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/nats-io/nats.go/jetstream"
-	billing_v1 "gitlab.calendaria.team/services/finance/billing/messages"
-	"gitlab.calendaria.team/services/rbac/ent"
-	"gitlab.calendaria.team/services/rbac/internal/data"
-	u_nats "gitlab.calendaria.team/services/utils/v2/nats"
+	billing_v1 "github.com/makesalekz/finance/billing/messages"
+	"github.com/makesalekz/rbac/ent"
+	"github.com/makesalekz/rbac/internal/data"
+	u_nats "github.com/makesalekz/utils/v2/nats"
 )
 
 const (

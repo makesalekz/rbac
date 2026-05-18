@@ -3,12 +3,12 @@ package service
 import (
 	"context"
 
-	v1 "gitlab.calendaria.team/services/rbac/api/rbac/v1"
-	"gitlab.calendaria.team/services/rbac/ent"
-	"gitlab.calendaria.team/services/rbac/internal/biz"
-	"gitlab.calendaria.team/services/rbac/internal/data"
-	utils_v1 "gitlab.calendaria.team/services/utils/api/utils/v1"
-	"gitlab.calendaria.team/services/utils/v2/auth"
+	v1 "github.com/makesalekz/rbac/api/rbac/v1"
+	"github.com/makesalekz/rbac/ent"
+	"github.com/makesalekz/rbac/internal/biz"
+	"github.com/makesalekz/rbac/internal/data"
+	utils_v1 "github.com/makesalekz/utils/api/utils/v1"
+	"github.com/makesalekz/utils/v2/auth"
 )
 
 type AssignsService struct {

@@ -5,9 +5,9 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"github.com/jackc/pgtype"
-	"gitlab.calendaria.team/services/rbac/ent"
-	"gitlab.calendaria.team/services/rbac/ent/team"
-	utils_v1 "gitlab.calendaria.team/services/utils/api/utils/v1"
+	"github.com/makesalekz/rbac/ent"
+	"github.com/makesalekz/rbac/ent/team"
+	utils_v1 "github.com/makesalekz/utils/api/utils/v1"
 
 	_ "github.com/lib/pq"
 )

@@ -12,14 +12,14 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
-	"gitlab.calendaria.team/services/rbac/ent/permission"
-	"gitlab.calendaria.team/services/rbac/ent/permissiongroup"
-	"gitlab.calendaria.team/services/rbac/ent/resourceaccess"
-	"gitlab.calendaria.team/services/rbac/ent/resourcetype"
-	"gitlab.calendaria.team/services/rbac/ent/role"
-	"gitlab.calendaria.team/services/rbac/ent/rolepermission"
-	"gitlab.calendaria.team/services/rbac/ent/team"
-	"gitlab.calendaria.team/services/rbac/ent/teamidentityrole"
+	"github.com/makesalekz/rbac/ent/permission"
+	"github.com/makesalekz/rbac/ent/permissiongroup"
+	"github.com/makesalekz/rbac/ent/resourceaccess"
+	"github.com/makesalekz/rbac/ent/resourcetype"
+	"github.com/makesalekz/rbac/ent/role"
+	"github.com/makesalekz/rbac/ent/rolepermission"
+	"github.com/makesalekz/rbac/ent/team"
+	"github.com/makesalekz/rbac/ent/teamidentityrole"
 )
 
 // ent aliases to avoid import conflicts in user's code.

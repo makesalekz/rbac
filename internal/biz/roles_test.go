@@ -4,12 +4,12 @@ import (
 	"context"
 	"testing"
 
-	v1 "gitlab.calendaria.team/services/rbac/api/rbac/v1"
-	"gitlab.calendaria.team/services/rbac/ent"
-	"gitlab.calendaria.team/services/rbac/internal/biz"
-	"gitlab.calendaria.team/services/rbac/internal/data"
-	"gitlab.calendaria.team/services/rbac/internal/data/mock"
-	"gitlab.calendaria.team/services/utils/v2/zap"
+	v1 "github.com/makesalekz/rbac/api/rbac/v1"
+	"github.com/makesalekz/rbac/ent"
+	"github.com/makesalekz/rbac/internal/biz"
+	"github.com/makesalekz/rbac/internal/data"
+	"github.com/makesalekz/rbac/internal/data/mock"
+	"github.com/makesalekz/utils/v2/zap"
 
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/require"

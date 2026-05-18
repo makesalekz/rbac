@@ -10,8 +10,8 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"gitlab.calendaria.team/services/rbac/ent/predicate"
-	"gitlab.calendaria.team/services/rbac/ent/resourceaccess"
+	"github.com/makesalekz/rbac/ent/predicate"
+	"github.com/makesalekz/rbac/ent/resourceaccess"
 )
 
 // ResourceAccessUpdate is the builder for updating ResourceAccess entities.

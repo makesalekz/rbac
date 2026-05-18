@@ -6,7 +6,7 @@ import (
 	"context"
 	"fmt"
 
-	"gitlab.calendaria.team/services/rbac/ent"
+	"github.com/makesalekz/rbac/ent"
 )
 
 // The PermissionFunc type is an adapter to allow the use of ordinary

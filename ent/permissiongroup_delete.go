@@ -8,8 +8,8 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"gitlab.calendaria.team/services/rbac/ent/permissiongroup"
-	"gitlab.calendaria.team/services/rbac/ent/predicate"
+	"github.com/makesalekz/rbac/ent/permissiongroup"
+	"github.com/makesalekz/rbac/ent/predicate"
 )
 
 // PermissionGroupDelete is the builder for deleting a PermissionGroup entity.

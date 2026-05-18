@@ -9,8 +9,8 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
-	"gitlab.calendaria.team/services/rbac/ent/permission"
-	"gitlab.calendaria.team/services/rbac/ent/permissiongroup"
+	"github.com/makesalekz/rbac/ent/permission"
+	"github.com/makesalekz/rbac/ent/permissiongroup"
 )
 
 // Permission is the model entity for the Permission schema.

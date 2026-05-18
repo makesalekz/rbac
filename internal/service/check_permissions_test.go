@@ -5,12 +5,12 @@ import (
 	"strconv"
 	"testing"
 
-	v1 "gitlab.calendaria.team/services/rbac/api/rbac/v1"
-	"gitlab.calendaria.team/services/rbac/ent"
-	"gitlab.calendaria.team/services/rbac/internal/biz"
-	"gitlab.calendaria.team/services/rbac/internal/data"
-	"gitlab.calendaria.team/services/rbac/internal/data/mock"
-	"gitlab.calendaria.team/services/rbac/internal/service"
+	v1 "github.com/makesalekz/rbac/api/rbac/v1"
+	"github.com/makesalekz/rbac/ent"
+	"github.com/makesalekz/rbac/internal/biz"
+	"github.com/makesalekz/rbac/internal/data"
+	"github.com/makesalekz/rbac/internal/data/mock"
+	"github.com/makesalekz/rbac/internal/service"
 
 	"github.com/go-kratos/kratos/v2/metadata"
 	"github.com/golang/mock/gomock"

@@ -8,9 +8,9 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
-	"gitlab.calendaria.team/services/rbac/ent/resourceaccess"
-	"gitlab.calendaria.team/services/rbac/ent/resourcetype"
-	"gitlab.calendaria.team/services/rbac/ent/role"
+	"github.com/makesalekz/rbac/ent/resourceaccess"
+	"github.com/makesalekz/rbac/ent/resourcetype"
+	"github.com/makesalekz/rbac/ent/role"
 )
 
 // ResourceAccess is the model entity for the ResourceAccess schema.

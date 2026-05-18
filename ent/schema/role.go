@@ -6,7 +6,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
-	"gitlab.calendaria.team/services/rbac/ent/mixins"
+	"github.com/makesalekz/rbac/ent/mixins"
 )
 
 // Role holds the schema definition for the Role entity.

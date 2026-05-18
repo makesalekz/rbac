@@ -3,9 +3,9 @@ package biz
 import (
 	"context"
 
-	v1 "gitlab.calendaria.team/services/rbac/api/rbac/v1"
-	"gitlab.calendaria.team/services/rbac/ent"
-	"gitlab.calendaria.team/services/rbac/internal/data"
+	v1 "github.com/makesalekz/rbac/api/rbac/v1"
+	"github.com/makesalekz/rbac/ent"
+	"github.com/makesalekz/rbac/internal/data"
 )
 
 // CheckPermissionsUsecase .

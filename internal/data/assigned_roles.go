@@ -3,9 +3,9 @@ package data
 import (
 	"context"
 
-	"gitlab.calendaria.team/services/rbac/ent"
-	"gitlab.calendaria.team/services/rbac/ent/predicate"
-	"gitlab.calendaria.team/services/rbac/ent/resourceaccess"
+	"github.com/makesalekz/rbac/ent"
+	"github.com/makesalekz/rbac/ent/predicate"
+	"github.com/makesalekz/rbac/ent/resourceaccess"
 
 	_ "github.com/lib/pq"
 )

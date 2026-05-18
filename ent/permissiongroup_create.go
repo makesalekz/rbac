@@ -11,8 +11,8 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"gitlab.calendaria.team/services/rbac/ent/permission"
-	"gitlab.calendaria.team/services/rbac/ent/permissiongroup"
+	"github.com/makesalekz/rbac/ent/permission"
+	"github.com/makesalekz/rbac/ent/permissiongroup"
 )
 
 // PermissionGroupCreate is the builder for creating a PermissionGroup entity.

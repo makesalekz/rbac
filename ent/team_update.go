@@ -12,8 +12,8 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/jackc/pgtype"
-	"gitlab.calendaria.team/services/rbac/ent/predicate"
-	"gitlab.calendaria.team/services/rbac/ent/team"
+	"github.com/makesalekz/rbac/ent/predicate"
+	"github.com/makesalekz/rbac/ent/team"
 )
 
 // TeamUpdate is the builder for updating Team entities.

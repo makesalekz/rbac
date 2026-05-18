@@ -11,8 +11,8 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/dialect/sql/sqljson"
 	"entgo.io/ent/schema/field"
-	"gitlab.calendaria.team/services/rbac/ent/predicate"
-	"gitlab.calendaria.team/services/rbac/ent/rolepermission"
+	"github.com/makesalekz/rbac/ent/predicate"
+	"github.com/makesalekz/rbac/ent/rolepermission"
 )
 
 // RolePermissionUpdate is the builder for updating RolePermission entities.

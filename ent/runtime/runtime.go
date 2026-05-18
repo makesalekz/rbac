@@ -5,15 +5,15 @@ package runtime
 import (
 	"time"
 
-	"gitlab.calendaria.team/services/rbac/ent/permission"
-	"gitlab.calendaria.team/services/rbac/ent/permissiongroup"
-	"gitlab.calendaria.team/services/rbac/ent/resourceaccess"
-	"gitlab.calendaria.team/services/rbac/ent/resourcetype"
-	"gitlab.calendaria.team/services/rbac/ent/role"
-	"gitlab.calendaria.team/services/rbac/ent/rolepermission"
-	"gitlab.calendaria.team/services/rbac/ent/schema"
-	"gitlab.calendaria.team/services/rbac/ent/team"
-	"gitlab.calendaria.team/services/rbac/ent/teamidentityrole"
+	"github.com/makesalekz/rbac/ent/permission"
+	"github.com/makesalekz/rbac/ent/permissiongroup"
+	"github.com/makesalekz/rbac/ent/resourceaccess"
+	"github.com/makesalekz/rbac/ent/resourcetype"
+	"github.com/makesalekz/rbac/ent/role"
+	"github.com/makesalekz/rbac/ent/rolepermission"
+	"github.com/makesalekz/rbac/ent/schema"
+	"github.com/makesalekz/rbac/ent/team"
+	"github.com/makesalekz/rbac/ent/teamidentityrole"
 )
 
 // The init function reads all schema descriptors with runtime code

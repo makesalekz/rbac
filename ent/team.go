@@ -10,7 +10,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/jackc/pgtype"
-	"gitlab.calendaria.team/services/rbac/ent/team"
+	"github.com/makesalekz/rbac/ent/team"
 )
 
 // Team is the model entity for the Team schema.

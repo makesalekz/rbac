@@ -5,17 +5,17 @@ import (
 	"os"
 	"slices"
 
-	"gitlab.calendaria.team/services/rbac/ent"
-	"gitlab.calendaria.team/services/rbac/internal/conf"
-	u_config "gitlab.calendaria.team/services/utils/v1/config"
-	u_jwt "gitlab.calendaria.team/services/utils/v2/jwt"
-	u_nats "gitlab.calendaria.team/services/utils/v2/nats"
-	u_tracing "gitlab.calendaria.team/services/utils/v2/tracing"
+	"github.com/makesalekz/rbac/ent"
+	"github.com/makesalekz/rbac/internal/conf"
+	u_config "github.com/makesalekz/utils/v1/config"
+	u_jwt "github.com/makesalekz/utils/v2/jwt"
+	u_nats "github.com/makesalekz/utils/v2/nats"
+	u_tracing "github.com/makesalekz/utils/v2/tracing"
 
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/google/wire"
 
-	_ "gitlab.calendaria.team/services/rbac/ent/runtime"
+	_ "github.com/makesalekz/rbac/ent/runtime"
 )
 
 // Hidden role ids.

@@ -9,8 +9,8 @@ import (
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
-	ent "gitlab.calendaria.team/services/rbac/ent"
-	data "gitlab.calendaria.team/services/rbac/internal/data"
+	ent "github.com/makesalekz/rbac/ent"
+	data "github.com/makesalekz/rbac/internal/data"
 )
 
 // MockRoleRepo is a mock of RoleRepo interface.

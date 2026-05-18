@@ -11,10 +11,10 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"gitlab.calendaria.team/services/rbac/ent/predicate"
-	"gitlab.calendaria.team/services/rbac/ent/resourceaccess"
-	"gitlab.calendaria.team/services/rbac/ent/resourcetype"
-	"gitlab.calendaria.team/services/rbac/ent/role"
+	"github.com/makesalekz/rbac/ent/predicate"
+	"github.com/makesalekz/rbac/ent/resourceaccess"
+	"github.com/makesalekz/rbac/ent/resourcetype"
+	"github.com/makesalekz/rbac/ent/role"
 )
 
 // ResourceAccessQuery is the builder for querying ResourceAccess entities.

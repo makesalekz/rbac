@@ -1,4 +1,4 @@
-module gitlab.calendaria.team/services/rbac
+module github.com/makesalekz/rbac
 
 go 1.23.1
 
@@ -13,8 +13,8 @@ require (
 	github.com/nats-io/nats.go v1.36.0
 	github.com/prometheus/client_golang v1.18.0
 	github.com/stretchr/testify v1.8.4
-	gitlab.calendaria.team/services/finance/billing v0.0.1-dev.3
-	gitlab.calendaria.team/services/utils v0.3.15
+	github.com/makesalekz/billing v0.0.1-dev.3
+	github.com/makesalekz/utils v0.3.15
 	go.uber.org/automaxprocs v1.6.0
 	google.golang.org/grpc v1.65.0
 	google.golang.org/protobuf v1.34.1
@@ -104,6 +104,6 @@ require (
 )
 
 replace (
-	gitlab.calendaria.team/services/finance/billing => ../billing
-	gitlab.calendaria.team/services/utils => ../utils
+	github.com/makesalekz/billing => ../billing
+	github.com/makesalekz/utils => ../utils
 )

@@ -4,10 +4,10 @@ import (
 	"context"
 	"encoding/json"
 
-	v1 "gitlab.calendaria.team/services/rbac/api/rbac/v1"
-	"gitlab.calendaria.team/services/rbac/ent"
-	"gitlab.calendaria.team/services/rbac/internal/data"
-	u_nats "gitlab.calendaria.team/services/utils/v2/nats"
+	v1 "github.com/makesalekz/rbac/api/rbac/v1"
+	"github.com/makesalekz/rbac/ent"
+	"github.com/makesalekz/rbac/internal/data"
+	u_nats "github.com/makesalekz/utils/v2/nats"
 
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/nats-io/nats.go/jetstream"

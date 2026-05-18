@@ -8,9 +8,9 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
-	"gitlab.calendaria.team/services/rbac/ent/role"
-	"gitlab.calendaria.team/services/rbac/ent/team"
-	"gitlab.calendaria.team/services/rbac/ent/teamidentityrole"
+	"github.com/makesalekz/rbac/ent/role"
+	"github.com/makesalekz/rbac/ent/team"
+	"github.com/makesalekz/rbac/ent/teamidentityrole"
 )
 
 // TeamIdentityRole is the model entity for the TeamIdentityRole schema.

@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/go-kratos/kratos/v2/log"
-	"gitlab.calendaria.team/services/rbac/internal/biz"
+	"github.com/makesalekz/rbac/internal/biz"
 )
 
 type BackgroundServer struct {

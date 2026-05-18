@@ -1,7 +1,7 @@
 package data
 
 import (
-	v1 "gitlab.calendaria.team/services/rbac/api/rbac/v1"
+	v1 "github.com/makesalekz/rbac/api/rbac/v1"
 )
 
 const ResourceTypeTeam = "team"
